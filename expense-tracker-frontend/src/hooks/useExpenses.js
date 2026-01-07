@@ -278,6 +278,7 @@ export function useExpenses() {
       showSuccess(`✅ ${successCount} Änderung(en) synchronisiert`);
       await fetchExpenses();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [syncQueue, showWarning, showSuccess, showError, fetchExpenses]);
 
   // ============================================

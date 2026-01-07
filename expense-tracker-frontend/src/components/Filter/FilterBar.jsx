@@ -9,7 +9,7 @@ import './FilterBar.scss';
  *   - categories: array
  *   - showAdvanced: boolean
  */
-function FilterBar({ onFilterChange = () => {}, categories = [], showAdvanced = false }) {
+function FilterBar({ onFilterChange = () => {}, categories = [] }) {
   const [filters, setFilters] = useState({
     search: '',
     type: 'all', // all, income, expense
