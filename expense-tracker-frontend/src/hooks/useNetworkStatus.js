@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useNetworkStatus = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);

@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../api/client';
 import { cacheManager } from '../api/cacheManager';
-import { retryManager } from '../api/retryManager';
 import { logger } from '../api/logger';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import './APIDebugDashboard.scss'; // Assuming you might want one

@@ -56,12 +56,12 @@ export const setupAutoInvalidation = () => {
       invalidateCacheByPattern(cacheInvalidationPatterns.STATS);
     },
     
-    onTransactionUpdated: (transactionId) => {
+    onTransactionUpdated: (_transactionId) => {
       invalidateCacheByPattern(cacheInvalidationPatterns.TRANSACTIONS);
       invalidateCacheByPattern(cacheInvalidationPatterns.STATS);
     },
     
-    onTransactionDeleted: (transactionId) => {
+    onTransactionDeleted: (_transactionId) => {
       invalidateCacheByPattern(cacheInvalidationPatterns.TRANSACTIONS);
       invalidateCacheByPattern(cacheInvalidationPatterns.STATS);
     },
@@ -94,14 +94,14 @@ export const setupAutoInvalidation = () => {
  */
 export const createCacheInvalidationMiddleware = () => {
   return {
-    beforeRequest: (config) => {
+    beforeRequest: (_config) => {
       // Track the request type
-      return config;
+      return _config;
     },
 
-    afterSuccess: (response, config) => {
+    afterSuccess: (response, _config) => {
       // Auto-invalidate caches based on HTTP method
-      const method = config.method?.toUpperCase();
+      const method = _config.method?.toUpperCase();
       
       if (method !== 'GET') {
         // Extract resource type from endpoint

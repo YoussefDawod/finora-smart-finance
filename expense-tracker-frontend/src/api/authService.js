@@ -77,10 +77,10 @@ class AuthService {
         );
 
         return response.data.accessToken;
-      } catch (error) {
+      } catch (_error) {
         // Refresh failed - clear tokens and redirect to login
         this.logout();
-        throw error;
+        throw _error;
       } finally {
         this.isRefreshing = false;
         this.refreshPromise = null;
@@ -145,7 +145,7 @@ class AuthService {
         try {
             await this.refreshAccessToken();
             return true;
-        } catch(e) {
+        } catch(_e) {
             return false;
         }
       }

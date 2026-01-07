@@ -38,7 +38,7 @@ class RetryManager {
   /**
    * Execute with retry
    */
-  async executeWithRetry(fn, context = {}) {
+  async executeWithRetry(fn) {
     let lastError;
     let lastStatusCode;
 

@@ -104,9 +104,10 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
   // ============================================
   const updateTransaction = useCallback(
     async (id, updates) => {
+      let oldTransaction;
       try {
         // Optimistic Update
-        const oldTransaction = transactions.find((t) => t.id === id);
+        oldTransaction = transactions.find((t) => t.id === id);
         setTransactions((prev) =>
           prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
         );
@@ -134,9 +135,10 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
   // ============================================
   const deleteTransaction = useCallback(
     async (id) => {
+      let oldTransactions;
       try {
         // Optimistic Update
-        const oldTransactions = transactions;
+        oldTransactions = transactions;
         setTransactions((prev) => prev.filter((t) => t.id !== id));
 
         // API Call

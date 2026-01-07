@@ -4,7 +4,6 @@
  */
 
 import { useCallback, useState } from 'react';
-import useToast from './useToast';
 import { handleError } from '../utils/errors';
 
 /**
@@ -20,7 +19,6 @@ import { handleError } from '../utils/errors';
 export const useAPIHook = (apiFunction) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { error: toastError } = useToast();
 
   const execute = useCallback(
     async (...args) => {

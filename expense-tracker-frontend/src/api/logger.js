@@ -57,7 +57,7 @@ class Logger {
     try {
       // Fire and forget - don't await blocking
       apiClient.post('/logs', logEntry, { retry: false }).catch(() => {});
-    } catch (e) {
+    } catch (_e) {
       // Ignore logging errors to prevent loops
     }
   }
