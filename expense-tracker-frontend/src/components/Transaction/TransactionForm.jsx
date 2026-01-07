@@ -13,7 +13,6 @@ function TransactionForm({ initialData = null, onSubmit, onCancel, loading = fal
   const isEditMode = Boolean(initialData);
   
   // Unique IDs für A11y
-  const typeId = useId();
   const amountId = useId();
   const categoryId = useId();
   const descriptionId = useId();

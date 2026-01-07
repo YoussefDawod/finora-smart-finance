@@ -19,8 +19,6 @@ export function ExpenseOperations() {
     deleteMultiple,
     updateExpense,
     syncQueue,
-    filters,
-    updateFilters,
   } = useExpenses();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,8 +31,6 @@ export function ExpenseOperations() {
     category: 'groceries',
     date: new Date().toISOString().split('T')[0],
   });
-
-  const editingExpense = expenses.find((exp) => exp.id === editingId);
 
   // ============================================
   // FORM HANDLING

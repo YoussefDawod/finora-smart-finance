@@ -105,7 +105,7 @@ export const createCacheInvalidationMiddleware = () => {
       
       if (method !== 'GET') {
         // Extract resource type from endpoint
-        const resourceType = config.url?.split('/')[0];
+        const resourceType = _config.url?.split('/')[0];
         if (resourceType) {
           invalidateCacheByPattern(resourceType);
         }
@@ -114,7 +114,7 @@ export const createCacheInvalidationMiddleware = () => {
       return response;
     },
 
-    afterError: (error, config) => {
+    afterError: (error, _config) => {
       // Don't invalidate on errors
       return error;
     },

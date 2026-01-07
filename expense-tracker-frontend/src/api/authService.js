@@ -145,7 +145,7 @@ class AuthService {
         try {
             await this.refreshAccessToken();
             return true;
-        } catch(_e) {
+        } catch {
             return false;
         }
       }
