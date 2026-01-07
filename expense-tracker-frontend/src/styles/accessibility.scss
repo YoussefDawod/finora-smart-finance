@@ -1,0 +1,330 @@
+// src/styles/accessibility.scss
+// ============================================
+// WCAG 2.1 Level AA Compliance
+// ============================================
+
+@import './variables.scss';
+
+// ============================================
+// FOCUS VISIBLE STYLES
+// ============================================
+:focus-visible {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+  border-radius: $border-radius-sm;
+}
+
+// Remove default focus outline
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Für Buttons
+.btn:focus-visible,
+.touch-btn:focus-visible {
+  box-shadow: 0 0 0 4px $color-primary-bg;
+  outline: 2px solid $color-primary;
+}
+
+// Für Input Fields
+.form-input:focus-visible,
+.search-input__field:focus-visible,
+.filter-bar__select:focus-visible {
+  border-color: $color-primary;
+  box-shadow: 0 0 0 3px $color-primary-bg;
+  outline: none;
+}
+
+// Für Links
+a:focus-visible {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+  border-radius: $border-radius-sm;
+}
+
+// ============================================
+// SKIP TO CONTENT LINK
+// ============================================
+.skip-to-content {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background-color: $color-primary;
+  color: white;
+  padding: $space-md $space-lg;
+  text-decoration: none;
+  z-index: 9999;
+  border-radius: 0 0 $border-radius-md 0;
+  font-weight: $font-weight-medium;
+  transition: top $transition-fast;
+
+  &:focus {
+    top: 0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: -4px;
+  }
+}
+
+// ============================================
+// SCREEN READER ONLY
+// ============================================
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Screen Reader Only (but focusable)
+.sr-only-focusable:active,
+.sr-only-focusable:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+// ============================================
+// REQUIRED FIELD INDICATOR
+// ============================================
+.required {
+  color: $color-error;
+  margin-left: $space-xs;
+  font-weight: $font-weight-bold;
+}
+
+.form-label .required::before {
+  content: '*';
+}
+
+// ============================================
+// ERROR MESSAGES
+// ============================================
+.form-error {
+  display: block;
+  color: $color-error;
+  font-size: $font-size-sm;
+  margin-top: $space-xs;
+  font-weight: $font-weight-medium;
+  
+  &::before {
+    content: '⚠️ ';
+  }
+}
+
+.form-input--error {
+  border-color: $color-error;
+  background-color: $color-error-bg;
+
+  &:focus {
+    box-shadow: 0 0 0 3px $color-error-bg;
+  }
+}
+
+// ============================================
+// LIVE REGIONS
+// ============================================
+.live-region {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+[aria-live="polite"],
+[aria-live="assertive"] {
+  // Screen readers will announce these
+  position: relative;
+}
+
+// ============================================
+// DISABLED STATES
+// ============================================
+[disabled],
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// ============================================
+// HIGH CONTRAST MODE
+// ============================================
+@media (prefers-contrast: high) {
+  :focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+
+  .btn {
+    border: 2px solid currentColor;
+  }
+
+  .form-input {
+    border-width: 2px;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .modal-backdrop,
+  .modal,
+  .toast {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// ============================================
+// KEYBOARD NAVIGATION HELPERS
+// ============================================
+.keyboard-user :focus-visible {
+  outline: 3px solid $color-primary;
+  outline-offset: 3px;
+}
+
+// Hide focus for mouse users
+.mouse-user :focus {
+  outline: none;
+}
+
+// ============================================
+// ARIA LABELS & DESCRIPTIONS
+// ============================================
+[aria-label] {
+  // Ensure screen readers can access
+  position: relative;
+}
+
+[aria-describedby] {
+  // Connected to description element
+  position: relative;
+}
+
+[role="status"],
+[role="alert"] {
+  // Announced by screen readers
+  position: relative;
+}
+
+// ============================================
+// MOBILE ACCESSIBILITY
+// ============================================
+@include on-mobile {
+  // Larger touch targets
+  .btn,
+  .touch-btn,
+  button {
+    min-height: $touch-target-min;
+    min-width: $touch-target-min;
+  }
+
+  // Larger focus indicators
+  :focus-visible {
+    outline-width: 3px;
+  }
+}
+
+// ============================================
+// FOCUS TRAP (for Modals)
+// ============================================
+.focus-trap {
+  // Container that traps focus
+  outline: none;
+}
+
+// ============================================
+// LOADING STATES (A11y)
+// ============================================
+[aria-busy="true"] {
+  cursor: wait;
+}
+
+.loading-spinner[role="status"] {
+  // Screen reader will announce loading
+  position: relative;
+}
+
+// ============================================
+// INTERACTIVE ELEMENT STATES
+// ============================================
+[aria-expanded="true"],
+[aria-pressed="true"],
+[aria-selected="true"] {
+  // Visual indication for state
+  position: relative;
+}
+
+// ============================================
+// ERROR SUMMARY
+// ============================================
+.error-summary {
+  background-color: $color-error-bg;
+  border: 2px solid $color-error;
+  border-radius: $border-radius-md;
+  padding: $space-lg;
+  margin-bottom: $space-lg;
+
+  h2 {
+    color: $color-error;
+    margin-bottom: $space-md;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    margin-bottom: $space-sm;
+
+    a {
+      color: $color-error;
+      text-decoration: underline;
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+// ============================================
+// VISUALLY HIDDEN (but accessible)
+// ============================================
+.visually-hidden {
+  @extend .sr-only;
+}
+
+// ============================================
+// FOCUS WITHIN
+// ============================================
+.form-group:focus-within {
+  .form-label {
+    color: $color-primary;
+  }
+}

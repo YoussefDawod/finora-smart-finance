@@ -1,0 +1,282 @@
+// src/styles/variables.scss
+// ============================================
+// COLOR PALETTE
+// ============================================
+$color-primary: #208090; // Teal
+$color-primary-light: #32b8c6;
+$color-primary-dark: #1a7473;
+$color-primary-bg: rgba(32, 128, 144, 0.08);
+
+$color-success: #22c55e;
+$color-success-bg: rgba(34, 197, 94, 0.08);
+
+$color-error: #ef4444;
+$color-error-bg: rgba(239, 68, 68, 0.08);
+
+$color-info: $color-primary;
+
+$color-warning: #f59e0b;
+$color-warning-bg: rgba(245, 158, 11, 0.08);
+
+$color-gray-50: #f9fafb;
+$color-gray-100: #f3f4f6;
+$color-gray-200: #e5e7eb;
+$color-gray-300: #d1d5db;
+$color-gray-400: #9ca3af;
+$color-gray-500: #6b7280;
+$color-gray-600: #4b5563;
+$color-gray-700: #374151;
+$color-gray-800: #1f2937;
+$color-gray-900: #111827;
+
+$color-text: $color-gray-900;
+$color-text-secondary: $color-gray-600;
+$color-text-light: $color-gray-400;
+
+$color-bg: #ffffff;
+$color-bg-secondary: $color-gray-50;
+$color-border: $color-gray-200;
+
+// ============================================
+// RESPONSIVE BREAKPOINTS
+// ============================================
+$bp-xs: 320px;  // Mobile Portrait
+$bp-sm: 480px;  // Mobile Landscape
+$bp-md: 768px;  // Tablet
+$bp-lg: 1024px; // Desktop Small
+$bp-xl: 1280px; // Desktop
+$bp-2xl: 1536px; // Desktop Large
+
+// ============================================
+// TOUCH-FRIENDLY SPACING
+// ============================================
+$touch-target-min: 44px; // Apple HIG
+$touch-padding-sm: 12px;
+$touch-padding-md: 16px;
+$touch-padding-lg: 20px;
+
+// ============================================
+// MEDIA QUERY MIXINS
+// ============================================
+
+// Mobile First Approach
+@mixin on-mobile {
+  // Default (Mobile First)
+  @content;
+}
+
+@mixin on-sm {
+  @media (min-width: $bp-sm) {
+    @content;
+  }
+}
+
+@mixin on-md {
+  @media (min-width: $bp-md) {
+    @content;
+  }
+}
+
+@mixin on-lg {
+  @media (min-width: $bp-lg) {
+    @content;
+  }
+}
+
+@mixin on-xl {
+  @media (min-width: $bp-xl) {
+    @content;
+  }
+}
+
+@mixin on-2xl {
+  @media (min-width: $bp-2xl) {
+    @content;
+  }
+}
+
+// Landscape Mode
+@mixin landscape {
+  @media (orientation: landscape) {
+    @content;
+  }
+}
+
+// Portrait Mode
+@mixin portrait {
+  @media (orientation: portrait) {
+    @content;
+  }
+}
+
+// Touch Devices
+@mixin touch-device {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+// Hover Devices
+@mixin hover-device {
+  @media (hover: hover) and (pointer: fine) {
+    @content;
+  }
+}
+
+// High DPI Displays (Retina)
+@mixin high-dpi {
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    @content;
+  }
+}
+
+// Dark Mode
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// Reduced Motion
+@mixin prefers-reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// ============================================
+// SPACING
+// ============================================
+$space-xs: 4px;
+$space-sm: 8px;
+$space-md: 12px;
+$space-lg: 16px;
+$space-xl: 24px;
+$space-2xl: 32px;
+$space-3xl: 48px;
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+$font-family-mono: 'Monaco', 'Courier New', monospace;
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 32px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-loose: 1.75;
+
+// ============================================
+// BORDER & RADIUS
+// ============================================
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-full: 9999px;
+
+$border-width: 1px;
+
+// ============================================
+// SHADOWS
+// ============================================
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+$shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.15);
+
+// ============================================
+// TRANSITIONS
+// ============================================
+$transition-fast: 150ms ease-in-out;
+$transition-normal: 250ms ease-in-out;
+$transition-slow: 350ms ease-in-out;
+
+// ============================================
+// BREAKPOINTS (Mobile-First)
+// ============================================
+$bp-sm: 480px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+
+// ============================================
+// MIXINS
+// ============================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-truncate-multi($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == 'sm' {
+    @media (min-width: $bp-sm) {
+      @content;
+    }
+  } @else if $breakpoint == 'md' {
+    @media (min-width: $bp-md) {
+      @content;
+    }
+  } @else if $breakpoint == 'lg' {
+    @media (min-width: $bp-lg) {
+      @content;
+    }
+  } @else if $breakpoint == 'xl' {
+    @media (min-width: $bp-xl) {
+      @content;
+    }
+  }
+}
+
+@mixin button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+
+  &:focus {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
+
+@mixin focus-ring {
+  outline: 2px solid $color-primary;
+  outline-offset: 2px;
+}

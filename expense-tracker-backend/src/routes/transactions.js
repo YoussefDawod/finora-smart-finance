@@ -1,0 +1,510 @@
+// routes/transactions.js
+const express = require('express');
+const router = express.Router();
+const Transaction = require('../models/Transaction');
+
+const ALLOWED_CATEGORIES = [
+  'Lebensmittel',
+  'Transport',
+  'Unterhaltung',
+  'Miete',
+  'Versicherung',
+  'Gesundheit',
+  'Bildung',
+  'Sonstiges',
+  'Gehalt',
+  'Freelance',
+  'Investitionen',
+  'Geschenk',
+];
+
+// ============================================
+// GET /api/transactions/stats/summary
+// Zusammenfassung: Total Income, Total Expense, Balance
+// WICHTIG: Muss VOR /:id Route stehen!
+// ============================================
+router.get('/stats/summary', async (req, res) => {
+  try {
+    const { startDate = '', endDate = '' } = req.query;
+
+    const filter = {};
+
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        if (!isNaN(start.getTime())) {
+          filter.date.$gte = start;
+        }
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        if (!isNaN(end.getTime())) {
+          filter.date.$lte = end;
+        }
+      }
+    }
+
+    // Aggregation für schnellere Berechnung
+    const stats = await Transaction.aggregate([
+      { $match: filter },
+      {
+        $group: {
+          _id: null,
+          totalIncome: {
+            $sum: { $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0] },
+          },
+          totalExpense: {
+            $sum: { $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0] },
+          },
+          transactionCount: { $sum: 1 },
+        },
+      },
+    ]);
+
+    const result = stats[0] || {
+      totalIncome: 0,
+      totalExpense: 0,
+      transactionCount: 0,
+    };
+
+    const balance = result.totalIncome - result.totalExpense;
+
+    res.json({
+      success: true,
+      data: {
+        totalIncome: parseFloat(result.totalIncome.toFixed(2)),
+        totalExpense: parseFloat(result.totalExpense.toFixed(2)),
+        balance: parseFloat(balance.toFixed(2)),
+        transactionCount: result.transactionCount,
+      },
+    });
+  } catch (error) {
+    console.error('GET /api/transactions/stats/summary Error:', error);
+    res.status(500).json({
+      error: 'Fehler beim Berechnen der Zusammenfassung',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// POST /api/transactions - Neue Transaktion
+// ============================================
+router.post('/', async (req, res) => {
+  try {
+    const { amount, category, description, type, date, tags, notes } = req.body;
+
+    // Validierung
+    if (!amount || amount <= 0) {
+      return res.status(400).json({
+        error: 'Amount ist erforderlich und muss > 0 sein',
+        code: 'INVALID_AMOUNT',
+      });
+    }
+
+    if (!category || !ALLOWED_CATEGORIES.includes(category)) {
+      return res.status(400).json({
+        error: 'Ungültige oder fehlende Category',
+        code: 'INVALID_CATEGORY',
+      });
+    }
+
+    if (!description || description.trim().length < 3) {
+      return res.status(400).json({
+        error: 'Description ist erforderlich (min. 3 Zeichen)',
+        code: 'INVALID_DESCRIPTION',
+      });
+    }
+
+    if (!type || !['income', 'expense'].includes(type)) {
+      return res.status(400).json({
+        error: 'Type muss "income" oder "expense" sein',
+        code: 'INVALID_TYPE',
+      });
+    }
+
+    if (!date) {
+      return res.status(400).json({
+        error: 'Date ist erforderlich (Format: YYYY-MM-DD)',
+        code: 'INVALID_DATE',
+      });
+    }
+
+    // Datum validieren
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return res.status(400).json({
+        error: 'Ungültiges Datum-Format. Nutze YYYY-MM-DD',
+        code: 'INVALID_DATE_FORMAT',
+      });
+    }
+
+    // Transaktion erstellen
+    const transaction = await Transaction.create({
+      amount: parseFloat(amount),
+      category,
+      description: description.trim(),
+      type,
+      date: parsedDate,
+      tags: tags || [],
+      notes: notes || null,
+    });
+
+    // Response mit 201 Created
+    res.status(201).json({
+      success: true,
+      data: transaction.toJSON(),
+      message: 'Transaktion erstellt',
+    });
+  } catch (error) {
+    console.error('POST /api/transactions Error:', error);
+
+    // Mongoose Validierungsfehler
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        error: 'Validierungsfehler',
+        details: messages,
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    // Generischer Fehler
+    res.status(500).json({
+      error: 'Fehler beim Erstellen der Transaktion',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// GET /api/transactions - Alle Transaktionen
+// Query Params:
+//   - page: Seite (default: 1)
+//   - limit: Items pro Seite (default: 10, max: 100)
+//   - type: 'income' | 'expense' | ''
+//   - category: Kategorie (z.B. 'Lebensmittel')
+//   - startDate: Von Datum (YYYY-MM-DD)
+//   - endDate: Bis Datum (YYYY-MM-DD)
+//   - sort: 'date' (default) | 'amount'
+//   - order: 'asc' | 'desc' (default)
+// ============================================
+router.get('/', async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      type = '',
+      category = '',
+      startDate = '',
+      endDate = '',
+      sort = 'date',
+      order = 'desc',
+    } = req.query;
+
+    // Validierung
+    const pageNum = Math.max(1, parseInt(page) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 10));
+    const skip = (pageNum - 1) * limitNum;
+
+    // Filter bauen
+    const filter = {};
+
+    if (type && ['income', 'expense'].includes(type)) {
+      filter.type = type;
+    }
+
+    if (category) {
+      filter.category = category;
+    }
+
+    // Datums-Range
+    if (startDate || endDate) {
+      filter.date = {};
+      if (startDate) {
+        const start = new Date(startDate);
+        if (!isNaN(start.getTime())) {
+          filter.date.$gte = start;
+        }
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // Ende des Tages
+        if (!isNaN(end.getTime())) {
+          filter.date.$lte = end;
+        }
+      }
+    }
+
+    // Sortierung
+    const sortObj = {};
+    if (sort === 'amount') {
+      sortObj.amount = order === 'asc' ? 1 : -1;
+    } else {
+      sortObj.date = order === 'asc' ? 1 : -1;
+    }
+
+    // Query ausführen
+    const total = await Transaction.countDocuments(filter);
+    const transactions = await Transaction.find(filter)
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limitNum);
+
+    // Response
+    res.json({
+      success: true,
+      data: transactions.map((t) => t.toJSON()),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum),
+      },
+    });
+  } catch (error) {
+    console.error('GET /api/transactions Error:', error);
+    res.status(500).json({
+      error: 'Fehler beim Abrufen der Transaktionen',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// GET /api/transactions/:id - Eine Transaktion
+// ============================================
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // MongoDB ObjectId validieren
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: 'Ungültige Transaktion ID',
+        code: 'INVALID_ID',
+      });
+    }
+
+    const transaction = await Transaction.findById(id);
+
+    if (!transaction) {
+      return res.status(404).json({
+        error: 'Transaktion nicht gefunden',
+        code: 'NOT_FOUND',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction.toJSON(),
+    });
+  } catch (error) {
+    console.error('GET /api/transactions/:id Error:', error);
+    res.status(500).json({
+      error: 'Fehler beim Abrufen der Transaktion',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// PUT /api/transactions/:id - Transaktion updaten
+// Body: { amount?, category?, description?, type?, date?, tags?, notes? }
+// ============================================
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, category, description, type, date, tags, notes } = req.body;
+
+    // ID validieren
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: 'Ungültige Transaktion ID',
+        code: 'INVALID_ID',
+      });
+    }
+
+    // Transaktion finden
+    const transaction = await Transaction.findById(id);
+    if (!transaction) {
+      return res.status(404).json({
+        error: 'Transaktion nicht gefunden',
+        code: 'NOT_FOUND',
+      });
+    }
+
+    // Update-Felder validieren und setzen
+    if (amount !== undefined) {
+      if (amount <= 0) {
+        return res.status(400).json({
+          error: 'Amount muss > 0 sein',
+          code: 'INVALID_AMOUNT',
+        });
+      }
+      transaction.amount = parseFloat(amount);
+    }
+
+    if (category !== undefined) {
+      if (!ALLOWED_CATEGORIES.includes(category)) {
+        return res.status(400).json({
+          error: 'Ungültige Category',
+          code: 'INVALID_CATEGORY',
+        });
+      }
+      transaction.category = category;
+    }
+
+    if (description !== undefined) {
+      if (description.trim().length < 3) {
+        return res.status(400).json({
+          error: 'Description muss mindestens 3 Zeichen lang sein',
+          code: 'INVALID_DESCRIPTION',
+        });
+      }
+      transaction.description = description.trim();
+    }
+
+    if (type !== undefined) {
+      if (!['income', 'expense'].includes(type)) {
+        return res.status(400).json({
+          error: 'Type muss "income" oder "expense" sein',
+          code: 'INVALID_TYPE',
+        });
+      }
+      transaction.type = type;
+    }
+
+    if (date !== undefined) {
+      const parsedDate = new Date(date);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({
+          error: 'Ungültiges Datum-Format. Nutze YYYY-MM-DD',
+          code: 'INVALID_DATE_FORMAT',
+        });
+      }
+      transaction.date = parsedDate;
+    }
+
+    if (tags !== undefined) {
+      transaction.tags = Array.isArray(tags) ? tags : [];
+    }
+
+    if (notes !== undefined) {
+      transaction.notes = notes || null;
+    }
+
+    // Speichern
+    await transaction.save();
+
+    res.json({
+      success: true,
+      data: transaction.toJSON(),
+      message: 'Transaktion aktualisiert',
+    });
+  } catch (error) {
+    console.error('PUT /api/transactions/:id Error:', error);
+
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        error: 'Validierungsfehler',
+        details: messages,
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    res.status(500).json({
+      error: 'Fehler beim Aktualisieren der Transaktion',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// DELETE /api/transactions/:id - Transaktion löschen
+// ============================================
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // ID validieren
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: 'Ungültige Transaktion ID',
+        code: 'INVALID_ID',
+      });
+    }
+
+    // Transaktion finden und löschen
+    const transaction = await Transaction.findByIdAndDelete(id);
+
+    if (!transaction) {
+      return res.status(404).json({
+        error: 'Transaktion nicht gefunden',
+        code: 'NOT_FOUND',
+      });
+    }
+
+    // 204 No Content oder 200 mit Message
+    res.json({
+      success: true,
+      message: 'Transaktion gelöscht',
+      data: {
+        id: transaction._id,
+        deletedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('DELETE /api/transactions/:id Error:', error);
+    res.status(500).json({
+      error: 'Fehler beim Löschen der Transaktion',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+// ============================================
+// DELETE /api/transactions - Alle Transaktionen löschen (DANGER!)
+// Query Param: confirm=true (Sicherheit)
+// ============================================
+router.delete('/', async (req, res) => {
+  try {
+    const { confirm } = req.query;
+
+    if (confirm !== 'true') {
+      return res.status(400).json({
+        error: 'Sicherheitsbestätigung erforderlich: ?confirm=true',
+        code: 'MISSING_CONFIRMATION',
+      });
+    }
+
+    const result = await Transaction.deleteMany({});
+
+    res.json({
+      success: true,
+      message: 'Alle Transaktionen gelöscht',
+      data: {
+        deletedCount: result.deletedCount,
+        deletedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error('DELETE /api/transactions Error:', error);
+    res.status(500).json({
+      error: 'Fehler beim Löschen aller Transaktionen',
+      code: 'SERVER_ERROR',
+      message: error.message,
+    });
+  }
+});
+
+module.exports = router;
