@@ -17,4 +17,27 @@
 // export { default as Header } from './layout/Header';
 // export { default as Footer } from './layout/Footer';
 
+// Connection & Sync Components
+export { ConnectionStatus, OfflineBanner, SyncStatus } from './connection';
+
+// Skeleton Components
+export {
+  SkeletonBox,
+  SkeletonText,
+  SkeletonCircle,
+  SkeletonButton,
+  SkeletonCard,
+  SkeletonTable,
+  SkeletonList,
+  SkeletonForm,
+} from './Skeleton';
+
+// Loading Components
+export {
+  LoadingContainer,
+  ProgressiveLoad,
+  LoadingFallback,
+  ErrorFallback,
+} from './Loading';
+
 // Die Komponenten werden in den nächsten Schritten implementiert

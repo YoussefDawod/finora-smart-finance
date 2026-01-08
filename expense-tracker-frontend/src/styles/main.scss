@@ -7,6 +7,14 @@
 @use './animations';
 @use './layout';
 @use './accessibility';
+@import './animations.css';
+@import './animation-utilities.css';
+@import './transition-utilities.css';
+@import './keyframes-advanced.css';
+@import './component-transitions.css';
+@import './transition-overrides.css';
+@import './dnd-animations.css';
+@import './gestures.css';
 
 // ============================================
 // CSS RESET & BASE

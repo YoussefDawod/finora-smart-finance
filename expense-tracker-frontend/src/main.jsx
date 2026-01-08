@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
+import { MotionProvider } from './context/MotionContext';
 import { setupAuthInterceptor } from './api/authInterceptor';
 import App from './App.jsx';
 import { initPerformanceMonitoring, generatePerformanceReport } from './utils/performance.js';
@@ -27,10 +28,12 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <ToastProvider maxToasts={5}>
-        <App />
-      </ToastProvider>
-    </AuthProvider>
+    <MotionProvider>
+      <AuthProvider>
+        <ToastProvider maxToasts={5}>
+          <App />
+        </ToastProvider>
+      </AuthProvider>
+    </MotionProvider>
   </StrictMode>
 );
