@@ -17,10 +17,10 @@ export const ENDPOINTS = {
 
   // Statistics
   STATS: {
-    SUMMARY: '/stats/summary',
-    BY_CATEGORY: '/stats/by-category',
-    BY_TYPE: '/stats/by-type',
-    MONTHLY: '/stats/monthly',
+    SUMMARY: '/transactions/stats/summary',
+    BY_CATEGORY: '/transactions/stats/by-category',
+    BY_TYPE: '/transactions/stats/by-type',
+    MONTHLY: '/transactions/stats/monthly',
   },
 
   // Categories
@@ -33,5 +33,16 @@ export const ENDPOINTS = {
     MONTHLY: '/reports/monthly',
     YEARLY: '/reports/yearly',
     EXPORT: (format) => `/reports/export?format=${format}`,
+  },
+
+  // Users
+  USERS: {
+    ME: '/users/me',
+    CHANGE_PASSWORD: '/users/change-password',
+    CHANGE_EMAIL: '/users/change-email',
+    VERIFY_EMAIL_CHANGE: '/users/verify-email-change',
+    PREFERENCES: '/users/preferences',
+    EXPORT_DATA: '/users/export-data',
+    DELETE_TRANSACTIONS: '/users/transactions',
   },
 };

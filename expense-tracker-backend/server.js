@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const crypto = require('crypto');
 
 // Config & Utils
 const config = require('./src/config/env');
@@ -12,6 +13,8 @@ const errorHandler = require('./src/middleware/errorHandler');
 // Routes
 const transactionRoutes = require('./src/routes/transactions');
 const authRoutes = require('./src/routes/auth');
+const userRoutes = require('./src/routes/users');
+const User = require('./src/models/User');
 
 const app = express();
 
@@ -63,6 +66,13 @@ const connectDB = async (retries = 5) => {
 connectDB();
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    app: 'Expense Tracker API',
+    message: 'Frontend läuft separat. Bitte öffne http://localhost:3000/ oder den Vite-Port (z.B. 3001).',
+    docs: '/api/health',
+  });
+});
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -76,6 +86,29 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+
+// Direct verification via backend link; redirects to frontend after success/failure
+app.get('/verify-email', async (req, res) => {
+  const { token } = req.query;
+  const frontend = config.frontendUrl || 'http://localhost:3001';
+  if (!token) return res.redirect(`${frontend}/verify-email?status=missing`);
+
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({ verificationToken: tokenHash, verificationExpires: { $gt: new Date() } });
+    if (!user) return res.redirect(`${frontend}/verify-email?status=invalid`);
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationExpires = undefined;
+    await user.save();
+
+    return res.redirect(`${frontend}/verify-email?status=done`);
+  } catch (err) {
+    return res.redirect(`${frontend}/verify-email?status=error`);
+  }
+});
 
 // 404 Handler
 app.use((req, res) => {

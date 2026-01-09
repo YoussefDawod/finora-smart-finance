@@ -120,6 +120,101 @@ Alle Transaktionen löschen (⚠️ GEFÄHRLICH!)
 
 **Response:** 200 OK | 400 Bad Request
 
+## 👤 User Routes
+
+### GET /api/users/me
+Aktuellen User abrufen (Auth erforderlich)
+
+**Response:** `{ success: true, data: user }`
+
+### PUT /api/users/me
+User-Profil aktualisieren
+
+**Body:**
+```json
+{
+  "name": "John",
+  "lastName": "Doe",
+  "phone": "+49 123 456789",
+  "avatar": "https://..."
+}
+```
+
+### POST /api/users/change-password
+Passwort ändern (Auth erforderlich)
+
+**Body:**
+```json
+{
+  "currentPassword": "old...",
+  "newPassword": "secure...",
+  "confirmPassword": "secure..."
+}
+```
+
+**Validierungen:**
+- Aktuelles Passwort korrekt
+- Neues Passwort ≠ altes Passwort
+- Passwort-Anforderungen: 8+ Zeichen, Groß-, Kleinbuchstaben, Ziffern
+- Passwörter stimmen überein
+
+### POST /api/users/change-email
+Email ändern (mit Verifizierungs-Token)
+
+**Body:**
+```json
+{
+  "newEmail": "new@example.com",
+  "password": "current..."
+}
+```
+
+**Response:** Email-Bestätigung an neue Adresse
+
+### GET /api/users/verify-email-change?token=...
+Email-Change verifizieren (Token aus Email-Link)
+
+**Aktion:**
+- Token validieren
+- Email aktualisieren
+- Tokens entfernen
+
+### PUT /api/users/preferences
+Benutzer-Einstellungen aktualisieren
+
+**Body:**
+```json
+{
+  "theme": "dark",
+  "currency": "EUR",
+  "timezone": "Europe/Berlin",
+  "language": "de",
+  "emailNotifications": true
+}
+```
+
+**Enum-Werte:**
+- theme: `light | dark | system`
+- currency: `USD | EUR | GBP | CHF | JPY`
+- language: `en | de | fr`
+
+### DELETE /api/users/me
+Account permanent löschen (Cascade: alle Transaktionen werden gelöscht)
+
+**Body:** `{ password: "current..." }`
+
+### POST /api/users/export-data
+Alle User-Daten exportieren (JSON-Download)
+
+**Response:** JSON-Datei mit User-Info + alle Transaktionen
+
+### DELETE /api/users/transactions
+Alle Transaktionen löschen (Account bleibt erhalten)
+
+**Body:** `{ password: "current..." }`
+
+**Response:** `{ success: true, data: { deletedCount } }`
+
 ## 🏁 Development & Linting
 
 ```bash
@@ -170,6 +265,8 @@ pm2 logs expense-tracker-api
 - [x] MongoDB Atlas Cluster verbunden
 - [x] Transaction Model (Mongoose Schema)
 - [x] CRUD Endpoints (POST, GET, PUT, DELETE)
+- [x] User Model mit erweiterten Feldern
+- [x] User Routes (Profile, Settings, Email, Data Export)
 - [x] Fehlerbehandlung & Logging
 - [x] Environment Configuration
 - [x] Production Deployment Setup
