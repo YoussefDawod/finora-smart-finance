@@ -1,9 +1,9 @@
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContextDef';
 
 /**
  * Hook to access authentication state and methods
- * @returns {import('../context/AuthContext').AuthContextValue} Auth context value
+ * @returns {import('../context/AuthContextDef').AuthContextValue} Auth context value
  */
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -12,3 +12,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

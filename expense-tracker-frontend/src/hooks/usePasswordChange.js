@@ -147,6 +147,25 @@ const usePasswordChange = () => {
   }, []);
 
   /**
+   * Reset form to initial state
+   */
+  const resetForm = useCallback(() => {
+    setForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    });
+    setPasswordStrength(PasswordStrengthLevels.WEAK);
+    setError(null);
+    setSuccess(false);
+    setShowPassword({
+      current: false,
+      new: false,
+      confirm: false,
+    });
+  }, []);
+
+  /**
    * Handle password change submission
    * @param {Event} e
    */
@@ -216,25 +235,6 @@ const usePasswordChange = () => {
     },
     [form, validateCurrentPassword, validateNewPassword, validatePasswordMatch, showSuccess, showError, resetForm]
   );
-
-  /**
-   * Reset form to initial state
-   */
-  const resetForm = useCallback(() => {
-    setForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-    setPasswordStrength(PasswordStrengthLevels.WEAK);
-    setError(null);
-    setSuccess(false);
-    setShowPassword({
-      current: false,
-      new: false,
-      confirm: false,
-    });
-  }, []);
 
   /**
    * Clear error message

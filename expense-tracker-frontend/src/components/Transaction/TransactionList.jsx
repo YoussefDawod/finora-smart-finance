@@ -1,6 +1,8 @@
 import React from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import TransactionCard from './TransactionCard';
 import SkeletonCard from '../Skeleton/SkeletonCard';
+import { listVariants } from '../../config/animationVariants';
 import './TransactionList.scss';
 
 /**
@@ -24,6 +26,8 @@ function TransactionList({
   onPageChange = () => {},
 }) {
   const { page = 1, pages = 1 } = pagination;
+  const reduceMotion = useReducedMotion();
+  const variants = listVariants(reduceMotion);
 
   if (error) {
     return (
@@ -51,22 +55,30 @@ function TransactionList({
   }
 
   return (
-    <div className="transaction-list">
-      <div className="transaction-list__items">
-        {transactions.map((transaction) => (
-          <TransactionCard
-            key={transaction.id}
-            id={transaction.id}
-            amount={transaction.amount}
-            category={transaction.category}
-            description={transaction.description}
-            date={transaction.date}
-            type={transaction.type}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
-      </div>
+    <motion.div className="transaction-list" initial="hidden" animate="show" variants={variants.container}>
+      <motion.div className="transaction-list__items" variants={variants.container}>
+        <AnimatePresence>
+          {transactions.map((transaction) => (
+            <motion.div
+              key={transaction.id}
+              variants={variants.item}
+              layout={!reduceMotion}
+              exit="exit"
+            >
+              <TransactionCard
+                id={transaction.id}
+                amount={transaction.amount}
+                category={transaction.category}
+                description={transaction.description}
+                date={transaction.date}
+                type={transaction.type}
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
 
       {pages > 1 && (
         <div className="transaction-list__pagination">
@@ -91,7 +103,7 @@ function TransactionList({
           </button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

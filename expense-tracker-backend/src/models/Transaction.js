@@ -1,5 +1,6 @@
 // models/Transaction.js
 const mongoose = require('mongoose');
+const User = require('./User');
 
 const transactionSchema = new mongoose.Schema(
   {
@@ -65,11 +66,11 @@ const transactionSchema = new mongoose.Schema(
       maxlength: [500, 'Notes darf 500 Zeichen nicht überschreiten'],
     },
 
-    // Nur für zukünftige Features
+    // User Reference für User-Isolation
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      // Wird später required
+      required: [true, 'userId ist erforderlich'],
     },
   },
   {
@@ -80,6 +81,10 @@ const transactionSchema = new mongoose.Schema(
 );
 
 // Indexes für Performance
+transactionSchema.index({ userId: 1 }); // USER-ISOLATION: Schnelle User-Queries
+transactionSchema.index({ userId: 1, date: -1 }); // User + Datum (häufig)
+transactionSchema.index({ userId: 1, type: 1, date: -1 }); // User + Type + Datum
+transactionSchema.index({ userId: 1, category: 1, date: -1 }); // User + Category + Datum
 transactionSchema.index({ date: -1 }); // Neueste zuerst
 transactionSchema.index({ category: 1, date: -1 }); // Category + Datum
 transactionSchema.index({ type: 1, date: -1 }); // Type + Datum
@@ -89,9 +94,14 @@ transactionSchema.virtual('formattedAmount').get(function () {
   return `€${this.amount.toFixed(2)}`;
 });
 
-// Pre-save Hook: Validierung (async/await statt next())
-transactionSchema.pre('save', async function () {
-  // Weitere Geschäftslogik hier
+// Pre-validate Hook: Sicherstellen, dass userId auf existierenden User zeigt
+transactionSchema.pre('validate', async function () {
+  if (!this.isModified('userId')) return;
+
+  const userExists = await User.exists({ _id: this.userId });
+  if (!userExists) {
+    throw new Error('userId verweist auf keinen bestehenden User');
+  }
 });
 
 // Statics: Hilfsmethoden
@@ -111,6 +121,7 @@ transactionSchema.statics.getIncome = function () {
 transactionSchema.methods.toJSON = function () {
   return {
     id: this._id,
+    userId: this.userId,
     amount: this.amount,
     formattedAmount: this.formattedAmount,
     category: this.category,

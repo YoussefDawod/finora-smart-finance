@@ -20,6 +20,9 @@
 // Connection & Sync Components
 export { ConnectionStatus, OfflineBanner, SyncStatus } from './connection';
 
+// Dialog Components
+export { default as AccountDeletionDialog } from './AccountDeletionDialog';
+
 // Skeleton Components
 export {
   SkeletonBox,

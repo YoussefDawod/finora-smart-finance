@@ -2,7 +2,11 @@
 const express = require('express');
 const router = express.Router();
 const Transaction = require('../models/Transaction');
+const authMiddleware = require('../middleware/authMiddleware');
 
+// ============================================
+// ALLOWED CATEGORIES
+// ============================================
 const ALLOWED_CATEGORIES = [
   'Lebensmittel',
   'Transport',
@@ -19,15 +23,24 @@ const ALLOWED_CATEGORIES = [
 ];
 
 // ============================================
+// AUTHENTICATION MIDDLEWARE
+// Alle Routes benötigen gültige JWT-Token
+// Extrahiert userId aus req.user.id
+// ============================================
+router.use(authMiddleware);
+
+// ============================================
 // GET /api/transactions/stats/summary
 // Zusammenfassung: Total Income, Total Expense, Balance
 // WICHTIG: Muss VOR /:id Route stehen!
+// FILTER: Nur eigene Transaktionen (userId)
 // ============================================
 router.get('/stats/summary', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert von authMiddleware
     const { startDate = '', endDate = '' } = req.query;
 
-    const filter = {};
+    const filter = { userId }; // USER-ISOLATION: Nur eigene Transaktionen
 
     if (startDate || endDate) {
       filter.date = {};
@@ -92,9 +105,11 @@ router.get('/stats/summary', async (req, res) => {
 
 // ============================================
 // POST /api/transactions - Neue Transaktion
+// userId wird AUTOMATISCH aus JWT gesetzt
 // ============================================
 router.post('/', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const { amount, category, description, type, date, tags, notes } = req.body;
 
     // Validierung
@@ -142,8 +157,9 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Transaktion erstellen
+    // Transaktion erstellen mit automatischem userId
     const transaction = await Transaction.create({
+      userId, // USER-ISOLATION: Automatisch aus JWT gesetzt
       amount: parseFloat(amount),
       category,
       description: description.trim(),
@@ -182,7 +198,7 @@ router.post('/', async (req, res) => {
 });
 
 // ============================================
-// GET /api/transactions - Alle Transaktionen
+// GET /api/transactions - Alle Transaktionen (nur eigene)
 // Query Params:
 //   - page: Seite (default: 1)
 //   - limit: Items pro Seite (default: 10, max: 100)
@@ -192,9 +208,11 @@ router.post('/', async (req, res) => {
 //   - endDate: Bis Datum (YYYY-MM-DD)
 //   - sort: 'date' (default) | 'amount'
 //   - order: 'asc' | 'desc' (default)
+// FILTER: { userId: req.user.id }
 // ============================================
 router.get('/', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const {
       page = 1,
       limit = 10,
@@ -211,8 +229,8 @@ router.get('/', async (req, res) => {
     const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 10));
     const skip = (pageNum - 1) * limitNum;
 
-    // Filter bauen
-    const filter = {};
+    // Filter bauen - IMPORTANT: userId IMMER mitfiltern
+    const filter = { userId }; // USER-ISOLATION
 
     if (type && ['income', 'expense'].includes(type)) {
       filter.type = type;
@@ -278,9 +296,12 @@ router.get('/', async (req, res) => {
 
 // ============================================
 // GET /api/transactions/:id - Eine Transaktion
+// OWNER-CHECK: Prüfe ob transaction.userId === req.user.id
+// 403 Forbidden wenn nicht Owner
 // ============================================
 router.get('/:id', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const { id } = req.params;
 
     // MongoDB ObjectId validieren
@@ -300,6 +321,14 @@ router.get('/:id', async (req, res) => {
       });
     }
 
+    // OWNER-CHECK: Nur der Owner kann die Transaktion sehen
+    if (transaction.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        error: 'Sie haben keine Berechtigung, diese Transaktion zu sehen',
+        code: 'FORBIDDEN',
+      });
+    }
+
     res.json({
       success: true,
       data: transaction.toJSON(),
@@ -316,10 +345,13 @@ router.get('/:id', async (req, res) => {
 
 // ============================================
 // PUT /api/transactions/:id - Transaktion updaten
+// OWNER-CHECK: Prüfe ob transaction.userId === req.user.id
+// 403 Forbidden wenn nicht Owner
 // Body: { amount?, category?, description?, type?, date?, tags?, notes? }
 // ============================================
 router.put('/:id', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const { id } = req.params;
     const { amount, category, description, type, date, tags, notes } = req.body;
 
@@ -337,6 +369,14 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({
         error: 'Transaktion nicht gefunden',
         code: 'NOT_FOUND',
+      });
+    }
+
+    // OWNER-CHECK: Nur der Owner kann die Transaktion updaten
+    if (transaction.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        error: 'Sie haben keine Berechtigung, diese Transaktion zu ändern',
+        code: 'FORBIDDEN',
       });
     }
 
@@ -430,9 +470,12 @@ router.put('/:id', async (req, res) => {
 
 // ============================================
 // DELETE /api/transactions/:id - Transaktion löschen
+// OWNER-CHECK: Prüfe ob transaction.userId === req.user.id
+// 403 Forbidden wenn nicht Owner
 // ============================================
 router.delete('/:id', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const { id } = req.params;
 
     // ID validieren
@@ -443,8 +486,8 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    // Transaktion finden und löschen
-    const transaction = await Transaction.findByIdAndDelete(id);
+    // Transaktion finden
+    const transaction = await Transaction.findById(id);
 
     if (!transaction) {
       return res.status(404).json({
@@ -453,7 +496,17 @@ router.delete('/:id', async (req, res) => {
       });
     }
 
-    // 204 No Content oder 200 mit Message
+    // OWNER-CHECK: Nur der Owner kann die Transaktion löschen
+    if (transaction.userId.toString() !== userId.toString()) {
+      return res.status(403).json({
+        error: 'Sie haben keine Berechtigung, diese Transaktion zu löschen',
+        code: 'FORBIDDEN',
+      });
+    }
+
+    // Transaktion löschen
+    await Transaction.findByIdAndDelete(id);
+
     res.json({
       success: true,
       message: 'Transaktion gelöscht',
@@ -473,11 +526,13 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ============================================
-// DELETE /api/transactions - Alle Transaktionen löschen (DANGER!)
+// DELETE /api/transactions - Alle Transaktionen löschen (BULK)
+// Nur EIGENE Transaktionen löschen (userId-Filter)
 // Query Param: confirm=true (Sicherheit)
 // ============================================
 router.delete('/', async (req, res) => {
   try {
+    const userId = req.user._id; // Aus JWT extrahiert
     const { confirm } = req.query;
 
     if (confirm !== 'true') {
@@ -487,11 +542,12 @@ router.delete('/', async (req, res) => {
       });
     }
 
-    const result = await Transaction.deleteMany({});
+    // USER-ISOLATION: Nur eigene Transaktionen löschen
+    const result = await Transaction.deleteMany({ userId });
 
     res.json({
       success: true,
-      message: 'Alle Transaktionen gelöscht',
+      message: 'Alle eigenen Transaktionen gelöscht',
       data: {
         deletedCount: result.deletedCount,
         deletedAt: new Date().toISOString(),

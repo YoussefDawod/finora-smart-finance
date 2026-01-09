@@ -233,9 +233,10 @@ class APIClient {
   /**
    * DELETE Request
    */
-  async delete(endpoint, options = {}) {
+  async delete(endpoint, body = undefined, options = {}) {
     try {
       return await this.request('DELETE', endpoint, {
+        body,
         ...options,
       });
     } catch (error) {

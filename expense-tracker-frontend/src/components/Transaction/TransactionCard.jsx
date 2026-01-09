@@ -1,4 +1,8 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import IconLibrary from '../IconLibrary';
+import { getCategoryIconName } from '../../utils';
+import { cardVariants } from '../../config/animationVariants';
 import './TransactionCard.scss';
 
 /**
@@ -14,19 +18,9 @@ import './TransactionCard.scss';
  *   - onDelete: (id) => void
  */
 function TransactionCard({ id, amount, category, description, date, type, onEdit, onDelete }) {
-  const categoryEmojis = {
-    Lebensmittel: '🛒',
-    Transport: '🚗',
-    Unterhaltung: '🎬',
-    Miete: '🏠',
-    Versicherung: '🛡️',
-    Gesundheit: '⚕️',
-    Bildung: '📚',
-    Sonstiges: '📌',
-    Gehalt: '💼',
-  };
-
-  const emoji = categoryEmojis[category] || '💰';
+  const reduceMotion = useReducedMotion();
+  const variants = cardVariants(reduceMotion);
+  const iconName = getCategoryIconName(category, type);
   const isExpense = type === 'expense';
   const amountClass = isExpense ? 'transaction-card__amount--expense' : 'transaction-card__amount--income';
 
@@ -43,9 +37,20 @@ function TransactionCard({ id, amount, category, description, date, type, onEdit
   };
 
   return (
-    <div className="transaction-card animate-fade-in">
+    <motion.article
+      className="transaction-card"
+      variants={variants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      whileHover="hover"
+      whileTap="tap"
+    >
       <div className="transaction-card__left">
-        <div className="transaction-card__avatar">{emoji}</div>
+        <div className="transaction-card__avatar glass shadow-elevated">
+          <IconLibrary name={iconName} size={22} aria-hidden />
+          <span className="sr-only">{category}</span>
+        </div>
         <div className="transaction-card__info">
           <h3 className="transaction-card__description">{description}</h3>
           <p className="transaction-card__category">{category}</p>
@@ -65,7 +70,7 @@ function TransactionCard({ id, amount, category, description, date, type, onEdit
           title="Bearbeiten"
           aria-label={`Bearbeiten: ${description}`}
         >
-          ✏️
+          <IconLibrary name="pencil-square" size={18} />
         </button>
         <button
           className="transaction-card__btn transaction-card__btn--delete"
@@ -73,10 +78,10 @@ function TransactionCard({ id, amount, category, description, date, type, onEdit
           title="Löschen"
           aria-label={`Löschen: ${description}`}
         >
-          🗑️
+          <IconLibrary name="trash" size={18} />
         </button>
       </div>
-    </div>
+    </motion.article>
   );
 }
 

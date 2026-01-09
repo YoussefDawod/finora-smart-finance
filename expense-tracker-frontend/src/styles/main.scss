@@ -2,11 +2,11 @@
 // ============================================
 // IMPORTS
 // ============================================
-@use 'sass:color';
 @use './variables' as *;
 @use './animations';
 @use './layout';
 @use './accessibility';
+@use './effects';
 @import './animations.css';
 @import './animation-utilities.css';
 @import './transition-utilities.css';
@@ -162,7 +162,7 @@ a {
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: color.adjust($color-success, $lightness: -10%);
+      background-color: $color-success-strong;
     }
   }
 
@@ -171,7 +171,7 @@ a {
     color: white;
 
     &:hover:not(:disabled) {
-      background-color: color.adjust($color-error, $lightness: -10%);
+      background-color: $color-error-strong;
     }
   }
 

@@ -83,9 +83,9 @@ UserSchema.index({ emailChangeToken: 1 }, { sparse: true });
 UserSchema.index({ lastLogin: 1 });
 
 // Pre-save Hook: Hash password wenn neu oder geändert
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {
   if (!this.isModified('passwordHash')) {
-    return next();
+    return;
   }
 
   try {
@@ -93,30 +93,28 @@ UserSchema.pre('save', async function (next) {
     this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
     this.lastPasswordChange = new Date();
     this.passwordChangedAt = new Date();
-    return next();
   } catch (error) {
-    return next(error);
+    throw error;
   }
 });
 
 // Pre-save Hook: Validate preferences structure
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', async function () {
   if (this.preferences) {
     const validCurrencies = ['USD', 'EUR', 'GBP', 'CHF', 'JPY'];
     const validThemes = ['light', 'dark', 'system'];
     const validLanguages = ['en', 'de', 'fr'];
 
     if (this.preferences.currency && !validCurrencies.includes(this.preferences.currency)) {
-      return next(new Error('Ungültige Währung'));
+      throw new Error('Ungültige Währung');
     }
     if (this.preferences.theme && !validThemes.includes(this.preferences.theme)) {
-      return next(new Error('Ungültiges Theme'));
+      throw new Error('Ungültiges Theme');
     }
     if (this.preferences.language && !validLanguages.includes(this.preferences.language)) {
-      return next(new Error('Ungültige Sprache'));
+      throw new Error('Ungültige Sprache');
     }
   }
-  next();
 });
 
 // toJSON: Sensitive fields entfernen
@@ -167,8 +165,7 @@ UserSchema.methods.recordLogin = function (meta = {}) {
 
 // Legacy methods (kept for backward compatibility with existing code)
 UserSchema.methods.setPassword = async function (password) {
-  const salt = await bcrypt.genSalt(10);
-  this.passwordHash = await bcrypt.hash(password, salt);
+  this.passwordHash = password; // Store plaintext, will be hashed by pre-save hook
   this.lastPasswordChange = new Date();
   this.passwordChangedAt = new Date();
 };

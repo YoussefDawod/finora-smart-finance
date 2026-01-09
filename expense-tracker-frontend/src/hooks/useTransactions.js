@@ -18,6 +18,12 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
     total: 0,
     pages: 0,
   });
+  const [stats, setStats] = useState({
+    totalIncome: 0,
+    totalExpense: 0,
+    balance: 0,
+    transactionCount: 0,
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { success: showSuccess, error: showError } = useToast();
@@ -55,7 +61,13 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
         return result;
       } catch (err) {
         setError(err.message);
-        showError('Fehler beim Laden der Transaktionen');
+        if (err.status === 403) {
+          showError("You don't have permission");
+        } else if (err.status === 401) {
+          showError('Bitte neu einloggen');
+        } else {
+          showError('Fehler beim Laden der Transaktionen');
+        }
         console.error('Fetch transactions error:', err);
         throw err;
       } finally {
@@ -65,6 +77,24 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
     },
     [initialPage, initialLimit, showError]
   );
+
+  // ============================================
+  // FETCH STATS FROM BACKEND
+  // ============================================
+  const fetchStats = useCallback(async () => {
+    try {
+      const result = await transactionService.getStatistics();
+      setStats({
+        totalIncome: result.totalIncome || 0,
+        totalExpense: result.totalExpense || 0,
+        balance: result.balance || 0,
+        transactionCount: result.transactionCount || 0,
+      });
+    } catch (err) {
+      console.error('Fetch stats error:', err);
+      // Don't show error toast - stats are secondary
+    }
+  }, []);
 
   // ============================================
   // CREATE TRANSACTION
@@ -88,15 +118,24 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
         setTransactions((prev) => prev.map((t) => (t.id === tempId ? newTransaction : t)));
         showSuccess('Transaktion erstellt');
 
+        // Reload stats from backend
+        await fetchStats();
+
         return newTransaction;
       } catch (err) {
         // Rollback bei Fehler
         setTransactions((prev) => prev.filter((t) => !t.id.startsWith('temp-')));
-        showError('Fehler beim Erstellen der Transaktion');
+        if (err.status === 403) {
+          showError("You don't have permission");
+        } else if (err.status === 401) {
+          showError('Bitte neu einloggen');
+        } else {
+          showError('Fehler beim Erstellen der Transaktion');
+        }
         throw err;
       }
     },
-    [showSuccess, showError]
+    [showSuccess, showError, fetchStats]
   );
 
   // ============================================
@@ -117,17 +156,26 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
         setTransactions((prev) => prev.map((t) => (t.id === id ? updated : t)));
         showSuccess('Transaktion aktualisiert');
 
+        // Reload stats from backend
+        await fetchStats();
+
         return updated;
       } catch (err) {
         // Rollback bei Fehler
         if (oldTransaction) {
           setTransactions((prev) => prev.map((t) => (t.id === id ? oldTransaction : t)));
         }
-        showError('Fehler beim Aktualisieren der Transaktion');
+        if (err.status === 403) {
+          showError("You don't have permission");
+        } else if (err.status === 401) {
+          showError('Bitte neu einloggen');
+        } else {
+          showError('Fehler beim Aktualisieren der Transaktion');
+        }
         throw err;
       }
     },
-    [transactions, showSuccess, showError]
+    [transactions, showSuccess, showError, fetchStats]
   );
 
   // ============================================
@@ -145,15 +193,24 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
         await transactionService.deleteTransaction(id);
         showSuccess('Transaktion gelöscht');
 
+        // Reload stats from backend
+        await fetchStats();
+
         return true;
       } catch (err) {
         // Rollback bei Fehler
         setTransactions(oldTransactions);
-        showError('Fehler beim Löschen der Transaktion');
+        if (err.status === 403) {
+          showError("You don't have permission");
+        } else if (err.status === 401) {
+          showError('Bitte neu einloggen');
+        } else {
+          showError('Fehler beim Löschen der Transaktion');
+        }
         throw err;
       }
     },
-    [transactions, showSuccess, showError]
+    [transactions, showSuccess, showError, fetchStats]
   );
 
   // ============================================
@@ -161,7 +218,8 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
   // ============================================
   useEffect(() => {
     fetchTransactions(initialPage, initialLimit);
-  }, [initialPage, initialLimit, fetchTransactions]);
+    fetchStats();
+  }, [initialPage, initialLimit, fetchTransactions, fetchStats]);
 
   // ============================================
   // CALCULATE STATS
@@ -242,9 +300,11 @@ function useTransactions(initialPage = 1, initialLimit = 10) {
     pagination,
     loading,
     error,
+    stats,
 
     // Methods
     fetchTransactions,
+    fetchStats,
     createTransaction,
     updateTransaction,
     deleteTransaction,

@@ -2,10 +2,11 @@ import React from 'react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ToastProvider } from './context/ToastContext';
-import { AuthProvider } from './context/AuthContext';
 import { MotionProvider } from './context/MotionContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { setupAuthInterceptor } from './api/authInterceptor';
-import App from './App.jsx';
+import '@fontsource/plus-jakarta-sans/index.css';
+import AppRoutes from './AppRoutes';
 import { initPerformanceMonitoring, generatePerformanceReport } from './utils/performance.js';
 
 // Init APIs
@@ -28,12 +29,13 @@ if (import.meta.env.DEV) {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <MotionProvider>
-      <AuthProvider>
+    <ThemeProvider>
+      <MotionProvider>
         <ToastProvider maxToasts={5}>
-          <App />
+          <AppRoutes />
         </ToastProvider>
-      </AuthProvider>
-    </MotionProvider>
+      </MotionProvider>
+    </ThemeProvider>
   </StrictMode>
 );
+

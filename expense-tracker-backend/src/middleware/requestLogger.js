@@ -32,7 +32,9 @@ const requestLoggerMiddleware = (req, res, next) => {
         requestId,
         status,
         duration: `${duration}ms`,
-        error: data.error,
+        error: data?.error,
+        code: data?.code,
+        message: data?.message,
       });
     } else {
       logger.info(`${req.method} ${req.path} - ${status}`, {
@@ -42,7 +44,10 @@ const requestLoggerMiddleware = (req, res, next) => {
       });
     }
 
-    return originalJson.call(this, data);
+    // Call original with proper binding
+    const result = originalJson.call(this, data);
+    console.log('[LOGGER]  Response sent for', req.method, req.path, 'with status', status);
+    return result;
   };
 
   next();

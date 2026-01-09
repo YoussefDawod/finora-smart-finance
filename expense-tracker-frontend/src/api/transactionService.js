@@ -6,6 +6,28 @@
 import { apiClient } from './client';
 import { ENDPOINTS } from './endpoints';
 import { ValidationError } from '../utils/errors';
+import { authService } from './authService';
+
+const handleApiError = (error) => {
+  const status = error?.response?.status;
+
+  if (status === 401) {
+    // Session abgelaufen → Logout und Redirect
+    authService.logout();
+    window.location.assign('/login');
+    const err = new Error('Unauthorized');
+    err.status = 401;
+    throw err;
+  }
+
+  if (status === 403) {
+    const err = new Error("You don't have permission");
+    err.status = 403;
+    throw err;
+  }
+
+  throw error;
+};
 
 export const transactionService = {
   /**
@@ -25,17 +47,21 @@ export const transactionService = {
       sortOrder: filters.sortOrder || 'desc',
     };
 
-    const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.LIST, queryParams);
+    try {
+      const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.LIST, queryParams);
 
-    return {
-      data: response.data || [],
-      pagination: response.pagination || {
-        page: 1,
-        limit: 10,
-        total: 0,
-        pages: 0,
-      },
-    };
+      return {
+        data: response.data || [],
+        pagination: response.pagination || {
+          page: 1,
+          limit: 10,
+          total: 0,
+          pages: 0,
+        },
+      };
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -48,8 +74,12 @@ export const transactionService = {
       throw new ValidationError('Transaction ID is required', { id: 'Required' });
     }
 
-    const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.GET(id));
-    return response.data;
+    try {
+      const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.GET(id));
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -63,15 +93,19 @@ export const transactionService = {
       throw new ValidationError('Validation failed', errors);
     }
 
-    const response = await apiClient.post(ENDPOINTS.TRANSACTIONS.CREATE, {
-      type: transactionData.type || 'expense',
-      description: transactionData.description.trim(),
-      amount: parseFloat(transactionData.amount),
-      category: transactionData.category,
-      date: transactionData.date || new Date().toISOString().split('T')[0],
-    });
+    try {
+      const response = await apiClient.post(ENDPOINTS.TRANSACTIONS.CREATE, {
+        type: transactionData.type || 'expense',
+        description: transactionData.description.trim(),
+        amount: parseFloat(transactionData.amount),
+        category: transactionData.category,
+        date: transactionData.date || new Date().toISOString().split('T')[0],
+      });
 
-    return response.data;
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -97,8 +131,12 @@ export const transactionService = {
       throw new ValidationError('No fields to update', {});
     }
 
-    const response = await apiClient.put(ENDPOINTS.TRANSACTIONS.UPDATE(id), updateData);
-    return response.data;
+    try {
+      const response = await apiClient.put(ENDPOINTS.TRANSACTIONS.UPDATE(id), updateData);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -111,8 +149,12 @@ export const transactionService = {
       throw new ValidationError('Transaction ID is required', { id: 'Required' });
     }
 
-    const response = await apiClient.delete(ENDPOINTS.TRANSACTIONS.DELETE(id));
-    return response;
+    try {
+      const response = await apiClient.delete(ENDPOINTS.TRANSACTIONS.DELETE(id));
+      return response;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -120,8 +162,12 @@ export const transactionService = {
    * @returns {Promise<Object>} Statistics-Objekt
    */
   async getStatistics() {
-    const response = await apiClient.get(ENDPOINTS.STATS.SUMMARY);
-    return response.data;
+    try {
+      const response = await apiClient.get(ENDPOINTS.STATS.SUMMARY);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -129,8 +175,12 @@ export const transactionService = {
    * @returns {Promise<Object>} Category-Statistics
    */
   async getStatsByCategory() {
-    const response = await apiClient.get(ENDPOINTS.STATS.BY_CATEGORY);
-    return response.data;
+    try {
+      const response = await apiClient.get(ENDPOINTS.STATS.BY_CATEGORY);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**
@@ -138,8 +188,12 @@ export const transactionService = {
    * @returns {Promise<Object>} Type-Statistics
    */
   async getStatsByType() {
-    const response = await apiClient.get(ENDPOINTS.STATS.BY_TYPE);
-    return response.data;
+    try {
+      const response = await apiClient.get(ENDPOINTS.STATS.BY_TYPE);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   },
 
   /**

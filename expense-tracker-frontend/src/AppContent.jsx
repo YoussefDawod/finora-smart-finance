@@ -9,8 +9,11 @@ import ToastContainer from './components/Toast/ToastContainer';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import { NetworkStatusBanner } from './components/NetworkStatusBanner/NetworkStatusBanner';
 import APIDebugDashboard from './components/APIDebugDashboard';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import UserMenu from './components/UserMenu';
 import './styles/main.scss';
 import './styles/layout.scss';
+import './styles/auth.scss';
 
 /**
  * App - Hauptkomponente der Expense Tracker Anwendung
@@ -23,6 +26,7 @@ function AppContent() {
     pagination,
     loading,
     error,
+    stats,
     createTransaction,
     updateTransaction,
     deleteTransaction,
@@ -67,8 +71,6 @@ function AppContent() {
     );
   }, [filteredTransactions]);
 
-  // Alle Statistiken
-  const stats = calculateStats();
   const handleFilterChange = useCallback((newFilters) => {
     setFilters(newFilters);
   }, []);
@@ -148,9 +150,15 @@ function AppContent() {
       <ToastContainer />
 
       <header className="app__header" role="banner">
-        <div className="container">
-          <h1>💰 Expense Tracker</h1>
-          <p className="text-muted">Verwalte deine Ausgaben einfach und übersichtlich</p>
+        <div className="container app__header-grid">
+          <div className="app__branding">
+            <h1>Expense Tracker</h1>
+            <p className="text-muted">Verwalte deine Ausgaben einfach und übersichtlich</p>
+          </div>
+          <div className="app__header-actions">
+            <ThemeSwitcher compact />
+            <UserMenu />
+          </div>
         </div>
       </header>
 
@@ -161,13 +169,13 @@ function AppContent() {
             <div className="stat-card">
               <p className="stat-card__label">Einnahmen gesamt</p>
               <p className="stat-card__value">
-                €{formatAmount(stats.income)}
+                €{formatAmount(stats.totalIncome)}
               </p>
             </div>
             <div className="stat-card">
               <p className="stat-card__label">Ausgaben gesamt</p>
               <p className="stat-card__value">
-                €{formatAmount(stats.expense)}
+                €{formatAmount(stats.totalExpense)}
               </p>
             </div>
             <div className="stat-card">
@@ -259,8 +267,8 @@ function AppContent() {
   );
 }
 
-// Wrapper mit ErrorBoundary
-function App() {
+// Wrapped mit ErrorBoundary
+function AppContentWithErrorBoundary() {
   return (
     <ErrorBoundary>
       <AppContent />
@@ -268,4 +276,5 @@ function App() {
   );
 }
 
-export default App;
+export default AppContentWithErrorBoundary;
+

@@ -1,0 +1,82 @@
+// src/styles/effects.scss
+// Premium surface effects, glassmorphism, gradients
+@use './variables' as *;
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-elevated {
+  box-shadow: var(--shadow-lg);
+}
+
+.shadow-floating {
+  box-shadow: var(--shadow-xl);
+}
+
+.shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.gradient-subtle {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(18, 182, 237, 0.14));
+}
+
+.gradient-accent {
+  background: radial-gradient(circle at 20% 20%, rgba(18, 182, 237, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 10%, rgba(244, 63, 94, 0.12), transparent 28%),
+    linear-gradient(135deg, rgba(79, 70, 229, 0.16), rgba(12, 156, 204, 0.18));
+}
+
+.hover-lift {
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.blur-focus {
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.glow-focus {
+  box-shadow: 0 0 0 3px var(--color-info-bg), 0 10px 30px rgba(79, 70, 229, 0.18);
+}
+
+.glass-badge {
+  padding: $space-xs $space-sm;
+  border-radius: $border-radius-full;
+  background: color-mix(in srgb, var(--color-primary-600) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary-600) 35%, transparent);
+  color: var(--color-text);
+}
+
+.hover-outline {
+  position: relative;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:hover::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: $border-radius-lg;
+    background: color-mix(in srgb, var(--color-primary-600) 12%, transparent);
+    z-index: -1;
+    filter: blur(10px);
+  }
+}

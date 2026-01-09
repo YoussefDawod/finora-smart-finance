@@ -133,3 +133,5 @@ export const getCategoryDetails = (category, type) => {
   const categories = type === 'income' ? CATEGORIES.income : CATEGORIES.expense;
   return categories.find((c) => c.value === category) || null;
 };
+
+export * from './iconMapping';

@@ -4,12 +4,14 @@
   background-color: $color-bg;
   border: $border-width solid $color-border;
   border-radius: $border-radius-lg;
-  overflow: hidden;
+  padding: $space-md;
+  box-shadow: $shadow-md;
 }
 
 .transaction-list__items {
   display: flex;
   flex-direction: column;
+  gap: $space-sm;
 }
 
 .transaction-list__error,

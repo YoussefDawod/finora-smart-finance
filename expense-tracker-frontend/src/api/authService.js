@@ -1,13 +1,25 @@
 // src/api/authService.js
 import { apiClient } from './client';
-// Use ENDPOINTS directly or hardcode if not available in current context. 
-// Assuming integration with apiClient mostly.
+import * as tokenManager from '../utils/tokenManager';
 
 const AUTH_ENDPOINTS = {
-    LOGIN: '/auth/login',
-    REFRESH: '/auth/refresh',
-    PROFILE: '/auth/profile',
-    LOGOUT: '/auth/logout'
+  REGISTER: '/auth/register',
+  LOGIN: '/auth/login',
+  REFRESH: '/auth/refresh',
+  ME: '/auth/me',
+  UPDATE_PROFILE: '/auth/me',
+  DELETE_ACCOUNT: '/auth/me',
+  LOGOUT: '/auth/logout',
+  VERIFY_EMAIL: '/auth/verify-email',
+  FORGOT_PASSWORD: '/auth/forgot-password',
+  RESET_PASSWORD: '/auth/reset-password',
+  RESEND_VERIFICATION: '/auth/resend-verification',
+  CHANGE_EMAIL: '/auth/change-email',
+  VERIFY_EMAIL_CHANGE: '/auth/verify-email-change',
+  CHANGE_PASSWORD: '/auth/change-password',
+  UPDATE_PREFERENCES: '/auth/preferences',
+  EXPORT_DATA: '/auth/export-data',
+  DELETE_TRANSACTIONS: '/auth/transactions',
 };
 
 class AuthService {
@@ -17,40 +29,85 @@ class AuthService {
     this.tokenExpiry = null;
     this.isRefreshing = false;
     this.refreshPromise = null;
+    this.user = null;
+    
+    // Set up refresh callback for tokenManager
+    tokenManager.setRefreshCallback(() => this.refreshAccessToken());
   }
 
   /**
-   * Store tokens
+   * Store tokens using tokenManager
    */
   setTokens(accessToken, refreshToken, expiresIn = 3600) {
     this.accessToken = accessToken;
     this.refreshToken = refreshToken;
     this.tokenExpiry = Date.now() + expiresIn * 1000;
 
-    // Store in secure location (NOT localStorage for sensitive tokens in real robust apps, but here session storage as requested)
-    sessionStorage.setItem('accessToken', accessToken);
-    sessionStorage.setItem('refreshToken', refreshToken);
-    sessionStorage.setItem('tokenExpiry', this.tokenExpiry);
-
+    // Use tokenManager for storage
+    tokenManager.saveTokens(accessToken, refreshToken, expiresIn);
+    
+    // Also store user in localStorage
     apiClient.setAuthToken(accessToken);
   }
 
   /**
-   * Get access token
+   * Store user data
    */
-  getAccessToken() {
-    if (this.isTokenExpired()) {
-      return null;
+  setUser(user) {
+    this.user = user;
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
     }
-    return this.accessToken;
   }
 
   /**
-   * Check if token is expired
+   * Get stored user
    */
-  isTokenExpired(buffer = 60000) { // 1 minute buffer
-    if (!this.tokenExpiry) return true;
-    return Date.now() > this.tokenExpiry - buffer;
+  getUser() {
+    if (this.user) return this.user;
+    
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      try {
+        this.user = JSON.parse(stored);
+        return this.user;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get access token using tokenManager
+   */
+  getAccessToken() {
+    const token = tokenManager.getAccessToken();
+    if (token) {
+      this.accessToken = token;
+    }
+    return token;
+  }
+
+  /**
+   * Get refresh token using tokenManager
+   */
+  getRefreshToken() {
+    const token = tokenManager.getRefreshToken();
+    if (token) {
+      this.refreshToken = token;
+    }
+    return token;
+  }
+
+  /**
+   * Check if token is expired using tokenManager
+   */
+  isTokenExpired(buffer = 60000) {
+    // Use tokenManager's validation
+    return !tokenManager.isTokenValid();
   }
 
   /**
@@ -66,8 +123,15 @@ class AuthService {
 
     this.refreshPromise = (async () => {
       try {
+        // Get refresh token from tokenManager
+        const refreshToken = tokenManager.getRefreshToken();
+        
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+        
         const response = await apiClient.post(AUTH_ENDPOINTS.REFRESH, {
-          refreshToken: this.refreshToken,
+          refreshToken,
         });
 
         this.setTokens(
@@ -99,59 +163,150 @@ class AuthService {
       password,
     });
 
-    this.setTokens(
-      response.data.accessToken,
-      response.data.refreshToken,
-      response.data.expiresIn
-    );
-
+    this.setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresIn);
+    this.setUser(response.data.user);
     return response.data.user;
   }
 
   /**
-   * Logout
+   * Fetch current user profile
+   */
+  async fetchUserProfile() {
+    const response = await apiClient.get(AUTH_ENDPOINTS.ME);
+    this.setUser(response.data.user);
+    return response.data.user;
+  }
+
+  /**
+   * Logout - clear all tokens using tokenManager
    */
   logout() {
     this.accessToken = null;
     this.refreshToken = null;
     this.tokenExpiry = null;
+    this.user = null;
 
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
-    sessionStorage.removeItem('tokenExpiry');
+    // Use tokenManager to clear tokens
+    tokenManager.clearTokens();
+    
+    // Also clear user data
+    localStorage.removeItem('user');
 
     apiClient.setAuthToken(null);
   }
 
   /**
-   * Load stored tokens on app init
+   * Load stored tokens on app init using tokenManager
    */
   async loadStoredTokens() {
-    const accessToken = sessionStorage.getItem('accessToken');
-    const refreshToken = sessionStorage.getItem('refreshToken');
-    const tokenExpiry = sessionStorage.getItem('tokenExpiry');
+    // Initialize tokenManager (sets up auto-refresh)
+    const hasValidTokens = tokenManager.initializeTokenManager();
+    
+    if (hasValidTokens) {
+      // Load tokens into service
+      this.accessToken = tokenManager.getAccessToken();
+      this.refreshToken = tokenManager.getRefreshToken();
+      this.tokenExpiry = tokenManager.getTokenExpiry();
 
-    if (accessToken && refreshToken && tokenExpiry) {
-      this.accessToken = accessToken;
-      this.refreshToken = refreshToken;
-      this.tokenExpiry = parseInt(tokenExpiry);
+      // Load user from localStorage
+      this.getUser();
 
-      // Check if token is still valid
-      if (!this.isTokenExpired()) {
-        apiClient.setAuthToken(accessToken);
+      // Set auth token in API client
+      if (this.accessToken) {
+        apiClient.setAuthToken(this.accessToken);
         return true;
-      } else if (this.refreshToken) {
-        // Try to refresh
-        try {
-            await this.refreshAccessToken();
-            return true;
-        } catch {
-            return false;
-        }
+      }
+    }
+    
+    // Try to refresh if we have a refresh token but access token is expired
+    const refreshToken = tokenManager.getRefreshToken();
+    if (refreshToken) {
+      try {
+        await this.refreshAccessToken();
+        return true;
+      } catch {
+        return false;
       }
     }
 
     return false;
+  }
+
+  async register({ email, password, name }) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.REGISTER, { email, password, name });
+    return response.data; // Return both user and verificationLink
+  }
+
+  async me() {
+    const response = await apiClient.get(AUTH_ENDPOINTS.ME);
+    return response.data;
+  }
+
+  async verifyEmail(token) {
+    const response = await apiClient.get(AUTH_ENDPOINTS.VERIFY_EMAIL, { token });
+    return response.data;
+  }
+
+  async resendVerification(email) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.RESEND_VERIFICATION, { email });
+    return response.data;
+  }
+
+  async forgotPassword(email) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.FORGOT_PASSWORD, { email });
+    return response.data;
+  }
+
+  async resetPassword(token, password) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.RESET_PASSWORD, { token, password });
+    return response.data;
+  }
+
+  async updateProfile(name) {
+    const response = await apiClient.put(AUTH_ENDPOINTS.UPDATE_PROFILE, { name });
+    this.setUser(response.data); // Update cached user
+    return response.data;
+  }
+
+  async changeEmail(newEmail) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.CHANGE_EMAIL, { newEmail });
+    return response.data;
+  }
+
+  async verifyEmailChange(token) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.VERIFY_EMAIL_CHANGE, { token });
+    this.setUser(response.data); // Update cached user with new email
+    return response.data;
+  }
+
+  async deleteAccount(email) {
+    const response = await apiClient.delete(AUTH_ENDPOINTS.DELETE_ACCOUNT, { email });
+    this.logout(); // Clear tokens after account deletion
+    return response.data;
+  }
+
+  async changePassword(currentPassword, newPassword) {
+    const response = await apiClient.post(AUTH_ENDPOINTS.CHANGE_PASSWORD, { 
+      currentPassword, 
+      newPassword 
+    });
+    return response.data;
+  }
+
+  async updatePreferences(preferences) {
+    const response = await apiClient.put(AUTH_ENDPOINTS.UPDATE_PREFERENCES, preferences);
+    this.setUser(response.data); // Update cached user with new preferences
+    return response.data;
+  }
+
+  async exportData() {
+    const response = await apiClient.post(AUTH_ENDPOINTS.EXPORT_DATA);
+    return response.data;
+  }
+
+  async deleteTransactions(password) {
+    const response = await apiClient.delete(AUTH_ENDPOINTS.DELETE_TRANSACTIONS, { password });
+    return response.data;
   }
 }
 

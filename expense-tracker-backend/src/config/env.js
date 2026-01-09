@@ -8,6 +8,7 @@ const config = {
     nodeEnv: 'development',
     port: process.env.PORT || 5000,
     apiUrl: process.env.API_URL || 'http://localhost:5000',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
     mongodb: {
       uri: process.env.MONGODB_URI,
       db: process.env.MONGODB_DB || 'expense-tracker',
@@ -40,6 +41,7 @@ const config = {
     nodeEnv: 'production',
     port: process.env.PORT || 5000,
     apiUrl: process.env.API_URL || 'https://api.youssefdawod.com',
+    frontendUrl: process.env.FRONTEND_URL || 'https://expense-tracker.youssefdawod.com',
     mongodb: {
       uri: process.env.MONGODB_URI,
       db: process.env.MONGODB_DB || 'expense-tracker',
@@ -72,6 +74,7 @@ const config = {
     nodeEnv: 'test',
     port: 5001,
     apiUrl: 'http://localhost:5001',
+    frontendUrl: 'http://localhost:5173',
     mongodb: {
       uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/expense-tracker-test',
       db: 'expense-tracker-test',

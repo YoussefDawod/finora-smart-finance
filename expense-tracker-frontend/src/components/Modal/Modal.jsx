@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import useKeyboardNavigation from '../../hooks/useKeyboardNavigation';
+import { modalVariants } from '../../config/animationVariants';
 import './Modal.scss';
 
 /**
@@ -14,6 +16,8 @@ import './Modal.scss';
 function Modal({ isOpen, onClose, title, children, size = 'md' }) {
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const variants = modalVariants(reduceMotion);
 
   // Keyboard Navigation mit Focus Trap
   useKeyboardNavigation(modalRef, {
@@ -47,41 +51,52 @@ function Modal({ isOpen, onClose, title, children, size = 'md' }) {
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   return (
-    <div 
-      className="modal-overlay animate-fade-in" 
-      onClick={onClose}
-      role="presentation"
-    >
-      <div
-        ref={modalRef}
-        className={`modal modal--${size} animate-scale-in`}
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        tabIndex={-1}
-      >
-        <div className="modal__header">
-          <h2 id="modal-title" className="modal__title">
-            {title}
-          </h2>
-          <button
-            className="modal__close"
-            onClick={onClose}
-            aria-label="Modal schließen"
-            title="Schließen (ESC)"
-            type="button"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="modal-overlay glass"
+          onClick={onClose}
+          role="presentation"
+          variants={variants.overlay}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          <motion.div
+            ref={modalRef}
+            className={`modal modal--${size} glass shadow-elevated`}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            tabIndex={-1}
+            variants={variants.content}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            layout
           >
-            ✕
-          </button>
-        </div>
+            <div className="modal__header">
+              <h2 id="modal-title" className="modal__title">
+                {title}
+              </h2>
+              <button
+                className="modal__close"
+                onClick={onClose}
+                aria-label="Modal schließen"
+                title="Schließen (ESC)"
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
 
-        <div className="modal__body">{children}</div>
-      </div>
-    </div>
+            <div className="modal__body">{children}</div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 

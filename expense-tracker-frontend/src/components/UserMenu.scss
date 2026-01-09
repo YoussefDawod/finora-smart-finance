@@ -1,0 +1,138 @@
+@use '../styles/variables' as *;
+
+.user-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.user-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid $color-border;
+  background: $color-bg;
+  border-radius: $border-radius-full;
+  cursor: pointer;
+  transition: all $transition-fast;
+  min-width: 0;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-primary;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.user-menu__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $color-primary, $color-secondary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: $font-weight-semibold;
+  font-size: 14px;
+  flex-shrink: 0;
+  box-shadow: $shadow-sm;
+}
+
+.user-menu__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.user-menu__name {
+  font-weight: $font-weight-semibold;
+  font-size: 14px;
+  color: $color-text;
+  line-height: 1.2;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu__email {
+  font-size: 12px;
+  color: $color-text-secondary;
+  line-height: 1.2;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu__chevron {
+  font-size: 14px;
+  color: $color-text-secondary;
+  margin-left: 2px;
+}
+
+.user-menu__dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-md;
+  min-width: 200px;
+  padding: 8px;
+  display: grid;
+  gap: 4px;
+  z-index: 200;
+}
+
+.user-menu__item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: $color-text;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background $transition-fast, color $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    background: $color-bg-secondary;
+    outline: none;
+  }
+
+  &--danger {
+    color: $color-error;
+
+    &:hover,
+    &:focus-visible {
+      background: $color-error-bg;
+      color: $color-error-strong;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .user-menu__trigger {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .user-menu__name {
+    max-width: 120px;
+  }
+
+  .user-menu__email {
+    display: none;
+  }
+}

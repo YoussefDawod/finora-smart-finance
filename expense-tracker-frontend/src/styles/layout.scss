@@ -60,6 +60,33 @@
   }
 }
 
+.app__header-grid {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-lg;
+  flex-wrap: wrap;
+}
+
+.app__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-md;
+}
+
+.app__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-md;
+  margin-left: auto;
+}
+
+.app__branding {
+  display: flex;
+  flex-direction: column;
+  gap: $space-xs;
+}
+
 .app__main {
   flex: 1;
   padding: $space-lg max($space-lg, env(safe-area-inset-left)) $space-lg max($space-lg, env(safe-area-inset-right));
