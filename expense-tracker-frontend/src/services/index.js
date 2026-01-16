@@ -1,5 +1,9 @@
-// src/services/index.js
-// Deprecated: forward exports to new API layer
+/**
+ * Services Export
+ * API Service Modules
+ */
 
-export { default as api } from './api';
-export { transactionService } from '../api/transactionService';
+export { default as apiClient } from './api';
+export { authService } from './auth';
+export { transactionService } from './transactions';
+export { userService } from './users';

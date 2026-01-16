@@ -1,0 +1,246 @@
+@use '@/styles/variables' as *;
+@use '@/styles/animations' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg);
+  padding: var(--lg);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(99, 102, 241, 0.02) 100%);
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  @media (max-width: var(--bp-md)) {
+    padding: var(--md);
+    gap: var(--md);
+  }
+}
+
+// ============================================================================
+// HEADER
+// ============================================================================
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--md);
+
+  @media (max-width: var(--bp-sm)) {
+    flex-wrap: wrap;
+  }
+}
+
+.title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-b);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.viewAllLink {
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  padding: var(--xs) var(--sm);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateX(4px);
+  }
+}
+
+// ============================================================================
+// LIST
+// ============================================================================
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sm);
+}
+
+// ============================================================================
+// TRANSACTION ITEM
+// ============================================================================
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--md);
+  padding: var(--md);
+  background: var(--surface);
+  border: 1px solid rgba(31, 41, 55, 0.05);
+  border-left: 4px solid transparent;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: var(--surface-2);
+    border-left-color: var(--primary);
+  }
+
+  // Type variants
+  &.income {
+    border-left-color: var(--success);
+
+    .amount {
+      color: var(--success);
+      font-weight: var(--fw-b);
+    }
+  }
+
+  &.expense {
+    border-left-color: var(--error);
+
+    .amount {
+      color: var(--error);
+      font-weight: var(--fw-b);
+    }
+  }
+
+  @media (max-width: var(--bp-sm)) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// ============================================================================
+// CATEGORY SECTION
+// ============================================================================
+.category {
+  display: flex;
+  align-items: center;
+  gap: var(--md);
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xs);
+  min-width: 0;
+}
+
+.categoryName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ============================================================================
+// DETAILS SECTION (Amount & Date)
+// ============================================================================
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--xs);
+  flex-shrink: 0;
+
+  @media (max-width: var(--bp-sm)) {
+    align-items: flex-start;
+  }
+}
+
+.date {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-weight: var(--fw-m);
+}
+
+.amount {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-b);
+  font-variant-numeric: tabular-nums;
+}
+
+// ============================================================================
+// LOADING STATE (Skeleton)
+// ============================================================================
+.skeletons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sm);
+}
+
+.skeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--md);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+  background-size: 200% 100%;
+  border-radius: var(--r-md);
+  height: 4.5rem;
+}
+
+// ============================================================================
+// EMPTY STATE
+// ============================================================================
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--md);
+  padding: var(--xl) var(--lg);
+  text-align: center;
+  background: rgba(99, 102, 241, 0.05);
+  border-radius: var(--r-md);
+  border: 1px dashed rgba(99, 102, 241, 0.2);
+
+  @media (max-width: var(--bp-sm)) {
+    padding: var(--lg) var(--md);
+  }
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  opacity: 0.7;
+}
+
+.emptyText {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-m);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.emptySubtext {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+@media (max-width: var(--bp-md)) {
+  .container {
+    padding: var(--md);
+  }
+
+  .item {
+    padding: var(--sm) var(--md);
+  }
+}

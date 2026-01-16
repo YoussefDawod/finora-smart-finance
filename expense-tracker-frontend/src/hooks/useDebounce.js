@@ -1,40 +1,63 @@
+/**
+ * @fileoverview useDebounce Custom Hook
+ * @description Debounces a value with optional callback
+ * 
+ * USAGE:
+ * const debouncedValue = useDebounce(searchQuery, 300)
+ * 
+ * @module useDebounce
+ */
+
 import { useState, useEffect } from 'react';
 
+/* eslint-disable no-undef */
+
 /**
- * useDebounce Hook
- * 
- * Verzögert die Aktualisierung eines Wertes bis nach einer bestimmten Zeit ohne Änderung.
- * Ideal für Search-Input, Auto-Complete, etc.
- * 
- * @param {*} value - Der zu debouncende Wert
- * @param {number} delay - Verzögerung in Millisekunden (default: 500ms)
- * @returns {*} Der gedebouncte Wert
+ * Debounce a value
+ * @param {*} value - Value to debounce
+ * @param {number} [delay=300] - Debounce delay in ms
+ * @param {Function} [callback] - Optional callback when value changes
+ * @returns {*} Debounced value
  * 
  * @example
- * const [searchTerm, setSearchTerm] = useState('');
- * const debouncedSearch = useDebounce(searchTerm, 500);
+ * const [searchQuery, setSearchQuery] = useState('');
+ * const debouncedQuery = useDebounce(searchQuery, 500);
  * 
  * useEffect(() => {
- *   // API Call nur mit debouncedSearch
- *   fetchResults(debouncedSearch);
- * }, [debouncedSearch]);
+ *   if (debouncedQuery) {
+ *     fetchTransactions(debouncedQuery);
+ *   }
+ * }, [debouncedQuery]);
+ * 
+ * return (
+ *   <input
+ *     value={searchQuery}
+ *     onChange={(e) => setSearchQuery(e.target.value)}
+ *     placeholder="Search..."
+ *   />
+ * )
  */
-export const useDebounce = (value, delay = 500) => {
+export function useDebounce(value, delay = 300, callback) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    // Setze neuen Wert nach Verzögerung
-    const handler = setTimeout(() => {
+    // Set timeout to update debounced value
+    const timeoutId = globalThis.setTimeout(() => {
       setDebouncedValue(value);
+
+      // Call optional callback
+      if (callback && typeof callback === 'function') {
+        callback(value);
+      }
     }, delay);
 
-    // Cleanup: Timer abbrechen wenn value sich ändert
+    // Cleanup: Cancel timeout if value changes before delay completes
     return () => {
-      clearTimeout(handler);
+      globalThis.clearTimeout(timeoutId);
     };
-  }, [value, delay]);
+  }, [value, delay, callback]);
 
   return debouncedValue;
-};
+}
 
 export default useDebounce;

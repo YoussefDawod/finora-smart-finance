@@ -1,0 +1,99 @@
+/**
+ * UserMenu styles
+ */
+
+.userMenu {
+  position: relative;
+}
+
+.avatarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--tx);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--surface);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.avatarCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: var(--on-primary);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--tx) 15%, transparent);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.dropdownHeader {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdownName {
+  font-weight: 700;
+  color: var(--tx);
+}
+
+.dropdownEmail {
+  font-size: 0.9rem;
+  color: var(--tx-muted);
+  margin-top: 4px;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  color: var(--tx);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+}

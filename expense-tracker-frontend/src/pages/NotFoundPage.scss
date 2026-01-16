@@ -1,0 +1,43 @@
+@use '@styles/variables.scss' as *;
+@use '@styles/mixins.scss' as *;
+
+.not-found-page {
+  min-height: 100vh;
+  @include flex-center;
+  padding: var(--lg);
+  background: var(--bg);
+}
+
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+
+  .error-code {
+    font-size: 8rem;
+    font-weight: var(--fw-b);
+    color: var(--primary);
+    margin: 0;
+    line-height: 1;
+  }
+
+  h2 {
+    font-size: var(--fs-2xl);
+    margin: var(--lg) 0;
+    color: var(--tx);
+  }
+
+  p {
+    color: var(--tx-muted);
+    margin-bottom: var(--xl);
+  }
+
+  .btn {
+    @include button-base;
+    background: var(--primary);
+    color: white;
+
+    &:hover {
+      background: var(--pri-hover);
+    }
+  }
+}

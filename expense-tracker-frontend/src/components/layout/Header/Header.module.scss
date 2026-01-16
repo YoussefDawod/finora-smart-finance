@@ -1,0 +1,290 @@
+/**
+ * Header Component Styles - Vereinfachte Version
+ * Nur Sticky Top Bar (Logo/Hamburger + Avatar)
+ */
+
+// ============================================
+// STICKY TOP BAR (Logo/Hamburger + Avatar)
+// ============================================
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--sh-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    height: 56px;
+    padding: 0 16px;
+    gap: 12px;
+  }
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+// Keep right section lean; spacing harmonized
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    gap: 8px;
+  }
+}
+
+// ============================================
+// HAMBURGER MENU (Mobile)
+// ============================================
+
+.hamburger {
+  display: none;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--tx);
+  padding: 0;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    border-radius: 6px;
+    outline-offset: 2px;
+  }
+
+  &.open {
+    color: var(--primary);
+  }
+}
+
+// ============================================
+// AUTH BUTTONS
+// ============================================
+
+.authBtns {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    gap: 6px;
+  }
+}
+
+.loginBtn,
+.registerBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+  }
+}
+
+.loginBtn {
+  background: transparent;
+  color: var(--tx);
+  border: 1px solid var(--border);
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.registerBtn {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+
+  &:hover {
+    background: var(--primary-dark);
+  }
+}
+
+.dropdownUser {
+  padding: 12px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdownName {
+  font-weight: 600;
+  color: var(--tx);
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.dropdownEmail {
+  font-size: 0.8rem;
+  color: var(--tx-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdownLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  color: var(--tx);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    outline: 2px inset var(--primary);
+  }
+
+  &.logoutLink {
+    color: var(--error);
+
+    &:hover {
+      background: color-mix(in srgb, var(--error) 10%, transparent);
+    }
+  }
+}
+
+// ============================================
+// AUTH BUTTONS
+// ============================================
+
+.authBtns {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
+}
+
+.loginBtn,
+.registerBtn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--tx);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+.registerBtn {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+
+  &:hover {
+    background: var(--pri-hover);
+    border-color: var(--pri-hover);
+    color: white;
+  }
+}
+
+// ============================================
+// HAMBURGER MENU (MOBILE)
+// ============================================
+
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--tx);
+  transition: all 0.2s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  &:hover {
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    border-radius: 8px;
+    outline-offset: 2px;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .searchInput,
+  .filterBtn,
+  .avatarBtn,
+  .loginBtn,
+  .registerBtn,
+  .hamburger,
+  .dropdownLink,
+  .filterOption {
+    transition: none;
+  }
+}

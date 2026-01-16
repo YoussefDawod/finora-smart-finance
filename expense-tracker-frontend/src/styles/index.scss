@@ -1,0 +1,27 @@
+// ============================================
+// 🎨 MAIN STYLESHEET - CENTRAL ENTRY POINT
+// ============================================
+
+// 1. Variables & Configuration
+@use './variables.scss' as *;
+@use './mixins.scss' as *;
+
+// 2. Themes
+@use './themes/light.scss';
+@use './themes/dark.scss';
+@use './themes/glassmorphic.scss';
+
+// 3. Global Styles
+@use './globals.scss';
+
+// 4. Accessibility & Focus States
+@use './accessibility.scss';
+
+// 5. Animations
+@use './animations.scss';
+
+// 5. Components
+@use './components/index' as components;
+
+// 6. Utilities
+@use './utilities/index' as utilities;

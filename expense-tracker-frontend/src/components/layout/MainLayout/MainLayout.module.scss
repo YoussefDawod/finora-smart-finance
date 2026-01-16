@@ -1,0 +1,160 @@
+/**
+ * @fileoverview MainLayout Component Styles
+ * @description Responsive layout styling for main application container.
+ * 
+ * LAYOUT STRUCTURE:
+ * - Desktop (>768px):
+ *   - Header: 64px fixed top
+ *   - Container: Sidebar (280px/80px) + Content (flex-1)
+ *   - Footer: full width below content
+ * 
+ * - Mobile (â‰¤768px):
+ *   - Header: 56px fixed top
+ *   - Container: Content (full width) + Sidebar (overlay)
+ *   - Footer: full width below content
+ * 
+ * HEIGHT CALCULATION:
+ * - Desktop: 100vh - 64px (header height)
+ * - Mobile:  100vh - 56px (header height)
+ * 
+ * Z-INDEX HIERARCHY:
+ * - Header: 100
+ * - Sidebar (mobile): 90
+ * - Sidebar backdrop (mobile): 80
+ * - Content: auto
+ * - Footer: auto
+ * 
+ * @module styles/MainLayout.module.scss
+ */
+
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg);
+}
+
+/**
+ * Layout Container (Sidebar + Content Grid)
+ */
+.layoutContainer {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  grid-template-rows: 1fr;
+  width: 100%;
+  min-height: calc(100vh - 64px); /* Viewport - Header (64px) */
+  transition: grid-template-columns 0.3s ease;
+
+  &.sidebarCollapsed {
+    grid-template-columns: 80px 1fr;
+  }
+
+  &.sidebarExpanded {
+    grid-template-columns: 280px 1fr;
+  }
+
+  /* ============================================ */
+  /* MOBILE LAYOUT (â‰¤768px) */
+  /* ============================================ */
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 56px); /* Viewport - Header (56px) */
+  }
+}
+
+/**
+ * Main Content Area
+ */
+.layoutContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  background-color: var(--bg);
+  padding: 24px;
+  transition: padding 0.3s ease;
+
+  /* ============================================ */
+  /* MOBILE CONTENT AREA */
+  /* ============================================ */
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 16px;
+  }
+
+  /* ============================================ */
+  /* TABLET LAYOUT (480px - 768px) */
+  /* ============================================ */
+
+  @media (max-width: 768px) and (min-width: 480px) {
+    padding: 20px;
+  }
+
+  /* ============================================ */
+  /* SMALL MOBILE (< 480px) */
+  /* ============================================ */
+
+  @media (max-width: 479px) {
+    padding: 12px;
+  }
+}
+
+/**
+ * Scrollbar styling
+ */
+.layoutContent {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--tx-muted);
+    }
+  }
+}
+
+/**
+ * Smooth transitions
+ */
+.layoutContainer {
+  transition: grid-template-columns 0.3s ease;
+}
+
+.layoutContent {
+  transition: padding 0.3s ease;
+}
+
+/**
+ * Reduced motion support
+ */
+@media (prefers-reduced-motion: reduce) {
+  .layoutContainer,
+  .layoutContent {
+    transition: none;
+  }
+}
+
+/**
+ * Dark mode support (automatic via CSS variables)
+ */
+@media (prefers-color-scheme: dark) {
+  .layoutContent {
+    background-color: var(--bg);
+  }
+}

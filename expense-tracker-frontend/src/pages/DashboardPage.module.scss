@@ -1,0 +1,207 @@
+/**
+ * @fileoverview DashboardPage Component Styles
+ * @description Modern Dashboard Layout mit responsive Grid
+ */
+
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+
+.dashboardPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xl);
+  width: 100%;
+  min-height: 100%;
+
+  @include tablet {
+    gap: calc(var(--xl) - var(--sm));
+  }
+
+  @include tablet {
+    gap: var(--lg);
+  }
+
+  @media (max-width: 480px) {
+    gap: 16px;
+  }
+}
+
+// ============================================
+// HEADER SECTION
+// ============================================
+
+.headerSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--sm);
+  border-bottom: 1px solid var(--border);
+
+  @include tablet {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--md);
+  }
+}
+
+.greeting {
+  flex: 1;
+
+  h1 {
+    font-size: var(--fs-3xl);
+    font-weight: 700;
+    color: var(--tx);
+    margin: 0 0 4px 0;
+    letter-spacing: -0.02em;
+
+    @include tablet {
+      font-size: var(--fs-2xl);
+    }
+
+    @include tablet {
+      font-size: var(--fs-2xl);
+    }
+
+    @include mobile {
+      font-size: var(--fs-xl);
+    }
+  }
+
+  p {
+    font-size: 1rem;
+    color: var(--tx-muted);
+    margin: 0;
+
+    @include tablet {
+      font-size: var(--fs-sm);
+    }
+
+    @include mobile {
+      font-size: var(--fs-sm);
+    }
+  }
+}
+
+// ============================================
+// SUMMARY CARDS GRID
+// ============================================
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width: 100%;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--lg);
+  }
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: var(--md);
+  }
+
+  // Responsive für kleine Screens
+  @include mobile {
+    gap: calc(var(--md) - var(--sm));
+  }
+}
+
+// ============================================
+// CHARTS SECTION
+// ============================================
+
+.chartsSection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: var(--lg);
+  }
+
+  @media (max-width: 480px) {
+    gap: 16px;
+  }
+}
+
+// ============================================
+// TRANSACTIONS SECTION
+// ============================================
+
+.transactionsSection {
+  width: 100%;
+}
+
+// ============================================
+// COMING SOON PLACEHOLDER
+// ============================================
+
+.comingSoon {
+  padding: calc(var(--xxl) - var(--sm)) var(--lg);
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: var(--r-xl);
+  text-align: center;
+  transition: all var(--tr);
+
+  @include tablet {
+    padding: var(--xl) var(--lg);
+    border-radius: var(--r-lg);
+  }
+
+  @include mobile {
+    padding: var(--lg) var(--md);
+  }
+
+  h2 {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin: 0 0 var(--sm) 0;
+
+    @include tablet {
+      font-size: var(--fs-lg);
+    }
+
+    @include mobile {
+      font-size: var(--fs-md);
+    }
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    margin: 0;
+
+    @include tablet {
+      font-size: var(--fs-sm);
+    }
+
+    @include mobile {
+      font-size: var(--fs-xs);
+    }
+  }
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+  }
+}
+
+// ============================================
+// ANIMATION STAGGER
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboardPage {
+    gap: 24px;
+  }
+}

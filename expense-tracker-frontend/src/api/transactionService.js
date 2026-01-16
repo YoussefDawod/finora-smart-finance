@@ -1,244 +1,88 @@
 /**
- * Transaction Service
- * Domainspezifischer Service für Transaction-API-Operationen
+ * @fileoverview Transaction API Service
+ * @description All transaction-related API calls
+ * 
+ * @module api/transactionService
  */
 
-import { apiClient } from './client';
+import client from './client';
 import { ENDPOINTS } from './endpoints';
-import { ValidationError } from '../utils/errors';
-import { authService } from './authService';
-
-const handleApiError = (error) => {
-  const status = error?.response?.status;
-
-  if (status === 401) {
-    // Session abgelaufen → Logout und Redirect
-    authService.logout();
-    window.location.assign('/login');
-    const err = new Error('Unauthorized');
-    err.status = 401;
-    throw err;
-  }
-
-  if (status === 403) {
-    const err = new Error("You don't have permission");
-    err.status = 403;
-    throw err;
-  }
-
-  throw error;
-};
 
 export const transactionService = {
   /**
-   * Get all transactions with optional filters
-   * @param {Object} filters - Filter-Optionen
-   * @returns {Promise<Array>} Array von Transaktionen
+   * Get transactions with filters & pagination
+   * @param {Object} filters
+   * @param {string} [filters.category]
+   * @param {string} [filters.type] - 'income' | 'expense'
+   * @param {string} [filters.startDate]
+   * @param {string} [filters.endDate]
+   * @param {string} [filters.search]
+   * @param {Object} pagination
+   * @param {number} [pagination.page]
+   * @param {number} [pagination.limit]
+   * @returns {Promise<AxiosResponse<{ data: any[], pagination: object }>>}
    */
-  async getTransactions(filters = {}) {
-    const queryParams = {
-      page: filters.page || 1,
-      limit: filters.limit || 10,
-      ...(filters.type && filters.type !== 'all' && { type: filters.type }),
-      ...(filters.category && filters.category !== 'all' && { category: filters.category }),
-      ...(filters.startDate && { startDate: filters.startDate }),
-      ...(filters.endDate && { endDate: filters.endDate }),
-      sortBy: filters.sortBy || 'date',
-      sortOrder: filters.sortOrder || 'desc',
-    };
-
-    try {
-      const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.LIST, queryParams);
-
-      return {
-        data: response.data || [],
-        pagination: response.pagination || {
-          page: 1,
-          limit: 10,
-          total: 0,
-          pages: 0,
-        },
-      };
-    } catch (error) {
-      handleApiError(error);
-    }
+  getTransactions: (filters = {}, pagination = {}) => {
+    const params = { ...filters, ...pagination };
+    return client.get(ENDPOINTS.transactions.list, { params });
   },
 
   /**
-   * Get single transaction by ID
-   * @param {string} id - Transaction ID
-   * @returns {Promise<Object>} Transaction-Objekt
+   * Get single transaction
+   * @param {string} id
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  async getTransaction(id) {
-    if (!id) {
-      throw new ValidationError('Transaction ID is required', { id: 'Required' });
-    }
-
-    try {
-      const response = await apiClient.get(ENDPOINTS.TRANSACTIONS.GET(id));
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
+  getTransaction: (id) => {
+    return client.get(ENDPOINTS.transactions.get(id));
   },
 
   /**
-   * Create new transaction
-   * @param {Object} transactionData - Transaction-Daten
-   * @returns {Promise<Object>} Neu erstellte Transaction
+   * Create transaction
+   * @param {Object} data
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  async createTransaction(transactionData) {
-    const errors = this.validateTransaction(transactionData);
-    if (Object.keys(errors).length > 0) {
-      throw new ValidationError('Validation failed', errors);
-    }
-
-    try {
-      const response = await apiClient.post(ENDPOINTS.TRANSACTIONS.CREATE, {
-        type: transactionData.type || 'expense',
-        description: transactionData.description.trim(),
-        amount: parseFloat(transactionData.amount),
-        category: transactionData.category,
-        date: transactionData.date || new Date().toISOString().split('T')[0],
-      });
-
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
+  createTransaction: (data) => {
+    return client.post(ENDPOINTS.transactions.create, data);
   },
 
   /**
-   * Update existing transaction
-   * @param {string} id - Transaction ID
-   * @param {Object} updates - Zu aktualisierende Felder
-   * @returns {Promise<Object>} Aktualisierte Transaction
+   * Update transaction
+   * @param {string} id
+   * @param {Object} data
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  async updateTransaction(id, updates) {
-    if (!id) {
-      throw new ValidationError('Transaction ID is required', { id: 'Required' });
-    }
-
-    const updateData = {};
-
-    if (updates.type) updateData.type = updates.type;
-    if (updates.description) updateData.description = updates.description.trim();
-    if (updates.amount) updateData.amount = parseFloat(updates.amount);
-    if (updates.category) updateData.category = updates.category;
-    if (updates.date) updateData.date = updates.date;
-
-    if (Object.keys(updateData).length === 0) {
-      throw new ValidationError('No fields to update', {});
-    }
-
-    try {
-      const response = await apiClient.put(ENDPOINTS.TRANSACTIONS.UPDATE(id), updateData);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
+  updateTransaction: (id, data) => {
+    return client.put(ENDPOINTS.transactions.update(id), data);
   },
 
   /**
    * Delete transaction
-   * @param {string} id - Transaction ID
-   * @returns {Promise<Object>} Erfolgs-Response
+   * @param {string} id
+   * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  async deleteTransaction(id) {
-    if (!id) {
-      throw new ValidationError('Transaction ID is required', { id: 'Required' });
-    }
-
-    try {
-      const response = await apiClient.delete(ENDPOINTS.TRANSACTIONS.DELETE(id));
-      return response;
-    } catch (error) {
-      handleApiError(error);
-    }
+  deleteTransaction: (id) => {
+    return client.delete(ENDPOINTS.transactions.delete(id));
   },
 
   /**
-   * Get transaction statistics
-   * @returns {Promise<Object>} Statistics-Objekt
+   * Bulk delete transactions
+   * @param {string[]} ids
+   * @returns {Promise<AxiosResponse<{ deleted: number, message: string }>>}
    */
-  async getStatistics() {
-    try {
-      const response = await apiClient.get(ENDPOINTS.STATS.SUMMARY);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
+  bulkDelete: (ids) => {
+    return client.delete(ENDPOINTS.transactions.bulkDelete, { data: { ids } });
   },
 
   /**
-   * Get statistics by category
-   * @returns {Promise<Object>} Category-Statistics
+   * Get stats overview
+   * @param {string} [period='month']
+   * @param {string} [startDate]
+   * @param {string} [endDate]
+   * @returns {Promise<AxiosResponse<{ totalIncome: number, totalExpense: number, balance: number, categoryBreakdown: object, monthlyTrend: object[] }>>}
    */
-  async getStatsByCategory() {
-    try {
-      const response = await apiClient.get(ENDPOINTS.STATS.BY_CATEGORY);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  /**
-   * Get statistics by type (income/expense)
-   * @returns {Promise<Object>} Type-Statistics
-   */
-  async getStatsByType() {
-    try {
-      const response = await apiClient.get(ENDPOINTS.STATS.BY_TYPE);
-      return response.data;
-    } catch (error) {
-      handleApiError(error);
-    }
-  },
-
-  /**
-   * Validate transaction data
-   * @param {Object} data - Zu validierende Daten
-   * @returns {Object} Errors-Objekt (leer wenn valid)
-   */
-  validateTransaction(data) {
-    const errors = {};
-
-    // Type validation
-    if (!data.type || !['income', 'expense'].includes(data.type)) {
-      errors.type = 'Type must be "income" or "expense"';
-    }
-
-    // Description validation
-    if (!data.description?.trim()) {
-      errors.description = 'Description is required';
-    } else if (data.description.length > 255) {
-      errors.description = 'Description must be less than 255 characters';
-    }
-
-    // Amount validation
-    if (!data.amount) {
-      errors.amount = 'Amount is required';
-    } else if (parseFloat(data.amount) <= 0) {
-      errors.amount = 'Amount must be greater than 0';
-    } else if (isNaN(parseFloat(data.amount))) {
-      errors.amount = 'Amount must be a valid number';
-    }
-
-    // Category validation
-    if (!data.category?.trim()) {
-      errors.category = 'Category is required';
-    }
-
-    // Date validation
-    if (data.date) {
-      const dateObj = new Date(data.date);
-      if (dateObj.toString() === 'Invalid Date') {
-        errors.date = 'Invalid date format (use YYYY-MM-DD)';
-      }
-    }
-
-    return errors;
+  getStats: (period = 'month', startDate, endDate) => {
+    const params = { period, startDate, endDate };
+    return client.get(ENDPOINTS.transactions.stats, { params });
   },
 };
 

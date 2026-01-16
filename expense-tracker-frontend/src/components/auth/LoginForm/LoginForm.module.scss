@@ -1,0 +1,364 @@
+/**
+ * LoginForm Styles
+ */
+
+.loginForm {
+  width: 100%;
+  --error-soft-bg: color-mix(in srgb, var(--error) 10%, transparent);
+  --error-soft-border: color-mix(in srgb, var(--error) 30%, transparent);
+  --primary-soft-glow: color-mix(in srgb, var(--primary) 10%, transparent);
+  --error-soft-glow: color-mix(in srgb, var(--error) 10%, transparent);
+  --button-foreground: var(--on-primary, #fff);
+  transition: transform 0.25s ease;
+}
+
+.shake {
+  animation: shake-soft 0.28s ease;
+}
+
+/* ============================================
+   ERROR BANNER
+   ============================================ */
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--error-soft-bg);
+  border: 1px solid var(--error-soft-border);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.errorText {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--error);
+  line-height: 1.4;
+}
+
+.errorDismiss {
+  background: none;
+  border: none;
+  color: var(--error);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: var(--error-soft-bg);
+  }
+}
+
+/* ============================================
+   FORM GROUPS
+   ============================================ */
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Password toggle button styling for FloatingLabelInput */
+.floatingPasswordWrapper {
+  position: relative;
+}
+
+.passwordToggleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-muted);
+  transition: all 0.2s ease;
+  border-radius: 4px;
+
+  &:hover {
+    color: var(--tx);
+    background: rgba(var(--tx-rgb), 0.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--tx);
+}
+
+.input {
+  @include input-base;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background: var(--surface);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    background: var(--bg);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--surface-2);
+  }
+
+  &::placeholder {
+    color: var(--tx-muted);
+    opacity: 0.7;
+  }
+}
+
+.inputError {
+  border-color: var(--error-color);
+  background: rgba(var(--error-rgb), 0.02);
+
+  &:focus {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgba(var(--error-rgb), 0.1);
+    outline: none;
+  }
+}
+
+.inputValid {
+  border-color: var(--success-color);
+  background: rgba(var(--success-rgb), 0.02);
+
+  &:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(var(--success-rgb), 0.1);
+    outline: none;
+  }
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: var(--error-color);
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.validIcon {
+  font-size: 1rem;
+  color: var(--success-color);
+  font-weight: bold;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* ============================================
+   PASSWORD TOGGLE
+   ============================================ */
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-muted);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--tx);
+  }
+
+  &:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+/* ============================================
+   CHECKBOX
+   ============================================ */
+
+.checkboxGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary);
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.checkboxLabel {
+  font-size: 0.875rem;
+  color: var(--tx-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================
+   SUBMIT BUTTON
+   ============================================ */
+
+.submitButton {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--button-foreground);
+  background: var(--primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  &:hover:not(:disabled) {
+    background: var(--pri-hover);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow: var(--sh-md);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.995);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes shake-soft {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+  100% { transform: translateX(0); }
+}
+
+/* ============================================
+   SPINNER
+   ============================================ */
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid color-mix(in srgb, var(--button-foreground) 25%, transparent);
+  border-top-color: var(--button-foreground);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 640px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+  }
+
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+}

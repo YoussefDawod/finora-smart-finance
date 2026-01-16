@@ -1,0 +1,31 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.toastContainer {
+  position: fixed !important;
+  top: 1rem !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  margin-left: -250px !important; /* HÃ¤lfte von max-width: 500px */
+  z-index: 10000 !important; /* Sehr hoch, damit es Ã¼ber allem anderen ist */
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem;
+  pointer-events: none;
+  max-width: 500px; /* Begrenzt die Breite */
+  width: 90%; /* Responsive Breite */
+
+  > * {
+    pointer-events: auto;
+  }
+
+  @include mobile {
+    top: 0.75rem; /* Etwas mehr Abstand auf Mobile */
+    left: 50%;
+    right: auto;
+    margin-left: -45%; /* FÃ¼r 90% width auf Mobile */
+    width: calc(100% - 2rem); /* Full width mit Padding */
+    max-width: none;
+  }
+}

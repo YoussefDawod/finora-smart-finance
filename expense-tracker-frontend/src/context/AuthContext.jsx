@@ -1,255 +1,427 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { authService } from '../api/authService';
-import PropTypes from 'prop-types';
-import { AuthContext } from './AuthContextDef';
+/**
+ * @fileoverview Authentication Context Provider
+ * @description Manages global authentication state with localStorage persistence,
+ * auto-login, and comprehensive error handling.
+ * 
+ * STATE SHAPE:
+ * {
+ *   user: User | null,
+ *   isAuthenticated: boolean,
+ *   isLoading: boolean,
+ *   error: string | null,
+ *   token: string | null
+ * }
+ * 
+ * @module AuthContext
+ */
 
-export const AuthProvider = ({ children }) => {
-  // ============================================
-  // State Management
-  // ============================================
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
-  const [refreshToken, setRefreshToken] = useState(null);
-  const [expiresIn, setExpiresIn] = useState(null);
+import { useReducer, useEffect, useCallback, createContext } from 'react';
+
+// ============================================
+// 🔐 AUTH STATE & ACTIONS
+// ============================================
+
+/**
+ * @typedef {Object} User
+ * @property {string} id
+ * @property {string} email
+ * @property {string} name
+ * @property {string} [avatar]
+ * @property {UserPreferences} preferences
+ */
+
+/**
+ * @typedef {Object} UserPreferences
+ * @property {'light'|'dark'|'glass'} theme
+ * @property {'USD'|'EUR'} currency
+ * @property {'en'|'de'} language
+ */
+
+/**
+ * @typedef {Object} AuthState
+ * @property {User|null} user
+ * @property {boolean} isAuthenticated
+ * @property {boolean} isLoading
+ * @property {string|null} error
+ * @property {string|null} token
+ */
+
+/** @type {AuthState} */
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: true, // Start with loading to check for existing session
+  error: null,
+  token: null,
+};
+
+// Action Types
+const AUTH_ACTIONS = {
+  SET_LOADING: 'SET_LOADING',
+  SET_ERROR: 'SET_ERROR',
+  CLEAR_ERROR: 'CLEAR_ERROR',
+  LOGIN_SUCCESS: 'LOGIN_SUCCESS',
+  REGISTER_SUCCESS: 'REGISTER_SUCCESS',
+  LOGOUT: 'LOGOUT',
+  VERIFY_SUCCESS: 'VERIFY_SUCCESS',
+  AUTO_LOGIN_SUCCESS: 'AUTO_LOGIN_SUCCESS',
+  AUTO_LOGIN_FAIL: 'AUTO_LOGIN_FAIL',
+};
+
+// ============================================
+// 🔄 REDUCER
+// ============================================
+
+/**
+ * Auth Reducer
+ * @param {AuthState} state 
+ * @param {Object} action 
+ * @returns {AuthState}
+ */
+function authReducer(state, action) {
+  switch (action.type) {
+    case AUTH_ACTIONS.SET_LOADING:
+      return {
+        ...state,
+        isLoading: action.payload,
+      };
+
+    case AUTH_ACTIONS.SET_ERROR:
+      return {
+        ...state,
+        error: action.payload,
+        isLoading: false,
+      };
+
+    case AUTH_ACTIONS.CLEAR_ERROR:
+      return {
+        ...state,
+        error: null,
+      };
+
+    case AUTH_ACTIONS.LOGIN_SUCCESS:
+    case AUTH_ACTIONS.REGISTER_SUCCESS:
+    case AUTH_ACTIONS.AUTO_LOGIN_SUCCESS:
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      };
+
+    case AUTH_ACTIONS.VERIFY_SUCCESS:
+      return {
+        ...state,
+        user: action.payload.user,
+        isLoading: false,
+        error: null,
+      };
+
+    case AUTH_ACTIONS.LOGOUT:
+    case AUTH_ACTIONS.AUTO_LOGIN_FAIL:
+      return {
+        ...initialState,
+        isLoading: false,
+      };
+
+    default:
+      return state;
+  }
+}
+
+// ============================================
+// 📦 CONTEXT (without export for Fast Refresh)
+// ============================================
+
+const AuthContext = createContext(undefined);
+
+// ============================================
+// 🎯 PROVIDER COMPONENT
+// ============================================
+
+/**
+ * AuthProvider Component
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ */
+export function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(authReducer, initialState);
 
   // ============================================
-  // Helper Functions
+  // 💾 LOCALSTORAGE HELPERS
   // ============================================
-  
+
   /**
-   * Clear error after timeout
+   * Save token to localStorage
+   * @param {string} token 
+   */
+  const saveToken = useCallback((token) => {
+    try {
+      globalThis.localStorage?.setItem('auth_token', token);
+    } catch (error) {
+      globalThis.console?.error('Failed to save token to localStorage:', error);
+    }
+  }, []);
+
+  const saveRefreshToken = useCallback((token) => {
+    try {
+      globalThis.localStorage?.setItem('refresh_token', token);
+    } catch (error) {
+      globalThis.console?.error('Failed to save refresh token to localStorage:', error);
+    }
+  }, []);
+
+  /**
+   * Get token from localStorage
+   * @returns {string|null}
+   */
+  const getToken = useCallback(() => {
+    try {
+      return globalThis.localStorage?.getItem('auth_token');
+    } catch (error) {
+      globalThis.console?.error('Failed to get token from localStorage:', error);
+      return null;
+    }
+  }, []);
+
+  const getRefreshToken = useCallback(() => {
+    try {
+      return globalThis.localStorage?.getItem('refresh_token');
+    } catch (error) {
+      globalThis.console?.error('Failed to get refresh token from localStorage:', error);
+      return null;
+    }
+  }, []);
+
+  /**
+   * Remove token from localStorage
+   */
+  const removeToken = useCallback(() => {
+    try {
+      globalThis.localStorage?.removeItem('auth_token');
+    } catch (error) {
+      globalThis.console?.error('Failed to remove token from localStorage:', error);
+    }
+  }, []);
+
+  const removeRefreshToken = useCallback(() => {
+    try {
+      globalThis.localStorage?.removeItem('refresh_token');
+    } catch (error) {
+      globalThis.console?.error('Failed to remove refresh token from localStorage:', error);
+    }
+  }, []);
+
+  // ============================================
+  // 🔐 AUTH ACTIONS
+  // ============================================
+
+  /**
+   * Login user
+   * @param {string} email 
+   * @param {string} password 
+   * @returns {Promise<void>}
+   */
+  const login = useCallback(async (email, password) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
+
+    try {
+      // Import dynamically to avoid circular dependencies
+      const { default: authService } = await import('@/api/authService');
+      
+      const response = await authService.login(email, password);
+      
+      console.log('🔍 [AuthContext] Login response:', response);
+      console.log('🔍 [AuthContext] Response.data:', response.data);
+      
+      // Backend returns {success, data: {accessToken, refreshToken, user, ...}}
+      const { accessToken, refreshToken, user } = response.data.data;
+      
+      console.log('🔑 [AuthContext] Extracted accessToken:', accessToken ? `${accessToken.substring(0, 20)}...` : 'NONE');
+      console.log('👤 [AuthContext] Extracted user:', user);
+      
+      saveToken(accessToken);
+      if (refreshToken) {
+        saveRefreshToken(refreshToken);
+      }
+      
+      // Verify token was saved
+      const savedToken = globalThis.localStorage?.getItem('auth_token');
+      console.log('💾 [AuthContext] Token saved to localStorage:', savedToken ? `${savedToken.substring(0, 20)}...` : 'FAILED');
+      
+      dispatch({
+        type: AUTH_ACTIONS.LOGIN_SUCCESS,
+        payload: { user, token: accessToken },
+      });
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Login fehlgeschlagen. Bitte versuche es erneut.';
+      
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
+      throw error;
+    }
+  }, [saveToken]);
+
+  /**
+   * Register new user
+   * @param {string} email 
+   * @param {string} password 
+   * @param {string} name 
+   * @returns {Promise<void>}
+   */
+  const register = useCallback(async (email, password, name) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
+
+    try {
+      const { default: authService } = await import('@/api/authService');
+      
+      const response = await authService.register(email, password, name);
+      
+      const { token, user } = response.data;
+      
+      saveToken(token);
+      
+      dispatch({
+        type: AUTH_ACTIONS.REGISTER_SUCCESS,
+        payload: { user, token },
+      });
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
+      
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
+      throw error;
+    }
+  }, [saveToken]);
+
+  /**
+   * Logout user
+   */
+  const logout = useCallback(async () => {
+    try {
+      // Optional: Call backend logout endpoint
+      const { default: authService } = await import('@/api/authService');
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        await authService.logout(refreshToken);
+      }
+    } catch (error) {
+      // Continue with local logout even if API call fails
+      globalThis.console?.warn('Logout API call failed:', error);
+    } finally {
+      removeToken();
+      removeRefreshToken();
+      dispatch({ type: AUTH_ACTIONS.LOGOUT });
+    }
+  }, [getRefreshToken, removeToken, removeRefreshToken]);
+
+  /**
+   * Verify email with token
+   * @param {string} verificationToken 
+   * @returns {Promise<void>}
+   */
+  const verifyEmail = useCallback(async (verificationToken) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
+
+    try {
+      const { default: authService } = await import('@/api/authService');
+      
+      const response = await authService.verifyEmail(verificationToken);
+      
+      const { user } = response.data;
+      
+      dispatch({
+        type: AUTH_ACTIONS.VERIFY_SUCCESS,
+        payload: { user },
+      });
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Email-Verifizierung fehlgeschlagen.';
+      
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
+      throw error;
+    }
+  }, []);
+
+  /**
+   * Clear error message
    */
   const clearError = useCallback(() => {
-    setError(null);
+    dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
   }, []);
 
   /**
-   * Update tokens in state
+   * Set loading state
+   * @param {boolean} isLoading 
    */
-  const updateTokens = useCallback((access, refresh, expires) => {
-    setAccessToken(access);
-    setRefreshToken(refresh);
-    setExpiresIn(expires);
+  const setIsLoading = useCallback((isLoading) => {
+    dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: isLoading });
   }, []);
 
   // ============================================
-  // Auth Status Check on Mount
+  // 🚀 AUTO-LOGIN ON MOUNT
   // ============================================
+
   useEffect(() => {
-    const checkAuthStatus = async () => {
+    const autoLogin = async () => {
+      const token = getToken();
+      
+      if (!token) {
+        dispatch({ type: AUTH_ACTIONS.AUTO_LOGIN_FAIL });
+        return;
+      }
+
       try {
-        // 1) Versuche gespeicherte Tokens zu laden (inkl. Timer-Setup)
-        const hasValidToken = await authService.loadStoredTokens();
-
-        // 2) Wenn kein gültiger Access Token gefunden, aber Refresh vorhanden → Refresh-Flow
-        if (!hasValidToken) {
-          try {
-            const refreshToken = authService.getRefreshToken?.();
-            if (refreshToken) {
-              await authService.refreshAccessToken();
-            } else {
-              // Keine Tokens vorhanden
-              setIsAuthenticated(false);
-              setUser(null);
-              return;
-            }
-          } catch (refreshErr) {
-            console.error('Refresh on init failed', refreshErr);
-            authService.logout();
-            setIsAuthenticated(false);
-            setUser(null);
-            return;
-          }
-        }
-
-        // 3) User aus localStorage laden oder vom Backend holen
-        let userData = authService.getUser();
-
-        if (!userData) {
-          try {
-            userData = await authService.fetchUserProfile();
-          } catch (err) {
-            console.error('Failed to fetch user profile', err);
-            authService.logout();
-            setIsAuthenticated(false);
-            setUser(null);
-            return;
-          }
-        }
-
-        // 4) State setzen
-        setUser(userData);
-        setIsAuthenticated(true);
-        updateTokens(
-          authService.accessToken,
-          authService.refreshToken,
-          authService.tokenExpiry
-        );
-      } catch (err) {
-        console.error('Auth initialization failed', err);
-        setError(err);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
+        const { default: authService } = await import('@/api/authService');
+        
+        // Verify token is still valid
+        const response = await authService.getCurrentUser();
+        
+        // Backend returns {success, data: {user, ...}}
+        const user = response.data.data?.user || response.data.data;
+        
+        dispatch({
+          type: AUTH_ACTIONS.AUTO_LOGIN_SUCCESS,
+          payload: { user, token },
+        });
+      } catch (error) {
+        // Token invalid, expired, or no token present
+        removeToken();
+        dispatch({ type: AUTH_ACTIONS.AUTO_LOGIN_FAIL });
+        // Silently fail - user will be redirected to login
       }
     };
 
-    checkAuthStatus();
-  }, [updateTokens]);
+    autoLogin();
+  }, [getToken, removeToken]);
 
   // ============================================
-  // Login Function
+  // 📤 CONTEXT VALUE
   // ============================================
-  const login = useCallback(async (email, password) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const userData = await authService.login(email, password);
-      
-      setUser(userData);
-      setIsAuthenticated(true);
-      updateTokens(
-        authService.accessToken,
-        authService.refreshToken,
-        authService.tokenExpiry
-      );
-      
-      return userData;
-    } catch (err) {
-      setError(err);
-      setIsAuthenticated(false);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [updateTokens]);
 
-  // ============================================
-  // Register Function
-  // ============================================
-  const register = useCallback(async ({ email, password, name }) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const result = await authService.register({ email, password, name });
-      // Don't auto-login after register, user needs to verify email
-      return result; // return both user and verificationLink
-    } catch (err) {
-      setError(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // ============================================
-  // Logout Function
-  // ============================================
-  const logout = useCallback(() => {
-    // Optional: könnte einen API-Logout callen; aktuell nur lokale Bereinigung
-    authService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-    setAccessToken(null);
-    setRefreshToken(null);
-    setExpiresIn(null);
-    setError(null);
-  }, []);
-
-  // ============================================
-  // Refresh Token Function
-  // ============================================
-  const refreshAccessToken = useCallback(async () => {
-    setError(null);
-    try {
-      const newAccessToken = await authService.refreshAccessToken();
-      updateTokens(
-        authService.accessToken,
-        authService.refreshToken,
-        authService.tokenExpiry
-      );
-      return newAccessToken;
-    } catch (err) {
-      setError(err);
-      // If refresh fails, logout user
-      logout();
-      throw err;
-    }
-  }, [logout, updateTokens]);
-
-  // ============================================
-  // Additional Auth Functions
-  // ============================================
-  const forgotPassword = useCallback(async (email) => {
-    setError(null);
-    try {
-      return await authService.forgotPassword(email);
-    } catch (err) {
-      setError(err);
-      throw err;
-    }
-  }, []);
-
-  const resetPassword = useCallback(async (token, password) => {
-    setError(null);
-    try {
-      return await authService.resetPassword(token, password);
-    } catch (err) {
-      setError(err);
-      throw err;
-    }
-  }, []);
-
-  const resendVerification = useCallback(async (email) => {
-    setError(null);
-    try {
-      return await authService.resendVerification(email);
-    } catch (err) {
-      setError(err);
-      throw err;
-    }
-  }, []);
-
-  // ============================================
-  // Auto Clear Error after 5 seconds
-  // ============================================
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
-
-  // ============================================
-  // Context Value
-  // ============================================
   const value = {
     // State
-    user,
-    isAuthenticated,
-    isLoading: loading,
-    error,
-    accessToken,
-    refreshToken,
-    expiresIn,
+    user: state.user,
+    isAuthenticated: state.isAuthenticated,
+    isLoading: state.isLoading,
+    error: state.error,
+    token: state.token,
     
-    // Functions
+    // Actions
     login,
-    logout,
     register,
-    refreshAccessToken,
-    forgotPassword,
-    resetPassword,
-    resendVerification,
+    logout,
+    verifyEmail,
     clearError,
-    
-    // Deprecated (for backwards compatibility)
-    loading,
+    setIsLoading,
   };
 
   return (
@@ -257,8 +429,7 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired
-};
+// Export context separately for Fast Refresh compatibility
+export { AuthContext };

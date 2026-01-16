@@ -1,99 +1,158 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
-import AppContent from './AppContent';
-import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useAuth } from '@/hooks';
+import { MainLayout } from '@/components/layout';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import VerifyEmailPage from '@/pages/VerifyEmailPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import TermsPage from '@/pages/TermsPage';
+import DashboardPage from '@/pages/DashboardPage';
+import TransactionsPage from '@/pages/TransactionsPage';
+import SettingsPage from '@/pages/SettingsPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import AuthLayoutDemo from '@/pages/AuthLayoutDemo'; // DEMO
+import ProfilePage from '@/pages/ProfilePage';
 
-// Public Pages (Auth & Info)
-import RootPage from './pages/RootPage';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import VerifyEmailPage from './pages/VerifyEmailPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import ProfilePage from './pages/ProfilePage';
-import SettingsPage from './pages/SettingsPage';
+const PageTransition = ({ children }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -8 }}
+    transition={{ duration: 0.28, ease: 'easeOut' }}
+  >
+    {children}
+  </motion.div>
+);
 
-// Error Pages
-import UnauthorizedPage from './pages/UnauthorizedPage';
-import NotFoundPage from './pages/NotFoundPage';
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
 
-/**
- * AppRoutes - Complete Routing Configuration
- * 
- * Structure:
- * - PUBLIC: Authentication and Info Pages (no auth required)
- * - PROTECTED: Dashboard and user pages (auth required)
- * - ERROR: 404 and unauthorized pages
- * 
- * Wrapped with AuthProvider for global auth state
- */
-export default function AppRoutes() {
+  if (isLoading) {
+    return null;
+  }
+
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+};
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          {/* ROOT - Smart Redirect Based on Auth */}
-          <Route path="/" element={<RootPage />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        {/* Public Routes - ohne MainLayout */}
+        <Route
+          path="/login"
+          element={(
+            <PublicRoute>
+              <PageTransition>
+                <LoginPage />
+              </PageTransition>
+            </PublicRoute>
+          )}
+        />
+        <Route
+          path="/register"
+          element={(
+            <PublicRoute>
+              <PageTransition>
+                <RegisterPage />
+              </PageTransition>
+            </PublicRoute>
+          )}
+        />
+        <Route
+          path="/verify-email"
+          element={(
+            <PublicRoute>
+              <PageTransition>
+                <VerifyEmailPage />
+              </PageTransition>
+            </PublicRoute>
+          )}
+        />
+        <Route
+          path="/forgot-password"
+          element={(
+            <PublicRoute>
+              <PageTransition>
+                <ForgotPasswordPage />
+              </PageTransition>
+            </PublicRoute>
+          )}
+        />
+        <Route path="/terms" element={(<PageTransition><TermsPage /></PageTransition>)} />
 
-          {/* PUBLIC ROUTES - No Authentication */}
-          <Route path="/landing" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
+        {/* DEMO: AuthLayout Testing */}
+        <Route path="/auth-demo" element={(<PageTransition><AuthLayoutDemo /></PageTransition>)} />
 
-          {/* PROTECTED ROUTES - Requires Auth */}
+        {/* Protected Routes - mit MainLayout */}
+        <Route element={<MainLayout />}>
           <Route
             path="/dashboard"
-            element={
+            element={(
               <ProtectedRoute>
-                <AppContent />
+                <PageTransition>
+                  <DashboardPage />
+                </PageTransition>
               </ProtectedRoute>
-            }
+            )}
           />
-
           <Route
-            path="/profile"
-            element={
+            path="/transactions"
+            element={(
               <ProtectedRoute>
-                <ErrorBoundary>
-                  <ProfilePage />
-                </ErrorBoundary>
+                <PageTransition>
+                  <TransactionsPage />
+                </PageTransition>
               </ProtectedRoute>
-            }
+            )}
           />
-
           <Route
             path="/settings"
-            element={
+            element={(
               <ProtectedRoute>
-                <ErrorBoundary>
+                <PageTransition>
                   <SettingsPage />
-                </ErrorBoundary>
+                </PageTransition>
               </ProtectedRoute>
-            }
+            )}
           />
-
-          {/* Alternative path for app content */}
           <Route
-            path="/app/*"
-            element={
+            path="/profile"
+            element={(
               <ProtectedRoute>
-                <AppContent />
+                <PageTransition>
+                  <ProfilePage />
+                </PageTransition>
               </ProtectedRoute>
-            }
+            )}
           />
+        </Route>
 
-          {/* ERROR & NOT FOUND ROUTES */}
-          <Route path="/unauthorized" element={<UnauthorizedPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </AuthProvider>
-    </Router>
+        {/* Default & Fallback Routes */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={(<PageTransition><NotFoundPage /></PageTransition>)} />
+      </Routes>
+    </AnimatePresence>
   );
 }
 
+export default function AppRoutes() {
+  return (
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <AnimatedRoutes />
+    </BrowserRouter>
+  );
+}

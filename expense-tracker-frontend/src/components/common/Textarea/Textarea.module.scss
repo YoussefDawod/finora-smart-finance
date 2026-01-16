@@ -1,0 +1,280 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/animations' as *;
+
+// ============================================================================
+// TEXTAREA GROUP (Container)
+// ============================================================================
+.textareaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--xs);
+  width: 100%;
+
+  &.focused {
+    .label {
+      color: var(--primary);
+      font-weight: var(--fw-m);
+    }
+
+    .textareaWrapper {
+      border-color: var(--primary);
+      background: rgba(var(--primary-rgb), 0.02);
+    }
+  }
+
+  &.hasError {
+    .textareaWrapper {
+      border-color: var(--error);
+      background: rgba(var(--error-rgb), 0.05);
+    }
+
+    .label {
+      color: var(--error);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// ============================================================================
+// LABEL
+// ============================================================================
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--text-primary);
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  gap: var(--xs);
+}
+
+.required {
+  color: var(--error);
+  font-weight: var(--fw-b);
+}
+
+// ============================================================================
+// TEXTAREA WRAPPER
+// ============================================================================
+.textareaWrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid rgba(var(--text-primary-rgb), 0.1);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  overflow: hidden;
+
+  &:hover:not(:has(:disabled)) {
+    border-color: rgba(var(--primary-rgb), 0.3);
+  }
+}
+
+// ============================================================================
+// TEXTAREA FIELD
+// ============================================================================
+.textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: var(--sm) var(--md);
+  padding-bottom: 2.5rem;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  color: var(--text-primary);
+  outline: none;
+  cursor: text;
+  width: 100%;
+  resize: none;
+  line-height: 1.5;
+  transition: all var(--tr);
+
+  &::placeholder {
+    color: var(--text-secondary);
+  }
+
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // DISABLED
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--surface-2);
+  }
+
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // SCROLLBAR
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(var(--primary-rgb), 0.3);
+    border-radius: var(--r-full);
+
+    &:hover {
+      background: rgba(var(--primary-rgb), 0.5);
+    }
+  }
+}
+
+// ============================================================================
+// SIZE VARIANTS
+// ============================================================================
+.textareaGroup.small {
+  .textareaWrapper {
+    min-height: 5rem;
+  }
+
+  .textarea {
+    padding: var(--xs) var(--sm);
+    padding-bottom: 2rem;
+    font-size: var(--fs-xs);
+  }
+
+  .charCounter {
+    font-size: var(--fs-xs);
+    padding: var(--xs) var(--sm);
+  }
+}
+
+.textareaGroup.medium {
+  .textareaWrapper {
+    min-height: 6.5rem;
+  }
+
+  .textarea {
+    padding: var(--sm) var(--md);
+    padding-bottom: 2.5rem;
+    font-size: var(--fs-sm);
+  }
+
+  .charCounter {
+    font-size: var(--fs-xs);
+    padding: var(--sm) var(--md);
+  }
+}
+
+.textareaGroup.large {
+  .textareaWrapper {
+    min-height: 8rem;
+  }
+
+  .textarea {
+    padding: var(--md) var(--lg);
+    padding-bottom: 3rem;
+    font-size: var(--fs-md);
+  }
+
+  .charCounter {
+    font-size: var(--fs-sm);
+    padding: var(--md) var(--lg);
+  }
+}
+
+// ============================================================================
+// CHARACTER COUNTER
+// ============================================================================
+.charCounter {
+  position: absolute;
+  bottom: var(--sm);
+  right: var(--md);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  pointer-events: none;
+  background: var(--surface);
+  padding: 0 var(--xs);
+  border-radius: 2px;
+  transition: color var(--tr);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: fadeIn 0.3s ease-out;
+  }
+}
+
+// ============================================================================
+// FOOTER (Error / Hint)
+// ============================================================================
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 1.25rem;
+}
+
+.error,
+.hint {
+  font-size: var(--fs-xs);
+  margin: 0;
+  animation: slideInDown 0.2s ease-out;
+}
+
+.error {
+  color: var(--error);
+  font-weight: var(--fw-m);
+  flex: 1;
+}
+
+.hint {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+@include mobile {
+  .textareaGroup {
+    gap: var(--xs);
+  }
+
+  .textareaGroup.large {
+    .textareaWrapper {
+      min-height: 7rem;
+    }
+
+    .textarea {
+      padding: var(--sm) var(--md);
+      padding-bottom: 2.5rem;
+      font-size: var(--fs-sm);
+    }
+
+    .charCounter {
+      font-size: var(--xs);
+      padding: var(--sm) var(--md);
+    }
+  }
+}
+
+// ============================================================================
+// REDUCED MOTION
+// ============================================================================
+@media (prefers-reduced-motion: reduce) {
+  .textareaGroup {
+    transition: none;
+
+    .label,
+    .textareaWrapper,
+    .error,
+    .hint,
+    .charCounter {
+      animation: none;
+      transition: none;
+    }
+  }
+
+  .textarea {
+    transition: none;
+  }
+}

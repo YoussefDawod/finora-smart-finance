@@ -1,0 +1,36 @@
+// ============================================
+// 📝 INPUT - FOUNDATION
+// --------------------------------------------
+// Platzhalter + Mixin für Felder (input, textarea, select)
+// ============================================
+
+@use '../variables' as *;
+
+%input-base {
+  background: var(--surface);
+  color: var(--tx);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  padding: var(--md);
+  transition: background var(--tr-fast),
+              color var(--tr-fast),
+              border-color var(--tr-fast),
+              box-shadow var(--tr-fast),
+              transform var(--tr-fast);
+}
+
+%input-focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  &:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
+}
+
+@mixin input-base($with-focus: true) {
+  @extend %input-base;
+  @if $with-focus {
+    &:focus { @extend %input-focus; }
+  }
+  &::placeholder { color: var(--tx-muted); opacity: 1; }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}

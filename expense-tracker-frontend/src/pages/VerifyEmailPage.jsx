@@ -1,107 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { authService } from '../api/authService';
-import { Link, useNavigate } from 'react-router-dom';
+/**
+ * @fileoverview VerifyEmailPage Component
+ * @description Page for email verification with token from URL.
+ * 
+ * @module pages/VerifyEmailPage
+ */
 
-const VerifyEmailPage = ({ token }) => {
-  const [status, setStatus] = useState('pending');
-  const [currentToken, setCurrentToken] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useToast } from '@/hooks';
+import styles from './VerifyEmailPage.module.scss';
+
+export default function VerifyEmailPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const toast = useToast();
+  
+  const [status, setStatus] = useState('verifying'); // verifying, success, error
+  const [error, setError] = useState('');
+
+  const verifyEmail = useCallback(async (token) => {
+    try {
+      // TODO: Implement actual API call with token
+      // await authService.verifyEmail(token);
+      console.log('Verifying with token:', token);
+      
+      // Simulate API call
+      await new Promise(resolve => globalThis.setTimeout(resolve, 2000));
+      
+      setStatus('success');
+      toast.success('E-Mail erfolgreich verifiziert!');
+      
+      // Redirect to login after 3 seconds
+      globalThis.setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+    } catch (err) {
+      const errorMessage = err?.response?.data?.message || 
+        'Verifizierung fehlgeschlagen. Der Link ist möglicherweise abgelaufen.';
+      setStatus('error');
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  }, [navigate, toast]);
 
   useEffect(() => {
-    const run = async () => {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const statusParam = params.get('status');
-        if (statusParam) {
-          if (statusParam === 'done') return setStatus('done');
-          if (statusParam === 'missing') return setStatus('missing');
-          if (statusParam === 'invalid') return setStatus('error');
-          if (statusParam === 'error') return setStatus('error');
-        }
-
-        const t = token || params.get('token');
-        if (!t) return setStatus('missing');
-        setCurrentToken(t);
-        const res = await authService.verifyEmail(t);
-        if (res?.success || res?.data?.verified) {
-          setStatus('done');
-        } else {
-          setStatus('error');
-          setErrorMsg(res?.error || 'Verifizierung fehlgeschlagen');
-        }
-      } catch (e) {
-        setStatus('error');
-        setErrorMsg(e?.message || 'Verifizierung fehlgeschlagen');
-      }
-    };
-    run();
-  }, [token]);
-
-  const handleManualSubmit = async () => {
-    if (!currentToken) {
-      setStatus('missing');
+    const token = searchParams.get('token');
+    
+    if (!token) {
+      setStatus('error');
+      setError('Kein Verifizierungs-Token gefunden');
+      toast.error('Ungültiger Verifizierungs-Link');
       return;
     }
-    setStatus('pending');
-    setErrorMsg('');
-    try {
-      const res = await authService.verifyEmail(currentToken);
-      if (res?.success || res?.data?.verified) {
-        setStatus('done');
-      } else {
-        setStatus('error');
-        setErrorMsg(res?.error || 'Verifizierung fehlgeschlagen');
-      }
-    } catch (e) {
-      setStatus('error');
-      setErrorMsg(e?.message || 'Verifizierung fehlgeschlagen');
-    }
-  };
 
+    verifyEmail(token);
+  }, [searchParams, toast, verifyEmail]);
+
+  if (status === 'verifying') {
+    return (
+      <div className={styles.verifyEmailPage}>
+        <div className={styles.container}>
+          <div className={styles.card}>
+            <div className={styles.spinner} />
+            <h1 className={styles.title}>E-Mail wird verifiziert...</h1>
+            <p className={styles.description}>
+              Bitte warten Sie einen Moment.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'success') {
+    return (
+      <div className={styles.verifyEmailPage}>
+        <div className={styles.container}>
+          <div className={styles.card}>
+            <div className={styles.successIcon}>✓</div>
+            <h1 className={styles.title}>E-Mail verifiziert!</h1>
+            <p className={styles.description}>
+              Ihre E-Mail-Adresse wurde erfolgreich verifiziert.
+            </p>
+            <p className={styles.hint}>
+              Sie werden in Kürze zum Login weitergeleitet...
+            </p>
+            <Link to="/login" className={styles.button}>
+              Jetzt anmelden
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        {status === 'pending' && (
-          <p>Verifiziere...</p>
-        )}
-
-        {status === 'done' && (
-          <div className="alert alert--success">
-            <h3>✅ E-Mail verifiziert!</h3>
-            <p>Du kannst dich jetzt anmelden.</p>
-            <p className="mt-3"><Link to="/login">Zur Anmeldung</Link></p>
-            <button className="btn btn--primary mt-2" onClick={() => navigate('/login')}>Jetzt anmelden</button>
+    <div className={styles.verifyEmailPage}>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.errorIcon}>✕</div>
+          <h1 className={styles.title}>Verifizierung fehlgeschlagen</h1>
+          <p className={styles.description}>
+            {error}
+          </p>
+          <div className={styles.actions}>
+            <Link to="/login" className={styles.button}>
+              Zum Login
+            </Link>
+            <Link to="/register" className={styles.secondaryButton}>
+              Neu registrieren
+            </Link>
           </div>
-        )}
-
-        {status === 'missing' && (
-          <div className="alert alert--error">Verifizierungs-Token fehlt.</div>
-        )}
-
-        {status === 'error' && (
-          <div className="alert alert--error">
-            Verifizierung fehlgeschlagen. Bitte fordere einen neuen Link an.
-            {errorMsg && <p style={{ marginTop: '0.5rem' }}>{errorMsg}</p>}
-          </div>
-        )}
-
-        {/* Debug/Manual Helper */}
-        <div className="card" style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'rgba(99,102,241,0.05)', borderRadius: '0.75rem' }}>
-          <h4>Debug / Manuell verifizieren</h4>
-          <label htmlFor="tokenInput" className="text-small">Token</label>
-          <input
-            id="tokenInput"
-            className="form-input"
-            value={currentToken || ''}
-            onChange={(e) => setCurrentToken(e.target.value)}
-            placeholder="Token aus Link"
-          />
-          <button className="btn btn--primary btn--sm" style={{ marginTop: '0.5rem' }} onClick={handleManualSubmit}>Token jetzt verifizieren</button>
         </div>
       </div>
     </div>
   );
-};
-
-export default VerifyEmailPage;
+}

@@ -1,257 +1,143 @@
 /**
- * APIClient - Vereinfachter HTTP Client
- * Handles alle API-Kommunikation mit Fehlerbehandlung
+ * @fileoverview Axios Client Instance
+ * @description Configured axios instance with interceptors for auth and logging
+ * 
+ * FEATURES:
+ * - Auto token injection in headers
+ * - Request/Response logging
+ * - Error handling
+ * - 401 Unauthorized handling (auto logout)
+ * 
+ * @module api/client
  */
 
-import { APIError, NetworkError, TimeoutError } from '../utils/errors';
-import { cacheManager } from './cacheManager';
-import { requestDeduplicator } from './requestDeduplicator';
-import { retryManager } from './retryManager';
+import axios from 'axios';
+import { API_CONFIG } from './config';
+import { logRequest, logResponse, logError } from './logger';
+import { isUnauthorized, isForbidden, isNetworkError } from './errorHandler';
 
-class APIClient {
-  constructor(baseURL, timeout = 30000) {
-    this.baseURL = baseURL;
-    this.timeout = timeout;
-    this.defaultHeaders = {
-      'Content-Type': 'application/json',
-    };
+/* eslint-disable no-undef */
 
-    // Runtime state
-    this.authToken = null;
-    this.refreshHandler = null;
+/**
+ * Create axios instance with config
+ */
+const client = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: 10000, // 10 seconds per spec
+  headers: API_CONFIG.HEADERS,
+});
 
-    // Shared utilities
-    this.cache = cacheManager;
-    this.requestDeduplicator = requestDeduplicator;
-    this.retryManager = retryManager;
+/**
+ * Dispatch toast event (handled by ToastProvider listener)
+ * @param {'success'|'error'|'warning'|'info'} type
+ * @param {string} message
+ * @param {number} duration
+ */
+const dispatchToast = (type, message, duration = 5000) => {
+  try {
+    globalThis.window?.dispatchEvent(
+      new CustomEvent('toast:add', { detail: { type, message, duration } })
+    );
+  } catch (error) {
+    globalThis.console?.warn('Failed to dispatch toast event:', error, message);
   }
+};
 
-  /**
-   * Attach/clear bearer token used for authenticated requests
-   */
-  setAuthToken(token) {
-    this.authToken = token;
+// ============================================
+// 📤 REQUEST INTERCEPTOR
+// ============================================
 
-    if (token) {
-      this.defaultHeaders.Authorization = `Bearer ${token}`;
+/**
+ * Request Interceptor
+ * Injects auth token into every request
+ */
+client.interceptors.request.use(
+  (config) => {
+    try {
+      const token = globalThis.localStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY);
+
+      console.log('🔑 [API Client] Token from localStorage:', token ? `${token.substring(0, 20)}...` : 'NONE');
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('✅ [API Client] Authorization header set:', config.headers.Authorization.substring(0, 30) + '...');
+      } else {
+        console.warn('⚠️ [API Client] NO TOKEN FOUND - Request will fail with 401');
+      }
+    } catch (error) {
+      globalThis.console?.warn('Failed to get auth token:', error);
+    }
+
+    logRequest(config.method?.toUpperCase?.() || 'GET', config.url, config.data);
+
+    return config;
+  },
+  (error) => {
+    dispatchToast('error', 'Unerwarteter Fehler beim Senden der Anfrage');
+    return Promise.reject(error);
+  }
+);
+
+// ============================================
+// 📥 RESPONSE INTERCEPTOR
+// ============================================
+
+/**
+ * Response Interceptor
+ * Handles responses and errors
+ */
+client.interceptors.response.use(
+  (response) => {
+    logResponse(
+      response.config.method?.toUpperCase?.() || 'GET',
+      response.config.url,
+      response.status,
+      response.data
+    );
+
+    return response;
+  },
+  (error) => {
+    const isMeEndpoint = error?.config?.url?.includes('/auth/me');
+    
+    // Don't log 401 errors for /auth/me - they're expected during initial auth check
+    const shouldLog = !(isUnauthorized(error) && isMeEndpoint);
+    
+    if (shouldLog && !isUnauthorized(error)) {
+      logError(error.config?.method?.toUpperCase?.(), error.config?.url, error);
+    }
+
+    // Don't show toast for 401 on /auth/me endpoint (initial auth check)
+    const shouldShowAuthToast = !isMeEndpoint;
+
+    if (isUnauthorized(error)) {
+      try {
+        globalThis.localStorage?.removeItem(API_CONFIG.TOKEN_STORAGE_KEY);
+        globalThis.window?.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      } catch (err) {
+        globalThis.console?.warn('Failed to handle 401 error:', err);
+      }
+      
+      // Only show auth toast if not the initial auth check
+      if (shouldShowAuthToast) {
+        dispatchToast('error', 'Authentifizierung erforderlich');
+      }
+    } else if (isForbidden(error)) {
+      dispatchToast('error', 'Sie haben keine Berechtigung');
+    } else if (error?.response?.status === 404) {
+      dispatchToast('error', 'Ressource nicht gefunden');
+    } else if (error?.response?.status >= 500) {
+      dispatchToast('error', 'Server-Fehler, bitte später versuchen');
+    } else if (isNetworkError(error)) {
+      dispatchToast('error', 'Keine Verbindung zum Server');
+    } else if (error?.code === 'ECONNABORTED') {
+      dispatchToast('error', 'Request hat zu lange gedauert');
     } else {
-      delete this.defaultHeaders.Authorization;
-    }
-  }
-
-  /**
-   * Register async refresh handler (called on 401)
-   */
-  setRefreshHandler(handler) {
-    this.refreshHandler = handler;
-  }
-
-  /**
-   * Build Full URL with Query Parameters
-   */
-  buildURL(endpoint, params = {}) {
-    const url = new URL(`${this.baseURL}${endpoint}`);
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        url.searchParams.append(key, value);
-      }
-    });
-    return url.toString();
-  }
-
-  /**
-   * Fetch with Timeout
-   */
-  async fetchWithTimeout(url, options = {}) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      return response;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        throw new TimeoutError('Request timeout', this.timeout);
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Handle Response & Parse JSON
-   */
-  async handleResponse(response) {
-    let data;
-    try {
-      data = await response.json();
-    } catch {
-      if (!response.ok) {
-        throw new APIError(`HTTP ${response.status}`, response.status, response.url);
-      }
-      data = { success: true };
+      dispatchToast('error', 'Unerwarteter Fehler');
     }
 
-    if (!response.ok) {
-      throw new APIError(
-        data.error || `HTTP ${response.status}`,
-        response.status,
-        response.url,
-        data
-      );
-    }
-
-    return data;
+    return Promise.reject(error);
   }
+);
 
-  /**
-   * Execute HTTP request with optional caching, retry & refresh support
-   */
-  async request(method, endpoint, {
-    params = {},
-    body = undefined,
-    headers = {},
-    cache = false,
-    forceRefresh = false,
-    retry = true,
-  } = {}) {
-    const url = this.buildURL(endpoint, params);
-    const cacheKey = this.cache.generateKey(endpoint, params);
-
-    if (cache && !forceRefresh) {
-      const cached = this.cache.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
-    }
-
-    const dedupKey = `${method}:${cacheKey}:${body ? JSON.stringify(body) : ''}`;
-
-    const executeFetch = async () => {
-      const response = await this.fetchWithTimeout(url, {
-        method,
-        headers: {
-          ...this.defaultHeaders,
-          ...headers,
-        },
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-      });
-
-      // Auto-refresh on unauthorized
-      if (response.status === 401 && this.refreshHandler) {
-        const newToken = await this.refreshHandler();
-        if (newToken) {
-          this.setAuthToken(newToken);
-
-          return this.fetchWithTimeout(url, {
-            method,
-            headers: {
-              ...this.defaultHeaders,
-              ...headers,
-            },
-            body: body !== undefined ? JSON.stringify(body) : undefined,
-          });
-        }
-      }
-
-      return response;
-    };
-
-    // Deduplicate identical requests to avoid duplicate calls
-    const performRequest = () =>
-      this.requestDeduplicator.execute(dedupKey, async () => {
-        const response = retry
-          ? await this.retryManager.executeWithRetry(executeFetch)
-          : await executeFetch();
-        const data = await this.handleResponse(response);
-
-        if (cache) {
-          this.cache.set(cacheKey, data);
-        }
-
-        return data;
-      });
-
-    return performRequest();
-  }
-
-  /**
-   * GET Request
-   */
-  async get(endpoint, params = {}, options = {}) {
-    try {
-      return await this.request('GET', endpoint, {
-        params,
-        ...options,
-      });
-    } catch (error) {
-      if (error instanceof APIError || error instanceof TimeoutError) {
-        throw error;
-      }
-      throw new NetworkError('Network request failed');
-    }
-  }
-
-  /**
-   * POST Request
-   */
-  async post(endpoint, body = {}, options = {}) {
-    try {
-      return await this.request('POST', endpoint, {
-        body,
-        ...options,
-      });
-    } catch (error) {
-      if (error instanceof APIError || error instanceof TimeoutError) {
-        throw error;
-      }
-      throw new NetworkError('Network request failed');
-    }
-  }
-
-  /**
-   * PUT Request
-   */
-  async put(endpoint, body = {}, options = {}) {
-    try {
-      return await this.request('PUT', endpoint, {
-        body,
-        ...options,
-      });
-    } catch (error) {
-      if (error instanceof APIError || error instanceof TimeoutError) {
-        throw error;
-      }
-      throw new NetworkError('Network request failed');
-    }
-  }
-
-  /**
-   * DELETE Request
-   */
-  async delete(endpoint, body = undefined, options = {}) {
-    try {
-      return await this.request('DELETE', endpoint, {
-        body,
-        ...options,
-      });
-    } catch (error) {
-      if (error instanceof APIError || error instanceof TimeoutError) {
-        throw error;
-      }
-      throw new NetworkError('Network request failed');
-    }
-  }
-}
-
-// API URL aus Environment oder Fallback
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-// Export singleton instance
-export const apiClient = new APIClient(API_URL);
-
-export default APIClient;
+export default client;

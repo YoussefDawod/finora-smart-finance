@@ -1,74 +1,194 @@
-// src/api/logger.js
-import { apiClient } from './client';
+/**
+ * @fileoverview API Logger
+ * @description Structured logging with support for development and production modes.
+ * 
+ * Features:
+ * - Development mode: colorful output, timestamps, bodies, stack traces
+ * - Production mode: minimal logging only
+ * - Log levels: DEBUG, INFO, WARN, ERROR
+ * 
+ * @module api/logger
+ */
 
-const LOG_LEVELS = {
-  INFO: 'info',
-  WARN: 'warn',
-  ERROR: 'error',
+/* eslint-disable no-undef */
+
+// ============================================
+// 🎨 COLOR PALETTE
+// ============================================
+
+const COLORS = {
+  RESET: '\x1b[0m',
+  BRIGHT: '\x1b[1m',
+  DIM: '\x1b[2m',
+  RED: '\x1b[31m',
+  GREEN: '\x1b[32m',
+  YELLOW: '\x1b[33m',
+  BLUE: '\x1b[34m',
+  CYAN: '\x1b[36m',
+  GRAY: '\x1b[90m',
 };
 
-class Logger {
-  constructor() {
-    this.logs = [];
-    this.maxLogs = 100;
-  }
+// ============================================
+// 📊 LOG LEVELS
+// ============================================
 
-  log(level, message, details = null) {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      level,
-      message,
-      details,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
-    };
+const LOG_LEVELS = {
+  DEBUG: { level: 0, icon: '🐛', color: COLORS.CYAN },
+  INFO: { level: 1, icon: 'ℹ️', color: COLORS.BLUE },
+  WARN: { level: 2, icon: '⚠️', color: COLORS.YELLOW },
+  ERROR: { level: 3, icon: '❌', color: COLORS.RED },
+};
 
-    // Store locally for debug dashboard
-    this.logs.unshift(logEntry);
-    if (this.logs.length > this.maxLogs) {
-      this.logs.pop();
-    }
+// ============================================
+// ⚙️ CONFIGURATION
+// ============================================
 
-    // Console output
-    if (import.meta.env.DEV) {
-      const style = level === 'error' ? 'color: red' : level === 'warn' ? 'color: orange' : 'color: blue';
-      console.log(`%c[${level.toUpperCase()}] ${message}`, style, details || '');
-    }
+const isDevelopment = import.meta.env.DEV;
+const currentLogLevel = isDevelopment ? LOG_LEVELS.DEBUG.level : LOG_LEVELS.INFO.level;
 
-    // Send critical errors to backend (optional/debounced)
-    if (level === 'error' && import.meta.env.PROD) {
-      this.sendToBackend(logEntry);
-    }
-  }
+/**
+ * Get formatted timestamp
+ * @returns {string}
+ */
+function getTimestamp() {
+  return new Date().toISOString().split('T')[1].slice(0, -1);
+}
 
-  info(message, details) {
-    this.log(LOG_LEVELS.INFO, message, details);
-  }
+/**
+ * Format log message with styling
+ * @param {string} level
+ * @param {string} message
+ * @returns {string}
+ */
+function formatMessage(level, message) {
+  const { icon, color } = LOG_LEVELS[level];
+  const timestamp = isDevelopment ? `${COLORS.DIM}${getTimestamp()}${COLORS.RESET}` : '';
+  return `${color}${icon}${COLORS.RESET} ${message} ${timestamp}`;
+}
 
-  warn(message, details) {
-    this.log(LOG_LEVELS.WARN, message, details);
-  }
-
-  error(message, details) {
-    this.log(LOG_LEVELS.ERROR, message, details);
-  }
-
-  async sendToBackend(logEntry) {
-    try {
-      // Fire and forget - don't await blocking
-      apiClient.post('/logs', logEntry, { retry: false }).catch(() => {});
-    } catch {
-      // Ignore logging errors to prevent loops
-    }
-  }
-
-  getLogs() {
-    return this.logs;
-  }
-
-  clearLogs() {
-    this.logs = [];
+/**
+ * Log debug message (development only)
+ * @param {string} message
+ * @param {*} data - Optional data to log
+ */
+function debug(message, data) {
+  if (LOG_LEVELS.DEBUG.level < currentLogLevel || !isDevelopment) return;
+  
+  globalThis.console?.log(formatMessage('DEBUG', message));
+  if (data && isDevelopment) {
+    globalThis.console?.log('  ', data);
   }
 }
 
-export const logger = new Logger();
+/**
+ * Log info message
+ * @param {string} message
+ * @param {*} data - Optional data to log
+ */
+function info(message, data) {
+  if (LOG_LEVELS.INFO.level < currentLogLevel) return;
+  
+  globalThis.console?.log(formatMessage('INFO', message));
+  if (data && isDevelopment) {
+    globalThis.console?.log('  ', data);
+  }
+}
+
+/**
+ * Log warning message
+ * @param {string} message
+ * @param {*} data - Optional data to log
+ */
+function warn(message, data) {
+  if (LOG_LEVELS.WARN.level < currentLogLevel) return;
+  
+  globalThis.console?.warn(formatMessage('WARN', message));
+  if (data && isDevelopment) {
+    globalThis.console?.warn('  ', data);
+  }
+}
+
+/**
+ * Log error message
+ * @param {string} message
+ * @param {*} error - Error object or data
+ */
+function error(message, error) {
+  if (LOG_LEVELS.ERROR.level < currentLogLevel) return;
+  
+  globalThis.console?.error(formatMessage('ERROR', message));
+  
+  if (error) {
+    if (isDevelopment) {
+      globalThis.console?.error('  ', error);
+      if (error.stack) {
+        globalThis.console?.error(`  ${COLORS.GRAY}Stack:${COLORS.RESET}`, error.stack);
+      }
+    } else if (error.message) {
+      globalThis.console?.error('  ', error.message);
+    }
+  }
+}
+
+/**
+ * Log API request
+ * @param {string} method - HTTP method
+ * @param {string} url - Request URL
+ * @param {*} data - Request body
+ */
+function logRequest(method, url, data) {
+  if (!isDevelopment) return;
+  
+  const msg = `📤 ${method.toUpperCase()} ${url}`;
+  debug(msg, data);
+}
+
+/**
+ * Log API response
+ * @param {string} method - HTTP method
+ * @param {string} url - Request URL
+ * @param {number} status - Response status code
+ * @param {*} data - Response body
+ */
+function logResponse(method, url, status, data) {
+  if (!isDevelopment) return;
+  
+  const statusEmoji = status >= 200 && status < 300 ? '✅' : '⚠️';
+  const msg = `📥 ${statusEmoji} ${status} ${method.toUpperCase()} ${url}`;
+  debug(msg, data);
+}
+
+/**
+ * Log API error
+ * @param {string} method - HTTP method
+ * @param {string} url - Request URL
+ * @param {Error} err - Error object
+ */
+function logError(method, url, err) {
+  const msg = `API ERROR: ${method?.toUpperCase?.()} ${url} - ${err?.message || 'Unknown error'}`;
+  
+  if (isDevelopment) {
+    error(msg, {
+      status: err?.response?.status,
+      data: err?.response?.data,
+      message: err?.message,
+    });
+  } else {
+    error(msg);
+  }
+}
+
+// ============================================
+// 📤 EXPORTS
+// ============================================
+
+export const logger = {
+  debug,
+  info,
+  warn,
+  error,
+};
+
+export { logRequest, logResponse, logError };
+
+export default logger;

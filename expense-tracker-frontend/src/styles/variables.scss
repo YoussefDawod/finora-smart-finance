@@ -1,498 +1,143 @@
-// src/styles/variables.scss
-// 2026 Design System tokens: colors, typography, spacing, utilities
+// ============================================
+// 🎨 DESIGN TOKENS - THEME-INDEPENDENT
+// Purpose: Pure, brand-agnostic tokens used everywhere
+// ============================================
 
 :root {
-  // Typography
-  --font-family-base: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-family-heading: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-family-mono: 'SFMono-Regular', 'JetBrains Mono', 'Consolas', 'Menlo', monospace;
+  /* Spacing scale */
+  --xs: 0.25rem;
+  --sm: 0.5rem;
+  --md: 1rem;
+  --lg: 1.5rem;
+  --xl: 2rem;
+  --xxl: 3rem;
+  --xxxl: 4rem;
 
-  --font-weight-300: 300;
-  --font-weight-400: 400;
-  --font-weight-500: 500;
-  --font-weight-600: 600;
-  --font-weight-700: 700;
+  /* Typography scale */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 2rem;
+  --fs-4xl: 2.5rem;
 
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 32px;
+  --ff-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-mono: 'Fira Code', 'Courier New', monospace;
 
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-loose: 1.75;
+  --fw-l: 300;
+  --fw-n: 400;
+  --fw-m: 500;
+  --fw-sb: 600;
+  --fw-b: 700;
 
-  --letter-spacing-tight: -0.01em;
-  --letter-spacing-normal: 0;
-  --letter-spacing-loose: 0.01em;
+  --lh-tight: 1.2;
+  --lh-n: 1.5;
+  --lh-relax: 1.75;
 
-  // Color palette — Aurora Nightfall theme (premium navy + electric blue)
-  --color-primary-50: #f4f3ff;
-  --color-primary-100: #e4e1ff;
-  --color-primary-200: #c9c2ff;
-  --color-primary-300: #a9a0ff;
-  --color-primary-400: #867bff;
-  --color-primary-500: #6956f3;
-  --color-primary-600: #4f46e5; // main
-  --color-primary-700: #3d35c6;
-  --color-primary-800: #2b259e;
-  --color-primary-900: #1f1c7a;
-  --color-primary: var(--color-primary-600);
+  /* Radius */
+  --r-sm: 0.25rem;
+  --r-md: 0.5rem;
+  --r-lg: 0.75rem;
+  --r-xl: 1rem;
+  --r-2xl: 1.5rem;
+  --r-full: 9999px;
 
-  --color-secondary-50: #e8fbff;
-  --color-secondary-100: #cff4ff;
-  --color-secondary-200: #a5e8ff;
-  --color-secondary-300: #74dcff;
-  --color-secondary-400: #39ccff;
-  --color-secondary-500: #12b6ed;
-  --color-secondary-600: #0c9ccc;
-  --color-secondary-700: #0b7ba0;
-  --color-secondary-800: #0c5f7c;
-  --color-secondary-900: #0b4c63;
-  --color-secondary: var(--color-secondary-600);
+  /* Transitions & timing */
+  --tr-fast: 150ms ease-in-out;
+  --tr: 250ms ease-in-out;
+  --tr-slow: 350ms ease-in-out;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
 
-  --color-accent-50: #fff3f5;
-  --color-accent-100: #ffe1e7;
-  --color-accent-200: #ffc4d2;
-  --color-accent-300: #ff95b0;
-  --color-accent-400: #fb5f8a;
-  --color-accent-500: #f43f5e;
-  --color-accent-600: #e11d48;
-  --color-accent-700: #be123c;
-  --color-accent-800: #9f1239;
-  --color-accent-900: #881337;
-  --color-accent: var(--color-accent-500);
+  /* Breakpoints (mobile-first) */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
 
-  --color-success: #22c55e;
-  --color-success-strong: #16a34a;
-  --color-success-bg: rgba(34, 197, 94, 0.12);
+  /* Max Widths */
+  --mw-sm: 640px;
+  --mw-md: 768px;
+  --mw-lg: 1024px;
+  --mw-xl: 1280px;
+  --mw-2xl: 1536px;
 
-  --color-error: #ef4444;
-  --color-error-strong: #dc2626;
-  --color-error-bg: rgba(239, 68, 68, 0.12);
-
-  --color-warning: #f59e0b;
-  --color-warning-strong: #d97706;
-  --color-warning-bg: rgba(245, 158, 11, 0.12);
-
-  --color-info: var(--color-primary-600);
-  --color-info-strong: var(--color-primary-700);
-  --color-info-bg: rgba(79, 70, 229, 0.12);
-
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
-  --gray-950: #020617;
-
-  --color-bg: #f6f7fb;
-  --color-bg-secondary: #eef2f7;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f3f4f6;
-  --color-surface-contrast: #0f172a;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-
-  --color-text: #0b1224;
-  --color-text-secondary: #475569;
-  --color-text-muted: #64748b;
-  --color-text-inverse: #f8fafc;
-
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
-  --shadow-md: 0 8px 20px rgba(15, 23, 42, 0.12);
-  --shadow-lg: 0 14px 30px rgba(15, 23, 42, 0.14);
-  --shadow-xl: 0 22px 40px rgba(15, 23, 42, 0.18);
-  --shadow-glow: 0 10px 40px rgba(79, 70, 229, 0.25);
-
-  --glass-bg: rgba(255, 255, 255, 0.12);
-  --glass-border: rgba(255, 255, 255, 0.22);
-  --glass-blur: 14px;
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --radius-full: 9999px;
-
-  --border-width: 1px;
-
-  --transition-micro: 120ms cubic-bezier(0.33, 1, 0.68, 1);
-  --transition-fast: 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
-  --transition-normal: 240ms cubic-bezier(0.18, 0.69, 0.3, 1);
-  --transition-slow: 320ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-// Dark mode token overrides (system-aware when ThemeContext sets data-theme="dark")
-@mixin dark-theme-tokens {
-  --color-primary-50: #23254d;
-  --color-primary-100: #2d2f62;
-  --color-primary-200: #373a7a;
-  --color-primary-300: #42459a;
-  --color-primary-400: #4f51b8;
-  --color-primary-500: #5c5ed8;
-  --color-primary-600: #8c8ff8;
-  --color-primary-700: #a7a9ff;
-  --color-primary-800: #c5c7ff;
-  --color-primary-900: #e1e3ff;
-
-  --color-secondary-50: #0b1a26;
-  --color-secondary-100: #0f2533;
-  --color-secondary-200: #113043;
-  --color-secondary-300: #133c52;
-  --color-secondary-400: #144966;
-  --color-secondary-500: #0f6f9f;
-  --color-secondary-600: #1a90c8;
-  --color-secondary-700: #2db8ed;
-  --color-secondary-800: #61d7ff;
-  --color-secondary-900: #a5eaff;
-
-  --color-accent-50: #2b0f17;
-  --color-accent-100: #3a1620;
-  --color-accent-200: #4d1f2c;
-  --color-accent-300: #642a3b;
-  --color-accent-400: #7e354b;
-  --color-accent-500: #a84765;
-  --color-accent-600: #d85f80;
-  --color-accent-700: #ef7fa0;
-  --color-accent-800: #f8a3be;
-  --color-accent-900: #ffd0de;
-
-  --gray-50: #0b1220;
-  --gray-100: #10192c;
-  --gray-200: #1a2336;
-  --gray-300: #222d42;
-  --gray-400: #2f3b52;
-  --gray-500: #52607c;
-  --gray-600: #7a89a7;
-  --gray-700: #a7b4cb;
-  --gray-800: #cdd6e6;
-  --gray-900: #e8edf5;
-  --gray-950: #f5f7fb;
-
-  --color-bg: #060910;
-  --color-bg-secondary: #0b1220;
-  --color-surface: #10182b;
-  --color-surface-muted: #131d30;
-  --color-surface-contrast: #e8edf5;
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.16);
-
-  --color-text: #e8edf5;
-  --color-text-secondary: #c3cee1;
-  --color-text-muted: #9fb1ce;
-  --color-text-inverse: #0b1220;
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.45);
-  --shadow-xl: 0 26px 54px rgba(0, 0, 0, 0.55);
-  --shadow-glow: 0 12px 40px rgba(140, 143, 248, 0.35);
-
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.12);
-}
-
-:root[data-theme='dark'] {
-  @include dark-theme-tokens;
-}
-
-// Auto-dark fallback for users choosing "system"
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    @include dark-theme-tokens;
-  }
-}
-
-// High contrast tweaks
-@media (prefers-contrast: more) {
-  :root {
-    --color-border: var(--color-border-strong);
-    --color-border-strong: #94a3b8;
-    --shadow-sm: 0 0 0 rgba(0, 0, 0, 0);
-  }
+  /* Z-index scale */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1100;
+  --z-overlay: 1200;
+  --z-modal: 1300;
+  --z-popover: 1400;
+  --z-toast: 1500;
+  --z-max: 2147483647;
 }
 
 // ============================================
-// SASS TOKENS (reference CSS custom properties)
+// 🎨 DESIGN TOKENS - THEME-INDEPENDENT
 // ============================================
-$color-primary: var(--color-primary-600);
-$color-primary-light: var(--color-primary-400);
-$color-primary-dark: var(--color-primary-700);
-$color-primary-bg: var(--color-info-bg);
 
-$color-secondary: var(--color-secondary-600);
-$color-accent: var(--color-accent-500);
+:root {
+  /* Spacing */
+  --xs: 0.25rem;
+  --sm: 0.5rem;
+  --md: 1rem;
+  --lg: 1.5rem;
+  --xl: 2rem;
+  --xxl: 3rem;
+  --xxxl: 4rem;
 
-$color-success: var(--color-success);
-$color-success-strong: var(--color-success-strong);
-$color-success-bg: var(--color-success-bg);
+  /* Typography */
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-md: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-2xl: 1.5rem;
+  --fs-3xl: 2rem;
+  --fs-4xl: 2.5rem;
 
-$color-error: var(--color-error);
-$color-error-strong: var(--color-error-strong);
-$color-error-bg: var(--color-error-bg);
+  --ff-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ff-mono: 'Fira Code', 'Courier New', monospace;
 
-$color-warning: var(--color-warning);
-$color-warning-strong: var(--color-warning-strong);
-$color-warning-bg: var(--color-warning-bg);
+  --fw-l: 300;
+  --fw-n: 400;
+  --fw-m: 500;
+  --fw-sb: 600;
+  --fw-b: 700;
 
-$color-info: var(--color-info);
-$color-info-strong: var(--color-info-strong);
-$color-info-bg: var(--color-info-bg);
+  --lh-tight: 1.2;
+  --lh-n: 1.5;
+  --lh-relax: 1.75;
 
-$color-gray-50: var(--gray-50);
-$color-gray-100: var(--gray-100);
-$color-gray-200: var(--gray-200);
-$color-gray-300: var(--gray-300);
-$color-gray-400: var(--gray-400);
-$color-gray-500: var(--gray-500);
-$color-gray-600: var(--gray-600);
-$color-gray-700: var(--gray-700);
-$color-gray-800: var(--gray-800);
-$color-gray-900: var(--gray-900);
+  /* Radius */
+  --r-sm: 0.25rem;
+  --r-md: 0.5rem;
+  --r-lg: 0.75rem;
+  --r-xl: 1rem;
+  --r-2xl: 1.5rem;
+  --r-full: 9999px;
 
-$color-text: var(--color-text);
-$color-text-secondary: var(--color-text-secondary);
-$color-text-light: var(--color-text-muted);
+  /* Transitions */
+  --tr-fast: 150ms ease-in-out;
+  --tr: 250ms ease-in-out;
+  --tr-slow: 350ms ease-in-out;
 
-$color-bg: var(--color-surface);
-$color-bg-secondary: var(--color-bg-secondary);
-$color-border: var(--color-border);
-$color-border-strong: var(--color-border-strong);
+  /* Breakpoints */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
 
-// ============================================
-// RESPONSIVE BREAKPOINTS
-// ============================================
-$bp-xs: 320px; // Mobile Portrait
-$bp-sm: 480px; // Mobile Landscape
-$bp-md: 768px; // Tablet
-$bp-lg: 1024px; // Desktop Small
-$bp-xl: 1280px; // Desktop
-$bp-2xl: 1536px; // Desktop Large
-
-// ============================================
-// TOUCH-FRIENDLY SPACING
-// ============================================
-$touch-target-min: 44px; // Apple HIG
-$touch-padding-sm: 12px;
-$touch-padding-md: 16px;
-$touch-padding-lg: 20px;
-
-// ============================================
-// SPACING
-// ============================================
-$space-xs: 4px;
-$space-sm: 8px;
-$space-md: 12px;
-$space-lg: 16px;
-$space-xl: 24px;
-$space-2xl: 32px;
-$space-3xl: 48px;
-
-// ============================================
-// TYPOGRAPHY (SASS aliases)
-// ============================================
-$font-family-base: var(--font-family-base);
-$font-family-heading: var(--font-family-heading);
-$font-family-mono: var(--font-family-mono);
-
-$font-size-xs: var(--font-size-xs);
-$font-size-sm: var(--font-size-sm);
-$font-size-base: var(--font-size-base);
-$font-size-lg: var(--font-size-lg);
-$font-size-xl: var(--font-size-xl);
-$font-size-2xl: var(--font-size-2xl);
-$font-size-3xl: var(--font-size-3xl);
-
-$font-weight-light: var(--font-weight-300);
-$font-weight-normal: var(--font-weight-400);
-$font-weight-medium: var(--font-weight-500);
-$font-weight-semibold: var(--font-weight-600);
-$font-weight-bold: var(--font-weight-700);
-
-$line-height-tight: var(--line-height-tight);
-$line-height-normal: var(--line-height-normal);
-$line-height-loose: var(--line-height-loose);
-
-// ============================================
-// BORDER & RADIUS
-// ============================================
-$border-radius-sm: var(--radius-sm);
-$border-radius-md: var(--radius-md);
-$border-radius-lg: var(--radius-lg);
-$border-radius-xl: var(--radius-xl);
-$border-radius-full: var(--radius-full);
-
-$border-width: var(--border-width);
-
-// ============================================
-// SHADOWS
-// ============================================
-$shadow-sm: var(--shadow-sm);
-$shadow-md: var(--shadow-md);
-$shadow-lg: var(--shadow-lg);
-$shadow-xl: var(--shadow-xl);
-$shadow-2xl: var(--shadow-xl);
-
-// ============================================
-// TRANSITIONS
-// ============================================
-$transition-fast: var(--transition-fast);
-$transition-normal: var(--transition-normal);
-$transition-slow: var(--transition-slow);
-$transition-micro: var(--transition-micro);
-
-// ============================================
-// MEDIA QUERY MIXINS
-// ============================================
-@mixin on-mobile {
-  @content;
-}
-
-@mixin on-sm {
-  @media (min-width: $bp-sm) {
-    @content;
-  }
-}
-
-@mixin on-md {
-  @media (min-width: $bp-md) {
-    @content;
-  }
-}
-
-@mixin on-lg {
-  @media (min-width: $bp-lg) {
-    @content;
-  }
-}
-
-@mixin on-xl {
-  @media (min-width: $bp-xl) {
-    @content;
-  }
-}
-
-@mixin on-2xl {
-  @media (min-width: $bp-2xl) {
-    @content;
-  }
-}
-
-@mixin landscape {
-  @media (orientation: landscape) {
-    @content;
-  }
-}
-
-@mixin portrait {
-  @media (orientation: portrait) {
-    @content;
-  }
-}
-
-@mixin touch-device {
-  @media (hover: none) and (pointer: coarse) {
-    @content;
-  }
-}
-
-@mixin hover-device {
-  @media (hover: hover) and (pointer: fine) {
-    @content;
-  }
-}
-
-@mixin high-dpi {
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    @content;
-  }
-}
-
-@mixin dark-mode {
-  @media (prefers-color-scheme: dark) {
-    @content;
-  }
-}
-
-@mixin prefers-reduced-motion {
-  @media (prefers-reduced-motion: reduce) {
-    @content;
-  }
-}
-
-// ============================================
-// MIXINS
-// ============================================
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-@mixin text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@mixin text-truncate-multi($lines: 2) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-@mixin responsive($breakpoint) {
-  @if $breakpoint == 'sm' {
-    @media (min-width: $bp-sm) {
-      @content;
-    }
-  } @else if $breakpoint == 'md' {
-    @media (min-width: $bp-md) {
-      @content;
-    }
-  } @else if $breakpoint == 'lg' {
-    @media (min-width: $bp-lg) {
-      @content;
-    }
-  } @else if $breakpoint == 'xl' {
-    @media (min-width: $bp-xl) {
-      @content;
-    }
-  }
-}
-
-@mixin button-reset {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-
-  &:focus {
-    outline: 2px solid $color-primary;
-    outline-offset: 2px;
-  }
-}
-
-@mixin focus-ring {
-  outline: 2px solid $color-primary;
-  outline-offset: 2px;
+  /* Max Widths */
+  --mw-sm: 640px;
+  --mw-md: 768px;
+  --mw-lg: 1024px;
+  --mw-xl: 1280px;
+  --mw-2xl: 1536px;
 }

@@ -1,55 +1,118 @@
 /**
- * MotionContext provides global animation preferences and controls.
+ * @fileoverview Motion Context Provider
+ * @description Manages reduced motion preference from OS/browser settings.
+ * Used for conditional animations with Framer Motion or CSS animations.
+ * 
+ * STATE SHAPE:
+ * {
+ *   prefersReducedMotion: boolean
+ * }
+ * 
+ * USAGE:
+ * const { prefersReducedMotion } = useMotion();
+ * 
+ * <motion.div
+ *   animate={prefersReducedMotion ? {} : { opacity: 1 }}
+ *   transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
+ * >
+ *   Content
+ * </motion.div>
+ * 
+ * @module MotionContext
  */
-import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import PropTypes from 'prop-types';
-import { useMotionPreference } from '../hooks/useMotionPreference';
-import { defaultSpring } from '../config/framerMotionConfig';
 
-const MotionContext = createContext(undefined);
+import { createContext, useState, useEffect, useContext } from 'react';
 
-export const MotionProvider = ({ children, config = defaultSpring, onAnimationStart, onAnimationComplete }) => {
-  const { prefersReducedMotion } = useMotionPreference();
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [animationsEnabled, setAnimationsEnabled] = useState(true);
+// ============================================
+// 🎬 CONSTANTS
+// ============================================
 
-  const handleAnimationStart = useCallback(() => {
-    setIsAnimating(true);
-    if (onAnimationStart) onAnimationStart();
-  }, [onAnimationStart]);
+const MEDIA_QUERY = '(prefers-reduced-motion: reduce)';
 
-  const handleAnimationComplete = useCallback(() => {
-    setIsAnimating(false);
-    if (onAnimationComplete) onAnimationComplete();
-  }, [onAnimationComplete]);
+/* eslint-disable no-undef */
 
-  const value = useMemo(
-    () => ({
-      motionConfig: config,
-      isAnimating,
-      animationsEnabled,
-      prefersReducedMotion,
-      setAnimationsEnabled,
-      onAnimationStart: handleAnimationStart,
-      onAnimationComplete: handleAnimationComplete,
-    }),
-    [config, isAnimating, animationsEnabled, prefersReducedMotion, handleAnimationStart, handleAnimationComplete]
+// ============================================
+// 📦 CONTEXT
+// ============================================
+
+export const MotionContext = createContext(undefined);
+
+// ============================================
+// 🎯 PROVIDER COMPONENT
+// ============================================
+
+/**
+ * MotionProvider Component
+ * Detects and listens to @media (prefers-reduced-motion: reduce) preference
+ * 
+ * @param {Object} props
+ * @param {React.ReactNode} props.children
+ */
+export function MotionProvider({ children }) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // ============================================
+  // 🔍 DETECT & LISTEN TO REDUCED MOTION
+  // ============================================
+
+  useEffect(() => {
+    if (typeof globalThis.window === 'undefined') {
+      return;
+    }
+
+    // Check initial preference
+    const mediaQuery = globalThis.window.matchMedia(MEDIA_QUERY);
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    /**
+     * Handler for media query changes
+     * @param {MediaQueryListEvent} event
+     */
+    const handleChange = (event) => {
+      setPrefersReducedMotion(event.matches);
+    };
+
+    // Modern browsers use addEventListener
+    mediaQuery.addEventListener('change', handleChange);
+
+    // Cleanup
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
+
+  // ============================================
+  // 📤 CONTEXT VALUE
+  // ============================================
+
+  const value = {
+    prefersReducedMotion,
+  };
+
+  return (
+    <MotionContext.Provider value={value}>{children}</MotionContext.Provider>
   );
+}
 
-  return <MotionContext.Provider value={value}>{children}</MotionContext.Provider>;
-};
+// ============================================
+// 🪝 CUSTOM HOOK
+// ============================================
 
-MotionProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-  config: PropTypes.object,
-  onAnimationStart: PropTypes.func,
-  onAnimationComplete: PropTypes.func,
-};
-
+/**
+ * useMotion Hook
+ * Access motion preferences from MotionContext
+ * 
+ * @returns {{ prefersReducedMotion: boolean, shouldAnimate: boolean }}
+ */
 export const useMotion = () => {
-  const ctx = useContext(MotionContext);
-  if (!ctx) {
+  const context = useContext(MotionContext);
+  
+  if (context === undefined) {
     throw new Error('useMotion must be used within a MotionProvider');
   }
-  return ctx;
+
+  return {
+    prefersReducedMotion: context.prefersReducedMotion,
+    shouldAnimate: !context.prefersReducedMotion,
+  };
 };

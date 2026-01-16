@@ -1,23 +1,23 @@
+/**
+ * @fileoverview API Configuration
+ * @description Environment-specific API settings
+ * 
+ * @module api/config
+ */
+
+/* eslint-disable no-undef */
+
+export const API_BASE_URL = import.meta.env?.VITE_API_URL || 'http://localhost:5000';
+export const API_TIMEOUT = 10000;
+
 export const API_CONFIG = {
-  // Request timeouts by endpoint type
-  TIMEOUTS: {
-    DEFAULT: 30000, // 30s
-    UPLOAD: 120000, // 2m
-    DOWNLOAD: 60000, // 1m
-    QUICK: 5000, // 5s
+  BASE_URL: API_BASE_URL,
+  TIMEOUT: API_TIMEOUT,
+  HEADERS: {
+    'Content-Type': 'application/json',
   },
-
-  // Retry configuration
-  RETRY: {
-    MAX_ATTEMPTS: 3,
-    INITIAL_DELAY: 1000,
-    MAX_DELAY: 30000,
-    BACKOFF_MULTIPLIER: 2,
-  },
-
-  // Cache configuration
-  CACHE: {
-    DEFAULT_TTL: 5 * 60 * 1000, // 5m
-    STALE_TTL: 30 * 1000, // 30s
-  },
+  TOKEN_STORAGE_KEY: 'auth_token',
+  DEBUG: true,
 };
+
+export default API_CONFIG;

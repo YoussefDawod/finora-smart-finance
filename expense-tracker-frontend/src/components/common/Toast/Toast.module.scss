@@ -1,0 +1,201 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.toast {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  max-width: 500px;
+  padding: 1rem;
+  background: var(--surface-primary);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-xl);
+  border-left: 4px solid var(--primary-color);
+  animation: slideIn 0.3s ease-out;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    min-width: auto;
+    max-width: calc(100vw - 2rem);
+  }
+
+  &.exiting {
+    animation: slideOut 0.3s ease-in forwards;
+  }
+}
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  border-radius: 50%;
+}
+
+.message {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.actionButton {
+  padding: 0.25rem 0.75rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--primary-color);
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--primary-color);
+    color: var(--text-on-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+}
+
+.closeButton {
+  padding: 0.25rem;
+  font-size: var(--font-size-lg);
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--border-radius-sm);
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--background-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring-color);
+    outline-offset: 2px;
+  }
+}
+
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border-color);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: currentColor;
+  transition: width 50ms linear;
+}
+
+// Type variations
+.success {
+  border-left-color: var(--success-color);
+
+  .icon {
+    color: var(--success-color);
+    background: rgba(var(--success-rgb), 0.1);
+  }
+
+  .progressFill {
+    background: var(--success-color);
+  }
+}
+
+.error {
+  border-left-color: var(--error-color);
+
+  .icon {
+    color: var(--error-color);
+    background: rgba(var(--error-rgb), 0.1);
+  }
+
+  .progressFill {
+    background: var(--error-color);
+  }
+}
+
+.warning {
+  border-left-color: var(--warning-color);
+
+  .icon {
+    color: var(--warning-color);
+    background: rgba(var(--warning-rgb), 0.1);
+  }
+
+  .progressFill {
+    background: var(--warning-color);
+  }
+}
+
+.info {
+  border-left-color: var(--info-color);
+
+  .icon {
+    color: var(--info-color);
+    background: rgba(var(--info-rgb), 0.1);
+  }
+
+  .progressFill {
+    background: var(--info-color);
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);  /* Slide UP from bottom */
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);  /* Slide DOWN to bottom */
+    opacity: 0;
+  }
+}

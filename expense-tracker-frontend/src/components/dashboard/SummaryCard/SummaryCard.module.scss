@@ -1,0 +1,329 @@
+/**
+ * @fileoverview SummaryCard Component Styles
+ * @description Modern Card Design mit Glassmorphism und Animationen
+ */
+
+@use '@/styles/variables' as *;
+
+// ============================================
+// BASE CARD STYLES
+// ============================================
+
+.summaryCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.6, 0.3, 1);
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 16px;
+    gap: 12px;
+  }
+}
+
+// ============================================
+// COLOR VARIANTS
+// ============================================
+
+.income {
+  border-color: color-mix(in srgb, #10b981 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, #10b98120 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: #10b981;
+    background: color-mix(in srgb, #10b981 10%, transparent);
+  }
+
+  .trendBadge.up {
+    background: color-mix(in srgb, #10b981 20%, transparent);
+    color: #10b981;
+  }
+}
+
+.expense {
+  border-color: color-mix(in srgb, #ef4444 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, #ef444420 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: #ef4444;
+    background: color-mix(in srgb, #ef4444 10%, transparent);
+  }
+
+  .trendBadge.down {
+    background: color-mix(in srgb, #ef4444 20%, transparent);
+    color: #ef4444;
+  }
+}
+
+.balance {
+  border-color: color-mix(in srgb, #3b82f6 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, #3b82f620 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: #3b82f6;
+    background: color-mix(in srgb, #3b82f6 10%, transparent);
+  }
+}
+
+.primary {
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, var(--primary-op10) 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+
+.small {
+  padding: 16px;
+
+  .title {
+    font-size: 0.875rem;
+  }
+
+  .value {
+    font-size: 1.5rem;
+  }
+
+  .iconWrapper {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.large {
+  padding: 32px;
+
+  @media (max-width: 768px) {
+    padding: 24px;
+  }
+
+  .title {
+    font-size: 1.125rem;
+  }
+
+  .value {
+    font-size: 2.5rem;
+  }
+
+  .iconWrapper {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+// ============================================
+// BACKGROUND GRADIENT
+// ============================================
+
+.gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+// ============================================
+// HEADER (Icon + Title)
+// ============================================
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+
+  svg {
+    transition: transform 0.3s ease;
+  }
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--tx-muted);
+  margin: 0;
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+  }
+}
+
+// ============================================
+// VALUE SECTION
+// ============================================
+
+.valueSection {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
+}
+
+.value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--tx);
+  margin: 0;
+  line-height: 1.2;
+
+  @media (max-width: 768px) {
+    font-size: 1.75rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
+}
+
+// ============================================
+// TREND BADGE
+// ============================================
+
+.trendBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  svg {
+    margin-top: 1px;
+  }
+
+  &.up {
+    background: color-mix(in srgb, #10b981 20%, transparent);
+    color: #10b981;
+  }
+
+  &.down {
+    background: color-mix(in srgb, #ef4444 20%, transparent);
+    color: #ef4444;
+  }
+}
+
+// ============================================
+// TREND TEXT (Bottom)
+// ============================================
+
+.trendText {
+  font-size: 0.8125rem;
+  color: var(--tx-muted);
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+  }
+}
+
+// ============================================
+// SHIMMER EFFECT
+// ============================================
+
+.shimmer {
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: shimmer 6s infinite;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.summaryCard:hover .shimmer {
+  opacity: 1;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translate(-100%, -100%) rotate(45deg);
+  }
+  100% {
+    transform: translate(100%, 100%) rotate(45deg);
+  }
+}
+
+// ============================================
+// RESPONSIVE GRID
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .summaryCard,
+  .iconWrapper,
+  .shimmer {
+    transition: none;
+    animation: none;
+  }
+}

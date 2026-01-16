@@ -1,40 +1,60 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { visualizer } from 'rollup-plugin-visualizer';
+import path from 'path';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    visualizer({
-      open: true, // Öffnet Visualizer automatisch nach Build
-      gzipSize: true,
-      brotliSize: true,
-      filename: 'dist/stats.html',
-    }),
-  ],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // React Vendor Bundle
-          'react-vendor': ['react', 'react-dom'],
-          // Utils Bundle
-          utils: ['./src/utils/errors.js', './src/utils/performance.js'],
-        },
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@components': path.resolve(__dirname, './src/components'),
+      '@pages': path.resolve(__dirname, './src/pages'),
+      '@hooks': path.resolve(__dirname, './src/hooks'),
+      '@contexts': path.resolve(__dirname, './src/contexts'),
+      '@services': path.resolve(__dirname, './src/services'),
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@styles': path.resolve(__dirname, './src/styles'),
+    },
+  },
+  css: {
+    modules: {
+      // Verwende immer eindeutige Klassennamen, um Kollisionen zwischen Modulen (z.B. mehrere "header") zu vermeiden.
+      generateScopedName: process.env.NODE_ENV === 'production'
+        ? '[hash:base64:5]'
+        : '[name]__[local]__[hash:base64:5]',
+      
+      // Klassennamen in camelCase umwandeln
+      localsConvention: 'camelCaseOnly',
+    },
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        additionalData: `
+          @use "@styles/variables.scss" as *;
+          @use "@styles/mixins.scss" as *;
+        `,
       },
     },
-    chunkSizeWarningLimit: 500, // Warning bei > 500KB
-    sourcemap: true, // Source Maps für Debugging
   },
   server: {
     port: 3000,
-    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        silenceDeprecations: ['import'],
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          axios: ['axios'],
+          motion: ['framer-motion'],
+        },
       },
     },
   },

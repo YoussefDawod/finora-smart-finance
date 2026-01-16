@@ -1,88 +1,45 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from 'react';
 
 /**
- * Generic Fetch Hook (Alternative zu useApi für simple Requests)
- * Für: GET-only requests, externe APIs, statische Daten
+ * Custom hook for API calls with loading and error states
+ * @param {Function} apiFunction - Async function that makes the API call
+ * @param {boolean} immediate - Whether to call the function immediately
  */
-function useFetch(url, options = {}) {
+export const useFetch = (apiFunction, immediate = true) => {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const isMountedRef = useRef(true);
-  const abortControllerRef = useRef(new AbortController());
+  const execute = async (...params) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await apiFunction(...params);
+      setData(result);
+      return { success: true, data: result };
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || err.message || 'Ein Fehler ist aufgetreten';
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    if (immediate) {
+      execute();
+    }
+  }, []);
 
-        const response = await axios.get(url, {
-          signal: abortControllerRef.current.signal,
-          timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || 10000),
-          ...options,
-        });
+  const refetch = () => execute();
 
-        if (isMountedRef.current) {
-          setData(response.data);
-          setError(null);
-        }
-      } catch (err) {
-        if (axios.isCancel(err)) {
-          return; // Request abgebrochen
-        }
-
-        if (isMountedRef.current) {
-          setError(err.message);
-          setData(null);
-        }
-      } finally {
-        if (isMountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-
-    return () => {
-      isMountedRef.current = false;
-      abortControllerRef.current.abort();
-    };
-  }, [url, options]);
-
-  const refetch = useCallback(() => {
-    abortControllerRef.current = new AbortController();
-    setLoading(true);
-
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(url, {
-          signal: abortControllerRef.current.signal,
-          timeout: parseInt(import.meta.env.VITE_API_TIMEOUT || 10000),
-          ...options,
-        });
-
-        if (isMountedRef.current) {
-          setData(response.data);
-          setError(null);
-        }
-      } catch (err) {
-        if (!axios.isCancel(err) && isMountedRef.current) {
-          setError(err.message);
-        }
-      } finally {
-        if (isMountedRef.current) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchData();
-  }, [url, options]);
-
-  return { data, loading, error, refetch };
-}
-
-export default useFetch;
+  return {
+    data,
+    loading,
+    error,
+    execute,
+    refetch,
+  };
+};

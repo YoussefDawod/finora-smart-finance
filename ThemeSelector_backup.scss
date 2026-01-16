@@ -1,0 +1,384 @@
+﻿/**
+ * @fileoverview Theme Selector Component Styles - PROFESSIONAL
+ * @description Modern dropdown menu for theme management with Icons
+ */
+
+@use '@/styles/variables' as *;
+
+// ============================================
+// CONTAINER
+// ============================================
+
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+// ============================================
+// TRIGGER BUTTON - PROFESSIONELLE VERBESSERUNG
+// ============================================
+
+.triggerButton {
+  display: flex;
+  align-items: center;
+  gap: var(--sm);
+  padding: var(--sm) var(--md);
+  background: var(--surface-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr-default);
+  white-space: nowrap;
+  user-select: none;
+  box-shadow: 0 1px 3px color-mix(in srgb, var(--tx) 5%, transparent);
+
+  &:hover {
+    background: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 15%, transparent);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--tx) 5%, transparent);
+  }
+}
+
+.icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  min-width: 50px;
+}
+
+.chevron {
+  font-size: 1rem;
+  transition: transform var(--tr-fast);
+  transform: rotate(0deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+
+  &.open {
+    transform: rotate(90deg);
+  }
+}
+
+// ============================================
+// DROPDOWN MENU - VERBESSERTES DESIGN
+// ============================================
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--sm));
+  left: 0;
+  min-width: 240px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: 0 10px 40px color-mix(in srgb, var(--tx) 15%, transparent);
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideDown var(--tr-default) ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// SECTION STYLING
+// ============================================
+
+.section {
+  padding: var(--md) 0;
+  
+  &:first-child {
+    padding-top: var(--md);
+  }
+
+  &:last-child {
+    padding-bottom: var(--md);
+  }
+}
+
+.sectionLabel {
+  padding: 0 var(--md);
+  margin-bottom: var(--sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--tx-muted);
+}
+
+// ============================================
+// MENU ITEMS
+// ============================================
+
+.menuItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--md);
+  padding: var(--sm) var(--md);
+  background: transparent;
+  border: none;
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  user-select: none;
+  position: relative;
+  text-align: left;
+
+  &:hover:not(.toggle) {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    color: var(--primary);
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+    font-weight: var(--fw-m);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+}
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  z-index: 1000;
+  min-width: 180px;
+  overflow: hidden;
+  animation: slideDown 150ms ease-out;
+
+  @media (max-width: var(--bp-sm)) {
+    position: fixed;
+    top: auto;
+    bottom: var(--md);
+    left: var(--md);
+    right: var(--md);
+    min-width: auto;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// MENU SECTIONS
+// ============================================
+
+.section {
+  padding: var(--xs) 0;
+
+  &:first-child {
+    padding-top: var(--sm);
+  }
+
+  &:last-child {
+    padding-bottom: var(--sm);
+  }
+}
+
+.sectionLabel {
+  padding: var(--xs) var(--md);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-b);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// ============================================
+// DIVIDER
+// ============================================
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--xs) 0;
+}
+
+// ============================================
+// MENU ITEMS
+// ============================================
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--sm) var(--md);
+  background: none;
+  border: none;
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-n);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  gap: var(--sm);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px inset var(--primary);
+    outline-offset: -2px;
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+    font-weight: var(--fw-m);
+  }
+
+  // Glassmorphic background for both light and dark
+  [data-glass="true"] & {
+    &:hover {
+      background: color-mix(in srgb, var(--tx) 5%, transparent);
+    }
+
+    &.active {
+      background: color-mix(in srgb, var(--primary) 15%, transparent);
+    }
+  }
+}
+
+.itemIcon {
+  font-size: var(--fs-lg);
+  line-height: 1;
+  flex-shrink: 0;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemHint {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.checkmark {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-b);
+  color: var(--primary);
+  margin-left: auto;
+}
+
+// ============================================
+// TOGGLE SWITCH
+// ============================================
+
+.toggle {
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+  }
+}
+
+.toggleSwitch {
+  display: inline-flex;
+  width: 36px;
+  height: 20px;
+  background: var(--border);
+  border-radius: var(--r-full);
+  padding: 2px;
+  margin-left: auto;
+  transition: background var(--tr-fast);
+  align-items: center;
+
+  &.active {
+    background: var(--primary);
+  }
+}
+
+.toggleThumb {
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: var(--r-full);
+  transition: transform var(--tr-fast);
+  transform: translateX(0);
+
+  .active & {
+    transform: translateX(16px);
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+
+@media (max-width: var(--bp-sm)) {
+  .menu {
+    border-radius: var(--r-xl);
+  }
+
+  .menuItem {
+    padding: var(--md) var(--lg);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .menu,
+  .menuItem,
+  .chevron,
+  .toggleSwitch,
+  .toggleThumb {
+    animation: none;
+    transition: none;
+  }
+}
+

@@ -1,0 +1,30 @@
+// ============================================
+// 🃏 CARD - FOUNDATION
+// --------------------------------------------
+// Platzhalter + Mixin für Karten-Container.
+// ============================================
+
+@use '../variables' as *;
+
+%card-base {
+  background: var(--surface);
+  color: var(--tx);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  padding: var(--md);
+  transition: background var(--tr-fast),
+              color var(--tr-fast),
+              border-color var(--tr-fast),
+              box-shadow var(--tr-fast),
+              transform var(--tr-fast);
+}
+
+%card-hover {
+  &:hover { box-shadow: var(--sh-md); transform: translateY(-1px); }
+}
+
+@mixin card-base($hover: true) {
+  @extend %card-base;
+  @if $hover { @extend %card-hover; }
+}

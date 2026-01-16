@@ -1,42 +1,36 @@
 {
   "name": "expense-tracker-frontend",
-  "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
+  "description": "Modern Expense Tracker Frontend with React 19 + Vite + SCSS",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:analyze": "vite build && start dist/stats.html",
-    "lint": "eslint .",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext js,jsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@fontsource/plus-jakarta-sans": "^5.2.8",
-    "@heroicons/react": "^2.1.5",
-    "axios": "^1.13.2",
-    "framer-motion": "^12.24.10",
-    "prop-types": "^15.8.1",
-    "react": "^19.2.0",
-    "react-beautiful-dnd": "^13.1.1",
-    "react-dom": "^19.2.0",
-    "react-router-dom": "^7.12.0",
-    "socket.io-client": "^4.8.3",
-    "zod": "^4.3.5"
+    "@tanstack/react-query": "^5.17.0",
+    "axios": "^1.6.5",
+    "date-fns": "^3.2.0",
+    "framer-motion": "^11.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.21.0",
+    "recharts": "^2.10.0",
+    "zod": "^3.22.4",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "prettier": "^3.2.5",
-    "rollup-plugin-visualizer": "^5.14.0",
-    "sass": "^1.97.2",
-    "vite": "^7.2.4"
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "sass": "^1.70.0",
+    "vite": "^5.0.11"
   }
 }
