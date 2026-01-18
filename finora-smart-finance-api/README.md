@@ -252,7 +252,7 @@ sudo systemctl restart nginx
 ### Monitor
 ```bash
 pm2 status
-pm2 logs finora-api
+pm2 logs finora-smart-finance-api
 ```
 
 ## 🌍 API Live URL
