@@ -6,7 +6,7 @@ set -e
 echo "🚀 Starting Finora API deployment..."
 
 # Verzeichnis
-cd /var/www/finora-api || exit 1
+cd /var/www/finora-smart-finance-api || exit 1
 
 # Git Pull
 echo "📥 Pulling latest code..."
@@ -32,7 +32,7 @@ pm2 restart ecosystem.config.js --update-env
 
 # Logs
 echo "📋 Checking logs..."
-pm2 logs finora-api --lines 20
+pm2 logs finora-smart-finance-api --lines 20
 
 echo "✅ Finora API deployment complete!"
 pm2 status

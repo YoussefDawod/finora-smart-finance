@@ -47,7 +47,7 @@ const transactionSchema = z.object({
 // KATEGORIEN - MUSS MIT BACKEND SYNCHRON SEIN!
 // ============================================================================
 // Diese Kategorien MÜSSEN mit Backend ALLOWED_CATEGORIES übereinstimmen!
-// Quelle: finora-api/src/routes/transactions.js
+// Quelle: finora-smart-finance-api/src/routes/transactions.js
 const INCOME_CATEGORIES = ['Gehalt', 'Freelance', 'Investitionen', 'Geschenk', 'Sonstiges'];
 const EXPENSE_CATEGORIES = ['Lebensmittel', 'Transport', 'Unterhaltung', 'Miete', 'Versicherung', 'Gesundheit', 'Bildung', 'Sonstiges'];
 

@@ -1,5 +1,5 @@
 {
-  "name": "finora-api",
+  "name": "finora-smart-finance-api",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {

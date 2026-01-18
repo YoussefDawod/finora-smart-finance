@@ -1,8 +1,8 @@
-# Finora - Smart Finance
+# Finora Smart Finance
 
 > 🚀 Moderne Finanzverwaltung mit React + Node.js
 
-Finora ist eine vollständige Finanz-App mit Frontend (React + Vite) und Backend (Express + MongoDB) in einem Monorepo.
+Finora Smart Finance ist eine vollständige Finanz-App mit Frontend (React + Vite) und Backend (Express + MongoDB) in einem Monorepo.
 
 ## ✨ Features
 
@@ -15,20 +15,20 @@ Finora ist eine vollständige Finanz-App mit Frontend (React + Vite) und Backend
 
 ## 📁 Struktur
 
-- `finora-frontend/` – React 19 App mit Vite + SCSS
-- `finora-api/` – Node.js/Express REST-API
+- `finora-smart-finance-frontend/` – React 19 App mit Vite + SCSS
+- `finora-smart-finance-api/` – Node.js/Express REST-API
 - `.github/workflows/ci.yml` – CI-Pipeline für Lint/Build
 
 ## 🚀 Schnellstart
 
 ```bash
 # Frontend
-cd finora-frontend
+cd finora-smart-finance-frontend
 npm install
 npm run dev
 
 # Backend
-cd ../finora-api
+cd ../finora-smart-finance-api
 npm install
 npm run dev
 ```
@@ -41,8 +41,8 @@ npm run dev
 ## 🧪 CI
 
 Siehe `.github/workflows/ci.yml`:
-- Frontend Job: `npm ci`, `npm run lint`, `npm run build`
-- Backend Job: `npm ci`, `npm run lint`
+- Frontend Job: `npm ci`, `npm run lint`, `npm run build` (in `finora-smart-finance-frontend/`)
+- Backend Job: `npm ci`, `npm run lint` (in `finora-smart-finance-api/`)
 
 ## 🧭 Architektur
 

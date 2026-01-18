@@ -14,7 +14,7 @@ REST-API für Finora - Smart Finance. Gebaut mit Node.js, Express und MongoDB.
 ```bash
 # 1. Repo klonen
 git clone <repo-url>
-cd finora-api
+cd finora-smart-finance-api
 
 # 2. Dependencies installieren
 npm install

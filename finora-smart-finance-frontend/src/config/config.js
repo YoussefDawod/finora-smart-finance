@@ -17,7 +17,7 @@ const config = {
   // App Configuration
   // ============================================
   app: {
-    name: import.meta.env.VITE_APP_NAME || 'Finora',
+    name: import.meta.env.VITE_APP_NAME || 'Finora Smart Finance',
     version: import.meta.env.VITE_APP_VERSION || '2.0.0',
     environment: import.meta.env.VITE_APP_ENVIRONMENT || 'development',
   },

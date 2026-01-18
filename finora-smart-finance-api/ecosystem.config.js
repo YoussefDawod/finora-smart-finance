@@ -2,7 +2,7 @@
 module.exports = {
   apps: [
     {
-      name: 'finora-api',
+      name: 'finora-smart-finance-api',
       script: './server.js',
       instances: 'max', // Auto-scaling
       exec_mode: 'cluster',
