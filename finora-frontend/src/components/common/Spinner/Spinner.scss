@@ -1,0 +1,71 @@
+// ============================================
+// 🔄 SPINNER COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE SPINNER
+// ============================================
+.spinner {
+  --spinner-size: var(--space-lg);
+  --spinner-color: var(--primary);
+  --spinner-width: max(2px, calc(var(--spinner-size) * 0.1));
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.spinner-sm {
+  --spinner-size: var(--space-md);
+}
+
+.spinner-md {
+  --spinner-size: var(--space-lg);
+}
+
+.spinner-lg {
+  --spinner-size: var(--space-xl);
+}
+
+.spinner-xl {
+  --spinner-size: var(--space-2xl);
+}
+
+// ============================================
+// SPINNER RING
+// ============================================
+.spinner-ring {
+  width: 100%;
+  height: 100%;
+  border: var(--spinner-width) solid color-mix(in srgb, var(--primary) 10%, transparent);
+  border-top-color: var(--spinner-color);
+  border-radius: var(--r-full);
+  animation: spin var(--d-slow) linear infinite;
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .spinner-ring {
+    animation: none;
+    border-top-color: var(--spinner-color);
+    opacity: 0.8;
+  }
+}

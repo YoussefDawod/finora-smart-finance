@@ -1,0 +1,153 @@
+// ============================================
+// 💳 TRANSACTIONS PAGE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.transactionsPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+  padding: var(--space-lg);
+
+  @include tablet {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER
+// ============================================
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-lg);
+
+  @include tablet {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  h1 {
+    font-size: var(--fs-3xl);
+    font-weight: var(--fw-b);
+    color: var(--tx);
+    margin: 0;
+
+    @include tablet {
+      font-size: var(--fs-2xl);
+    }
+  }
+
+  p {
+    font-size: var(--fs-md);
+    color: var(--tx-muted);
+    margin: var(--space-2xs) 0 0 0;
+  }
+
+  button {
+    @include tablet {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================
+// FORM SECTION
+// ============================================
+.formSection {
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
+  border-radius: var(--r-lg);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+  box-shadow: var(--sh-md);
+
+  @include tablet {
+    padding: var(--space-md);
+  }
+}
+
+// ============================================
+// CONTROLS SECTION
+// ============================================
+.controlsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-md);
+
+  @include tablet {
+    padding: var(--space-md);
+  }
+}
+
+.controlsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-md);
+  align-items: center;
+
+  > * {
+    min-width: 0;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}
+
+// ============================================
+// CONTENT SECTION
+// ============================================
+.contentSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-3xl);
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+}
+
+.emptyIcon {
+  font-size: var(--fs-3xl);
+  color: var(--tx-muted);
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.emptyText {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin: 0;
+  max-width: 400px;
+}

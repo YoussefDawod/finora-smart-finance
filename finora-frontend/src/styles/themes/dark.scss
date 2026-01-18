@@ -1,0 +1,52 @@
+// ============================================
+// 🌙 DARK THEME
+// ============================================
+// Generated via generate-theme mixin
+// Only override colors here - no new definitions!
+// ============================================
+
+@use '../mixins' as *;
+
+// Dark Theme Palette
+$dark-palette: (
+  // Core Colors
+  background: #141717,
+  text: #fcf3d7,
+  
+  // Brand Colors
+  primary: #f13729,    // Coral Red
+  secondary: #f69a6c,  // Peach
+  accent: #fcc7a3,     // Light Peach
+  
+  // Status Colors
+  success: #10b981,    // Emerald
+  warning: #f59e0b,    // Amber
+  error: #ef4444,      // Red
+  info: #3b82f6        // Blue
+);
+
+// Generate all CSS custom properties
+@include generate-theme('dark', $dark-palette);
+
+// ============================================
+// 🌙 DARK THEME OVERRIDES
+// ============================================
+
+[data-theme="dark"] {
+  // Skeleton colors for dark mode
+  --skeleton-from: rgba(255, 255, 255, 0.05);
+  --skeleton-to: rgba(255, 255, 255, 0.1);
+  
+  // Adjust overlay for dark backgrounds
+  --overlay: rgba(0, 0, 0, 0.7);
+  
+  // Shadows need to be more subtle on dark
+  --sh-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  --sh-md: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+  --sh-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --sh-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.25);
+  
+  // Color scheme for form controls
+  color-scheme: dark;
+}
+

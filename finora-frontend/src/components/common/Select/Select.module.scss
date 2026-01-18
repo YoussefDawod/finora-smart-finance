@@ -1,0 +1,282 @@
+// ============================================
+// 📋 SELECT COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// SELECT GROUP (Container)
+// ============================================
+.selectGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+
+  &.focused {
+    .label {
+      color: var(--primary);
+      font-weight: var(--fw-m);
+    }
+
+    .selectWrapper {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 2%, transparent);
+    }
+
+    .arrow {
+      color: var(--primary);
+    }
+  }
+
+  &.hasError {
+    .selectWrapper {
+      border-color: var(--error);
+      background: color-mix(in srgb, var(--error) 5%, transparent);
+    }
+
+    .label {
+      color: var(--error);
+    }
+
+    .arrow {
+      color: var(--error);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// ============================================
+// LABEL
+// ============================================
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.required {
+  color: var(--error);
+  font-weight: var(--fw-b);
+}
+
+// ============================================
+// SELECT WRAPPER
+// ============================================
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  overflow: hidden;
+
+  &:hover:not(:has(:disabled)) {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+}
+
+// ============================================
+// SELECT FIELD
+// ============================================
+.select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  padding-right: var(--space-2xl);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  option {
+    background: var(--surface);
+    color: var(--tx);
+    padding: var(--space-sm);
+
+    &:checked {
+      background: var(--primary);
+      color: var(--on-primary);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--surface-2);
+  }
+
+  &:invalid {
+    color: var(--tx-muted);
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.selectGroup.small {
+  .selectWrapper {
+    min-height: var(--btn-h-sm, 2rem);
+  }
+
+  .select {
+    padding: var(--space-2xs) var(--space-sm);
+    padding-right: var(--space-xl);
+    font-size: var(--fs-xs);
+  }
+
+  .arrow {
+    padding: 0 var(--space-sm);
+    font-size: var(--fs-xs);
+  }
+}
+
+.selectGroup.medium {
+  .selectWrapper {
+    min-height: var(--input-h);
+  }
+
+  .select {
+    padding: var(--space-sm) var(--space-md);
+    padding-right: var(--space-2xl);
+    font-size: var(--fs-sm);
+  }
+
+  .arrow {
+    padding: 0 var(--space-md);
+    font-size: var(--fs-sm);
+  }
+}
+
+.selectGroup.large {
+  .selectWrapper {
+    min-height: var(--btn-h-lg, 3.25rem);
+  }
+
+  .select {
+    padding: var(--space-md) var(--space-lg);
+    padding-right: var(--space-3xl);
+    font-size: var(--fs-md);
+  }
+
+  .arrow {
+    padding: 0 var(--space-lg);
+    font-size: var(--fs-md);
+  }
+}
+
+// ============================================
+// DROPDOWN ARROW
+// ============================================
+.arrow {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tx-muted);
+  pointer-events: none;
+  transition: color var(--tr), transform var(--tr);
+  font-size: var(--fs-sm);
+}
+
+// ============================================
+// FOOTER (Error / Hint)
+// ============================================
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: var(--space-md);
+}
+
+.error,
+.hint {
+  font-size: var(--fs-xs);
+  margin: 0;
+  animation: slideInDown var(--d-fast) ease-out;
+}
+
+.error {
+  color: var(--error);
+  font-weight: var(--fw-m);
+  flex: 1;
+}
+
+.hint {
+  color: var(--tx-muted);
+  flex: 1;
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2xs) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include mobile {
+  .selectGroup {
+    gap: var(--space-2xs);
+  }
+
+  .selectGroup.large {
+    .selectWrapper {
+      min-height: var(--input-h);
+    }
+
+    .select {
+      padding: var(--space-sm) var(--space-md);
+      padding-right: var(--space-2xl);
+      font-size: var(--fs-sm);
+    }
+
+    .arrow {
+      padding: 0 var(--space-md);
+      font-size: var(--fs-sm);
+    }
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .selectGroup,
+  .label,
+  .selectWrapper,
+  .select,
+  .arrow,
+  .error,
+  .hint {
+    animation: none;
+    transition: none;
+  }
+}

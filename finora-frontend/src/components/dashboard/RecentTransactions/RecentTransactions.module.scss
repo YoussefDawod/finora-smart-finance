@@ -1,0 +1,303 @@
+// ============================================
+// 📋 RECENT TRANSACTIONS COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// CONTAINER
+// ============================================
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
+  border-radius: var(--r-lg);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
+  box-shadow: var(--sh-sm);
+
+  @include tablet {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER
+// ============================================
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+
+  @include mobile {
+    flex-wrap: wrap;
+  }
+}
+
+.title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin: 0;
+}
+
+.viewAllLink {
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    transform: translateX(4px);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// LIST
+// ============================================
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+// ============================================
+// TRANSACTION ITEM
+// ============================================
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
+  border-left: 4px solid transparent;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: all var(--tr);
+  box-shadow: var(--sh-xs);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 3%, var(--surface));
+    border-left-color: var(--primary);
+    box-shadow: var(--sh-md);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--sh-sm);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  // Type variants
+  &.income {
+    border-left-color: var(--success);
+
+    .amount {
+      color: var(--success);
+      font-weight: var(--fw-b);
+    }
+  }
+
+  &.expense {
+    border-left-color: var(--error);
+
+    .amount {
+      color: var(--error);
+      font-weight: var(--fw-b);
+    }
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+}
+
+// ============================================
+// CATEGORY SECTION
+// ============================================
+.category {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.categoryIcon {
+  font-size: var(--fs-xl);
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.categoryName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.description {
+  font-size: var(--fs-sm);
+  color: color-mix(in srgb, var(--tx) 75%, var(--tx-muted));
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include mobile {
+    white-space: normal;
+  }
+}
+
+// ============================================
+// DETAILS SECTION
+// ============================================
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2xs);
+  flex-shrink: 0;
+
+  @include mobile {
+    align-items: flex-start;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.date {
+  font-size: var(--fs-xs);
+  color: color-mix(in srgb, var(--tx) 60%, var(--tx-muted));
+  font-weight: var(--fw-m);
+}
+
+.amount {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-b);
+  font-variant-numeric: tabular-nums;
+}
+
+// ============================================
+// LOADING STATE (Skeleton)
+// ============================================
+.skeletons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+  background-size: 200% 100%;
+  border-radius: var(--r-md);
+  height: 72px;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: var(--fs-3xl);
+  color: var(--tx-muted);
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.emptyText {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin: 0;
+}
+
+.emptyAction {
+  margin-top: var(--space-sm);
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .item,
+  .viewAllLink {
+    transition: none;
+  }
+
+  .viewAllLink:hover {
+    transform: none;
+  }
+
+  .skeleton {
+    animation: none;
+  }
+}

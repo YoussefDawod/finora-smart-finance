@@ -1,0 +1,198 @@
+// ============================================
+// 📊 DASHBOARD PAGE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.dashboardPage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  width: 100%;
+  min-height: 100%;
+
+  @include tablet {
+    gap: var(--space-lg);
+  }
+
+  @include mobile {
+    gap: var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER SECTION
+// ============================================
+.headerSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+
+  @include tablet {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-md);
+  }
+
+  @include mobile {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+}
+
+.greeting {
+  flex: 1;
+
+  @include mobile {
+    flex: 1;
+    min-width: 0;
+  }
+
+  h1 {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin: 0 0 var(--space-2xs) 0;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+
+    @include tablet {
+      font-size: var(--fs-lg);
+    }
+
+    @include mobile {
+      font-size: var(--fs-md);
+      line-height: 1.3;
+      margin: 0 0 var(--space-3xs) 0;
+    }
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    margin: 0;
+    line-height: 1.5;
+
+    @include mobile {
+      font-size: var(--fs-xs);
+      line-height: 1.4;
+    }
+  }
+}
+
+.greetingTitle {
+  display: inline;
+}
+
+.greetingIntro {
+  color: var(--tx-muted);
+  font-weight: var(--fw-m);
+}
+
+.greetingName {
+  color: var(--tx);
+  font-weight: var(--fw-sb);
+}
+
+.headerSection button {
+  flex-shrink: 0;
+  
+  @include mobile {
+    align-self: flex-start;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--fs-xs);
+    height: auto;
+    min-height: 28px;
+  }
+}
+
+// ============================================
+// SUMMARY CARDS GRID
+// ============================================
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  width: 100%;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================
+// SECTIONS
+// ============================================
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+
+  h2 {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin: 0;
+
+    @include mobile {
+      font-size: var(--fs-lg);
+    }
+  }
+}
+
+.sectionLink {
+  font-size: var(--fs-sm);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  transition: color var(--tr);
+
+  &:hover {
+    color: var(--pri-hover);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// CHARTS GRID
+// ============================================
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .sectionLink {
+    transition: none;
+  }
+}

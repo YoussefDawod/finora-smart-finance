@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light" data-glass="false">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>Finora | Smart Finance - Intelligente Finanzverwaltung</title>
+    <meta name="title" content="Finora | Smart Finance - Intelligente Finanzverwaltung" />
+    <meta name="description" content="Finora ist Ihre moderne Finanz-App. Verwalten Sie Einnahmen und Ausgaben intelligent, analysieren Sie Ihre Finanzen mit übersichtlichen Charts und erreichen Sie Ihre Sparziele." />
+    <meta name="keywords" content="Finanzen, Finanzmanagement, Ausgabenverfolgung, Budget, Sparen, Geld verwalten, Finanz-App, Smart Finance, Finora" />
+    <meta name="author" content="Finora Team" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="German" />
+    
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/svg+xml" href="/finora-icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/finora-icon.svg" />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="msapplication-TileColor" content="#6366f1" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://finora.app/" />
+    <meta property="og:title" content="Finora | Smart Finance - Intelligente Finanzverwaltung" />
+    <meta property="og:description" content="Finora ist Ihre moderne Finanz-App. Verwalten Sie Einnahmen und Ausgaben intelligent und erreichen Sie Ihre Sparziele." />
+    <meta property="og:image" content="https://finora.app/og-image.png" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content="Finora" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://finora.app/" />
+    <meta property="twitter:title" content="Finora | Smart Finance" />
+    <meta property="twitter:description" content="Intelligente Finanzverwaltung für moderne Menschen. Tracken, analysieren und optimieren Sie Ihre Finanzen." />
+    <meta property="twitter:image" content="https://finora.app/og-image.png" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Finora" />
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Finora",
+      "alternateName": "Finora Smart Finance",
+      "description": "Moderne Finanz-App für intelligente Ausgabenverfolgung und Budgetverwaltung",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Portal roots for overlays - must be after #root for proper z-index stacking -->
+    <div id="toast-portal-root"></div>
+    <div id="modal-portal-root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

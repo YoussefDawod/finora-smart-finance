@@ -1,0 +1,165 @@
+// ============================================
+// 💎 GLASSMORPHIC THEME EXTENSION (v2)
+// ============================================
+// Ziel: Ruhig, professionell und harmonisch mit dem Design-System
+// Usage: <html data-theme="dark" data-glass="true">
+// ============================================
+
+@use '../variables' as *;
+
+// ============================================
+// 🔮 CORE GLASS TOKENS
+// ============================================
+
+[data-glass="true"] {
+  // Visual tuning
+  --glass-blur: 18px;
+  --glass-saturation: 160%;
+  --glass-surface-1: 82%;
+  --glass-surface-2: 72%;
+  --glass-surface-3: 60%;
+  --glass-border-strength: 75%;
+
+  // Border base derived from theme text color
+  --glass-border-base: color-mix(in srgb, var(--tx) 22%, transparent);
+
+  // Surfaces derived from theme background
+  --surface: color-mix(in srgb, var(--background) var(--glass-surface-1), transparent);
+  --surface-2: color-mix(in srgb, var(--background) var(--glass-surface-2), transparent);
+  --surface-3: color-mix(in srgb, var(--background) var(--glass-surface-3), transparent);
+
+  // Borders derived from theme border
+  --border: color-mix(in srgb, var(--glass-border-base) var(--glass-border-strength), transparent);
+  --border-light: color-mix(in srgb, var(--glass-border-base) 55%, transparent);
+  --border-strong: color-mix(in srgb, var(--glass-border-base) 100%, transparent);
+
+  // Shadows (soft, neutral)
+  --sh-sm: 0 2px 10px rgba(15, 23, 42, 0.08);
+  --sh-md: 0 10px 24px rgba(15, 23, 42, 0.12);
+  --sh-lg: 0 18px 40px rgba(15, 23, 42, 0.16);
+  --sh-xl: 0 28px 60px rgba(15, 23, 42, 0.2);
+
+  // Overlay tuning (modals, drawers)
+  --overlay: rgba(15, 23, 42, 0.45);
+}
+
+// ============================================
+// ☀️ GLASS ON LIGHT THEME
+// ============================================
+
+[data-theme="light"][data-glass="true"] {
+  --bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--background) 92%, var(--primary) 8%) 0%,
+    color-mix(in srgb, var(--background) 90%, var(--secondary) 10%) 45%,
+    color-mix(in srgb, var(--background) 92%, var(--accent) 8%) 100%
+  );
+  --glass-surface-1: 92%;
+  --glass-surface-2: 86%;
+  --glass-surface-3: 78%;
+  --glass-border-strength: 90%;
+  --overlay: color-mix(in srgb, var(--tx) 35%, transparent);
+}
+
+// ============================================
+// 🌙 GLASS ON DARK THEME
+// ============================================
+
+[data-theme="dark"][data-glass="true"] {
+  --bg: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--background) 85%, var(--primary) 15%) 0%,
+    color-mix(in srgb, var(--background) 88%, var(--secondary) 12%) 45%,
+    color-mix(in srgb, var(--background) 90%, var(--accent) 10%) 100%
+  );
+  --glass-surface-1: 72%;
+  --glass-surface-2: 62%;
+  --glass-surface-3: 52%;
+  --glass-border-strength: 80%;
+  --overlay: color-mix(in srgb, var(--tx) 60%, transparent);
+}
+
+// ============================================
+// 🧩 BACKGROUND APPLICATION
+// ============================================
+
+body[data-glass="true"] {
+  background: var(--bg);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+// ============================================
+// 🪟 GLASS COMPONENT BEHAVIOR
+// ============================================
+
+[data-glass="true"] {
+  .glass,
+  [class*="card"],
+  [class*="modal"],
+  [class*="dropdown"],
+  [class*="menu"],
+  [class*="popover"] {
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+}
+
+[data-glass="true"] {
+  header,
+  aside,
+  footer,
+  nav,
+  [role="banner"],
+  [role="navigation"],
+  [role="contentinfo"] {
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  }
+}
+
+// ============================================
+// 🎯 GLASS UTILITY CLASSES
+// ============================================
+
+.glass {
+  backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-saturation, 160%));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-saturation, 160%));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-sm);
+}
+
+.glass-sm {
+  --glass-blur: 10px;
+}
+
+.glass-lg {
+  --glass-blur: 24px;
+}
+
+.glass-xl {
+  --glass-blur: 32px;
+}
+
+.no-glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+// ============================================
+// ⚠️ FALLBACK FOR UNSUPPORTED BROWSERS
+// ============================================
+
+@supports not (backdrop-filter: blur(1px)) {
+  [data-glass="true"] {
+    --surface: rgba(255, 255, 255, 0.95);
+    --surface-2: rgba(249, 250, 251, 0.95);
+  }
+
+  [data-theme="dark"][data-glass="true"] {
+    --surface: rgba(17, 24, 39, 0.95);
+    --surface-2: rgba(24, 31, 45, 0.95);
+  }
+}
+

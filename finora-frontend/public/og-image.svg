@@ -1,0 +1,43 @@
+<svg viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0f23"/>
+      <stop offset="100%" stop-color="#1a1a3e"/>
+    </linearGradient>
+    <linearGradient id="primary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="1100" cy="100" r="200" fill="url(#primary)" opacity="0.1"/>
+  <circle cx="100" cy="530" r="150" fill="url(#accent)" opacity="0.1"/>
+  
+  <!-- Logo Icon -->
+  <g transform="translate(480, 180)">
+    <rect x="0" y="0" width="80" height="80" rx="16" fill="url(#primary)" opacity="0.2"/>
+    <path d="M20 15h40c2 0 4 2 4 4v4c0 2-2 4-4 4H28v12h24c2 0 4 2 4 4v4c0 2-2 4-4 4H28v16c0 2-2 4-4 4h-4c-2 0-4-2-4-4V19c0-2 2-4 4-4z" fill="url(#primary)"/>
+    <path d="M44 68L52 58L60 62L70 48" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="70" cy="48" r="5" fill="#10b981"/>
+  </g>
+  
+  <!-- Brand Name -->
+  <text x="600" y="320" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="white">Finora</text>
+  
+  <!-- Tagline -->
+  <text x="600" y="380" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="500" fill="#a1a1aa" letter-spacing="0.2em">SMART FINANCE</text>
+  
+  <!-- Description -->
+  <text x="600" y="450" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#71717a">Intelligente Finanzverwaltung für moderne Menschen</text>
+  
+  <!-- URL -->
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#6366f1">finora.app</text>
+</svg>

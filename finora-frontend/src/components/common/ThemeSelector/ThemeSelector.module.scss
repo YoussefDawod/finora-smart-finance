@@ -1,0 +1,344 @@
+// ============================================
+// 🎨 THEME SELECTOR - Redesigned für Navigation
+// ============================================
+// Position: Unter "Einstellungen" Link in Sidebar/HamburgerMenu
+// Design: Modern, kompakt, harmonisch mit Gesamtprojekt
+// ============================================
+
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// CONTAINER
+// ============================================
+.themeSelector {
+  position: relative;
+  width: 100%;
+  margin-top: 0;
+}
+
+// ============================================
+// TRIGGER BUTTON
+// ============================================
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-lg);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  position: relative;
+  min-height: 44px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 0;
+    background: var(--primary);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    transition: height var(--tr-fast);
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+    color: var(--tx);
+    &::before {
+      height: 50%;
+    }
+
+    .triggerIcon {
+      color: var(--primary);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.triggerOpen {
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+  color: var(--primary);
+  font-weight: var(--fw-sb);
+
+  &::before {
+    height: 70%;
+    width: 5px;
+  }
+
+  .triggerIcon {
+    color: var(--primary);
+  }
+}
+
+.triggerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  font-size: var(--fs-lg);
+  color: currentColor;
+  transition: transform var(--tr-fast);
+
+  .trigger:hover & {
+    transform: rotate(15deg);
+  }
+}
+
+.triggerLabel {
+  flex: 1;
+  text-align: left;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+}
+
+.triggerArrow {
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-xs);
+  opacity: 0.6;
+  transition: opacity var(--tr-fast);
+
+  .trigger:hover & {
+    opacity: 1;
+  }
+}
+
+// Collapsed State (für Sidebar collapsed mode)
+.triggerCollapsed {
+  justify-content: center;
+  padding: var(--space-sm);
+
+  .triggerIcon {
+    margin: 0;
+  }
+}
+
+// ============================================
+// DROPDOWN PANEL
+// ============================================
+.panel {
+  position: relative;
+  margin-top: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  z-index: var(--z-dropdown);
+  overflow: hidden;
+}
+
+// ============================================
+// SECTION
+// ============================================
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: 0 var(--space-md);
+}
+
+.sectionTitle {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-2xs) 0;
+  margin-bottom: var(--space-3xs);
+}
+
+// ============================================
+// OPTIONS
+// ============================================
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-xs) 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-n);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  position: relative;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    text-align: left;
+  }
+}
+
+.optionActive {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-weight: var(--fw-m);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+}
+
+.checkmark {
+  flex-shrink: 0;
+  color: var(--primary);
+  margin-left: auto;
+}
+
+// ============================================
+// DIVIDER
+// ============================================
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-xs) var(--space-md);
+}
+
+// ============================================
+// TOGGLE OPTION (für Glassmorphic)
+// ============================================
+.toggleOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-xs) 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: -2px;
+  }
+}
+
+.toggleLabel {
+  flex: 1;
+  text-align: left;
+  font-weight: var(--fw-n);
+}
+
+// ============================================
+// TOGGLE SWITCH
+// ============================================
+.toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  flex-shrink: 0;
+}
+
+.toggleActive {
+  background: var(--primary);
+  border-color: var(--primary);
+
+  .toggleThumb {
+    transform: translateX(18px);
+    background: white;
+  }
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--tx-muted);
+  border-radius: var(--r-full);
+  transition: all var(--tr-fast);
+  box-shadow: var(--sh-sm);
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include tablet {
+  .panel {
+    width: 100%;
+  }
+}
+
+@include mobile {
+  .panel {
+    width: 100%;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .trigger,
+  .triggerIcon,
+  .triggerArrow,
+  .option,
+  .toggle,
+  .toggleThumb {
+    transition: none;
+  }
+
+  .triggerIcon {
+    transform: none;
+  }
+
+  .trigger:hover .triggerIcon {
+    transform: none;
+  }
+}

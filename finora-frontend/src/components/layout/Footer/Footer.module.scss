@@ -1,0 +1,79 @@
+// ============================================
+// 🔻 FOOTER COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// FOOTER
+// ============================================
+.footer {
+  text-align: center;
+  height: var(--footer-height, 64px);
+  min-height: var(--footer-height, 64px);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-lg);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  transition: padding-left 0.3s ease;
+
+  // Desktop: Sidebar expanded - Footer content shifts right
+  &.sidebarExpanded {
+    padding-left: var(--sidebar-width, 280px);
+  }
+
+  // Desktop: Sidebar collapsed
+  &.sidebarCollapsed {
+    padding-left: var(--sidebar-collapsed-width, 72px);
+  }
+
+  @include mobile {
+    padding: 0 var(--space-md);
+    font-size: var(--fs-xs);
+    height: auto;
+    min-height: var(--footer-height, 64px);
+  }
+}
+
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+
+  @include md {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.footerLinks {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footerLink {
+  color: var(--tx-muted);
+  text-decoration: none;
+  transition: color var(--tr);
+
+  &:hover {
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+.copyright {
+  color: var(--tx-muted);
+}

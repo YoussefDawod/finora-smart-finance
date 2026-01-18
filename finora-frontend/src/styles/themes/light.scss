@@ -1,0 +1,46 @@
+// ============================================
+// ☀️ LIGHT THEME
+// ============================================
+// Generated via generate-theme mixin
+// Only override colors here - no new definitions!
+// ============================================
+
+@use '../mixins' as *;
+
+// Light Theme Palette
+$light-palette: (
+  // Core Colors
+  background: #f8fafc,
+  text: #0f172a,
+  
+  // Brand Colors
+  primary: #4f46e5,    // Indigo
+  secondary: #22c55e,  // Mint/Green
+  accent: #14b8a6,     // Teal
+  
+  // Status Colors
+  success: #10b981,    // Emerald
+  warning: #f59e0b,    // Amber
+  error: #ef4444,      // Red
+  info: #3b82f6        // Blue
+);
+
+// Generate all CSS custom properties
+@include generate-theme('light', $light-palette);
+
+// ============================================
+// ☀️ LIGHT THEME OVERRIDES
+// ============================================
+
+[data-theme="light"] {
+  // Skeleton colors for light mode
+  --skeleton-from: rgba(0, 0, 0, 0.04);
+  --skeleton-to: rgba(0, 0, 0, 0.08);
+  
+  // Adjust overlay for light backgrounds
+  --overlay: rgba(0, 0, 0, 0.5);
+  
+  // Color scheme for form controls
+  color-scheme: light;
+}
+

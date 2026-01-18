@@ -1,0 +1,388 @@
+// ============================================
+// ♿ ACCESSIBILITY STYLES
+// ============================================
+// Purpose: WCAG 2.1 AA Compliance
+// Focus States, Screen Reader Support, Reduced Motion
+// ============================================
+
+@use './variables' as *;
+
+// ============================================
+// 🎯 FOCUS MANAGEMENT
+// ============================================
+
+// Remove default focus - use :focus-visible instead
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Enhanced focus-visible for all interactive elements
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
+              rgba(var(--primary-rgb), var(--focus-ring-opacity));
+}
+
+// ============================================
+// ⏩ SKIP TO CONTENT LINK
+// ============================================
+
+.skip-to-content,
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: var(--fw-m);
+  text-decoration: none;
+  z-index: var(--z-max);
+  border-radius: 0 0 var(--r-md) var(--r-md);
+  transition: top var(--tr-fast);
+
+  &:focus,
+  &:focus-visible {
+    top: 0;
+    outline: var(--focus-ring-width) solid var(--on-primary);
+    outline-offset: -4px;
+  }
+}
+
+// ============================================
+// 🙈 SCREEN READER ONLY CONTENT
+// ============================================
+
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Focusable sr-only (becomes visible on focus)
+.sr-only-focusable:focus,
+.sr-only-focusable:focus-within,
+.visually-hidden-focusable:focus,
+.visually-hidden-focusable:active {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: normal !important;
+}
+
+// ============================================
+// 🎨 HIGH CONTRAST MODE SUPPORT
+// ============================================
+
+@media (prefers-contrast: high) {
+  :root {
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 3px;
+    --border-width: 2px;
+  }
+
+  // Stronger focus outlines
+  *:focus-visible {
+    outline-width: 3px !important;
+  }
+
+  // More visible borders
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 2px !important;
+  }
+
+  // Higher contrast text
+  a {
+    text-decoration: underline;
+  }
+}
+
+// Forced colors mode (Windows High Contrast)
+@media (forced-colors: active) {
+  *:focus-visible {
+    outline: 3px solid CanvasText !important;
+    outline-offset: 2px;
+  }
+
+  button,
+  [role="button"] {
+    border: 2px solid ButtonText;
+  }
+
+  a {
+    color: LinkText;
+  }
+}
+
+// ============================================
+// ⏸️ REDUCED MOTION SUPPORT
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  // Preserve essential focus transitions for accessibility
+  *:focus-visible {
+    transition: outline 150ms, box-shadow 150ms !important;
+  }
+
+  // Disable scroll animations
+  html {
+    scroll-behavior: auto;
+  }
+
+  // Disable hover transforms
+  *:hover {
+    transform: none !important;
+  }
+}
+
+// ============================================
+// 🔍 FOCUS WITHIN (Container Focus)
+// ============================================
+
+// Highlight parent when child has focus
+.focus-within-highlight:focus-within {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
+              rgba(var(--primary-rgb), var(--focus-ring-opacity));
+}
+
+// Border highlight variant
+.focus-within-border:focus-within {
+  border-color: var(--focus-ring-color);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+}
+
+// ============================================
+// 🔗 INTERACTIVE ELEMENT FOCUS STYLES
+// ============================================
+
+// Links in content areas
+article a:focus-visible,
+main a:focus-visible,
+p a:focus-visible,
+.prose a:focus-visible {
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: 2px 4px;
+  margin: -2px -4px;
+  border-radius: var(--r-sm);
+}
+
+// Icon buttons
+button[aria-label]:focus-visible,
+a[aria-label]:focus-visible,
+[role="button"]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+// Navigation items
+nav a:focus-visible,
+nav button:focus-visible,
+[role="navigation"] a:focus-visible,
+[role="navigation"] button:focus-visible {
+  background: rgba(var(--primary-rgb), 0.1);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+// Interactive cards
+.card-interactive:focus-visible,
+[role="button"]:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
+      rgba(var(--primary-rgb), var(--focus-ring-opacity)),
+    var(--sh-lg);
+}
+
+// ============================================
+// ⌨️ KEYBOARD NAVIGATION
+// ============================================
+
+// Add class via JS when user starts using keyboard
+body.keyboard-user *:focus-visible {
+  animation: focusPulse 300ms ease-out;
+}
+
+@keyframes focusPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
+                rgba(var(--primary-rgb), var(--focus-ring-opacity));
+  }
+}
+
+// Hide focus for mouse users
+body:not(.keyboard-user) *:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+// ============================================
+// 🔲 FOCUS TRAP (Modals, Dropdowns)
+// ============================================
+
+[data-focus-trap] {
+  isolation: isolate;
+}
+
+// Modal-specific focus handling
+[role="dialog"]:focus,
+[role="alertdialog"]:focus {
+  outline: none;
+}
+
+[role="dialog"] *:focus-visible,
+[role="alertdialog"] *:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+// ============================================
+// 📢 ARIA LIVE REGIONS
+// ============================================
+
+[aria-live="polite"],
+[aria-live="assertive"],
+[role="status"],
+[role="alert"] {
+  // Prevent layout shift
+  position: relative;
+}
+
+// Visual indicator for live regions (development only)
+[data-dev-mode] [aria-live]::before {
+  content: '📢 ' attr(aria-live);
+  position: absolute;
+  top: -24px;
+  left: 0;
+  font-size: var(--fs-2xs);
+  color: var(--warning);
+  background: color-mix(in srgb, var(--overlay) 90%, transparent);
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+  pointer-events: none;
+  z-index: 10;
+}
+
+[data-dev-mode] [aria-live="assertive"]::before {
+  color: var(--error);
+  content: '🚨 assertive';
+}
+
+// ============================================
+// ✅ FORM ACCESSIBILITY
+// ============================================
+
+// Required field indicator
+label[data-required]::after,
+.required::after {
+  content: ' *';
+  color: var(--error);
+  font-weight: var(--fw-b);
+}
+
+// Error state
+[aria-invalid="true"],
+.input-error {
+  border-color: var(--error) !important;
+  
+  &:focus-visible {
+    outline-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(var(--error-rgb), 0.2);
+  }
+}
+
+// Disabled state
+[aria-disabled="true"],
+:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+// Checkbox & Radio focus
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+// ============================================
+// 📏 MINIMUM TARGET SIZE (WCAG 2.5.5)
+// ============================================
+
+// Touch-friendly tap targets (minimum 44x44px)
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+// ============================================
+// 🎭 CONTENT VISIBILITY
+// ============================================
+
+// Hidden but preserve space
+.invisible {
+  visibility: hidden;
+}
+
+// Completely hidden
+[hidden],
+.hidden {
+  display: none !important;
+}
+
+// Visible only to assistive technology
+.assistive-text {
+  @extend .sr-only;
+}
+
+// ============================================
+// 🔊 AUDIO DESCRIPTIONS & CAPTIONS
+// ============================================
+
+// Video/audio with captions indicator
+[aria-describedby] {
+  position: relative;
+}
+
+// Caption styling
+.caption,
+figcaption {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin-top: var(--space-xs);
+}

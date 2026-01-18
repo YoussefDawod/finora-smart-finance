@@ -1,0 +1,321 @@
+// ============================================
+// 🔘 BUTTON COMPONENT STYLES
+// ============================================
+// Consolidated button foundation + variants
+// Uses only variables.scss via CSS custom properties
+// ============================================
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ============================================
+// 📦 BASE BUTTON
+// ============================================
+
+.btn {
+  @include button-base;
+  background: var(--surface);
+  color: var(--tx);
+  border: 1px solid var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+  }
+}
+
+// ============================================
+// 🎨 BUTTON VARIANTS
+// ============================================
+
+.btn-primary {
+  @include button-base;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--pri-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--sh-md);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+.btn-secondary {
+  @include button-base;
+  background: var(--surface-2);
+  color: var(--tx);
+  border: 1px solid var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface);
+    border-color: var(--border-strong);
+  }
+}
+
+.btn-ghost {
+  @include button-base;
+  background: transparent;
+  color: var(--tx);
+  border: 1px solid var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+.btn-outline {
+  @include button-base;
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--primary-rgb), 0.1);
+  }
+}
+
+.btn-danger {
+  @include button-base;
+  background: var(--error);
+  color: var(--on-error);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--error-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--sh-md);
+  }
+}
+
+.btn-success {
+  @include button-base;
+  background: var(--success);
+  color: var(--on-success);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--success-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--sh-md);
+  }
+}
+
+.btn-warning {
+  @include button-base;
+  background: var(--warning);
+  color: var(--on-warning);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--warning-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--sh-md);
+  }
+}
+
+.btn-link {
+  @include button-base;
+  background: transparent;
+  color: var(--primary);
+  border: none;
+  padding: 0;
+  height: auto;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover:not(:disabled) {
+    color: var(--pri-hover);
+    text-decoration-thickness: 2px;
+  }
+}
+
+// ============================================
+// 📏 BUTTON SIZES
+// ============================================
+
+.btn-xs {
+  height: 1.5rem;
+  padding: 0 var(--space-xs);
+  font-size: var(--fs-xs);
+  gap: var(--space-3xs);
+}
+
+.btn-sm {
+  height: var(--btn-height-sm);
+  padding: 0 var(--space-sm);
+  font-size: var(--fs-sm);
+  gap: var(--space-2xs);
+}
+
+.btn-lg {
+  height: var(--btn-height-lg);
+  padding: 0 var(--space-lg);
+  font-size: var(--fs-lg);
+  gap: var(--space-sm);
+}
+
+.btn-xl {
+  height: 3.5rem;
+  padding: 0 var(--space-xl);
+  font-size: var(--fs-xl);
+  gap: var(--space-md);
+}
+
+// Full width
+.btn-block {
+  width: 100%;
+}
+
+// ============================================
+// 🔵 ICON BUTTON
+// ============================================
+
+.btn-icon {
+  @include button-base;
+  @include flex-center;
+  width: var(--btn-height-md);
+  height: var(--btn-height-md);
+  padding: 0;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--tx);
+  border: none;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  &.btn-icon-xs {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  &.btn-icon-sm {
+    width: var(--btn-height-sm);
+    height: var(--btn-height-sm);
+  }
+
+  &.btn-icon-lg {
+    width: var(--btn-height-lg);
+    height: var(--btn-height-lg);
+  }
+}
+
+// ============================================
+// 🔄 BUTTON STATES
+// ============================================
+
+// Loading state
+.btn-loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin: -8px 0 0 -8px;
+    border: 2px solid currentColor;
+    border-radius: var(--r-full);
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
+    color: var(--on-primary);
+  }
+}
+
+// Active/Selected state
+.btn-active,
+.btn[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+// ============================================
+// 👥 BUTTON GROUP
+// ============================================
+
+.btn-group {
+  display: inline-flex;
+
+  .btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: var(--r-md) 0 0 var(--r-md);
+    }
+
+    &:last-child {
+      border-radius: 0 var(--r-md) var(--r-md) 0;
+    }
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+  }
+}
+
+// Vertical button group
+.btn-group-vertical {
+  display: inline-flex;
+  flex-direction: column;
+
+  .btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-radius: var(--r-md) var(--r-md) 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 0 var(--r-md) var(--r-md);
+    }
+
+    &:not(:first-child) {
+      margin-top: -1px;
+    }
+  }
+}
+
+// ============================================
+// 🎭 PLACEHOLDERS (for @extend)
+// ============================================
+
+%btn-base {
+  @include button-base;
+}
+
+%btn-solid {
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+}
+
+%btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+
+  &:hover:not(:disabled) {
+    background: rgba(var(--primary-rgb), 0.1);
+  }
+}

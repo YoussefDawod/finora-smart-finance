@@ -1,0 +1,143 @@
+// ============================================
+// 👤 USER MENU COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE
+// ============================================
+.userMenu {
+  position: relative;
+}
+
+// ============================================
+// AVATAR BUTTON
+// ============================================
+.avatarBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-2xl);
+  height: var(--space-2xl);
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--tx);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--surface);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// AVATAR CIRCLE
+// ============================================
+.avatarCircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: var(--r-full);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--pri-hover)));
+  color: var(--on-primary);
+  font-weight: var(--fw-b);
+  font-size: var(--fs-sm);
+}
+
+// ============================================
+// DROPDOWN MENU
+// ============================================
+.dropdownMenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + var(--space-xs));
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  z-index: var(--z-dropdown);
+  animation: fadeIn var(--tr) ease-out;
+}
+
+// ============================================
+// DROPDOWN HEADER
+// ============================================
+.dropdownHeader {
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.dropdownName {
+  font-weight: var(--fw-b);
+  color: var(--tx);
+}
+
+.dropdownEmail {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin-top: var(--space-3xs);
+}
+
+// ============================================
+// DROPDOWN ITEMS
+// ============================================
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  color: var(--tx);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: -2px;
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-xs) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .dropdownMenu {
+    animation: none;
+  }
+}

@@ -1,0 +1,12 @@
+// ============================================
+// 📦 COMPONENTS - INDEX
+// ============================================
+// Forward all component base styles
+// Consolidated: No duplicates!
+// ============================================
+
+@forward './button';   // Button variants & styles
+@forward './card';     // Card variants & layouts
+@forward './input';    // All form inputs
+@forward './modal';    // Modal dialogs & overlays
+@forward './skeleton'; // Loading placeholders

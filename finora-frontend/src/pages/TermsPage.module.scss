@@ -1,0 +1,147 @@
+// ============================================
+// 📜 TERMS PAGE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.termsContainer {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: var(--space-xl);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+
+  @include mobile {
+    padding: var(--space-md);
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.termsContent {
+  max-width: 800px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: var(--space-3xl);
+  box-shadow: var(--sh-lg);
+  margin: var(--space-xl) 0;
+
+  @include mobile {
+    padding: var(--space-lg);
+    margin: var(--space-md) 0;
+    border-radius: var(--r-lg);
+  }
+}
+
+// ============================================
+// TITLE
+// ============================================
+.title {
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+
+  @include mobile {
+    font-size: var(--fs-2xl);
+    margin-bottom: var(--space-lg);
+  }
+}
+
+// ============================================
+// SECTION
+// ============================================
+.section {
+  margin-bottom: var(--space-xl);
+
+  h2 {
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin-bottom: var(--space-md);
+
+    @include mobile {
+      font-size: var(--fs-lg);
+    }
+  }
+
+  p {
+    font-size: var(--fs-base);
+    color: var(--tx-muted);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+
+    @include mobile {
+      font-size: var(--fs-sm);
+    }
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-left: var(--space-lg);
+    margin-bottom: var(--space-md);
+
+    li {
+      font-size: var(--fs-base);
+      color: var(--tx-muted);
+      line-height: 1.6;
+      margin-bottom: var(--space-xs);
+
+      @include mobile {
+        font-size: var(--fs-sm);
+      }
+    }
+  }
+}
+
+// ============================================
+// FOOTER
+// ============================================
+.footer {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--border);
+}
+
+.lastUpdated {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  margin-top: var(--space-lg);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  transition: color var(--tr);
+
+  &:hover {
+    color: var(--pri-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .backLink {
+    transition: none;
+  }
+}

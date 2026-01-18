@@ -1,0 +1,503 @@
+/**
+ * @fileoverview MultiStepRegisterForm Styles - Premium Design
+ */
+
+// ============================================
+// FORM CONTAINER
+// ============================================
+
+.registerForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ============================================
+// STEP INDICATOR
+// ============================================
+
+.stepIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 0.5rem;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.stepCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-primary);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &.current {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+    background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  }
+
+  &.completed {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: white;
+  }
+
+  &:hover:not(:disabled):not(.completed) {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+  }
+}
+
+.stepLabel {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+
+  &.active {
+    color: var(--accent-primary);
+    font-weight: 500;
+  }
+}
+
+.stepLine {
+  width: 3rem;
+  height: 2px;
+  background: var(--border-primary);
+  margin: 0 0.25rem;
+  transition: background 0.3s ease;
+
+  &.completed {
+    background: var(--accent-primary);
+  }
+
+  @media (min-width: 480px) {
+    width: 4rem;
+  }
+}
+
+// ============================================
+// ERROR BANNER
+// ============================================
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: color-mix(in srgb, var(--error) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 25%, transparent);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--error);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  font-size: 1.125rem;
+}
+
+// ============================================
+// STEP CONTENT
+// ============================================
+
+.stepContent {
+  min-height: 280px;
+  position: relative;
+}
+
+.stepPane {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stepTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.stepDescription {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+// ============================================
+// INPUT GROUP (Same as LoginForm)
+// ============================================
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+// ============================================
+// LABEL (ABOVE INPUT)
+// ============================================
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+// ============================================
+// INPUT WRAPPER
+// ============================================
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-primary);
+  border-radius: var(--r-lg);
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+  }
+
+  &.error {
+    border-color: var(--error);
+    background: color-mix(in srgb, var(--error) 3%, var(--bg-secondary));
+
+    &:focus-within {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 15%, transparent);
+    }
+  }
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.125rem;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: color 0.2s ease;
+
+  .inputWrapper:focus-within & {
+    color: var(--accent-primary);
+  }
+
+  .inputWrapper.error & {
+    color: var(--error);
+  }
+}
+
+.input {
+  width: 100%;
+  height: 3rem;
+  padding: 0 1rem 0 2.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  }
+}
+
+.errorMessage {
+  font-size: 0.8125rem;
+  color: var(--error);
+  padding-left: 0.25rem;
+}
+
+// ============================================
+// PASSWORD STRENGTH
+// ============================================
+
+.strengthContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.strengthBar {
+  flex: 1;
+  height: 4px;
+  background: var(--border-primary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+
+  &.weak {
+    background: var(--error);
+  }
+
+  &.medium {
+    background: var(--warning);
+  }
+
+  &.strong {
+    background: var(--success);
+  }
+
+  &.excellent {
+    background: linear-gradient(90deg, var(--success), var(--accent-primary));
+  }
+}
+
+.strengthLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+
+  &.weak {
+    color: var(--error);
+  }
+
+  &.medium {
+    color: var(--warning);
+  }
+
+  &.strong,
+  &.excellent {
+    color: var(--success);
+  }
+}
+
+// ============================================
+// TERMS BOX
+// ============================================
+
+.termsBox {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: 0.75rem;
+  margin-bottom: 0.5rem;
+
+  h4 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// ============================================
+// CHECKBOX
+// ============================================
+
+.checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+
+  &.error .checkmark {
+    border-color: var(--error);
+  }
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.checkmark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--border-primary);
+  border-radius: 0.375rem;
+  transition: all 0.15s ease;
+
+  svg {
+    font-size: 0.75rem;
+    color: white;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.15s ease;
+  }
+
+  .checkbox input:checked + & {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+
+    svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+.checkboxText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+
+  a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      color: var(--accent-secondary);
+    }
+  }
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.prevButton {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1.5px solid var(--border-primary);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.nextButton,
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+  height: 3rem;
+  padding: 0 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent-primary) 35%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// SPINNER
+// ============================================
+
+.spinner {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

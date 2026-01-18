@@ -1,23 +1,34 @@
-# Expense Tracker (Monorepo)
+# Finora - Smart Finance
 
-Frontend (React + Vite) und Backend (Express + MongoDB) in einem gemeinsamen Repository.
+> 🚀 Moderne Finanzverwaltung mit React + Node.js
+
+Finora ist eine vollständige Finanz-App mit Frontend (React + Vite) und Backend (Express + MongoDB) in einem Monorepo.
+
+## ✨ Features
+
+- 📊 Übersichtliches Dashboard mit Echtzeit-Statistiken
+- 💰 Einnahmen & Ausgaben tracken
+- 📈 Interaktive Charts und Analysen
+- 🔐 Sichere Authentifizierung (JWT)
+- 🌙 Dark/Light Mode
+- 📱 Responsive Design
 
 ## 📁 Struktur
 
-- `expense-tracker-frontend/` – React-App mit robustem API-Layer
-- `expense-tracker-backend/` – Node.js/Express REST-API
+- `finora-frontend/` – React 19 App mit Vite + SCSS
+- `finora-api/` – Node.js/Express REST-API
 - `.github/workflows/ci.yml` – CI-Pipeline für Lint/Build
 
 ## 🚀 Schnellstart
 
 ```bash
 # Frontend
-cd expense-tracker-frontend
+cd finora-frontend
 npm install
 npm run dev
 
 # Backend
-cd ../expense-tracker-backend
+cd ../finora-api
 npm install
 npm run dev
 ```
@@ -38,21 +49,7 @@ Siehe `.github/workflows/ci.yml`:
 - Token-Refresh & Interceptors (Frontend)
 - Dedup/Retry/Cache im API-Client
 - Transaktions-CRUD & Statistiken (Backend)
-- Einfache Auth-Endpunkte (`/api/auth/login`, `/refresh`, `/logout`)
-
-## 🗂️ Repositories: Monorepo vs. Multi-Repo
-
-- **Monorepo (Empfehlung hier):** Synchronisierte Änderungen, einfache CI, einheitliche Versionierung.
-- **Multi-Repo:** Unabhängige Deploys/Versionierung, mehr Overhead bei Cross-Änderungen.
-
-### Migration zu Monorepo (Schritte)
-
-1. Neues Root-Git-Repo im Projektordner initialisieren (falls noch nicht vorhanden).
-2. Historie aus bestehenden Repos zusammenführen (optional) via `git subtree` oder `git filter-repo`.
-3. Entferne/konvertiere nested Repos (`.git` Ordner in Unterordnern) – stattdessen nur ein Root-Repo.
-4. CI/Workflows ins Root verschieben.
-
-> Hinweis: Wenn du bestehende GitHub-Repos behalten willst, können wir alternativ eine **GitHub Organisation** mit zwei Repos nutzen und ein drittes "Meta-Repo" als Monorepo anlegen, das beide via `subtree` einbindet.
+- Auth-Endpunkte (`/api/auth/login`, `/refresh`, `/logout`)
 
 ## 📄 Lizenz
 ISC

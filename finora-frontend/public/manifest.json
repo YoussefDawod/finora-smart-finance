@@ -1,0 +1,21 @@
+{
+  "name": "Finora - Smart Finance",
+  "short_name": "Finora",
+  "description": "Intelligente Finanzverwaltung für moderne Menschen",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "de",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/finora-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

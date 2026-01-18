@@ -1,0 +1,317 @@
+// ============================================
+// 📊 SUMMARY CARD COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE CARD STYLES
+// ============================================
+.summaryCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+  transition: all var(--tr);
+  overflow: hidden;
+
+  &:hover {
+    box-shadow: var(--sh-md);
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  @include tablet {
+    padding: var(--space-md);
+    border-radius: var(--r-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+}
+
+// ============================================
+// COLOR VARIANTS
+// ============================================
+.income {
+  border-color: color-mix(in srgb, var(--success) 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--success) 10%, transparent) 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 10%, transparent);
+  }
+
+  .trendBadge {
+    background: color-mix(in srgb, var(--success) 18%, transparent);
+    color: var(--success);
+  }
+}
+
+.expense {
+  border-color: color-mix(in srgb, var(--error) 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--error) 10%, transparent) 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: var(--error);
+    background: color-mix(in srgb, var(--error) 10%, transparent);
+  }
+
+  .trendBadge {
+    background: color-mix(in srgb, var(--error) 18%, transparent);
+    color: var(--error);
+  }
+}
+
+.balance {
+  border-color: color-mix(in srgb, var(--info) 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--info) 10%, transparent) 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: var(--info);
+    background: color-mix(in srgb, var(--info) 10%, transparent);
+  }
+
+  .trendBadge.up {
+    background: color-mix(in srgb, var(--info) 18%, transparent);
+    color: var(--info);
+  }
+
+  .trendBadge.down {
+    background: color-mix(in srgb, var(--error) 18%, transparent);
+    color: var(--error);
+  }
+}
+
+.primary {
+  border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+
+  .gradient {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0%, transparent 100%);
+  }
+
+  .iconWrapper {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.small {
+  padding: var(--space-md);
+
+  .title {
+    font-size: var(--fs-sm);
+  }
+
+  .value {
+    font-size: var(--fs-xl);
+  }
+
+  .iconWrapper {
+    width: var(--space-xl);
+    height: var(--space-xl);
+  }
+}
+
+.large {
+  padding: var(--space-2xl);
+
+  @include tablet {
+    padding: var(--space-lg);
+  }
+
+  .title {
+    font-size: var(--fs-md);
+  }
+
+  .value {
+    font-size: var(--fs-3xl);
+  }
+
+  .iconWrapper {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+// ============================================
+// BACKGROUND GRADIENT
+// ============================================
+.gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+// ============================================
+// HEADER
+// ============================================
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  position: relative;
+  z-index: 1;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-2xl);
+  height: var(--space-2xl);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-xl);
+  flex-shrink: 0;
+  transition: transform var(--tr);
+
+  .summaryCard:hover & {
+    transform: scale(1.1);
+  }
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// ============================================
+// VALUE
+// ============================================
+.value {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  z-index: 1;
+
+  @include mobile {
+    font-size: var(--fs-xl);
+  }
+}
+
+// ============================================
+// TREND BADGE
+// ============================================
+.trendBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+
+  &.up {
+    background: color-mix(in srgb, var(--success) 20%, transparent);
+    color: var(--success);
+  }
+
+  &.down {
+    background: color-mix(in srgb, var(--error) 20%, transparent);
+    color: var(--error);
+  }
+
+  &.neutral {
+    background: var(--surface-2);
+    color: var(--tx-muted);
+  }
+}
+
+.trendIcon {
+  font-size: var(--fs-sm);
+}
+
+// ============================================
+// FOOTER
+// ============================================
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.footerLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+// ============================================
+// LOADING STATE
+// ============================================
+.loading {
+  pointer-events: none;
+
+  .value,
+  .title,
+  .trendBadge {
+    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface) 50%, var(--surface-2) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    color: transparent;
+    border-radius: var(--r-sm);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .summaryCard,
+  .iconWrapper {
+    transition: none;
+  }
+
+  .summaryCard:hover {
+    transform: none;
+  }
+
+  .summaryCard:hover .iconWrapper {
+    transform: none;
+  }
+
+  .loading .value,
+  .loading .title,
+  .loading .trendBadge {
+    animation: none;
+  }
+}

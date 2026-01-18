@@ -1,0 +1,87 @@
+// ============================================
+// 📐 MAIN LAYOUT COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// MAIN LAYOUT
+// ============================================
+.mainLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg);
+}
+
+// ============================================
+// MAIN BODY (Sidebar + Content Container)
+// ============================================
+.mainBody {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: calc(100vh - var(--header-height, 56px) - var(--footer-height, 64px));
+  transition: padding-left 0.3s ease;
+
+  // Mobile: No padding, no sidebar - full width content
+  @include mobile {
+    padding-left: 0 !important;
+    min-height: auto;
+  }
+
+  // Desktop: Sidebar visible - use padding instead of margin
+  &.sidebarExpanded {
+    padding-left: var(--sidebar-width, 280px);
+  }
+
+  // Desktop: Sidebar collapsed (icon-only)
+  &.sidebarCollapsed {
+    padding-left: var(--sidebar-collapsed-width, 72px);
+  }
+}
+
+// ============================================
+// CONTENT WRAPPER (Contains main content)
+// ============================================
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-width: 0; // Prevent flex overflow
+  overflow-x: hidden;
+  background-color: var(--bg);
+}
+
+// ============================================
+// MAIN CONTENT AREA
+// ============================================
+.layoutContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: auto;
+  background-color: var(--bg);
+  padding: var(--space-lg);
+  flex: 1;
+
+  @include mobile {
+    padding: var(--space-md);
+  }
+
+  @include tablet {
+    padding: var(--space-lg);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .mainBody,
+  .contentWrapper {
+    transition: none;
+  }
+}

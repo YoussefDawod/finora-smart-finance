@@ -1,0 +1,98 @@
+// ============================================
+// 🚫 NOT FOUND PAGE (404)
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.not-found-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background: var(--bg);
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+
+  .error-code {
+    font-size: 8rem;
+    font-weight: var(--fw-b);
+    color: var(--primary);
+    margin: 0;
+    line-height: 1;
+
+    @include mobile {
+      font-size: 6rem;
+    }
+  }
+
+  h2 {
+    font-size: var(--fs-2xl);
+    margin: var(--space-lg) 0;
+    color: var(--tx);
+
+    @include mobile {
+      font-size: var(--fs-xl);
+    }
+  }
+
+  p {
+    color: var(--tx-muted);
+    margin-bottom: var(--space-xl);
+    font-size: var(--fs-base);
+  }
+}
+
+// ============================================
+// BUTTON
+// ============================================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--btn-h);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-sb);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: var(--pri-hover);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// PRIMARY BUTTON VARIANT
+// ============================================
+.btn-primary {
+  @extend .btn;
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .btn {
+    transition: none;
+  }
+}

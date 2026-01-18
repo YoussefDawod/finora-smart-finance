@@ -1,0 +1,307 @@
+// ============================================
+// 📝 INPUT COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// INPUT GROUP (Container)
+// ============================================
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+
+  // Focused State
+  &.focused {
+    .label {
+      color: var(--primary);
+      font-weight: var(--fw-m);
+    }
+
+    .inputWrapper {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 2%, transparent);
+    }
+  }
+
+  // Error State
+  &.hasError {
+    .inputWrapper {
+      border-color: var(--error);
+      background: color-mix(in srgb, var(--error) 5%, transparent);
+    }
+
+    .label {
+      color: var(--error);
+    }
+  }
+}
+
+// ============================================
+// LABEL
+// ============================================
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.required {
+  color: var(--error);
+  font-weight: var(--fw-b);
+}
+
+// ============================================
+// INPUT WRAPPER
+// ============================================
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  overflow: hidden;
+
+  &:hover:not(:has(:disabled)) {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+}
+
+// ============================================
+// INPUT FIELD
+// ============================================
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: var(--space-sm) var(--space-md);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  outline: none;
+  width: 100%;
+  height: 100%;
+
+  // Placeholder
+  &::placeholder {
+    color: var(--tx-muted);
+    opacity: 0.7;
+  }
+
+  // Autofill Styling
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+    -webkit-text-fill-color: var(--tx);
+  }
+
+  // Disabled
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--surface-2);
+  }
+
+  // Number Input Arrows
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &[type='number'] {
+    appearance: none;
+    -moz-appearance: textfield;
+  }
+
+  // Scrollbar
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: var(--r-sm);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 50%, transparent);
+    }
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.inputGroup.small {
+  .inputWrapper {
+    min-height: var(--btn-h-sm, 2rem);
+  }
+
+  .input {
+    padding: var(--space-2xs) var(--space-sm);
+    font-size: var(--fs-xs);
+  }
+}
+
+.inputGroup.medium {
+  .inputWrapper {
+    min-height: var(--input-h);
+  }
+
+  .input {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-sm);
+  }
+}
+
+.inputGroup.large {
+  .inputWrapper {
+    min-height: var(--btn-h-lg, 3.25rem);
+  }
+
+  .input {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--fs-md);
+  }
+}
+
+// ============================================
+// ICONS
+// ============================================
+.iconLeft,
+.iconRight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  font-size: 1.25em;
+  color: var(--tx-muted);
+  transition: color var(--tr);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.iconLeft {
+  order: -1;
+}
+
+.iconRight {
+  order: 1;
+}
+
+// Adjust padding when icons present
+.inputWrapper {
+  &:has(> .iconLeft) {
+    .input {
+      padding-left: 0;
+    }
+  }
+
+  &:has(> .iconRight) {
+    .input {
+      padding-right: 0;
+    }
+  }
+}
+
+// ============================================
+// FOOTER (Error / Hint / Char Count)
+// ============================================
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: var(--space-md);
+}
+
+.error,
+.hint,
+.charCount {
+  font-size: var(--fs-xs);
+  margin: 0;
+  animation: slideInDown var(--d-fast) ease-out;
+}
+
+.error {
+  color: var(--error);
+  font-weight: var(--fw-m);
+  flex: 1;
+}
+
+.hint {
+  color: var(--tx-muted);
+  flex: 1;
+}
+
+.charCount {
+  color: var(--tx-muted);
+  font-weight: var(--fw-m);
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: var(--space-sm);
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2xs) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include mobile {
+  .inputGroup {
+    gap: var(--space-2xs);
+  }
+
+  .inputGroup.large {
+    .inputWrapper {
+      min-height: var(--input-h);
+    }
+
+    .input {
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--fs-sm);
+    }
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .inputGroup,
+  .label,
+  .inputWrapper,
+  .input,
+  .iconLeft,
+  .iconRight,
+  .error,
+  .hint,
+  .charCount {
+    animation: none;
+    transition: none;
+  }
+}

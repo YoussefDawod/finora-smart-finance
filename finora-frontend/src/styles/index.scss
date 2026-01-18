@@ -1,0 +1,57 @@
+// ============================================
+// 🎨 MAIN STYLESHEET - CENTRAL ENTRY POINT
+// ============================================
+// Import order follows logical dependency chain:
+// 1. Variables → 2. Mixins → 3. Base → 4. Layout → 5. Themes → 6. Utils
+// ============================================
+
+// ============================================
+// 1️⃣ VARIABLES (Design Tokens)
+// ============================================
+// Single source of truth for all values
+@use './variables' as *;
+
+// ============================================
+// 2️⃣ MIXINS & FUNCTIONS
+// ============================================
+// Reusable SCSS logic, depends on variables
+@use './mixins' as *;
+
+// ============================================
+// 3️⃣ GLOBAL BASE STYLES
+// ============================================
+// CSS Reset, typography, base elements
+@use './globals';
+
+// ============================================
+// 4️⃣ ANIMATIONS
+// ============================================
+// All @keyframes and animation utilities
+@use './animations';
+
+// ============================================
+// 5️⃣ ACCESSIBILITY
+// ============================================
+// Focus states, screen reader utilities, WCAG compliance
+@use './accessibility';
+
+// ============================================
+// 6️⃣ COMPONENTS
+// ============================================
+// Reusable UI components (buttons, cards, inputs, modals, etc.)
+@use './components/index' as components;
+
+// ============================================
+// 7️⃣ UTILITIES
+// ============================================
+// Helper classes (spacing, display, flex, etc.)
+@use './utilities/index' as utilities;
+
+// ============================================
+// 8️⃣ THEMES
+// ============================================
+// Theme-specific CSS custom property overrides
+// Light theme is default, dark/glassmorphic are optional
+@use './themes/light';
+@use './themes/dark';
+@use './themes/glassmorphic';

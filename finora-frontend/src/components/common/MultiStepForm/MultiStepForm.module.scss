@@ -1,0 +1,280 @@
+// ============================================
+// 📊 MULTI-STEP FORM COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// CONTAINER
+// ============================================
+.multiStepForm {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+// ============================================
+// PROGRESS BAR
+// ============================================
+.progressBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  position: relative;
+}
+
+.progressLine {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.progressLineFill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 3px;
+  background: var(--primary);
+  transform: translateY(-50%);
+  transition: width var(--d-normal) ease-out;
+  z-index: 1;
+}
+
+// ============================================
+// STEP INDICATORS
+// ============================================
+.stepIndicator {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.stepCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  transition: all var(--tr);
+}
+
+.stepLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  text-align: center;
+  max-width: 80px;
+  transition: color var(--tr);
+}
+
+// Step States
+.stepIndicator.active {
+  .stepCircle {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--on-primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+
+  .stepLabel {
+    color: var(--primary);
+    font-weight: var(--fw-m);
+  }
+}
+
+.stepIndicator.completed {
+  .stepCircle {
+    background: var(--success);
+    border-color: var(--success);
+    color: var(--on-success);
+  }
+
+  .stepLabel {
+    color: var(--tx);
+  }
+}
+
+// ============================================
+// STEP CONTENT
+// ============================================
+.stepContent {
+  min-height: 200px;
+  animation: fadeIn var(--d-normal) ease-out;
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+.prevButton {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--tx);
+
+  &:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.nextButton {
+  background: var(--primary);
+  border: none;
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--pri-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.submitButton {
+  background: var(--success);
+  border: none;
+  color: var(--on-success);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--success) 90%, black);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// SPINNER
+// ============================================
+.spinner {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--r-full);
+  animation: spin var(--d-slow) linear infinite;
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(var(--space-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include tablet {
+  .progressBar {
+    margin-bottom: var(--space-lg);
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .stepCircle {
+    width: var(--space-lg);
+    height: var(--space-lg);
+    font-size: var(--fs-xs);
+  }
+}
+
+@include mobile {
+  .stepContent {
+    min-height: 150px;
+  }
+
+  .navigation {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .navButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .prevButton {
+    order: 1;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .stepContent {
+    animation: none;
+  }
+
+  .progressLineFill {
+    transition: none;
+  }
+
+  .spinner {
+    animation: none;
+    opacity: 0.6;
+  }
+}

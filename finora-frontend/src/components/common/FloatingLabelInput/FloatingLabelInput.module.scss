@@ -1,0 +1,226 @@
+// ============================================
+// ✨ FLOATING LABEL INPUT COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// INPUT GROUP (Container)
+// ============================================
+.inputGroup {
+  position: relative;
+  width: 100%;
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.inputGroup.small {
+  --input-height: var(--btn-h-sm, 2rem);
+  --input-font-size: var(--fs-xs);
+  --input-padding: var(--space-2xs) var(--space-sm);
+  --label-font-size: var(--fs-2xs);
+}
+
+.inputGroup.medium {
+  --input-height: var(--input-h);
+  --input-font-size: var(--fs-sm);
+  --input-padding: var(--space-sm) var(--space-md);
+  --label-font-size: var(--fs-xs);
+}
+
+.inputGroup.large {
+  --input-height: var(--btn-h-lg, 3.25rem);
+  --input-font-size: var(--fs-md);
+  --input-padding: var(--space-md) var(--space-lg);
+  --label-font-size: var(--fs-sm);
+}
+
+// ============================================
+// INPUT WRAPPER
+// ============================================
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  min-height: var(--input-height, var(--input-h));
+  overflow: hidden;
+
+  &:hover:not(:has(:disabled)) {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  &:focus-within {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 2%, transparent);
+  }
+}
+
+// ============================================
+// INPUT FIELD
+// ============================================
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: var(--input-padding, var(--space-sm) var(--space-md));
+  padding-top: var(--space-lg);
+  font-family: inherit;
+  font-size: var(--input-font-size, var(--fs-sm));
+  color: var(--tx);
+  outline: none;
+  width: 100%;
+  height: 100%;
+
+  &::placeholder {
+    color: transparent;
+  }
+
+  &:focus::placeholder {
+    color: var(--tx-muted);
+    opacity: 0.5;
+  }
+
+  // Autofill Styling
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+    -webkit-text-fill-color: var(--tx);
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--surface-2);
+  }
+}
+
+// ============================================
+// FLOATING LABEL
+// ============================================
+.label {
+  position: absolute;
+  left: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: var(--input-font-size, var(--fs-sm));
+  color: var(--tx-muted);
+  pointer-events: none;
+  transition: all var(--tr);
+  transform-origin: left center;
+  background: transparent;
+  padding: 0 var(--space-3xs);
+}
+
+// Float label when input has value or is focused
+.input:focus ~ .label,
+.input:not(:placeholder-shown) ~ .label,
+.inputGroup.hasValue .label {
+  top: var(--space-xs);
+  transform: translateY(0);
+  font-size: var(--label-font-size, var(--fs-xs));
+  color: var(--primary);
+  font-weight: var(--fw-m);
+}
+
+// ============================================
+// REQUIRED INDICATOR
+// ============================================
+.required {
+  color: var(--error);
+  font-weight: var(--fw-b);
+  margin-left: var(--space-3xs);
+}
+
+// ============================================
+// ERROR STATE
+// ============================================
+.inputGroup.hasError {
+  .inputWrapper {
+    border-color: var(--error);
+    background: color-mix(in srgb, var(--error) 5%, transparent);
+  }
+
+  .label {
+    color: var(--error);
+  }
+}
+
+// ============================================
+// ICONS
+// ============================================
+.iconLeft,
+.iconRight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-md);
+  font-size: 1.25em;
+  color: var(--tx-muted);
+  flex-shrink: 0;
+}
+
+.iconLeft {
+  order: -1;
+}
+
+.iconRight {
+  order: 1;
+}
+
+.inputWrapper:has(.iconLeft) .label {
+  left: var(--space-2xl);
+}
+
+// ============================================
+// FOOTER (Error / Hint)
+// ============================================
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: var(--space-md);
+  padding-top: var(--space-2xs);
+}
+
+.error,
+.hint {
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+
+.error {
+  color: var(--error);
+  font-weight: var(--fw-m);
+}
+
+.hint {
+  color: var(--tx-muted);
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include mobile {
+  .inputGroup.large {
+    --input-height: var(--input-h);
+    --input-font-size: var(--fs-sm);
+    --input-padding: var(--space-sm) var(--space-md);
+    --label-font-size: var(--fs-xs);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .inputWrapper,
+  .input,
+  .label {
+    transition: none;
+  }
+}

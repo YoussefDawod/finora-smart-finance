@@ -1,0 +1,79 @@
+// ============================================
+// ⏳ LOADING OVERLAY COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// OVERLAY
+// ============================================
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--surface) 50%, transparent);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-overlay);
+  animation: fadeIn var(--d-normal) ease-in-out;
+
+  &.fullScreen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--surface);
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: slideUp var(--d-slow) ease-out var(--d-fast) both;
+}
+
+// ============================================
+// MESSAGE
+// ============================================
+.message {
+  font-size: var(--fs-md);
+  color: var(--tx-muted);
+  text-align: center;
+  margin: 0;
+  font-weight: var(--fw-m);
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-sm));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .overlay,
+  .content {
+    animation: none;
+  }
+}

@@ -1,0 +1,65 @@
+// ============================================
+// 💀 SKELETON LOADING COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// WRAPPER
+// ============================================
+.skeleton-wrapper {
+  width: 100%;
+}
+
+// ============================================
+// BASE SKELETON
+// ============================================
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    var(--surface-3, var(--surface)) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer var(--d-slower) infinite;
+  display: block;
+  margin: 0;
+}
+
+// ============================================
+// SHAPE VARIANTS
+// ============================================
+.skeleton-line {
+  border-radius: var(--r-md);
+}
+
+.skeleton-circle {
+  border-radius: var(--r-full);
+}
+
+.skeleton-rect {
+  border-radius: var(--r-md);
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .skeleton {
+    animation: none;
+    opacity: 0.6;
+  }
+}

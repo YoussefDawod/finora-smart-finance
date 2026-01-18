@@ -1,0 +1,33 @@
+<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="48" height="48" rx="12" fill="url(#bg)"/>
+
+  <!-- Abstract "F" letterform - stylized and modern -->
+  <path 
+    d="M14 10h20c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v6h12c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v8c0 1.1-.9 2-2 2h-2c-1.1 0-2-.9-2-2V12c0-1.1.9-2 2-2z" 
+    fill="white"
+  />
+
+  <!-- Growth trend line -->
+  <path 
+    d="M24 38L30 30L36 33L42 22" 
+    stroke="url(#accent)" 
+    stroke-width="3" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+
+  <!-- Peak dot -->
+  <circle cx="42" cy="22" r="3.5" fill="#34d399" />
+</svg>

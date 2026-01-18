@@ -1,0 +1,256 @@
+// ============================================
+// 🔔 TOAST COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE TOAST
+// ============================================
+.toast {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-xl);
+  border-left: 4px solid var(--primary);
+  animation: slideIn var(--d-normal) ease-out;
+  position: relative;
+  overflow: hidden;
+
+  // Tablet
+  @include tablet {
+    padding: var(--space-md);
+  }
+
+  // Mobile
+  @include mobile {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  &.exiting {
+    animation: slideOut var(--d-normal) ease-in forwards;
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+// ============================================
+// ICON
+// ============================================
+.icon {
+  flex-shrink: 0;
+  width: var(--space-lg);
+  height: var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-b);
+  border-radius: var(--r-full);
+}
+
+// ============================================
+// MESSAGE
+// ============================================
+.message {
+  flex: 1;
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  line-height: var(--lh-relaxed);
+  word-break: break-word;
+}
+
+// ============================================
+// ACTIONS
+// ============================================
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.actionButton {
+  padding: var(--space-2xs) var(--space-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+
+  &:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// CLOSE BUTTON
+// ============================================
+.closeButton {
+  padding: var(--space-2xs);
+  font-size: var(--fs-lg);
+  color: var(--tx-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--tr-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-lg);
+  height: var(--space-lg);
+  border-radius: var(--r-sm);
+
+  &:hover {
+    color: var(--tx);
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
+// PROGRESS BAR
+// ============================================
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: currentColor;
+  transition: width 50ms linear;
+}
+
+// ============================================
+// TYPE VARIATIONS
+// ============================================
+.success {
+  border-left-color: var(--success);
+
+  .icon {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 10%, transparent);
+  }
+
+  .progressFill {
+    background: var(--success);
+  }
+}
+
+.error {
+  border-left-color: var(--error);
+
+  .icon {
+    color: var(--error);
+    background: color-mix(in srgb, var(--error) 10%, transparent);
+  }
+
+  .progressFill {
+    background: var(--error);
+  }
+}
+
+.warning {
+  border-left-color: var(--warning);
+
+  .icon {
+    color: var(--warning);
+    background: color-mix(in srgb, var(--warning) 10%, transparent);
+  }
+
+  .progressFill {
+    background: var(--warning);
+  }
+}
+
+.info {
+  border-left-color: var(--info);
+
+  .icon {
+    color: var(--info);
+    background: color-mix(in srgb, var(--info) 10%, transparent);
+  }
+
+  .progressFill {
+    background: var(--info);
+  }
+}
+
+// ============================================
+// ANIMATIONS
+// ============================================
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .toast {
+    animation: fadeIn var(--d-fast) ease-out;
+
+    &.exiting {
+      animation: fadeOut var(--d-fast) ease-in forwards;
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+}

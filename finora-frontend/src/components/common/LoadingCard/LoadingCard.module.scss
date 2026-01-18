@@ -1,0 +1,81 @@
+// ============================================
+// 📦 LOADING CARD COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE CARD
+// ============================================
+.card {
+  padding: var(--space-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  animation: pulse var(--d-slower) ease-in-out infinite;
+
+  &:hover {
+    box-shadow: var(--sh-sm);
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+// ============================================
+// CARD VARIATIONS
+// ============================================
+.card-transaction {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+
+  .content {
+    flex: 1;
+    gap: var(--space-xs);
+  }
+}
+
+.card-chart {
+  .content {
+    gap: var(--space-md);
+  }
+}
+
+.card-listItem {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.card-stats {
+  text-align: center;
+
+  .content {
+    align-items: center;
+    gap: var(--space-xs);
+  }
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .card {
+    animation: none;
+    opacity: 0.6;
+  }
+}

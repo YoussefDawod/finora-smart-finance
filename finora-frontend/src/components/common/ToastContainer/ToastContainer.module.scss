@@ -1,0 +1,50 @@
+// ============================================
+// 📦 TOAST CONTAINER
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// CONTAINER
+// ============================================
+.toastContainer {
+  // Fixed positioning - always in viewport
+  position: fixed;
+  z-index: 9999;
+  
+  // Centered horizontally
+  left: 50%;
+  transform: translateX(-50%);
+  
+  // Position below header
+  top: calc(var(--header-height, 56px) + var(--space-md));
+  
+  // Sizing - max 500px, minimum 320px
+  width: 500px;
+  max-width: calc(100vw - var(--space-lg) * 2);
+  
+  // Layout
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  
+  // Don't block clicks on content behind
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  // Tablet
+  @include tablet {
+    width: 450px;
+    max-width: calc(100vw - var(--space-md) * 2);
+  }
+
+  // Mobile
+  @include mobile {
+    top: calc(var(--header-height, 48px) + var(--space-sm));
+    width: calc(100vw - var(--space-md) * 2);
+    max-width: none;
+  }
+}

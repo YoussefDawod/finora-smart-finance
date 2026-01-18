@@ -1,0 +1,277 @@
+// ============================================
+// 🪟 MODAL COMPONENT STYLES
+// ============================================
+// Consolidated modal foundation + variants
+// Uses only variables.scss via CSS custom properties
+// ============================================
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ============================================
+// 🌑 MODAL BACKDROP
+// ============================================
+
+.modal-backdrop {
+  @include modal-overlay;
+  animation: backdropFadeIn var(--tr) ease-out;
+}
+
+.modal-backdrop-blur {
+  @include modal-overlay;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+// ============================================
+// 📦 BASE MODAL
+// ============================================
+
+.modal {
+  @include modal-base;
+  animation: modalEnter var(--tr) ease-out;
+}
+
+[data-glass="true"] .modal {
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+// ============================================
+// 📏 MODAL SIZES
+// ============================================
+
+.modal-xs {
+  width: min(320px, 92vw);
+}
+
+.modal-sm {
+  width: min(var(--modal-width-sm), 92vw);
+}
+
+.modal-md {
+  width: min(var(--modal-width-md), 92vw);
+}
+
+.modal-lg {
+  width: min(var(--modal-width-lg), 92vw);
+}
+
+.modal-xl {
+  width: min(var(--modal-width-xl), 92vw);
+}
+
+.modal-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+// ============================================
+// 🧩 MODAL PARTS
+// ============================================
+
+.modal-header {
+  @include flex-between;
+  padding: var(--modal-padding);
+  border-bottom: 1px solid var(--border);
+
+  h2, h3 {
+    margin: 0;
+    font-size: var(--fs-xl);
+    font-weight: var(--fw-sb);
+  }
+}
+
+.modal-close {
+  @include button-base;
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--tx-muted);
+  border: none;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--tx);
+  }
+}
+
+.modal-body {
+  padding: var(--modal-padding);
+  overflow-y: auto;
+  max-height: calc(90vh - 140px);
+  @include custom-scrollbar;
+}
+
+.modal-footer {
+  @include flex-between;
+  padding: var(--modal-padding);
+  border-top: 1px solid var(--border);
+  gap: var(--space-md);
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-left: auto;
+}
+
+// ============================================
+// 🎨 MODAL VARIANTS
+// ============================================
+
+// Centered modal (vertically)
+.modal-centered {
+  margin: auto;
+}
+
+// Slide from bottom (for mobile sheets)
+.modal-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  animation: slideInUp var(--tr) ease-out;
+}
+
+// Slide from right (sidebar)
+.modal-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: var(--r-xl) 0 0 var(--r-xl);
+  animation: slideInRight var(--tr) ease-out;
+}
+
+// Slide from left
+.modal-drawer-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  height: 100vh;
+  max-height: 100vh;
+  border-radius: 0 var(--r-xl) var(--r-xl) 0;
+  animation: slideInLeft var(--tr) ease-out;
+}
+
+// ============================================
+// 🚨 ALERT DIALOGS
+// ============================================
+
+.modal-alert {
+  text-align: center;
+  max-width: 400px;
+
+  .modal-body {
+    padding-top: var(--space-xl);
+  }
+
+  .modal-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-md);
+    border-radius: var(--r-full);
+    @include flex-center;
+    font-size: var(--fs-3xl);
+  }
+
+  .modal-icon-success {
+    background: rgba(var(--success-rgb), 0.1);
+    color: var(--success);
+  }
+
+  .modal-icon-error {
+    background: rgba(var(--error-rgb), 0.1);
+    color: var(--error);
+  }
+
+  .modal-icon-warning {
+    background: rgba(var(--warning-rgb), 0.1);
+    color: var(--warning);
+  }
+
+  .modal-icon-info {
+    background: rgba(var(--info-rgb), 0.1);
+    color: var(--info);
+  }
+
+  .modal-title {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-sb);
+    margin-bottom: var(--space-xs);
+  }
+
+  .modal-message {
+    color: var(--tx-muted);
+    font-size: var(--fs-sm);
+  }
+
+  .modal-footer {
+    justify-content: center;
+  }
+}
+
+// ============================================
+// 🔒 CONFIRM DIALOG
+// ============================================
+
+.modal-confirm {
+  max-width: 450px;
+
+  .modal-footer {
+    justify-content: flex-end;
+  }
+}
+
+// ============================================
+// 🎬 MODAL ANIMATIONS
+// ============================================
+
+// Exit animations
+.modal-exit {
+  animation: modalLeave var(--tr) ease-in forwards;
+}
+
+.modal-backdrop-exit {
+  animation: backdropFadeOut var(--tr) ease-in forwards;
+}
+
+.modal-bottom.modal-exit {
+  animation: slideOutDown var(--tr) ease-in forwards;
+}
+
+.modal-drawer.modal-exit {
+  animation: slideOutRight var(--tr) ease-in forwards;
+}
+
+.modal-drawer-left.modal-exit {
+  animation: slideOutLeft var(--tr) ease-in forwards;
+}
+
+// ============================================
+// 🎭 PLACEHOLDERS (for @extend)
+// ============================================
+
+%modal-overlay {
+  @include modal-overlay;
+}
+
+%modal-base {
+  @include modal-base;
+}

@@ -1,0 +1,235 @@
+// ============================================
+// 🏷️ MODERN LOGO COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// LOGO CONTAINER
+// ============================================
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  text-decoration: none;
+  color: var(--tx);
+  transition: transform 0.2s ease;
+  
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+    border-radius: var(--r-md);
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.default {
+  .iconWrapper {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .brandName {
+    font-size: 1.25rem;
+  }
+  
+  .tagline {
+    font-size: 0.65rem;
+  }
+}
+
+.small {
+  gap: var(--space-xs);
+  
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .brandName {
+    font-size: 1rem;
+  }
+  
+  .tagline {
+    font-size: 0.55rem;
+  }
+}
+
+.large {
+  gap: var(--space-md);
+  
+  .iconWrapper {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .brandName {
+    font-size: 1.5rem;
+  }
+  
+  .tagline {
+    font-size: 0.75rem;
+  }
+}
+
+// ============================================
+// ICON WRAPPER - Clean minimal container
+// ============================================
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-xl, 16px);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 8%, var(--surface)),
+    color-mix(in srgb, var(--secondary) 5%, var(--surface))
+  );
+  box-shadow: 
+    0 2px 8px color-mix(in srgb, var(--primary) 15%, transparent),
+    0 1px 2px color-mix(in srgb, var(--shadow) 8%, transparent);
+  overflow: visible;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+// ============================================
+// SVG ICON
+// ============================================
+.icon {
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+// ============================================
+// SVG ELEMENTS - Using CSS Variables
+// ============================================
+.letterPath {
+  fill: var(--primary);
+}
+
+.growthLine {
+  stroke: var(--accent);
+  fill: none;
+}
+
+.peakDot {
+  fill: var(--success);
+}
+
+// Gradient stops
+.gradientStopPrimary {
+  stop-color: var(--primary);
+}
+
+.gradientStopSecondary {
+  stop-color: var(--secondary);
+}
+
+.gradientStopAccent1 {
+  stop-color: var(--info);
+}
+
+.gradientStopAccent2 {
+  stop-color: var(--success);
+}
+
+// ============================================
+// TEXT WRAPPER
+// ============================================
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+
+// ============================================
+// BRAND NAME
+// ============================================
+.brandName {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(
+    135deg,
+    var(--tx) 0%,
+    color-mix(in srgb, var(--tx) 70%, var(--primary)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+// ============================================
+// TAGLINE
+// ============================================
+.tagline {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--tx-muted);
+  opacity: 0.7;
+  margin: 0;
+  padding: 0;
+  display: block;
+  line-height: 1;
+}
+
+// ============================================
+// HOVER EFFECTS
+// ============================================
+.logo:hover {
+  .iconWrapper {
+    box-shadow: 
+      0 8px 24px color-mix(in srgb, var(--primary) 35%, transparent),
+      0 4px 8px color-mix(in srgb, var(--shadow) 15%, transparent),
+      inset 0 1px 1px color-mix(in srgb, white 15%, transparent);
+  }
+  
+  .brandName {
+    background: linear-gradient(
+      135deg,
+      var(--primary) 0%,
+      var(--secondary) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .logo,
+  .iconWrapper {
+    transition: none;
+  }
+}
+
+// ============================================
+// MOBILE ADJUSTMENTS
+// ============================================
+@media (max-width: 480px) {
+  .default {
+    .iconWrapper {
+      width: 38px;
+      height: 38px;
+    }
+    
+    .brandName {
+      font-size: 1.1rem;
+    }
+    
+    .tagline {
+      font-size: 0.55rem;
+    }
+  }
+}

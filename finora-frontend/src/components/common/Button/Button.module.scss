@@ -1,0 +1,243 @@
+// ============================================
+// 🔘 BUTTON COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BASE BUTTON
+// ============================================
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+  font-size: var(--fs-sm);
+
+  // Focus State (Accessibility)
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  // Disabled State
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Full Width
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.button.small {
+  padding: var(--space-2xs) var(--space-sm);
+  font-size: var(--fs-xs);
+  height: var(--btn-height-sm, 2rem);
+  min-width: var(--btn-height-sm, 2rem);
+}
+
+.button.medium {
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--fs-sm);
+  height: var(--btn-height-md, 2.5rem);
+  min-width: var(--btn-height-md, 2.5rem);
+}
+
+.button.large {
+  padding: var(--space-md) var(--space-xl);
+  font-size: var(--fs-md);
+  height: var(--btn-height-lg, 3rem);
+  min-width: var(--btn-height-lg, 3rem);
+  font-weight: var(--fw-b);
+}
+
+// ============================================
+// VARIANT: PRIMARY
+// ============================================
+.button.primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 25%, transparent);
+
+  &:hover:not(.disabled) {
+    background: var(--pri-hover);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 35%, transparent);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(.disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}
+
+// ============================================
+// VARIANT: SECONDARY
+// ============================================
+.button.secondary {
+  background: var(--surface-2);
+  color: var(--tx);
+  border: 1px solid var(--border);
+
+  &:hover:not(.disabled) {
+    background: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:active:not(.disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+// ============================================
+// VARIANT: DANGER
+// ============================================
+.button.danger {
+  background: var(--error);
+  color: var(--on-error);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--error) 25%, transparent);
+
+  &:hover:not(.disabled) {
+    background: var(--error-hover, color-mix(in srgb, var(--error) 90%, black));
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--error) 35%, transparent);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(.disabled) {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--error) 20%, transparent);
+  }
+}
+
+// ============================================
+// VARIANT: GHOST (Minimal)
+// ============================================
+.button.ghost {
+  background: transparent;
+  color: var(--primary);
+  border: none;
+
+  &:hover:not(.disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  &:active:not(.disabled) {
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+}
+
+// ============================================
+// VARIANT: OUTLINE
+// ============================================
+.button.outline {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+
+  &:hover:not(.disabled) {
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+  }
+
+  &:active:not(.disabled) {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+// ============================================
+// TEXT & ICON
+// ============================================
+.text {
+  display: inline;
+  font-weight: inherit;
+}
+
+.iconLeft,
+.iconRight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25em;
+  line-height: 1;
+}
+
+// ============================================
+// SPINNER (Loading)
+// ============================================
+.spinner {
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-top-color: currentColor;
+  border-radius: var(--r-full);
+  animation: spin var(--d-slow) linear infinite;
+}
+
+.button.primary .spinner {
+  border-color: color-mix(in srgb, var(--on-primary) 30%, transparent);
+  border-top-color: var(--on-primary);
+}
+
+.button.secondary .spinner,
+.button.ghost .spinner,
+.button.outline .spinner {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  border-top-color: var(--primary);
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@include sm {
+  .button.medium {
+    padding: var(--space-xs) var(--space-md);
+  }
+
+  .button.large {
+    padding: var(--space-sm) var(--space-lg);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .button {
+    transition: none;
+
+    &:hover:not(.disabled) {
+      transform: none;
+    }
+  }
+
+  .spinner {
+    animation: none;
+    opacity: 0.6;
+  }
+}

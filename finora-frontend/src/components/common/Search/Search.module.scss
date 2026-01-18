@@ -1,0 +1,73 @@
+// ============================================
+// 🔍 SEARCH COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// FORM
+// ============================================
+.searchForm {
+  width: 100%;
+  display: flex;
+  flex: 1;
+}
+
+// ============================================
+// INPUT WRAPPER
+// ============================================
+.searchInputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  border-radius: var(--r-md);
+}
+
+// ============================================
+// SEARCH ICON
+// ============================================
+.searchIcon {
+  position: absolute;
+  left: var(--space-sm);
+  color: color-mix(in srgb, var(--tx) 55%, var(--tx-muted));
+  pointer-events: none;
+  font-size: var(--fs-lg);
+}
+
+// ============================================
+// SEARCH INPUT
+// ============================================
+.searchInput {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-2xl);
+  min-height: var(--input-h);
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  border-radius: var(--r-md);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  box-shadow: var(--sh-sm);
+  transition: all var(--tr);
+
+  &::placeholder {
+    color: var(--tx-muted);
+  }
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+    box-shadow: var(--sh-md);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  }
+
+  @include mobile {
+    font-size: var(--fs-sm);
+    padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
+    min-height: calc(var(--input-h) - var(--space-3xs));
+  }
+}

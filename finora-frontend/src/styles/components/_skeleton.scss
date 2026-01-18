@@ -1,0 +1,261 @@
+// ============================================
+// 🦴 SKELETON LOADING STYLES
+// ============================================
+// Placeholder loading states
+// Uses only variables.scss via CSS custom properties
+// ============================================
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// ============================================
+// 📦 BASE SKELETON
+// ============================================
+
+.skeleton {
+  position: relative;
+  display: block;
+  border-radius: var(--r-md);
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-from) 0%,
+    var(--skeleton-to) 50%,
+    var(--skeleton-from) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading var(--skeleton-duration) ease-in-out infinite;
+  overflow: hidden;
+  
+  // No text inside skeleton
+  color: transparent !important;
+  user-select: none;
+}
+
+// ============================================
+// 🎨 SKELETON SHAPES
+// ============================================
+
+.skeleton-text {
+  @extend .skeleton;
+  height: 1em;
+  width: 100%;
+}
+
+.skeleton-text-sm {
+  @extend .skeleton;
+  height: 0.75em;
+  width: 80%;
+}
+
+.skeleton-text-lg {
+  @extend .skeleton;
+  height: 1.25em;
+  width: 100%;
+}
+
+.skeleton-circle {
+  @extend .skeleton;
+  border-radius: var(--r-full);
+  aspect-ratio: 1 / 1;
+}
+
+.skeleton-rect {
+  @extend .skeleton;
+  border-radius: var(--r-md);
+}
+
+.skeleton-avatar {
+  @extend .skeleton;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+}
+
+.skeleton-avatar-sm {
+  @extend .skeleton;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+}
+
+.skeleton-avatar-lg {
+  @extend .skeleton;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-full);
+}
+
+.skeleton-button {
+  @extend .skeleton;
+  height: var(--btn-height-md);
+  width: 100px;
+  border-radius: var(--r-md);
+}
+
+.skeleton-input {
+  @extend .skeleton;
+  height: var(--input-height-md);
+  width: 100%;
+  border-radius: var(--r-md);
+}
+
+.skeleton-image {
+  @extend .skeleton;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  border-radius: var(--r-lg);
+}
+
+.skeleton-thumbnail {
+  @extend .skeleton;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  border-radius: var(--r-md);
+}
+
+// ============================================
+// 📊 SKELETON LAYOUTS
+// ============================================
+
+.skeleton-stack {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+// Card skeleton
+.skeleton-card {
+  @include card($hover: false);
+  
+  .skeleton-card-image {
+    @extend .skeleton;
+    height: 160px;
+    margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) var(--space-md);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+  }
+  
+  .skeleton-card-title {
+    @extend .skeleton;
+    height: 1.5em;
+    width: 70%;
+    margin-bottom: var(--space-sm);
+  }
+  
+  .skeleton-card-text {
+    @extend .skeleton;
+    height: 1em;
+    width: 100%;
+    margin-bottom: var(--space-2xs);
+    
+    &:last-child {
+      width: 60%;
+    }
+  }
+}
+
+// List skeleton
+.skeleton-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  
+  .skeleton-list-avatar {
+    @extend .skeleton;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-full);
+    flex-shrink: 0;
+  }
+  
+  .skeleton-list-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    
+    .skeleton-list-title {
+      @extend .skeleton;
+      height: 1em;
+      width: 60%;
+    }
+    
+    .skeleton-list-subtitle {
+      @extend .skeleton;
+      height: 0.75em;
+      width: 40%;
+    }
+  }
+}
+
+// Table skeleton
+.skeleton-table {
+  width: 100%;
+  
+  .skeleton-table-row {
+    display: flex;
+    gap: var(--space-md);
+    padding: var(--space-sm) 0;
+    border-bottom: 1px solid var(--border);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  .skeleton-table-cell {
+    @extend .skeleton;
+    height: 1em;
+    flex: 1;
+  }
+}
+
+// ============================================
+// ⏸️ SKELETON ANIMATION CONTROL
+// ============================================
+
+.skeleton-paused {
+  animation-play-state: paused;
+}
+
+.skeleton-no-animation {
+  animation: none;
+  background: var(--skeleton-from);
+}
+
+// ============================================
+// ♿ REDUCED MOTION
+// ============================================
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--skeleton-from);
+  }
+}
+
+// ============================================
+// 🎭 KEYFRAMES
+// ============================================
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
