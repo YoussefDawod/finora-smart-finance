@@ -24,6 +24,9 @@ yarn-error.log*
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.staging
 .npmrc
 
 ### Editor/OS
