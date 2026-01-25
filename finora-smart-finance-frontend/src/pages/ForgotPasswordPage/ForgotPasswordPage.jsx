@@ -17,7 +17,9 @@ import { motion } from 'framer-motion';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { ForgotPasswordRequestForm, ResetPasswordForm } from '@/components/auth';
+import Logo from '@/components/common/Logo/Logo';
 import { FiArrowLeft } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './ForgotPasswordPage.module.scss';
 
 export default function ForgotPasswordPage() {
@@ -26,6 +28,7 @@ export default function ForgotPasswordPage() {
   const { shouldAnimate } = useMotion();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { t } = useTranslation();
 
   // ============================================
   // AUTO-REDIRECT IF AUTHENTICATED
@@ -95,12 +98,12 @@ export default function ForgotPasswordPage() {
           variants={shouldAnimate ? itemVariants : {}}
         >
           <h1 className={styles.title}>
-            {token ? 'Neues Passwort' : 'Passwort vergessen?'}
+            {token ? t('auth.resetTitle') : t('auth.forgotTitle')}
           </h1>
           <p className={styles.subtitle}>
             {token
-              ? 'Geben Sie Ihr neues sicheres Passwort ein.'
-              : 'Kein Problem! Wir senden Ihnen einen Link.'}
+              ? t('auth.resetSubtitle')
+              : t('auth.forgotSubtitle')}
           </p>
         </motion.header>
 
@@ -114,7 +117,7 @@ export default function ForgotPasswordPage() {
           className={styles.divider}
           variants={shouldAnimate ? itemVariants : {}}
         >
-          <span>oder</span>
+          <span>{t('common.or')}</span>
         </motion.div>
 
         {/* Login Link */}
@@ -124,7 +127,7 @@ export default function ForgotPasswordPage() {
         >
           <Link to="/login" className={styles.loginLink}>
             <FiArrowLeft className={styles.linkIcon} />
-            Zurück zur Anmeldung
+            {t('common.backToLogin')}
           </Link>
         </motion.div>
       </motion.div>

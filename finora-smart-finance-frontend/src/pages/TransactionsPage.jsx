@@ -10,31 +10,60 @@
  * @module pages/TransactionsPage
  */
 
-import { useCallback, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
+import { useDebounce, useIsMobile } from '@/hooks';
+import { ALL_CATEGORIES } from '@/config/categoryConstants';
 import Button from '@/components/common/Button/Button';
 import Search from '@/components/common/Search/Search';
 import Filter from '@/components/common/Filter/Filter';
 import TransactionList from '@/components/transactions/TransactionList/TransactionList';
 import TransactionForm from '@/components/transactions/TransactionForm/TransactionForm';
 import { FiPlus } from 'react-icons/fi';
-import { CATEGORIES } from '@/utils/constants';
+import { useTranslation } from 'react-i18next';
 import styles from './TransactionsPage.module.scss';
 
 const TransactionsPage = () => {
   const { filter, setFilter, clearFilter } = useTransactions();
+  const isMobile = useIsMobile();
+  const { t } = useTranslation();
   
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
+  
+  // ──────────────────────────────────────────────────────────────────────
+  // LOKALER SEARCH STATE mit DEBOUNCE
+  // ──────────────────────────────────────────────────────────────────────
+  const [localSearchQuery, setLocalSearchQuery] = useState(filter.searchQuery || '');
+  const debouncedSearchQuery = useDebounce(localSearchQuery, 300);
+  const isInitialMount = useRef(true);
 
-  const categoryOptions = useMemo(() => CATEGORIES, []);
+  // Sync debounced value zum Context (löst Backend-Anfrage aus)
+  useEffect(() => {
+    // Überspringe initiales Mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    // Nur updaten wenn sich der debounced Wert unterscheidet
+    if (debouncedSearchQuery !== filter.searchQuery) {
+      setFilter({ searchQuery: debouncedSearchQuery });
+    }
+  }, [debouncedSearchQuery, filter.searchQuery, setFilter]);
+
+  const categoryOptions = useMemo(() => ALL_CATEGORIES, []);
+  
+  // Mobile-optimierte pageSize: weniger Items auf kleinen Bildschirmen
+  const pageSize = useMemo(() => isMobile ? 8 : 15, [isMobile]);
 
   const handleSearchChange = useCallback(
     (value) => {
-      setFilter({ searchQuery: value });
+      // Nur lokalen State updaten → sofortiges UI-Feedback
+      setLocalSearchQuery(value);
     },
-    [setFilter]
+    []
   );
 
   const handleFilterChange = useCallback(
@@ -93,8 +122,8 @@ const TransactionsPage = () => {
       {/* HEADER */}
       <motion.div className={styles.header} variants={itemVariants}>
         <div>
-          <h1>Transaktionen</h1>
-          <p>Verwalte deine Einnahmen und Ausgaben</p>
+          <h1>{t('transactions.pageTitle')}</h1>
+          <p>{t('transactions.manageSubtitle')}</p>
         </div>
         <Button
           variant="primary"
@@ -104,38 +133,42 @@ const TransactionsPage = () => {
             setEditingTransaction(null);
             setShowForm(!showForm);
           }}
-          aria-label="Transaktion hinzufügen"
+          aria-label={t('transactions.addTransaction')}
         />
       </motion.div>
 
       {/* FORM SECTION (wenn geöffnet) */}
-      {showForm && (
-        <motion.div
-          className={styles.formSection}
-          variants={itemVariants}
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <TransactionForm
-            initialData={editingTransaction}
-            onSuccess={handleFormSuccess}
-            onCancel={() => {
-              setShowForm(false);
-              setEditingTransaction(null);
-            }}
-          />
-        </motion.div>
-      )}
+      <AnimatePresence mode="wait">
+        {showForm && (
+          <motion.div
+            key="transaction-form"
+            className={styles.formSection}
+            variants={itemVariants}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
+          >
+            <TransactionForm
+              initialData={editingTransaction}
+              onSuccess={handleFormSuccess}
+              onCancel={() => {
+                setShowForm(false);
+                setEditingTransaction(null);
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* SEARCH & FILTER CONTROLS */}
       <motion.div className={styles.controlsSection} variants={itemVariants}>
         <div className={styles.controlsRow}>
           <Search
-            value={filter.searchQuery}
+            value={localSearchQuery}
             onChange={handleSearchChange}
             onSubmit={handleSearchChange}
-            placeholder="Transaktionen durchsuchen..."
-            ariaLabel="Transaktionen durchsuchen"
+            placeholder={t('transactions.searchPlaceholder')}
+            ariaLabel={t('transactions.searchAria')}
           />
           <Filter
             value={filter}
@@ -148,7 +181,7 @@ const TransactionsPage = () => {
 
       {/* TRANSACTIONS LIST SECTION */}
       <motion.div className={styles.contentSection} variants={itemVariants}>
-        <TransactionList onEdit={handleEdit} pageSize={15} />
+        <TransactionList onEdit={handleEdit} pageSize={pageSize} />
       </motion.div>
     </motion.div>
   );

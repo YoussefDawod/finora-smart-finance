@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiLock, 
@@ -55,6 +56,7 @@ export default function ResetPasswordForm({ token }) {
   const { resetPassword } = useAuth();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
+  const { t } = useTranslation();
 
   // ============================================
   // STATE
@@ -78,16 +80,16 @@ export default function ResetPasswordForm({ token }) {
   // ============================================
 
   const validatePassword = (password) => {
-    if (!password) return 'Passwort ist erforderlich';
-    if (password.length < 8) return 'Mindestens 8 Zeichen';
+    if (!password) return t('auth.reset.validation.passwordRequired');
+    if (password.length < 8) return t('auth.reset.validation.passwordMin');
     const strength = calculatePasswordStrength(password);
-    if (strength.level === 'weak') return 'Zu schwach';
+    if (strength.level === 'weak') return t('auth.reset.validation.passwordWeak');
     return '';
   };
 
   const validateConfirmPassword = (confirmPassword, password) => {
-    if (!confirmPassword) return 'Bestätigung erforderlich';
-    if (confirmPassword !== password) return 'Passwörter stimmen nicht überein';
+    if (!confirmPassword) return t('auth.reset.validation.confirmRequired');
+    if (confirmPassword !== password) return t('auth.reset.validation.passwordMismatch');
     return '';
   };
 
@@ -137,7 +139,7 @@ export default function ResetPasswordForm({ token }) {
     setTouched({ password: true, confirmPassword: true });
 
     if (!validateForm()) {
-      toast.warning('Bitte füllen Sie alle Felder korrekt aus');
+      toast.warning(t('auth.reset.validation.formInvalid'));
       return;
     }
 
@@ -147,7 +149,7 @@ export default function ResetPasswordForm({ token }) {
     try {
       await resetPassword(token, formData.password);
       setIsSuccess(true);
-      toast.success('Passwort erfolgreich geändert!');
+      toast.success(t('auth.reset.successToast'));
 
       // Redirect to login after delay
       window.setTimeout(() => {
@@ -156,7 +158,7 @@ export default function ResetPasswordForm({ token }) {
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
-        'Fehler beim Zurücksetzen. Der Link ist möglicherweise abgelaufen.';
+        t('auth.reset.errorToast');
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -173,12 +175,12 @@ export default function ResetPasswordForm({ token }) {
   const getStrengthLabel = (level) => {
     const labels = {
       none: '',
-      weak: 'Schwach',
-      medium: 'Mittel',
-      strong: 'Stark',
-      excellent: 'Exzellent',
+      weak: t('auth.reset.strength.weak'),
+      medium: t('auth.reset.strength.medium'),
+      strong: t('auth.reset.strength.strong'),
+      excellent: t('auth.reset.strength.excellent'),
     };
-    return labels[level];
+    return labels[level] || '';
   };
 
   // ============================================
@@ -196,9 +198,9 @@ export default function ResetPasswordForm({ token }) {
         <div className={styles.successIcon}>
           <FiCheck />
         </div>
-        <h2 className={styles.successTitle}>Passwort geändert!</h2>
+        <h2 className={styles.successTitle}>{t('auth.reset.successTitle')}</h2>
         <p className={styles.successMessage}>
-          Ihr Passwort wurde erfolgreich aktualisiert. Sie werden zur Anmeldung weitergeleitet...
+          {t('auth.reset.successMessage')}
         </p>
       </motion.div>
     );
@@ -254,7 +256,7 @@ export default function ResetPasswordForm({ token }) {
             autoFocus
           />
           <label htmlFor="password" className={styles.label}>
-            Neues Passwort
+            {t('auth.reset.passwordLabel')}
           </label>
           <button
             type="button"
@@ -311,7 +313,7 @@ export default function ResetPasswordForm({ token }) {
             autoComplete="new-password"
           />
           <label htmlFor="confirmPassword" className={styles.label}>
-            Passwort bestätigen
+            {t('auth.reset.confirmLabel')}
           </label>
           <button
             type="button"
@@ -345,11 +347,11 @@ export default function ResetPasswordForm({ token }) {
         {isLoading ? (
           <>
             <span className={styles.spinner} />
-            <span>Speichern...</span>
+            <span>{t('auth.reset.saving')}</span>
           </>
         ) : (
           <>
-            <span>Passwort speichern</span>
+            <span>{t('auth.reset.submit')}</span>
             <FiCheck className={styles.buttonIcon} />
           </>
         )}

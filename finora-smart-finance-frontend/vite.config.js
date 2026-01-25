@@ -50,14 +50,39 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    chunkSizeWarningLimit: 700,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           axios: ['axios'],
           motion: ['framer-motion'],
+          charts: ['recharts'],
+          query: ['@tanstack/react-query'],
+          icons: ['react-icons/fi'],
         },
       },
+    },
+  },
+  // ============================================
+  // VITEST CONFIGURATION
+  // ============================================
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    exclude: ['node_modules', 'dist'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'src/test/',
+        '**/*.d.ts',
+        '**/*.config.js',
+        '**/index.js',
+      ],
     },
   },
 });

@@ -1,0 +1,204 @@
+###############################################################################
+# 🛠️ Admin API - User Management
+# 
+# VS Code Extension: REST Client (humao.rest-client)
+# Oder importiere diese Datei in Postman/Insomnia
+#
+# Hinweis: Ersetze <userId> mit echter User-ID aus der Liste
+###############################################################################
+
+@baseUrl = http://localhost:3000/api
+@adminUrl = {{baseUrl}}/admin
+
+### Variables
+@userId = 60d5ec49f1b2c72b8c8e4f1a
+
+
+###############################################################################
+# 📊 1. STATISTIKEN
+###############################################################################
+
+### 1.1 Übersicht abrufen
+GET {{adminUrl}}/stats
+Content-Type: application/json
+
+
+###############################################################################
+# 👥 2. USER LISTE
+###############################################################################
+
+### 2.0 Neuen User anlegen
+POST {{adminUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "devuser",
+  "password": "Dev@123",
+  "email": "dev@example.com",
+  "isVerified": true
+}
+
+
+### 2.1 Alle Users (Standard)
+GET {{adminUrl}}/users
+Content-Type: application/json
+
+### 2.2 Mit Pagination
+GET {{adminUrl}}/users?page=1&limit=10
+Content-Type: application/json
+
+### 2.3 Suche nach Name/Email
+GET {{adminUrl}}/users?search=john
+Content-Type: application/json
+
+### 2.4 Nur verifizierte Users
+GET {{adminUrl}}/users?isVerified=true
+Content-Type: application/json
+
+### 2.5 Mit sensitiven Daten (Tokens, passwordHash, etc.)
+GET {{adminUrl}}/users?showSensitive=true
+Content-Type: application/json
+
+### 2.6 Sortiert nach letztem Login
+GET {{adminUrl}}/users?sortBy=lastLogin&order=desc
+Content-Type: application/json
+
+
+###############################################################################
+# 🔍 3. EINZELNER USER
+###############################################################################
+
+### 3.1 User Details abrufen (mit Stats)
+GET {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+
+###############################################################################
+# ✏️ 4. USER BEARBEITEN
+###############################################################################
+
+### 4.1 User verifizieren
+PATCH {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "isVerified": true
+}
+
+### 4.2 Name ändern
+PATCH {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "Neuer Name",
+  "lastName": "Mustermann"
+}
+
+### 4.3 Email hinzufügen
+PATCH {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "email": "neue@email.com"
+}
+
+### 4.4 Mehrere Felder ändern
+PATCH {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+{
+  "name": "Max",
+  "lastName": "Mustermann",
+  "email": "max@example.com",
+  "phone": "+49123456789",
+  "isVerified": true
+}
+
+
+###############################################################################
+# 🔑 5. PASSWORT MANAGEMENT
+###############################################################################
+
+### 5.1 Passwort zurücksetzen
+POST {{adminUrl}}/users/{{userId}}/reset-password
+Content-Type: application/json
+
+{
+  "newPassword": "test123"
+}
+
+### 5.2 Passwort auf "Dev123!" setzen
+POST {{adminUrl}}/users/{{userId}}/reset-password
+Content-Type: application/json
+
+{
+  "newPassword": "Dev123!"
+}
+
+
+###############################################################################
+# 🗑️ 6. USER LÖSCHEN
+###############################################################################
+
+### 6.1 Einzelnen User löschen (inkl. aller Transaktionen)
+DELETE {{adminUrl}}/users/{{userId}}
+Content-Type: application/json
+
+
+### 6.2 ⚠️ ALLE Users löschen (VORSICHT!)
+DELETE {{adminUrl}}/users
+Content-Type: application/json
+
+{
+  "confirm": "DELETE_ALL_USERS"
+}
+
+
+###############################################################################
+# 📋 7. BEISPIEL-WORKFLOWS
+###############################################################################
+
+### Workflow 1: Neuen Testuser erstellen und konfigurieren
+
+# 1. User registrieren
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "testuser",
+  "password": "Test123!",
+  "email": "test@example.com"
+}
+
+# 2. User-ID aus Response kopieren, dann:
+# @userId = <hier-die-id-einfügen>
+
+# 3. User verifizieren
+# PATCH {{adminUrl}}/users/{{userId}}
+# {"isVerified": true}
+
+# 4. Passwort auf bekannten Wert setzen
+# POST {{adminUrl}}/users/{{userId}}/reset-password
+# {"newPassword": "test123"}
+
+
+### Workflow 2: User Audit
+
+# 1. Statistiken prüfen
+# GET {{adminUrl}}/stats
+
+# 2. User suchen
+# GET {{adminUrl}}/users?search=john
+
+# 3. Details anschauen
+# GET {{adminUrl}}/users/{{userId}}
+
+
+### Workflow 3: Cleanup für neue Tests
+
+# 1. Alle User löschen
+# DELETE {{adminUrl}}/users
+# {"confirm": "DELETE_ALL_USERS"}
+
+# 2. Verifizieren
+# GET {{adminUrl}}/stats

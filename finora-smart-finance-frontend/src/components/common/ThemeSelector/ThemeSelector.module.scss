@@ -226,6 +226,11 @@
   margin-left: auto;
 }
 
+:global([dir='rtl']) .checkmark {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 // ============================================
 // DIVIDER
 // ============================================

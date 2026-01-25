@@ -1,11 +1,15 @@
 /**
  * @fileoverview Filter - Filterkomponente für Header
  * @description Dropdown-Filter mit verschiedenen Filteroptionen
+ * Features: Typ-abhängige Kategoriefilterung
  */
 
 import { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiChevronDown } from 'react-icons/fi';
+import { getCategoriesForType } from '@/config/categoryConstants';
+import { translateCategory } from '@/utils/categoryTranslations';
+import { useTranslation } from 'react-i18next';
 import styles from './Filter.module.scss';
 
 const getPeriodRange = (period) => {
@@ -56,6 +60,7 @@ export default function Filter({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activePeriod, setActivePeriod] = useState(null);
+  const { t } = useTranslation();
 
   const activeType = value?.type || null;
   const activeCategory = value?.category || '';
@@ -63,14 +68,38 @@ export default function Filter({
   const endDate = value?.endDate || '';
   const hasActiveFilters = Boolean(activeType || activeCategory || startDate || endDate);
 
+  // Kategorien basierend auf gewähltem Typ filtern
   const categoryOptions = useMemo(() => {
-    return categories.map((category) => ({ label: category, value: category }));
-  }, [categories]);
+    // Wenn ein Typ gewählt ist, nur die entsprechenden Kategorien zeigen
+    const relevantCategories = activeType 
+      ? getCategoriesForType(activeType)
+      : categories;
+    
+    return relevantCategories.map((category) => ({
+      label: translateCategory(category, t),
+      value: category,
+    }));
+  }, [categories, activeType, t]);
 
   const handleTypeChange = (nextType) => {
-    onChange?.({
-      type: activeType === nextType ? null : nextType,
-    });
+    const newType = activeType === nextType ? null : nextType;
+    
+    // Wenn der Typ geändert wird, prüfe ob die aktuelle Kategorie noch gültig ist
+    if (newType && activeCategory) {
+      const validCategories = getCategoriesForType(newType);
+      const isCategoryValid = validCategories.includes(activeCategory);
+      
+      // Wenn die Kategorie nicht zum neuen Typ passt, lösche sie
+      if (!isCategoryValid) {
+        onChange?.({ 
+          type: newType,
+          category: null 
+        });
+        return;
+      }
+    }
+    
+    onChange?.({ type: newType });
   };
 
   const handlePeriodChange = (period) => {
@@ -91,14 +120,14 @@ export default function Filter({
 
   const filterOptions = {
     period: [
-      { label: 'Heute', value: 'today' },
-      { label: 'Diese Woche', value: 'week' },
-      { label: 'Dieser Monat', value: 'month' },
-      { label: 'Dieses Jahr', value: 'year' },
+      { label: t('filters.today'), value: 'today' },
+      { label: t('filters.thisWeek'), value: 'week' },
+      { label: t('filters.thisMonth'), value: 'month' },
+      { label: t('filters.thisYear'), value: 'year' },
     ],
     type: [
-      { label: 'Einnahmen', value: 'income' },
-      { label: 'Ausgaben', value: 'expense' },
+      { label: t('transactions.income'), value: 'income' },
+      { label: t('transactions.expense'), value: 'expense' },
     ],
   };
 
@@ -108,10 +137,10 @@ export default function Filter({
         className={`${styles.filterBtn} ${isOpen || hasActiveFilters ? styles.active : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        aria-label="Filter öffnen"
+        aria-label={t('filters.open')}
       >
         <FiFilter size={18} />
-        <span>Filter</span>
+        <span>{t('filters.title')}</span>
         <FiChevronDown size={16} className={styles.chevron} />
       </button>
 
@@ -126,7 +155,7 @@ export default function Filter({
           >
             {/* Zeitraum */}
             <div className={styles.filterSection}>
-              <h4 className={styles.filterTitle}>Zeitraum</h4>
+              <h4 className={styles.filterTitle}>{t('filters.period')}</h4>
               <div className={styles.filterOptions}>
                 {filterOptions.period.map((option) => (
                   <button
@@ -147,7 +176,7 @@ export default function Filter({
 
             {/* Typ */}
             <div className={styles.filterSection}>
-              <h4 className={styles.filterTitle}>Typ</h4>
+              <h4 className={styles.filterTitle}>{t('filters.type')}</h4>
               <div className={styles.filterOptions}>
                 {filterOptions.type.map((option) => (
                   <button
@@ -168,13 +197,13 @@ export default function Filter({
 
             {/* Kategorie */}
             <div className={styles.filterSection}>
-              <h4 className={styles.filterTitle}>Kategorie</h4>
+              <h4 className={styles.filterTitle}>{t('filters.category')}</h4>
               <select
                 className={styles.filterSelect}
                 value={activeCategory}
                 onChange={(e) => onChange?.({ category: e.target.value || null })}
               >
-                <option value="">Alle Kategorien</option>
+                <option value="">{t('filters.allCategories')}</option>
                 {categoryOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -187,10 +216,10 @@ export default function Filter({
 
             {/* Datum */}
             <div className={styles.filterSection}>
-              <h4 className={styles.filterTitle}>Datum</h4>
+              <h4 className={styles.filterTitle}>{t('filters.date')}</h4>
               <div className={styles.dateRow}>
                 <label className={styles.dateLabel}>
-                  Von
+                  {t('filters.from')}
                   <input
                     type="date"
                     value={startDate}
@@ -199,7 +228,7 @@ export default function Filter({
                   />
                 </label>
                 <label className={styles.dateLabel}>
-                  Bis
+                  {t('filters.to')}
                   <input
                     type="date"
                     value={endDate}
@@ -219,7 +248,7 @@ export default function Filter({
                   onClear?.();
                 }}
               >
-                Filter zurücksetzen
+                {t('filters.reset')}
               </button>
             </div>
           </motion.div>

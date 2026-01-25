@@ -63,6 +63,13 @@
   }
 }
 
+:global([dir='rtl']) .sidebar {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
 // ============================================
 // MOBILE SIDEBAR (Overlay - identisch HamburgerMenu)
 // ============================================
@@ -85,6 +92,11 @@
   @media (max-width: 400px) {
     width: 288px;
   }
+}
+
+:global([dir='rtl']) .mobileSidebar {
+  left: auto;
+  right: 0;
 }
 
 // ============================================
@@ -344,9 +356,31 @@
 
 .navLabel {
   flex: 1;
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+:global([dir='rtl']) .navItem {
+  flex-direction: row-reverse;
+  text-align: right;
+
+  &::before {
+    left: auto;
+    right: 0;
+    border-radius: var(--r-sm) 0 0 var(--r-sm);
+  }
+}
+
+:global([dir='rtl']) .logoutBtn {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+:global([dir='rtl']) .logoutBtn:hover .logoutIcon {
+  transform: translateX(-4px);
 }
 
 // ============================================

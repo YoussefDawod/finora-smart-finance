@@ -1,26 +1,29 @@
-import React, { useMemo } from 'react';
+/**
+ * @fileoverview RecentTransactions Component
+ * @description Zeigt die letzten Transaktionen auf dem Dashboard
+ * Nutzt aggregierte Daten vom Server (recentTransactions)
+ */
+
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTransactions } from '@/hooks/useTransactions';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
+import { translateCategory } from '@/utils/categoryTranslations';
+import { useTranslation } from 'react-i18next';
 import styles from './RecentTransactions.module.scss';
 
 // ============================================================================
 // KOMPONENTE
 // ============================================================================
-export const RecentTransactions = ({ limit = 3 }) => {
-  const { transactions, loading } = useTransactions();
+export const RecentTransactions = () => {
+  const { dashboardData, dashboardLoading } = useTransactions();
+  const { t } = useTranslation();
 
   // ──────────────────────────────────────────────────────────────────────
-  // GET RECENT TRANSACTIONS (sorted by date, newest first)
+  // GET RECENT TRANSACTIONS FROM SERVER DATA
   // ──────────────────────────────────────────────────────────────────────
-  const recentTransactions = useMemo(() => {
-    const sorted = [...transactions].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    );
-    return sorted.slice(0, limit);
-  }, [transactions, limit]);
+  const recentTransactions = dashboardData?.recentTransactions || [];
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -55,7 +58,7 @@ export const RecentTransactions = ({ limit = 3 }) => {
   // ──────────────────────────────────────────────────────────────────────
   // LOADING STATE
   // ──────────────────────────────────────────────────────────────────────
-  if (loading) {
+  if (dashboardLoading && !dashboardData) {
     return (
       <motion.div
         className={styles.container}
@@ -64,7 +67,7 @@ export const RecentTransactions = ({ limit = 3 }) => {
         animate="visible"
       >
         <div className={styles.header}>
-          <h3 className={styles.title}>Letzte Transaktionen</h3>
+          <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
         </div>
         <div className={styles.skeletons}>
           {Array.from({ length: 3 }).map((_, i) => (
@@ -91,15 +94,15 @@ export const RecentTransactions = ({ limit = 3 }) => {
         animate={{ opacity: 1, y: 0 }}
       >
         <div className={styles.header}>
-          <h3 className={styles.title}>Letzte Transaktionen</h3>
+          <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
         </div>
         <div className={styles.empty}>
           <div className={styles.emptyIcon}><STATE_ICONS.chart /></div>
           <p className={styles.emptyText}>
-            Noch keine Transaktionen vorhanden
+            {t('dashboard.noTransactions')}
           </p>
           <p className={styles.emptySubtext}>
-            Füge deine erste Transaktion hinzu, um sie hier zu sehen
+            {t('dashboard.noTransactionsSub')}
           </p>
         </div>
       </motion.div>
@@ -118,9 +121,9 @@ export const RecentTransactions = ({ limit = 3 }) => {
     >
       {/* HEADER */}
       <div className={styles.header}>
-        <h3 className={styles.title}>Letzte Transaktionen</h3>
+        <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
         <Link to="/transactions" className={styles.viewAllLink}>
-          Alle anzeigen →
+          {t('common.seeAll')} →
         </Link>
       </div>
 
@@ -139,7 +142,9 @@ export const RecentTransactions = ({ limit = 3 }) => {
                 <CategoryIcon category={transaction.category} />
               </span>
               <div className={styles.categoryInfo}>
-                <p className={styles.categoryName}>{transaction.category}</p>
+                <p className={styles.categoryName}>
+                  {translateCategory(transaction.category, t)}
+                </p>
                 <p className={styles.description}>{transaction.description}</p>
               </div>
             </div>

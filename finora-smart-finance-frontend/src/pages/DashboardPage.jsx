@@ -1,10 +1,11 @@
 /**
  * @fileoverview DashboardPage Component
  * @description Haupt-Dashboard mit Summary Cards, Charts und Statistiken
+ * Nutzt aggregierte Daten vom Server (keine Client-Side-Berechnung)
  * 
  * LAYOUT:
  * - Header mit Begrüßung
- * - 3 Summary Cards: Einkommen | Ausgaben | Balance (ECHTE DATEN)
+ * - 3 Summary Cards: Einkommen | Ausgaben | Balance
  * - Charts & Breakdowns
  * - Recent Transactions
  */
@@ -16,154 +17,125 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
 import { SummaryCard, RecentTransactions, DashboardCharts } from '@/components/dashboard';
 import Button from '@/components/common/Button/Button';
+import Spinner from '@/components/common/Spinner/Spinner';
+import { formatCurrency } from '@/utils/formatters';
 import { FiDollarSign, FiCreditCard, FiTrendingUp, FiPlus } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './DashboardPage.module.scss';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { transactions } = useTransactions();
+  const { dashboardData, dashboardLoading } = useTransactions();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // ──────────────────────────────────────────────────────────────────────
-  // BERECHNE ECHTE DATEN AUS TRANSAKTIONEN
+  // FORMAT SUMMARY DATA FROM SERVER
   // ──────────────────────────────────────────────────────────────────────
   const summaryData = useMemo(() => {
-    // Aktuelle Periode: Dieser Monat
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    // Vorherige Periode: Letzter Monat
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const lastYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-
-    // ────────────────────────────────────────────────────────────────────
-    // FILTER TRANSAKTIONEN NACH MONAT
-    // ────────────────────────────────────────────────────────────────────
-    const currentMonthTransactions = transactions.filter((tx) => {
-      const txDate = new Date(tx.date);
-      return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
-    });
-
-    const lastMonthTransactions = transactions.filter((tx) => {
-      const txDate = new Date(tx.date);
-      return txDate.getMonth() === lastMonth && txDate.getFullYear() === lastYear;
-    });
-
-    // ────────────────────────────────────────────────────────────────────
-    // BERECHNE SUMMEN FÜR AKTUELLEN MONAT
-    // ────────────────────────────────────────────────────────────────────
-    const currentIncome = currentMonthTransactions
-      .filter((tx) => tx.type === 'income')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    const currentExpense = currentMonthTransactions
-      .filter((tx) => tx.type === 'expense')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    const currentBalance = currentIncome - currentExpense;
-
-    // ────────────────────────────────────────────────────────────────────
-    // BERECHNE SUMMEN FÜR LETZTEN MONAT (FÜR TRENDS)
-    // ────────────────────────────────────────────────────────────────────
-    const lastMonthIncome = lastMonthTransactions
-      .filter((tx) => tx.type === 'income')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    const lastMonthExpense = lastMonthTransactions
-      .filter((tx) => tx.type === 'expense')
-      .reduce((sum, tx) => sum + tx.amount, 0);
-
-    const lastMonthBalance = lastMonthIncome - lastMonthExpense;
-
-    // ────────────────────────────────────────────────────────────────────
-    // BERECHNE TRENDS (% CHANGE)
-    // ────────────────────────────────────────────────────────────────────
-    const calculatePercent = (current, previous) => {
-      if (previous === 0) return null;
-      return Math.round(((current - previous) / Math.abs(previous)) * 100);
-    };
-
-    const buildTrend = (current, previous, mode = 'standard') => {
-      const percent = calculatePercent(current, previous);
-
-      if (percent === null) {
-        const hasValue = current !== 0;
-        let variant = hasValue ? (current > 0 ? 'up' : 'down') : 'neutral';
-        if (mode === 'expense' && current > 0) {
-          variant = 'down';
-        }
-        if (mode === 'balance') {
-          variant = current > 0 ? 'up' : current < 0 ? 'down' : 'neutral';
-        }
+    const buildTrendInfo = (percent, mode = 'standard') => {
+      // Kein Trend-Vergleich möglich (Vormonat hatte keine Daten)
+      if (percent === null || percent === undefined) {
         return {
-          percent: null,
-          label: hasValue ? 'Neu' : '0%',
-          variant,
+          label: null, // Kein Label anzeigen
+          variant: 'neutral',
+          showTrend: false,
         };
       }
 
-      let variant = percent > 0 ? 'up' : percent < 0 ? 'down' : 'neutral';
-      if (mode === 'expense') {
-        variant = percent > 0 ? 'down' : percent < 0 ? 'up' : 'neutral';
+      // Keine Änderung
+      if (percent === 0) {
+        return {
+          label: t('dashboard.noChange'),
+          variant: 'neutral',
+          showTrend: true,
+        };
       }
-      if (mode === 'balance') {
-        variant = current > 0 ? 'up' : current < 0 ? 'down' : 'neutral';
+
+      let variant = percent > 0 ? 'up' : 'down';
+      // Bei Ausgaben ist "mehr" schlecht (down) und "weniger" gut (up)
+      if (mode === 'expense') {
+        variant = percent > 0 ? 'down' : 'up';
       }
 
       return {
-        percent,
         label: `${percent > 0 ? '+' : ''}${percent}%`,
         variant,
+        showTrend: true,
       };
     };
 
-    const incomeTrend = buildTrend(currentIncome, lastMonthIncome, 'standard');
-    const expenseTrend = buildTrend(currentExpense, lastMonthExpense, 'expense');
-    const balanceTrend = buildTrend(currentBalance, lastMonthBalance, 'balance');
+    // Fallback wenn keine Daten
+    if (!dashboardData?.summary) {
+      return {
+        income: {
+          value: formatCurrency(0),
+          amount: 0,
+          trend: null,
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trendPercent: null,
+        },
+        expense: {
+          value: formatCurrency(0),
+          amount: 0,
+          trend: null,
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trendPercent: null,
+        },
+        balance: {
+          value: formatCurrency(0),
+          amount: 0,
+          trend: null,
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trendPercent: null,
+        },
+      };
+    }
 
-    // ────────────────────────────────────────────────────────────────────
-    // FORMAT DATEN FÜR DISPLAY
-    // ────────────────────────────────────────────────────────────────────
-    const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(amount);
+    const { currentMonth, trends } = dashboardData.summary;
+    
+    const incomeTrend = buildTrendInfo(trends?.income, 'standard');
+    const expenseTrend = buildTrendInfo(trends?.expense, 'expense');
+    const balanceTrend = buildTrendInfo(trends?.balance, currentMonth?.balance >= 0 ? 'standard' : 'expense');
+
+    // Trend-Text nur anzeigen wenn wirklich ein Vergleich möglich ist
+    const getTrendText = (trendInfo) => {
+      return trendInfo.showTrend ? t('dashboard.vsLastMonth') : null;
     };
 
     return {
       income: {
-        value: formatCurrency(currentIncome),
-        amount: currentIncome,
-        trend: 'im Vergleich zum letzten Monat',
+        value: formatCurrency(currentMonth?.income),
+        amount: currentMonth?.income || 0,
+        trend: getTrendText(incomeTrend),
         trendLabel: incomeTrend.label,
         trendVariant: incomeTrend.variant,
-        trendPercent: incomeTrend.percent ?? 0,
-        trendTooltip: 'Einkommen im Vergleich zum letzten Monat',
+        trendPercent: trends?.income,
+          trendTooltip: incomeTrend.showTrend ? t('dashboard.incomeTrendTooltip') : null,
       },
       expense: {
-        value: formatCurrency(currentExpense),
-        amount: currentExpense,
-        trend: 'im Vergleich zum letzten Monat',
+        value: formatCurrency(currentMonth?.expense),
+        amount: currentMonth?.expense || 0,
+        trend: getTrendText(expenseTrend),
         trendLabel: expenseTrend.label,
         trendVariant: expenseTrend.variant,
-        trendPercent: expenseTrend.percent ?? 0,
-        trendTooltip: 'Ausgaben im Vergleich zum letzten Monat',
+        trendPercent: trends?.expense,
+          trendTooltip: expenseTrend.showTrend ? t('dashboard.expenseTrendTooltip') : null,
       },
       balance: {
-        value: formatCurrency(currentBalance),
-        amount: currentBalance,
-        trend: 'im Vergleich zum letzten Monat',
+        value: formatCurrency(currentMonth?.balance),
+        amount: currentMonth?.balance || 0,
+        trend: getTrendText(balanceTrend),
         trendLabel: balanceTrend.label,
         trendVariant: balanceTrend.variant,
-        trendPercent: balanceTrend.percent ?? 0,
-        trendTooltip: 'Balance im Vergleich zum letzten Monat',
+        trendPercent: trends?.balance,
+          trendTooltip: balanceTrend.showTrend ? t('dashboard.balanceTrendTooltip') : null,
       },
     };
-  }, [transactions]);
+  }, [dashboardData, t]);
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -187,6 +159,18 @@ export default function DashboardPage() {
     },
   };
 
+  // ──────────────────────────────────────────────────────────────────────
+  // LOADING STATE
+  // ──────────────────────────────────────────────────────────────────────
+  if (dashboardLoading && !dashboardData) {
+    return (
+      <div className={styles.loadingContainer}>
+        <Spinner size="large" />
+        <p>{t('dashboard.loading')}</p>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       className={styles.dashboardPage}
@@ -198,10 +182,10 @@ export default function DashboardPage() {
       <motion.section className={styles.headerSection} variants={itemVariants}>
         <div className={styles.greeting}>
           <h1 className={styles.greetingTitle}>
-            <span className={styles.greetingIntro}>Willkommen zurück,</span>{' '}
+            <span className={styles.greetingIntro}>{t('dashboard.greetingIntro')}</span>{' '}
             <span className={styles.greetingName}>{user?.name?.split(' ')[0]}</span> 👋
           </h1>
-          <p>Hier ist eine Übersicht Ihrer finanziellen Aktivitäten diesen Monat</p>
+          <p>{t('dashboard.overview')}</p>
         </div>
         <Button
           variant="primary"
@@ -209,7 +193,7 @@ export default function DashboardPage() {
           icon={<FiPlus />}
           onClick={() => navigate('/transactions')}
         >
-          Neue Transaktion
+          {t('dashboard.newTransaction')}
         </Button>
       </motion.section>
 
@@ -223,7 +207,7 @@ export default function DashboardPage() {
         {/* Income Card */}
         <motion.div variants={itemVariants} key="income">
           <SummaryCard
-            title="Einkommen"
+            title={t('dashboard.income')}
             value={summaryData.income.value}
             icon={FiDollarSign}
             trend={summaryData.income.trend}
@@ -239,7 +223,7 @@ export default function DashboardPage() {
         {/* Expense Card */}
         <motion.div variants={itemVariants} key="expense">
           <SummaryCard
-            title="Ausgaben"
+            title={t('dashboard.expenses')}
             value={summaryData.expense.value}
             icon={FiCreditCard}
             trend={summaryData.expense.trend}
@@ -255,7 +239,7 @@ export default function DashboardPage() {
         {/* Balance Card */}
         <motion.div variants={itemVariants} key="balance">
           <SummaryCard
-            title="Balance"
+            title={t('dashboard.balance')}
             value={summaryData.balance.value}
             icon={FiTrendingUp}
             trend={summaryData.balance.trend}
@@ -272,14 +256,14 @@ export default function DashboardPage() {
       {/* Charts Section */}
       <motion.section className={styles.section} variants={itemVariants}>
         <div className={styles.sectionHeader}>
-          <h2>Charts & Visualisierungen</h2>
+          <h2>{t('dashboard.chartsTitle')}</h2>
         </div>
         <DashboardCharts />
       </motion.section>
 
       {/* Recent Transactions Section */}
       <motion.section className={styles.transactionsSection} variants={itemVariants}>
-        <RecentTransactions limit={3} />
+        <RecentTransactions limit={5} />
       </motion.section>
     </motion.div>
   );

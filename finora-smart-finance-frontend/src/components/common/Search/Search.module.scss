@@ -35,6 +35,11 @@
   font-size: var(--fs-lg);
 }
 
+:global([dir='rtl']) .searchIcon {
+  left: auto;
+  right: var(--space-sm);
+}
+
 // ============================================
 // SEARCH INPUT
 // ============================================
@@ -69,5 +74,13 @@
     font-size: var(--fs-sm);
     padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
     min-height: calc(var(--input-h) - var(--space-3xs));
+  }
+}
+
+:global([dir='rtl']) .searchInput {
+  padding: var(--space-sm) var(--space-2xl) var(--space-sm) var(--space-md);
+
+  @include mobile {
+    padding: var(--space-xs) var(--space-xl) var(--space-xs) var(--space-sm);
   }
 }

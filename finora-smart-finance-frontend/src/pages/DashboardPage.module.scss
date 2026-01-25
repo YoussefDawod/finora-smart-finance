@@ -12,7 +12,8 @@
   flex-direction: column;
   gap: var(--space-xl);
   width: 100%;
-  min-height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh; // Dynamic viewport height für bessere Mobile-Kompatibilität
 
   @include tablet {
     gap: var(--space-lg);
@@ -20,6 +21,8 @@
 
   @include mobile {
     gap: var(--space-md);
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 
@@ -39,8 +42,8 @@
   }
 
   @include mobile {
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
     gap: var(--space-sm);
   }
 }
@@ -103,11 +106,12 @@
   flex-shrink: 0;
   
   @include mobile {
-    align-self: flex-start;
+    width: 100%;
     padding: var(--space-xs) var(--space-sm);
-    font-size: var(--fs-xs);
+    font-size: var(--fs-sm);
     height: auto;
-    min-height: 28px;
+    min-height: 36px;
+    justify-content: center;
   }
 }
 

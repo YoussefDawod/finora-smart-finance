@@ -28,4 +28,21 @@ module.exports = [
       'no-console': 'off',
     },
   },
+  // Jest Test-Dateien - zusätzliche Globals
+  {
+    files: ['__tests__/**/*.js', '**/*.test.js', '**/*.spec.js'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        test: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        jest: 'readonly',
+      },
+    },
+  },
 ];

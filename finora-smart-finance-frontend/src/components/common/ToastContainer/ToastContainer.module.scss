@@ -48,3 +48,13 @@
     max-width: none;
   }
 }
+
+:global([dir='rtl']) .toastContainer {
+  left: auto;
+  right: var(--space-lg);
+  transform: none;
+
+  @include mobile {
+    right: var(--space-md);
+  }
+}

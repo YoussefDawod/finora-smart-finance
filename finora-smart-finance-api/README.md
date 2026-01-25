@@ -9,6 +9,29 @@ REST-API für Finora - Smart Finance. Gebaut mit Node.js, Express und MongoDB.
 - **Database:** MongoDB (Mongoose ODM)
 - **Extras:** CORS, dotenv
 
+---
+
+## 🛠️ **NEU: User-Verwaltung für Entwickler**
+
+Als Entwickler kannst du jetzt einfach deine User verwalten:
+
+```bash
+# Schnell-Übersicht
+npm run admin:stats
+
+# Alle Users anzeigen
+npm run admin:list
+
+# Passwort zurücksetzen
+node admin-cli.js reset-password <userId> test123
+```
+
+📖 **Vollständige Anleitung:** [SOFORT_STARTEN.md](SOFORT_STARTEN.md)  
+📚 **Dokumentation:** [docs/ADMIN_API.md](docs/ADMIN_API.md)  
+🧪 **REST Beispiele:** [admin-api.http](admin-api.http)
+
+---
+
 ## 📦 Installation
 
 ```bash

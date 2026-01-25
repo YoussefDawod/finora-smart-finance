@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ThemeSelector, Logo } from '@/components/common';
 import { NAV_ITEMS } from '@/config/navigation';
 import { FiLogOut, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './Sidebar.module.scss';
 
 /**
@@ -29,6 +30,8 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
   const { logout, user, isAuthenticated } = useAuth();
   const isMobile = useMediaQuery('(max-width: 768px)');
   const sidebarRef = useRef(null);
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
 
   // ============================================
   // MOBILE: Escape Key Handler
@@ -117,13 +120,13 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
             <motion.aside
               ref={sidebarRef}
               className={styles.mobileSidebar}
-              initial={{ x: '-100%' }}
+              initial={{ x: isRtl ? '100%' : '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
+              exit={{ x: isRtl ? '100%' : '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               role="navigation"
               aria-modal="true"
-              aria-label="Hauptnavigation"
+              aria-label={t('common.navigation')}
             >
 {/* Mobile Header: Logo */}
             <div className={styles.mobileHeader}>
@@ -153,37 +156,35 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
               <nav className={styles.nav}>
                 {NAV_ITEMS.map((item, idx) => {
                   const IconComponent = item.icon;
+                  const label = t(item.labelKey);
                   const active = isActive(item.path);
                   return (
                     <React.Fragment key={item.path}>
                       <motion.button
                         className={`${styles.navItem} ${active ? styles.active : ''}`}
                         onClick={() => handleNavigate(item.path)}
-                        initial={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        whileHover={{ x: 8, backgroundColor: 'rgba(99, 102, 241, 0.1)' }}
+                        whileHover={{ x: isRtl ? -8 : 8, backgroundColor: 'rgba(99, 102, 241, 0.1)' }}
                         whileTap={{ scale: 0.96 }}
                       >
                         <span className={styles.navIcon}>
                           <IconComponent size={24} />
                         </span>
-                        <span className={styles.navLabel}>{item.label}</span>
+                        <span className={styles.navLabel}>{label}</span>
                       </motion.button>
-                      {/* ThemeSelector unter Settings Link */}
-                      {item.path === '/settings' && (
-                        <motion.div
-                          className={styles.themeSection}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: (idx + 0.5) * 0.05 }}
-                        >
-                          <ThemeSelector />
-                        </motion.div>
-                      )}
                     </React.Fragment>
                   );
                 })}
+                <motion.div
+                  className={styles.themeSection}
+                  initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <ThemeSelector />
+                </motion.div>
               </nav>
 
               {/* Mobile Logout */}
@@ -191,11 +192,11 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
                 <motion.button
                   className={styles.logoutBtn}
                   onClick={handleLogout}
-                  whileHover={{ x: 8 }}
+                  whileHover={{ x: isRtl ? -8 : 8 }}
                   whileTap={{ scale: 0.96 }}
                 >
                   <FiLogOut size={20} />
-                  <span>Abmelden</span>
+                  <span>{t('nav.logout')}</span>
                 </motion.button>
               )}
             </motion.aside>
@@ -217,10 +218,12 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
           onClick={onToggleCollapse}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
-          title={isCollapsed ? 'Sidebar erweitern' : 'Sidebar einklappen'}
-          aria-label={isCollapsed ? 'Sidebar erweitern' : 'Sidebar einklappen'}
+          title={isCollapsed ? t('common.expand') : t('common.collapse')}
+          aria-label={isCollapsed ? t('common.expand') : t('common.collapse')}
         >
-          {isCollapsed ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />}
+          {isCollapsed
+            ? (isRtl ? <FiChevronLeft size={20} /> : <FiChevronRight size={20} />)
+            : (isRtl ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />)}
         </motion.button>
       </div>
 
@@ -228,6 +231,7 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
       <nav className={styles.nav}>
         {NAV_ITEMS.map((item) => {
           const IconComponent = item.icon;
+          const label = t(item.labelKey);
           const active = isActive(item.path);
           return (
             <React.Fragment key={item.path}>
@@ -236,22 +240,19 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
                 onClick={() => handleNavigate(item.path)}
                 whileHover={{ x: isCollapsed ? 0 : 4 }}
                 whileTap={{ scale: 0.96 }}
-                title={item.label}
+                title={label}
               >
                 <span className={styles.navIcon}>
                   <IconComponent size={24} />
                 </span>
-                {!isCollapsed && <span className={styles.navLabel}>{item.label}</span>}
+                {!isCollapsed && <span className={styles.navLabel}>{label}</span>}
               </motion.button>
-              {/* ThemeSelector unter Settings Link */}
-              {item.path === '/settings' && (
-                <div className={styles.themeSection}>
-                  <ThemeSelector isCollapsed={isCollapsed} />
-                </div>
-              )}
             </React.Fragment>
           );
         })}
+        <div className={styles.themeSection}>
+          <ThemeSelector isCollapsed={isCollapsed} />
+        </div>
       </nav>
 
       {/* Desktop Footer: Logout */}
@@ -262,12 +263,12 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
             onClick={handleLogout}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            title="Abmelden"
+            title={t('nav.logout')}
           >
             <span className={styles.logoutIcon}>
               <FiLogOut size={20} />
             </span>
-            {!isCollapsed && <span className={styles.logoutLabel}>Abmelden</span>}
+            {!isCollapsed && <span className={styles.logoutLabel}>{t('nav.logout')}</span>}
           </motion.button>
         )}
       </div>

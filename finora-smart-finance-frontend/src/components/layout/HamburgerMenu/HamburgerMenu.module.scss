@@ -17,27 +17,36 @@
 
 // ============================================
 // MENU OVERLAY
-// ============================================
 .menu {
   position: fixed;
   top: 0;
   left: 0;
   width: 320px;
   max-width: 85vw;
-  height: 100vh;
+  height: 100svh;
+  @supports (height: 100dvh) {
+    height: 100dvh;
+  }
   display: flex;
   flex-direction: column;
   z-index: 1200;
   background: var(--surface);
   box-shadow: var(--sh-xl);
-  overflow-y: auto;
+  overflow: hidden;
   overflow-x: hidden;
-  padding-bottom: var(--space-md);
+  padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
   border-right: 1px solid var(--border);
 
   @media (max-width: 400px) {
     width: 288px;
   }
+}
+
+:global([dir='rtl']) .menu {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: 1px solid var(--border);
 }
 
 // ============================================
@@ -124,6 +133,23 @@
   list-style: none;
   margin: 0;
   min-height: 0;
+}
+
+// ============================================
+// MENU CONTENT & FOOTER
+// ============================================
+.menuContent {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.menuFooter {
+  padding: 0 var(--space-md) calc(var(--space-md) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
 }
 
 // ============================================
@@ -228,9 +254,27 @@
 
 .navLabel {
   flex: 1;
-  white-space: nowrap;
+  white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+:global([dir='rtl']) .navItem {
+  flex-direction: row-reverse;
+  text-align: right;
+
+  &::before {
+    left: auto;
+    right: 0;
+    border-radius: var(--r-sm) 0 0 var(--r-sm);
+  }
+}
+
+:global([dir='rtl']) .logoutBtn {
+  flex-direction: row-reverse;
+  text-align: right;
 }
 
 // ============================================
@@ -241,7 +285,7 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  margin: var(--space-md);
+  margin: 0;
   background: transparent;
   border: 1px solid var(--border);
   border-radius: var(--r-md);
@@ -251,8 +295,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  width: calc(100% - var(--space-2xl));
+  width: 100%;
   min-height: 44px;
+  flex-shrink: 0;
+  background: var(--surface);
+  z-index: 1;
 
   // Hover State
   &:hover {

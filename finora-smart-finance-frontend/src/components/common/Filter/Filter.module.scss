@@ -58,6 +58,10 @@
   }
 }
 
+:global([dir='rtl']) .filterBtn {
+  flex-direction: row-reverse;
+}
+
 // ============================================
 // FILTER ICON
 // ============================================
@@ -83,6 +87,11 @@
   padding: var(--space-xs);
 }
 
+:global([dir='rtl']) .filterDropdown {
+  right: auto;
+  left: 0;
+}
+
 // ============================================
 // FILTER SECTIONS
 // ============================================
@@ -100,6 +109,10 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   margin: 0;
+}
+
+:global([dir='rtl']) .filterTitle {
+  text-align: right;
 }
 
 .filterOptions {
@@ -142,6 +155,11 @@
   }
 }
 
+:global([dir='rtl']) .filterOption {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
 // ============================================
 // SELECT & DATE INPUTS
 // ============================================
@@ -154,6 +172,10 @@
   background: var(--surface);
   color: var(--tx);
   font-size: var(--fs-sm);
+}
+
+:global([dir='rtl']) .filterSelect {
+  text-align: right;
 }
 
 .dateRow {
@@ -174,6 +196,10 @@
   color: var(--tx-muted);
 }
 
+:global([dir='rtl']) .dateLabel {
+  text-align: right;
+}
+
 .dateInput {
   width: 100%;
   padding: var(--space-2xs) var(--space-sm);
@@ -185,6 +211,10 @@
   font-size: var(--fs-sm);
 }
 
+:global([dir='rtl']) .dateInput {
+  text-align: right;
+}
+
 // ============================================
 // FOOTER
 // ============================================
@@ -192,6 +222,10 @@
   display: flex;
   justify-content: flex-end;
   padding: var(--space-xs);
+}
+
+:global([dir='rtl']) .filterFooter {
+  justify-content: flex-start;
 }
 
 .clearButton {

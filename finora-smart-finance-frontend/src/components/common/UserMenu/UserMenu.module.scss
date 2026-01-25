@@ -72,6 +72,11 @@
   animation: fadeIn var(--tr) ease-out;
 }
 
+:global([dir='rtl']) .dropdownMenu {
+  right: auto;
+  left: 0;
+}
+
 // ============================================
 // DROPDOWN HEADER
 // ============================================
@@ -80,15 +85,23 @@
   border-bottom: 1px solid var(--border);
 }
 
+:global([dir='rtl']) .dropdownHeader {
+  text-align: right;
+}
+
 .dropdownName {
   font-weight: var(--fw-b);
   color: var(--tx);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .dropdownEmail {
   font-size: var(--fs-sm);
   color: var(--tx-muted);
   margin-top: var(--space-3xs);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 // ============================================
@@ -117,6 +130,11 @@
     outline: var(--focus-w) solid var(--focus-c);
     outline-offset: -2px;
   }
+}
+
+:global([dir='rtl']) .dropdownItem {
+  flex-direction: row-reverse;
+  text-align: right;
 }
 
 // ============================================

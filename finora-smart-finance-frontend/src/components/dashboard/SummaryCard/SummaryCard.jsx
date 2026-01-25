@@ -4,32 +4,39 @@
  * 
  * FEATURES:
  * - Icon + Title + Value
- * - Trend Indicator (up/down)
+ * - Trend Indicator mit Vergleichswert
  * - Color Variants (income, expense, balance)
  * - Framer Motion Hover Effects
  * - Responsive Design
  */
 
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
+import { FiArrowUp, FiArrowDown, FiMinus } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './SummaryCard.module.scss';
 
 export default function SummaryCard({
-  title = 'Titel',
-  value = '0,00 €',
+  title,
+  value,
   icon: IconComponent = null,
   trend = null,
-  trendPercent = 0,
   trendLabel = null,
   trendVariant = null,
   trendTooltip = null,
   color = 'primary', // 'income' (green), 'expense' (red), 'balance' (blue), 'primary'
   size = 'medium', // 'small', 'medium', 'large'
 }) {
-  const computedVariant = trendVariant ?? (trendPercent > 0 ? 'up' : trendPercent < 0 ? 'down' : 'neutral');
-  const showTrend = trendLabel !== null ? Boolean(trendLabel) : trendPercent !== 0;
-  const label = trendLabel ?? `${Math.abs(trendPercent)}%`;
-  const TrendIcon = computedVariant === 'up' ? FiTrendingUp : computedVariant === 'down' ? FiTrendingDown : null;
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t('dashboard.summaryDefaultTitle');
+  const resolvedValue = value ?? t('dashboard.summaryDefaultValue');
+  // Determine trend direction and styling
+  const computedVariant = trendVariant ?? 'neutral';
+  
+  // Trend Icon based on direction
+  const TrendIcon = computedVariant === 'up' ? FiArrowUp : computedVariant === 'down' ? FiArrowDown : FiMinus;
+  
+  // Show trend only if there's a label (null = no comparison possible)
+  const showTrend = trendLabel !== null && trendLabel !== undefined;
 
   return (
     <motion.div
@@ -37,8 +44,8 @@ export default function SummaryCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      whileHover={{ y: -6, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-      whileTap={{ y: -2 }}
+      whileHover={{ y: -4, boxShadow: '0 16px 32px rgba(0,0,0,0.08)' }}
+      tabIndex={0}
     >
       {/* Background Gradient */}
       <div className={styles.gradient} />
@@ -46,46 +53,33 @@ export default function SummaryCard({
       {/* Top Section: Icon + Title */}
       <div className={styles.header}>
         {IconComponent && (
-          <motion.div
-            className={styles.iconWrapper}
-            whileHover={{ scale: 1.1, rotate: 5 }}
-          >
-            <IconComponent size={24} />
-          </motion.div>
+          <div className={styles.iconWrapper}>
+            <IconComponent size={22} strokeWidth={2} />
+          </div>
         )}
-        <h3 className={styles.title}>{title}</h3>
+        <h3 className={styles.title}>{resolvedTitle}</h3>
       </div>
 
       {/* Value Section */}
-      <motion.div
-        className={styles.valueSection}
-        initial={{ scale: 0.95 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.1 }}
-      >
-        <p className={styles.value}>{value}</p>
-        {showTrend && (
-          <div
+      <div className={styles.valueSection}>
+        <p className={styles.value}>{resolvedValue}</p>
+      </div>
+
+      {/* Trend Section - Separate and clearer */}
+      {showTrend && (
+        <div className={styles.trendSection}>
+          <div 
             className={`${styles.trendBadge} ${styles[computedVariant]}`}
             title={trendTooltip || undefined}
             aria-label={trendTooltip || undefined}
           >
-            {TrendIcon && <TrendIcon size={14} />}
-            <span>{label}</span>
+            <TrendIcon size={12} strokeWidth={2.5} />
+            <span className={styles.trendValue}>{trendLabel}</span>
           </div>
-        )}
-      </motion.div>
-
-      {/* Bottom: Trend Text */}
-      {trend && (
-        <motion.div
-          className={styles.trendText}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
-          {trend}
-        </motion.div>
+          {trend && (
+            <span className={styles.trendDescription}>{trend}</span>
+          )}
+        </div>
       )}
 
       {/* Shimmer Effect on Hover */}

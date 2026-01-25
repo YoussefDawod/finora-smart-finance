@@ -1,154 +1,36 @@
-import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useForm } from '@/hooks/useForm';
-import { useToast } from '@/hooks/useToast';
-import { useTransactions } from '@/hooks/useTransactions';
+import { useTranslation } from 'react-i18next';
+import { useTransactionForm } from '@/hooks/useTransactionForm';
+import { translateCategory } from '@/utils/categoryTranslations';
+import { formContainerVariants, formItemVariants, buttonMotionProps } from '@/constants/animations';
 import Select from '@/components/common/Select/Select';
 import Input from '@/components/common/Input/Input';
 import Textarea from '@/components/common/Textarea/Textarea';
 import Button from '@/components/common/Button/Button';
 import { FiAlertCircle, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
-import { z } from 'zod';
 import styles from './TransactionForm.module.scss';
-
-// ============================================================================
-// VALIDIERUNGSSCHEMA (ZOD)
-// ============================================================================
-const transactionSchema = z.object({
-  type: z.enum(['income', 'expense'], {
-    errorMap: () => ({ message: 'Typ ist erforderlich' }),
-  }),
-  amount: z
-    .string()
-    .min(1, 'Betrag ist erforderlich')
-    .refine(
-      (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
-      'Betrag muss größer als 0 sein'
-    ),
-  category: z
-    .string()
-    .min(1, 'Kategorie ist erforderlich')
-    .min(2, 'Kategorie muss mindestens 2 Zeichen lang sein'),
-  description: z
-    .string()
-    .min(1, 'Beschreibung ist erforderlich')
-    .min(3, 'Beschreibung muss mindestens 3 Zeichen lang sein')
-    .max(100, 'Beschreibung darf maximal 100 Zeichen lang sein'),
-  date: z
-    .string()
-    .min(1, 'Datum ist erforderlich')
-    .refine(
-      (val) => !isNaN(new Date(val).getTime()),
-      'Ungültiges Datum'
-    ),
-});
-
-// ============================================================================
-// KATEGORIEN - MUSS MIT BACKEND SYNCHRON SEIN!
-// ============================================================================
-// Diese Kategorien MÜSSEN mit Backend ALLOWED_CATEGORIES übereinstimmen!
-// Quelle: finora-smart-finance-api/src/routes/transactions.js
-const INCOME_CATEGORIES = ['Gehalt', 'Freelance', 'Investitionen', 'Geschenk', 'Sonstiges'];
-const EXPENSE_CATEGORIES = ['Lebensmittel', 'Transport', 'Unterhaltung', 'Miete', 'Versicherung', 'Gesundheit', 'Bildung', 'Sonstiges'];
 
 // ============================================================================
 // KOMPONENTE
 // ============================================================================
 export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => {
-  const [transactionType, setTransactionType] = useState(
-    initialData?.type || 'expense'
-  );
-  const { createTransaction, updateTransaction, loading: apiLoading, error } = useTransactions();
-  const { addToast } = useToast();
+  const { t } = useTranslation();
 
   // ──────────────────────────────────────────────────────────────────────
-  // FORM HOOK
+  // FORM HOOK - Extrahierte Logik
   // ──────────────────────────────────────────────────────────────────────
   const {
-    values: formData,
+    formData,
     errors,
+    transactionType,
+    categories,
+    isLoading,
+    error,
+    isEditMode,
     handleChange,
-    handleSubmit: onFormSubmit,
-    resetForm,
-    setFieldValue,
-    isSubmitting: formSubmitting,
-  } = useForm(
-    {
-      type: initialData?.type || 'expense',
-      amount: initialData?.amount || '',
-      category: initialData?.category || '',
-      description: initialData?.description || '',
-      date: initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    },
-    async (values) => {
-      try {
-        const submitData = {
-          ...values,
-          amount: parseFloat(values.amount),
-        };
-
-        if (initialData?.id) {
-          await updateTransaction(initialData.id, submitData);
-          addToast('Transaktion aktualisiert', 'success');
-        } else {
-          const result = await createTransaction(submitData);
-          addToast('Transaktion erstellt', 'success');
-        }
-
-        resetForm();
-        onSuccess?.();
-      } catch (err) {
-        console.error('❌ [TransactionForm] Submit error:', err);
-        // Don't show toast for 401/403 - the API client already handles this
-        if (err.response?.status !== 401 && err.response?.status !== 403) {
-          addToast(err.response?.data?.message || 'Fehler beim Speichern', 'error');
-        }
-      }
-    },
-    transactionSchema
-  );
-
-  // ──────────────────────────────────────────────────────────────────────
-  // HANDLE TYPE CHANGE
-  // ──────────────────────────────────────────────────────────────────────
-  const handleTypeChange = useCallback((newType) => {
-    setTransactionType(newType);
-    setFieldValue('type', newType);
-    setFieldValue('category', '');
-  }, [setFieldValue]);
-
-  // ──────────────────────────────────────────────────────────────────────
-  // KATEGORIEN LISTE BASIEREND AUF TYP
-  // ──────────────────────────────────────────────────────────────────────
-  const categories =
-    transactionType === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
-
-  // Kombinierte loading state
-  const isLoading = apiLoading || formSubmitting;
-
-  // ──────────────────────────────────────────────────────────────────────
-  // ANIMATIONSVARIANTEN
-  // ──────────────────────────────────────────────────────────────────────
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        staggerChildren: 0.08,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3 },
-    },
-  };
+    handleTypeChange,
+    onFormSubmit,
+  } = useTransactionForm({ initialData, onSuccess });
 
   // ──────────────────────────────────────────────────────────────────────
   // RENDER
@@ -157,7 +39,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
     <motion.form
       className={styles.form}
       onSubmit={onFormSubmit}
-      variants={containerVariants}
+      variants={formContainerVariants}
       initial="hidden"
       animate="visible"
     >
@@ -165,7 +47,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
       {error && (
         <motion.div
           className={styles.error}
-          variants={itemVariants}
+          variants={formItemVariants}
           role="alert"
         >
           <span><FiAlertCircle /> {error}</span>
@@ -173,8 +55,8 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
       )}
 
       {/* TYPE SELECTOR */}
-      <motion.div className={styles.typeSelector} variants={itemVariants}>
-        <label className={styles.label}>Typ</label>
+      <motion.div className={styles.typeSelector} variants={formItemVariants}>
+        <label className={styles.label}>{t('transactions.type')}</label>
         <div className={styles.typeButtons}>
           <motion.button
             type="button"
@@ -182,11 +64,10 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
               transactionType === 'income' ? styles.active : ''
             } ${styles.income}`}
             onClick={() => handleTypeChange('income')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            {...buttonMotionProps}
           >
             <span className={styles.icon}><FiTrendingUp /></span>
-            <span>Einnahme</span>
+            <span>{t('transactions.income')}</span>
           </motion.button>
           <motion.button
             type="button"
@@ -194,22 +75,21 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
               transactionType === 'expense' ? styles.active : ''
             } ${styles.expense}`}
             onClick={() => handleTypeChange('expense')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            {...buttonMotionProps}
           >
             <span className={styles.icon}><FiTrendingDown /></span>
-            <span>Ausgabe</span>
+            <span>{t('transactions.expense')}</span>
           </motion.button>
         </div>
       </motion.div>
 
       {/* AMOUNT INPUT */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={formItemVariants}>
         <Input
-          label="Betrag (€)"
+          label={t('transactions.amount')}
           id="amount"
           type="number"
-          placeholder="0.00"
+          placeholder={t('transactions.amountPlaceholder')}
           value={formData.amount}
           onChange={(e) =>
             handleChange({
@@ -220,16 +100,16 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           required
           disabled={isLoading}
           size="medium"
-          hint="Geben Sie den Betrag der Transaktion ein"
+          hint={t('transactions.amountHint')}
         />
       </motion.div>
 
       {/* CATEGORY SELECT */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={formItemVariants}>
         <Select
-          label="Kategorie"
-          options={categories.map((cat) => ({ value: cat, label: cat }))}
-          placeholder="Wähle eine Kategorie"
+          label={t('transactions.category')}
+          options={categories.map((cat) => ({ value: cat, label: translateCategory(cat, t) }))}
+          placeholder={t('transactions.categoryPlaceholder')}
           value={formData.category}
           onChange={(e) =>
             handleChange({
@@ -240,14 +120,16 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           required
           disabled={isLoading}
           size="medium"
-          hint={`Wähle eine ${transactionType === 'income' ? 'Einnahme' : 'Ausgabe'}-Kategorie`}
+          hint={t('transactions.categoryHint', {
+            type: transactionType === 'income' ? t('transactions.income') : t('transactions.expense'),
+          })}
         />
       </motion.div>
 
       {/* DATE INPUT */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={formItemVariants}>
         <Input
-          label="Datum"
+          label={t('transactions.date')}
           id="date"
           type="date"
           value={formData.date}
@@ -260,16 +142,16 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           required
           disabled={isLoading}
           size="medium"
-          hint="Wählen Sie das Transaktionsdatum"
+          hint={t('transactions.dateHint')}
         />
       </motion.div>
 
       {/* DESCRIPTION TEXTAREA */}
-      <motion.div variants={itemVariants}>
+      <motion.div variants={formItemVariants}>
         <Textarea
-          label="Beschreibung"
+          label={t('transactions.description')}
           id="description"
-          placeholder="Beschreibe diese Transaktion..."
+          placeholder={t('transactions.descriptionPlaceholder')}
           value={formData.description}
           onChange={(e) =>
             handleChange({
@@ -283,12 +165,12 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           rows={4}
           showCharCount
           maxLength={100}
-          hint="Geben Sie Details zur Transaktion ein (max. 100 Zeichen)"
+          hint={t('transactions.descriptionHint')}
         />
       </motion.div>
 
       {/* BUTTONS */}
-      <motion.div className={styles.actions} variants={itemVariants}>
+      <motion.div className={styles.actions} variants={formItemVariants}>
         <Button
           type="submit"
           variant="primary"
@@ -297,7 +179,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           loading={isLoading}
           fullWidth
         >
-          {initialData?.id ? 'Aktualisieren' : 'Transaktion hinzufügen'}
+          {isEditMode ? t('transactions.updateAction') : t('transactions.addTransaction')}
         </Button>
         {onCancel && (
           <Button
@@ -308,7 +190,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
             disabled={isLoading}
             fullWidth
           >
-            Abbrechen
+            {t('common.cancel')}
           </Button>
         )}
       </motion.div>

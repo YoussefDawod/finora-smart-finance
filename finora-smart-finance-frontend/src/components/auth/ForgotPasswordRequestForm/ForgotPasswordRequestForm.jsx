@@ -13,11 +13,13 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiMail, 
   FiAlertCircle, 
   FiArrowRight,
+  FiArrowLeft,
   FiX
 } from 'react-icons/fi';
 import styles from './ForgotPasswordRequestForm.module.scss';
@@ -26,6 +28,8 @@ export default function ForgotPasswordRequestForm() {
   const { forgotPassword } = useAuth();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
 
   // ============================================
   // STATE
@@ -43,8 +47,8 @@ export default function ForgotPasswordRequestForm() {
   // ============================================
 
   const validateEmail = (value) => {
-    if (!value) return 'E-Mail ist erforderlich';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Ungültige E-Mail';
+    if (!value) return t('auth.forgot.validation.emailRequired');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('auth.forgot.validation.emailInvalid');
     return '';
   };
 
@@ -84,11 +88,11 @@ export default function ForgotPasswordRequestForm() {
     try {
       await forgotPassword(email);
       setIsSuccess(true);
-      toast.success('Reset-Link wurde gesendet!');
+      toast.success(t('auth.forgot.successToast'));
     } catch (err) {
       const errorMessage =
         err?.response?.data?.message ||
-        'Fehler beim Senden. Bitte versuchen Sie es später erneut.';
+        t('auth.forgot.errorToast');
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -111,20 +115,19 @@ export default function ForgotPasswordRequestForm() {
         <div className={styles.successIcon}>
           <FiMail />
         </div>
-        <h2 className={styles.successTitle}>E-Mail gesendet!</h2>
+        <h2 className={styles.successTitle}>{t('auth.forgot.successTitle')}</h2>
         <p className={styles.successMessage}>
-          Wir haben einen Link zum Zurücksetzen Ihres Passworts an{' '}
-          <strong>{email}</strong> gesendet.
+          {t('auth.forgot.successMessage', { email })}
         </p>
         <p className={styles.successHint}>
-          Der Link ist 24 Stunden gültig. Prüfen Sie auch Ihren Spam-Ordner.
+          {t('auth.forgot.successHint')}
         </p>
         <button
           type="button"
           className={styles.resendButton}
           onClick={() => setIsSuccess(false)}
         >
-          Andere E-Mail verwenden
+          {t('auth.forgot.useDifferentEmail')}
         </button>
       </motion.div>
     );
@@ -178,7 +181,7 @@ export default function ForgotPasswordRequestForm() {
             autoFocus
           />
           <label htmlFor="email" className={styles.label}>
-            E-Mail-Adresse
+            {t('auth.forgot.emailLabel')}
           </label>
         </div>
         <AnimatePresence>
@@ -204,12 +207,12 @@ export default function ForgotPasswordRequestForm() {
         {isLoading ? (
           <>
             <span className={styles.spinner} />
-            <span>Senden...</span>
+            <span>{t('auth.forgot.sending')}</span>
           </>
         ) : (
           <>
-            <span>Reset-Link senden</span>
-            <FiArrowRight className={styles.buttonIcon} />
+            <span>{t('auth.forgot.submit')}</span>
+            {isRtl ? <FiArrowLeft className={styles.buttonIcon} /> : <FiArrowRight className={styles.buttonIcon} />}
           </>
         )}
       </button>

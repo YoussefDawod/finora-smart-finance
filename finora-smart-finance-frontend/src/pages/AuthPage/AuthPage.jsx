@@ -19,6 +19,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useMotion, useIsDesktop } from '@/hooks';
 import { LoginForm, MultiStepRegisterForm, BrandingPanel } from '@/components/auth';
 import styles from './AuthPage.module.scss';
@@ -29,6 +30,7 @@ export default function AuthPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const { shouldAnimate } = useMotion();
   const isDesktop = useIsDesktop();
+  const { t } = useTranslation();
 
   // Determine current mode from URL
   const isRegisterMode = location.pathname === '/register';
@@ -40,6 +42,18 @@ export default function AuthPage() {
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
+
+  // Set data attribute on HTML element for CSS styling
+  useEffect(() => {
+    const htmlElement = document.documentElement;
+
+    if (!isDesktop && !isRegisterMode) {
+      // Mobile in login mode: Branding panel is at bottom
+      htmlElement.setAttribute('data-auth-branding-bottom', 'true');
+    } else {
+      htmlElement.removeAttribute('data-auth-branding-bottom');
+    }
+  }, [isDesktop, isRegisterMode]);
 
   // Loading state
   if (isLoading) {
@@ -72,9 +86,9 @@ export default function AuthPage() {
             className={styles.formWrapper}
           >
             <header className={styles.header}>
-              <h1 className={styles.title}>Konto erstellen</h1>
+              <h1 className={styles.title}>{t('auth.page.registerTitle')}</h1>
               <p className={styles.subtitle}>
-                Starten Sie in wenigen Schritten mit Finora durch.
+                {t('auth.page.registerSubtitle')}
               </p>
             </header>
             <MultiStepRegisterForm />
@@ -89,9 +103,9 @@ export default function AuthPage() {
             className={styles.formWrapper}
           >
             <header className={styles.header}>
-              <h1 className={styles.title}>Anmelden</h1>
+              <h1 className={styles.title}>{t('auth.page.loginTitle')}</h1>
               <p className={styles.subtitle}>
-                Willkommen zurück! Melden Sie sich an, um fortzufahren.
+                {t('auth.page.loginSubtitle')}
               </p>
             </header>
             <LoginForm />
@@ -134,22 +148,18 @@ export default function AuthPage() {
   // MOBILE LAYOUT (Vertical 60/40)
   // ============================================
   return (
-    <div className={styles.authPageMobile}>
-      {/* Form Panel - 60% height, starts top, slides down on register */}
+    <div className={`${styles.authPageMobile} ${isRegisterMode ? styles.registerMode : ''}`}>
       <motion.div 
+        layout
         className={styles.formPanelMobile}
-        initial={false}
-        animate={{ y: isRegisterMode ? '66.67%' : '0%' }}
         transition={springConfig}
       >
         {renderFormContent()}
       </motion.div>
 
-      {/* Branding Panel - 40% height, starts bottom, slides up on register */}
       <motion.div 
+        layout
         className={styles.brandingPanelMobile}
-        initial={false}
-        animate={{ y: isRegisterMode ? '-150%' : '0%' }}
         transition={springConfig}
       >
         <BrandingPanel mode={mode} isDesktop={isDesktop} />

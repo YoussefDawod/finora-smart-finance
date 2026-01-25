@@ -14,6 +14,7 @@ const errorHandler = require('./src/middleware/errorHandler');
 const transactionRoutes = require('./src/routes/transactions');
 const authRoutes = require('./src/routes/auth');
 const userRoutes = require('./src/routes/users');
+const adminRoutes = require('./src/routes/admin');
 const User = require('./src/models/User');
 
 const app = express();
@@ -87,6 +88,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes); // Admin routes (nur Development)
 
 // Direct verification via backend link; redirects to frontend after success/failure
 app.get('/verify-email', async (req, res) => {

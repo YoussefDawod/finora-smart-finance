@@ -1,0 +1,50 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "Finora Smart Finance - Moderne Finanzverwaltung mit React + Node.js",
+  "private": true,
+  "workspaces": [
+    "finora-smart-finance-frontend",
+    "finora-smart-finance-api"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=finora-smart-finance-frontend",
+    "dev:api": "npm run dev --workspace=finora-smart-finance-api",
+    "build": "npm run build --workspace=finora-smart-finance-frontend",
+    "lint": "npm run lint --workspaces",
+    "lint:fix": "npm run lint:fix --workspaces",
+    "format": "npm run format --workspaces",
+    "format:check": "npm run format:check --workspaces",
+    "test:frontend": "npm run test --workspace=finora-smart-finance-frontend",
+    "test:api": "npm run test --workspace=finora-smart-finance-api",
+    "test": "npm run test:frontend && npm run test:api",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YoussefDawod/expense-tracker.git"
+  },
+  "author": "Youssef Dawod",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YoussefDawod/expense-tracker/issues"
+  },
+  "homepage": "https://github.com/YoussefDawod/expense-tracker#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7"
+  },
+  "lint-staged": {
+    "finora-smart-finance-frontend/src/**/*.{js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "finora-smart-finance-frontend/src/**/*.{scss,css}": [
+      "prettier --write"
+    ],
+    "finora-smart-finance-api/**/*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

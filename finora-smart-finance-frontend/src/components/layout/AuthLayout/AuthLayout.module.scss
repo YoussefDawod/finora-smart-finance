@@ -104,9 +104,9 @@
   padding: 3rem;
   background: linear-gradient(
     135deg,
-    var(--accent-primary) 0%,
-    color-mix(in srgb, var(--accent-primary), var(--accent-secondary) 40%) 50%,
-    var(--accent-secondary) 100%
+    var(--primary) 0%,
+    color-mix(in srgb, var(--primary), var(--secondary) 40%) 50%,
+    var(--secondary) 100%
   );
   overflow: hidden;
   z-index: 10;
@@ -196,7 +196,7 @@
   margin-bottom: 2rem;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--primary);
   background: white;
   border: none;
   border-radius: var(--r-full);
@@ -279,9 +279,9 @@
     padding: 2rem 1.5rem;
     background: linear-gradient(
       135deg,
-      var(--accent-primary) 0%,
-      color-mix(in srgb, var(--accent-primary), var(--accent-secondary) 40%) 50%,
-      var(--accent-secondary) 100%
+      var(--primary) 0%,
+      color-mix(in srgb, var(--primary), var(--secondary) 40%) 50%,
+      var(--secondary) 100%
     );
     color: white;
     text-align: center;
@@ -325,7 +325,7 @@
   padding: 0.75rem 1.5rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--primary);
   background: white;
   border: none;
   border-radius: var(--r-full);

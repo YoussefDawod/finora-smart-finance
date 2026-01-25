@@ -16,7 +16,7 @@
   border-radius: var(--r-md);
   box-shadow: var(--sh-xl);
   border-left: 4px solid var(--primary);
-  animation: slideIn var(--d-normal) ease-out;
+  animation: slideIn var(--duration-normal) ease-out;
   position: relative;
   overflow: hidden;
 
@@ -31,8 +31,13 @@
   }
 
   &.exiting {
-    animation: slideOut var(--d-normal) ease-in forwards;
+    animation: slideOut var(--duration-normal) ease-in forwards;
   }
+}
+
+:global([dir='rtl']) .toast {
+  border-left: none;
+  border-right: 4px solid var(--primary);
 }
 
 // ============================================
@@ -43,6 +48,10 @@
   align-items: flex-start;
   gap: var(--space-sm);
   margin-bottom: var(--space-xs);
+}
+
+:global([dir='rtl']) .content {
+  flex-direction: row-reverse;
 }
 
 // ============================================
@@ -168,6 +177,10 @@
   }
 }
 
+:global([dir='rtl']) .success {
+  border-right-color: var(--success);
+}
+
 .error {
   border-left-color: var(--error);
 
@@ -179,6 +192,10 @@
   .progressFill {
     background: var(--error);
   }
+}
+
+:global([dir='rtl']) .error {
+  border-right-color: var(--error);
 }
 
 .warning {
@@ -194,6 +211,10 @@
   }
 }
 
+:global([dir='rtl']) .warning {
+  border-right-color: var(--warning);
+}
+
 .info {
   border-left-color: var(--info);
 
@@ -205,6 +226,10 @@
   .progressFill {
     background: var(--info);
   }
+}
+
+:global([dir='rtl']) .info {
+  border-right-color: var(--info);
 }
 
 // ============================================

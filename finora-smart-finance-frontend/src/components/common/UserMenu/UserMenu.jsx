@@ -5,12 +5,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiLogOut, FiSettings, FiUser } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
+import { FiLogOut, FiUser } from 'react-icons/fi';
 import styles from './UserMenu.module.scss';
 
 export default function UserMenu({ user, onLogout }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
+  const { t } = useTranslation();
 
   const initials = (user?.name || 'U')
     .split(' ')
@@ -55,7 +57,7 @@ export default function UserMenu({ user, onLogout }) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         aria-expanded={open}
-        aria-label="Benutzermenü"
+        aria-label={t('common.userMenu')}
       >
         <span className={styles.avatarCircle}>{initials}</span>
       </motion.button>
@@ -76,17 +78,13 @@ export default function UserMenu({ user, onLogout }) {
 
             <Link to="/profile" className={styles.dropdownItem} onClick={() => setOpen(false)}>
               <FiUser size={18} />
-              <span>Profil</span>
+              <span>{t('nav.profile')}</span>
             </Link>
 
-            <Link to="/settings" className={styles.dropdownItem} onClick={() => setOpen(false)}>
-              <FiSettings size={18} />
-              <span>Einstellungen</span>
-            </Link>
 
             <button className={styles.dropdownItem} onClick={handleLogout}>
               <FiLogOut size={18} />
-              <span>Abmelden</span>
+              <span>{t('nav.logout')}</span>
             </button>
           </motion.div>
         )}

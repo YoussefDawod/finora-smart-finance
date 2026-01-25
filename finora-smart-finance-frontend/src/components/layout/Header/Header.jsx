@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { FiMenu } from 'react-icons/fi';
@@ -22,6 +23,7 @@ export default function Header() {
   const { user, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const { t } = useTranslation();
   
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
 
@@ -63,7 +65,7 @@ export default function Header() {
               onClick={() => setIsHamburgerOpen(!isHamburgerOpen)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Menü"
+              aria-label={t('common.menu')}
               aria-expanded={isHamburgerOpen}
             >
               <FiMenu size={24} />
@@ -81,10 +83,10 @@ export default function Header() {
           ) : !isLoading ? (
             <div className={styles.authBtns}>
               <Link to="/login" className={styles.loginBtn}>
-                Anmelden
+                {t('auth.page.loginTitle')}
               </Link>
               <Link to="/register" className={styles.registerBtn}>
-                Registrieren
+                {t('auth.page.registerAction')}
               </Link>
             </div>
           ) : null}

@@ -14,7 +14,8 @@
  * @module components/common/Toast
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './Toast.module.scss';
 
 // Toast type icons
@@ -33,8 +34,16 @@ export default function Toast({
   action,
   onClose 
 }) {
+  const { t } = useTranslation();
   const [isExiting, setIsExiting] = useState(false);
   const [progress, setProgress] = useState(100);
+
+  const handleClose = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => {
+      onClose?.(id);
+    }, 300); // Match animation duration
+  }, [id, onClose]);
 
   // Auto-dismiss with progress bar
   useEffect(() => {
@@ -57,14 +66,7 @@ export default function Toast({
     }, interval);
 
     return () => clearInterval(timer);
-  }, [duration]);
-
-  const handleClose = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      onClose?.(id);
-    }, 300); // Match animation duration
-  };
+  }, [duration, handleClose]);
 
   const handleAction = () => {
     action?.onClick();
@@ -98,7 +100,7 @@ export default function Toast({
           type="button"
           className={styles.closeButton}
           onClick={handleClose}
-          aria-label="Benachrichtigung schließen"
+          aria-label={t('common.closeNotification')}
         >
           ✕
         </button>

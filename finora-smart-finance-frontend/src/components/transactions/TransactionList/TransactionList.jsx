@@ -1,59 +1,44 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useToast } from '@/hooks/useToast';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
+import { translateCategory } from '@/utils/categoryTranslations';
 import Button from '@/components/common/Button/Button';
-import Input from '@/components/common/Input/Input';
-import { FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './TransactionList.module.scss';
 
 // ============================================================================
-// KOMPONENTE
+// KOMPONENTE - SERVER-SIDE PAGINATION
 // ============================================================================
-export const TransactionList = ({
-  onEdit = null,
-  pageSize = 10,
-}) => {
-  const { filteredTransactions, deleteTransaction, loading, error, sortBy, sortOrder, setSort } = useTransactions();
+export const TransactionList = ({ onEdit = null }) => {
+  const { 
+    transactions, 
+    deleteTransaction, 
+    loading, 
+    error, 
+    sortBy, 
+    sortOrder, 
+    setSort,
+    // Server-Side Pagination
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    nextPage,
+    prevPage,
+  } = useTransactions();
+  
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const isMobile = useIsMobile();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
   
   // State
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-
-  // ──────────────────────────────────────────────────────────────────────
-  // FILTER & SEARCH TRANSACTIONS (aber NICHT sortieren - das macht der Context!)
-  // ──────────────────────────────────────────────────────────────────────
-  const processedTransactions = useMemo(() => {
-    let items = [...filteredTransactions];
-
-    // Search by description or category
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      items = items.filter(
-        (tx) =>
-          tx.description.toLowerCase().includes(query) ||
-          tx.category.toLowerCase().includes(query)
-      );
-    }
-
-    // KEIN sortieren hier - filteredTransactions ist bereits sortiert vom Context!
-    return items;
-  }, [filteredTransactions, searchQuery]);
-
-  // ──────────────────────────────────────────────────────────────────────
-  // PAGINATION
-  // ──────────────────────────────────────────────────────────────────────
-  const totalPages = Math.ceil(processedTransactions.length / pageSize);
-  const paginatedTransactions = useMemo(() => {
-    const startIdx = (currentPage - 1) * pageSize;
-    return processedTransactions.slice(startIdx, startIdx + pageSize);
-  }, [processedTransactions, currentPage, pageSize]);
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLERS
@@ -62,21 +47,26 @@ export const TransactionList = ({
     try {
       await deleteTransaction(id);
       setDeleteConfirm(null);
-      showSuccessToast('Transaktion gelöscht');
+      showSuccessToast(t('transactions.deleteSuccess'));
     } catch (err) {
-      showErrorToast('Fehler beim Löschen');
+      showErrorToast(t('transactions.deleteError'));
     }
-  }, [deleteTransaction, showSuccessToast, showErrorToast]);
+  }, [deleteTransaction, showSuccessToast, showErrorToast, t]);
 
   const handleToggleSort = useCallback((field) => {
     if (sortBy === field) {
-      // Toggle zwischen asc und desc
       setSort(field, sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      // Neues Feld, starte mit desc
       setSort(field, 'desc');
     }
   }, [sortBy, sortOrder, setSort]);
+
+  // Page-Size-Optionen
+  const pageSizeOptions = [10, 20, 50];
+
+  const handlePageSizeChange = useCallback(() => {
+    // NOTE: setLimit not available in context, adjust page size via API
+  }, []);
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -100,15 +90,15 @@ export const TransactionList = ({
   const renderTableView = () => (
     <>
       <motion.div className={styles.tableHeader} variants={itemVariants}>
-        <div className={styles.colCategory}>Kategorie</div>
-        <div className={styles.colDescription}>Beschreibung</div>
+        <div className={styles.colCategory}>{t('transactions.category')}</div>
+        <div className={styles.colDescription}>{t('transactions.description')}</div>
         <div
           className={`${styles.colAmount} ${styles.sortable}`}
           onClick={() => handleToggleSort('amount')}
           role="button"
           tabIndex={0}
         >
-          Betrag
+          {t('transactions.amount')}
           {sortBy === 'amount' && (
             <span className={styles.sortIcon}>
               {sortOrder === 'asc' ? ' ↑' : ' ↓'}
@@ -121,19 +111,19 @@ export const TransactionList = ({
           role="button"
           tabIndex={0}
         >
-          Datum
+          {t('transactions.date')}
           {sortBy === 'date' && (
             <span className={styles.sortIcon}>
               {sortOrder === 'asc' ? ' ↑' : ' ↓'}
             </span>
           )}
         </div>
-        <div className={styles.colActions}>Aktionen</div>
+        <div className={styles.colActions}>{t('transactions.actions')}</div>
       </motion.div>
 
       <motion.div className={styles.tableBody} variants={itemVariants}>
         <AnimatePresence mode="popLayout">
-          {paginatedTransactions.map((transaction) => (
+          {transactions.map((transaction) => (
             <motion.div
               key={transaction.id}
               className={`${styles.tableRow} ${styles[transaction.type]}`}
@@ -145,7 +135,9 @@ export const TransactionList = ({
                 <span className={styles.categoryIcon}>
                   <CategoryIcon category={transaction.category} />
                 </span>
-                <span className={styles.categoryName}>{transaction.category}</span>
+                <span className={styles.categoryName}>
+                  {translateCategory(transaction.category, t)}
+                </span>
               </div>
 
               {/* DESCRIPTION */}
@@ -182,7 +174,7 @@ export const TransactionList = ({
                       onClick={() => onEdit(transaction)}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      title="Bearbeiten"
+                      title={t('transactions.editTransaction')}
                     >
                       <FiEdit2 />
                     </motion.button>
@@ -192,7 +184,7 @@ export const TransactionList = ({
                     onClick={() => setDeleteConfirm(transaction.id)}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    title="Löschen"
+                    title={t('transactions.deleteTransaction')}
                   >
                     <FiTrash2 />
                   </motion.button>
@@ -208,21 +200,21 @@ export const TransactionList = ({
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                   >
-                    <p>Wirklich löschen?</p>
+                    <p>{t('transactions.deleteConfirm')}</p>
                     <div className={styles.confirmButtons}>
                       <Button
                         variant="ghost"
                         size="small"
                         onClick={() => setDeleteConfirm(null)}
                       >
-                        Abbrechen
+                        {t('common.cancel')}
                       </Button>
                       <Button
                         variant="danger"
                         size="small"
                         onClick={() => handleDelete(transaction.id)}
                       >
-                        Löschen
+                        {t('transactions.deleteTransaction')}
                       </Button>
                     </div>
                   </motion.div>
@@ -238,7 +230,7 @@ export const TransactionList = ({
   const renderCardView = () => (
     <motion.div className={styles.cardList} variants={itemVariants}>
       <AnimatePresence mode="popLayout">
-        {paginatedTransactions.map((transaction) => (
+        {transactions.map((transaction) => (
           <motion.div
             key={transaction.id}
             className={`${styles.card} ${styles[transaction.type]}`}
@@ -250,7 +242,7 @@ export const TransactionList = ({
                 <span className={styles.categoryIcon}>
                   <CategoryIcon category={transaction.category} />
                 </span>
-                <span className={styles.categoryName}>{transaction.category}</span>
+                <span className={styles.categoryName}>{translateCategory(transaction.category, t)}</span>
               </div>
               <div className={styles.cardAmount}>
                 <span className={`${styles.amount} ${styles[transaction.type]}`}>
@@ -266,13 +258,13 @@ export const TransactionList = ({
 
             <div className={styles.cardMeta}>
               <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>Datum</span>
+                <span className={styles.metaLabel}>{t('transactions.date')}</span>
                 <time dateTime={transaction.date} className={styles.metaValue}>
                   {formatDate(transaction.date, 'short')}
                 </time>
               </div>
               <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>Betrag</span>
+                <span className={styles.metaLabel}>{t('transactions.amount')}</span>
                 <span className={`${styles.metaValue} ${styles[transaction.type]}`}>
                   {transaction.type === 'income' ? '+' : '-'}
                   {formatCurrency(transaction.amount)}
@@ -285,7 +277,7 @@ export const TransactionList = ({
                 <button
                   className={`${styles.editBtn} ${styles.cardActionBtn}`}
                   onClick={() => onEdit(transaction)}
-                  title="Bearbeiten"
+                  title={t('transactions.editAction')}
                 >
                   <FiEdit2 />
                 </button>
@@ -293,7 +285,7 @@ export const TransactionList = ({
               <button
                 className={`${styles.deleteBtn} ${styles.cardActionBtn}`}
                 onClick={() => setDeleteConfirm(transaction.id)}
-                title="Löschen"
+                title={t('transactions.deleteAction')}
               >
                 <FiTrash2 />
               </button>
@@ -307,21 +299,21 @@ export const TransactionList = ({
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                 >
-                  <p>Wirklich löschen?</p>
+                  <p>{t('transactions.deleteConfirm')}</p>
                   <div className={styles.confirmButtons}>
                     <Button
                       variant="ghost"
                       size="small"
                       onClick={() => setDeleteConfirm(null)}
                     >
-                      Abbrechen
+                      {t('common.cancel')}
                     </Button>
                     <Button
                       variant="danger"
                       size="small"
                       onClick={() => handleDelete(transaction.id)}
                     >
-                      Löschen
+                      {t('transactions.deleteAction')}
                     </Button>
                   </div>
                 </motion.div>
@@ -366,7 +358,7 @@ export const TransactionList = ({
         <div className={styles.errorIcon}>
           <STATE_ICONS.error />
         </div>
-        <h3 className={styles.errorTitle}>Fehler beim Laden</h3>
+        <h3 className={styles.errorTitle}>{t('transactions.loadErrorTitle')}</h3>
         <p className={styles.errorMessage}>{error}</p>
       </motion.div>
     );
@@ -375,7 +367,7 @@ export const TransactionList = ({
   // ──────────────────────────────────────────────────────────────────────
   // EMPTY STATE
   // ──────────────────────────────────────────────────────────────────────
-  if (processedTransactions.length === 0) {
+  if (transactions.length === 0 && !loading) {
     return (
       <motion.div
         className={styles.emptyContainer}
@@ -385,11 +377,9 @@ export const TransactionList = ({
         <div className={styles.emptyIcon}>
           <STATE_ICONS.empty />
         </div>
-        <h3 className={styles.emptyTitle}>Keine Transaktionen</h3>
+        <h3 className={styles.emptyTitle}>{t('transactions.emptyTitle')}</h3>
         <p className={styles.emptyText}>
-          {searchQuery
-            ? 'Keine Transaktionen gefunden, die Ihrer Suche entsprechen'
-            : 'Es gibt noch keine Transaktionen'}
+          {t('transactions.emptySubtitle')}
         </p>
       </motion.div>
     );
@@ -405,49 +395,58 @@ export const TransactionList = ({
       initial="hidden"
       animate="visible"
     >
-      {/* SEARCH BAR */}
-      <motion.div className={styles.searchBar} variants={itemVariants}>
-        <Input
-          icon={<FiSearch />}
-          placeholder="Nach Beschreibung oder Kategorie suchen..."
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
-      </motion.div>
       {isMobile ? renderCardView() : renderTableView()}
 
-      {/* PAGINATION */}
-      {totalPages > 1 && (
+      {/* PAGINATION - SERVER-SIDE */}
+      {totalPages > 0 && (
         <motion.div className={styles.pagination} variants={itemVariants}>
-          <Button
-            size="small"
-            variant="secondary"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-          >
-            ← Zurück
-          </Button>
-          <span className={styles.pageInfo}>
-            Seite {currentPage} von {totalPages}
-          </span>
-          <Button
-            size="small"
-            variant="secondary"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-          >
-            Weiter →
-          </Button>
+          <div className={styles.paginationLeft}>
+            <label className={styles.pageSizeLabel}>
+              {t('transactions.perPage')}
+              <select 
+                value={pageSize} 
+                onChange={handlePageSizeChange}
+                className={styles.pageSizeSelect}
+              >
+                {pageSizeOptions.map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className={styles.paginationCenter}>
+            <Button
+              size="small"
+              variant="ghost"
+              disabled={currentPage === 1 || loading}
+              onClick={prevPage}
+              icon={isRtl ? <FiChevronRight /> : <FiChevronLeft />}
+              aria-label={t('transactions.prevPage')}
+            />
+            <span className={styles.pageInfo}>
+              {t('transactions.page')} {currentPage} {t('transactions.of')} {totalPages}
+            </span>
+            <Button
+              size="small"
+              variant="ghost"
+              disabled={currentPage === totalPages || loading}
+              onClick={nextPage}
+              icon={isRtl ? <FiChevronLeft /> : <FiChevronRight />}
+              aria-label={t('transactions.nextPage')}
+            />
+          </div>
+
+          <div className={styles.paginationRight}>
+            <span className={styles.totalInfo}>
+              {t('transactions.total', {
+                count: totalItems,
+                suffix: totalItems !== 1 ? 'en' : '',
+              })}
+            </span>
+          </div>
         </motion.div>
       )}
-
-      {/* INFO */}
-      <motion.p className={styles.info} variants={itemVariants}>
-        {processedTransactions.length} Transaktion{processedTransactions.length !== 1 ? 'en' : ''}
-      </motion.p>
     </motion.div>
   );
 };

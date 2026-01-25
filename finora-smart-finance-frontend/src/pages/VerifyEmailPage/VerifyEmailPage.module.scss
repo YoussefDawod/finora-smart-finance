@@ -2,6 +2,8 @@
  * @fileoverview VerifyEmailPage Styles - Premium Design
  */
 
+@use '../../styles/mixins' as *;
+
 // ============================================
 // PAGE CONTAINER
 // ============================================
@@ -18,9 +20,18 @@
 
 .mobileLogo {
   display: none;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 
-  @media (max-width: 1024px) {
+  @include desktop {
+    display: none;
+  }
+  
+  @include mobile {
+    display: flex;
+    justify-content: center;
+  }
+  
+  @include tablet {
     display: flex;
     justify-content: center;
   }
@@ -32,33 +43,33 @@
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 
-  @media (min-width: 1025px) {
+  @include lg {
     text-align: left;
   }
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  letter-spacing: var(--ls-tight);
+  color: var(--tx);
+  margin-bottom: var(--space-xs);
 
-  @media (min-width: 480px) {
-    font-size: 2rem;
+  @include xs {
+    font-size: var(--fs-3xl);
   }
 }
 
 .subtitle {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
+  font-size: var(--fs-md);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
 
   strong {
-    color: var(--text-primary);
-    font-weight: 600;
+    color: var(--tx);
+    font-weight: var(--fw-sb);
   }
 }
 
@@ -69,23 +80,23 @@
 .divider {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
 
   &::before,
   &::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border-primary);
+    background: var(--border);
   }
 
   span {
-    font-size: 0.875rem;
-    color: var(--text-muted);
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 500;
+    letter-spacing: var(--ls-wide);
+    font-weight: var(--fw-m);
   }
 }
 
@@ -95,34 +106,31 @@
 
 .footer {
   text-align: center;
-  padding-top: 0.5rem;
+  padding-top: var(--space-xs);
 }
 
 .loginLink {
   display: inline-flex;
   align-items: center;
-  gap: 0.375rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: var(--accent-primary);
+  gap: var(--space-2xs);
+  min-height: var(--touch-target-min);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: color var(--tr-fast), gap var(--tr-fast);
 
   &:hover {
-    color: var(--accent-secondary);
-    gap: 0.5rem;
+    color: var(--pri-hover);
+    gap: var(--space-xs);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--accent-primary);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+  @include focus-ring;
 }
 
 .linkIcon {
-  font-size: 1rem;
-  transition: transform 0.2s ease;
+  font-size: var(--fs-md);
+  transition: transform var(--tr-fast);
 
   .loginLink:hover & {
     transform: translateX(-2px);

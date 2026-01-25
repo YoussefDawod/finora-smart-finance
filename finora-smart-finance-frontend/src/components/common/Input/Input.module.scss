@@ -202,6 +202,14 @@
   order: 1;
 }
 
+:global([dir='rtl']) .iconLeft {
+  order: 1;
+}
+
+:global([dir='rtl']) .iconRight {
+  order: -1;
+}
+
 // Adjust padding when icons present
 .inputWrapper {
   &:has(> .iconLeft) {
@@ -252,6 +260,12 @@
   text-align: right;
   flex-shrink: 0;
   margin-left: var(--space-sm);
+}
+
+:global([dir='rtl']) .charCount {
+  text-align: left;
+  margin-left: 0;
+  margin-right: var(--space-sm);
 }
 
 // ============================================

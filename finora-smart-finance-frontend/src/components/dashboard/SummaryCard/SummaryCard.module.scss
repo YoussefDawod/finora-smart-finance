@@ -144,17 +144,34 @@
     padding: var(--space-lg);
   }
 
+  @include mobile {
+    padding: var(--space-md);
+  }
+
   .title {
     font-size: var(--fs-md);
+
+    @include mobile {
+      font-size: var(--fs-sm);
+    }
   }
 
   .value {
     font-size: var(--fs-3xl);
+
+    @include mobile {
+      font-size: var(--fs-2xl);
+    }
   }
 
   .iconWrapper {
     width: 52px;
     height: 52px;
+
+    @include mobile {
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 
@@ -206,16 +223,20 @@
 }
 
 // ============================================
-// VALUE
+// VALUE SECTION
 // ============================================
+.valueSection {
+  position: relative;
+  z-index: 1;
+}
+
 .value {
   font-size: var(--fs-2xl);
   font-weight: var(--fw-b);
   color: var(--tx);
   margin: 0;
   font-variant-numeric: tabular-nums;
-  position: relative;
-  z-index: 1;
+  line-height: 1.2;
 
   @include mobile {
     font-size: var(--fs-xl);
@@ -223,24 +244,41 @@
 }
 
 // ============================================
-// TREND BADGE
+// TREND SECTION
 // ============================================
+.trendSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  position: relative;
+  z-index: 1;
+}
+
 .trendBadge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
   padding: var(--space-2xs) var(--space-xs);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-full);
   font-size: var(--fs-xs);
   font-weight: var(--fw-sb);
+  line-height: 1;
+  white-space: nowrap;
+
+  svg {
+    flex-shrink: 0;
+  }
 
   &.up {
-    background: color-mix(in srgb, var(--success) 20%, transparent);
+    background: color-mix(in srgb, var(--success) 15%, transparent);
     color: var(--success);
   }
 
   &.down {
-    background: color-mix(in srgb, var(--error) 20%, transparent);
+    background: color-mix(in srgb, var(--error) 15%, transparent);
     color: var(--error);
   }
 
@@ -250,8 +288,18 @@
   }
 }
 
-.trendIcon {
-  font-size: var(--fs-sm);
+.trendValue {
+  font-variant-numeric: tabular-nums;
+}
+
+.trendDescription {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  font-weight: var(--fw-r);
+
+  @include mobile {
+    display: none;
+  }
 }
 
 // ============================================

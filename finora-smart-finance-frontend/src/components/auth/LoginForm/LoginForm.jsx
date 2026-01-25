@@ -1,9 +1,9 @@
 /**
  * @fileoverview LoginForm Component - Premium Redesign
- * @description Modern login form with floating labels and smooth animations
+ * @description Modern login form with name-based authentication
  * 
  * FEATURES:
- * - Email and password inputs with floating labels
+ * - Username and password inputs
  * - Remember me checkbox
  * - Form validation with real-time feedback
  * - Loading state with spinner
@@ -16,14 +16,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
-  FiMail, 
+  FiUser, 
   FiLock, 
   FiEye, 
   FiEyeOff, 
   FiAlertCircle,
   FiArrowRight,
+  FiArrowLeft,
   FiCheck,
   FiX
 } from 'react-icons/fi';
@@ -33,13 +35,15 @@ export default function LoginForm() {
   const { login } = useAuth();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
 
   // ============================================
   // STATE
   // ============================================
 
   const [formData, setFormData] = useState({
-    email: '',
+    name: '',
     password: '',
     rememberMe: false,
   });
@@ -54,24 +58,23 @@ export default function LoginForm() {
   // VALIDATION
   // ============================================
 
-  const validateEmail = (email) => {
-    if (!email) return 'E-Mail ist erforderlich';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Ungültige E-Mail-Adresse';
+  const validateName = (name) => {
+    if (!name) return t('auth.login.validation.usernameRequired');
+    if (name.length < 3) return t('auth.login.validation.usernameMin');
     return '';
   };
 
   const validatePassword = (password) => {
-    if (!password) return 'Passwort ist erforderlich';
-    if (password.length < 6) return 'Mindestens 6 Zeichen';
+    if (!password) return t('auth.login.validation.passwordRequired');
     return '';
   };
 
   const validateForm = () => {
     const newErrors = {};
-    const emailError = validateEmail(formData.email);
+    const nameError = validateName(formData.name);
     const passwordError = validatePassword(formData.password);
 
-    if (emailError) newErrors.email = emailError;
+    if (nameError) newErrors.name = nameError;
     if (passwordError) newErrors.password = passwordError;
 
     setErrors(newErrors);
@@ -99,8 +102,8 @@ export default function LoginForm() {
 
     // Validate on change if field was touched
     if (touched[name]) {
-      const error = name === 'email' 
-        ? validateEmail(value) 
+      const error = name === 'name' 
+        ? validateName(value) 
         : name === 'password' 
           ? validatePassword(value) 
           : '';
@@ -115,8 +118,8 @@ export default function LoginForm() {
     const { name, value } = e.target;
     setTouched((prev) => ({ ...prev, [name]: true }));
     
-    const error = name === 'email' 
-      ? validateEmail(value) 
+    const error = name === 'name' 
+      ? validateName(value) 
       : name === 'password' 
         ? validatePassword(value) 
         : '';
@@ -127,11 +130,11 @@ export default function LoginForm() {
     e.preventDefault();
     
     // Mark all as touched
-    setTouched({ email: true, password: true });
+    setTouched({ name: true, password: true });
     
     // Validate form
     if (!validateForm()) {
-      toast.warning('Bitte füllen Sie alle Felder korrekt aus');
+      toast.warning(t('auth.login.validation.formInvalid'));
       return;
     }
 
@@ -139,14 +142,14 @@ export default function LoginForm() {
     setApiError('');
 
     try {
-      await login(formData.email, formData.password);
-      toast.success('Erfolgreich angemeldet!');
+      await login(formData.name, formData.password);
+      toast.success(t('auth.login.success'));
       // AuthContext will handle redirect
     } catch (error) {
       const errorMessage = 
         error?.response?.data?.message || 
         error?.response?.data?.error ||
-        'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+        t('auth.login.error');
       
       setApiError(errorMessage);
       toast.error(errorMessage);
@@ -159,9 +162,9 @@ export default function LoginForm() {
   // RENDER
   // ============================================
 
-  const emailStatus = getFieldStatus('email');
+  const nameStatus = getFieldStatus('name');
   const passwordStatus = getFieldStatus('password');
-  const isFormValid = formData.email && formData.password && !errors.email && !errors.password;
+  const isFormValid = formData.name && formData.password && !errors.name && !errors.password;
 
   return (
     <form onSubmit={handleSubmit} className={styles.loginForm} noValidate>
@@ -181,7 +184,7 @@ export default function LoginForm() {
               type="button"
               className={styles.errorDismiss}
               onClick={() => setApiError('')}
-              aria-label="Fehler schließen"
+              aria-label={t('auth.login.dismissError')}
             >
               <FiX />
             </button>
@@ -189,41 +192,41 @@ export default function LoginForm() {
         )}
       </AnimatePresence>
 
-      {/* Email Field */}
+      {/* Username Field */}
       <div className={styles.inputGroup}>
-        <label htmlFor="email" className={styles.label}>
-          E-Mail-Adresse
+        <label htmlFor="name" className={styles.label}>
+          {t('auth.login.username')}
         </label>
-        <div className={`${styles.inputWrapper} ${emailStatus ? styles[emailStatus] : ''}`}>
-          <FiMail className={styles.inputIcon} />
+        <div className={`${styles.inputWrapper} ${nameStatus ? styles[nameStatus] : ''}`}>
+          <FiUser className={styles.inputIcon} />
           <input
-            id="email"
-            name="email"
-            type="email"
+            id="name"
+            name="name"
+            type="text"
             className={styles.input}
-            placeholder="name@beispiel.de"
-            value={formData.email}
+            placeholder={t('auth.login.usernamePlaceholder')}
+            value={formData.name}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isLoading}
-            autoComplete="email"
-            aria-invalid={emailStatus === 'error'}
-            aria-describedby={errors.email ? 'email-error' : undefined}
+            autoComplete="username"
+            aria-invalid={nameStatus === 'error'}
+            aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {emailStatus === 'valid' && (
+          {nameStatus === 'valid' && (
             <FiCheck className={styles.statusIcon} />
           )}
         </div>
         <AnimatePresence>
-          {errors.email && touched.email && (
+          {errors.name && touched.name && (
             <motion.span 
-              id="email-error"
+              id="name-error"
               className={styles.errorMessage}
               initial={shouldAnimate ? { opacity: 0, y: -4 } : {}}
               animate={{ opacity: 1, y: 0 }}
               exit={shouldAnimate ? { opacity: 0, y: -4 } : {}}
             >
-              {errors.email}
+              {errors.name}
             </motion.span>
           )}
         </AnimatePresence>
@@ -232,7 +235,7 @@ export default function LoginForm() {
       {/* Password Field */}
       <div className={styles.inputGroup}>
         <label htmlFor="password" className={styles.label}>
-          Passwort
+          {t('auth.login.password')}
         </label>
         <div className={`${styles.inputWrapper} ${passwordStatus ? styles[passwordStatus] : ''}`}>
           <FiLock className={styles.inputIcon} />
@@ -241,7 +244,7 @@ export default function LoginForm() {
             name="password"
             type={showPassword ? 'text' : 'password'}
             className={styles.input}
-            placeholder="Ihr Passwort"
+            placeholder={t('auth.login.passwordPlaceholder')}
             value={formData.password}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -254,7 +257,7 @@ export default function LoginForm() {
             type="button"
             className={styles.passwordToggle}
             onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? 'Passwort verbergen' : 'Passwort anzeigen'}
+            aria-label={showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')}
             tabIndex={-1}
           >
             {showPassword ? <FiEyeOff /> : <FiEye />}
@@ -288,11 +291,11 @@ export default function LoginForm() {
           <span className={styles.checkmark}>
             <FiCheck />
           </span>
-          <span className={styles.checkboxLabel}>Angemeldet bleiben</span>
+          <span className={styles.checkboxLabel}>{t('auth.login.rememberMe')}</span>
         </label>
 
         <Link to="/forgot-password" className={styles.forgotLink}>
-          Passwort vergessen?
+          {t('auth.login.forgot')}
         </Link>
       </div>
 
@@ -305,12 +308,12 @@ export default function LoginForm() {
         {isLoading ? (
           <>
             <span className={styles.spinner} />
-            <span>Anmelden...</span>
+            <span>{t('auth.login.loading')}</span>
           </>
         ) : (
           <>
-            <span>Anmelden</span>
-            <FiArrowRight className={styles.buttonIcon} />
+            <span>{t('auth.login.submit')}</span>
+            {isRtl ? <FiArrowLeft className={styles.buttonIcon} /> : <FiArrowRight className={styles.buttonIcon} />}
           </>
         )}
       </button>

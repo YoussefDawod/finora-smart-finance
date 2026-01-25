@@ -1,0 +1,147 @@
+/**
+ * @fileoverview ExportSection Styles
+ * @description Styles für die Export-Komponente - Professionelles Design
+ */
+
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.exportSection {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  padding: var(--space-xl);
+  box-shadow: var(--sh-sm);
+
+  @include mobile {
+    padding: var(--space-lg);
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+
+  h2 {
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin-bottom: var(--space-2xs);
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    line-height: 1.5;
+  }
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(135deg, var(--primary-bg), color-mix(in srgb, var(--primary) 15%, transparent));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: var(--primary);
+  }
+}
+
+.exportOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.exportCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  background: var(--bg);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  transition: all var(--tr);
+
+  &:hover {
+    border-color: var(--primary-light);
+    background: color-mix(in srgb, var(--primary) 2%, var(--bg));
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    text-align: center;
+  }
+}
+
+.exportIcon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    color: var(--primary);
+  }
+
+  @include mobile {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+}
+
+.exportInfo {
+  flex: 1;
+  min-width: 0;
+
+  h3 {
+    font-size: var(--fs-md);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    margin-bottom: var(--space-2xs);
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    line-height: 1.5;
+
+    @include mobile {
+      display: none;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUTTON OVERRIDE FOR EXPORT
+// ═══════════════════════════════════════════════════════════════════════════
+.exportCard button {
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  @include mobile {
+    width: 100%;
+  }
+}

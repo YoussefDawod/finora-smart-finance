@@ -308,7 +308,7 @@ router.get('/verify-email-change', async (req, res) => {
 // ============================================================================
 router.put('/preferences', auth, async (req, res) => {
   try {
-    const { theme, currency, timezone, language, emailNotifications } = req.body;
+    const { theme, currency, timezone, language, dateFormat, emailNotifications } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -319,7 +319,8 @@ router.put('/preferences', auth, async (req, res) => {
     const errors = [];
     const validThemes = ['light', 'dark', 'system'];
     const validCurrencies = ['USD', 'EUR', 'GBP', 'CHF', 'JPY'];
-    const validLanguages = ['en', 'de', 'fr'];
+    const validLanguages = ['en', 'de', 'fr', 'ar', 'ka'];
+    const validDateFormats = ['iso', 'dmy'];
 
     if (theme !== undefined && !validThemes.includes(theme)) {
       errors.push(`Theme muss einer dieser Werte sein: ${validThemes.join(', ')}`);
@@ -331,6 +332,10 @@ router.put('/preferences', auth, async (req, res) => {
 
     if (language !== undefined && !validLanguages.includes(language)) {
       errors.push(`Sprache muss einer dieser Werte sein: ${validLanguages.join(', ')}`);
+    }
+
+    if (dateFormat !== undefined && !validDateFormats.includes(dateFormat)) {
+      errors.push(`Datumsformat muss einer dieser Werte sein: ${validDateFormats.join(', ')}`);
     }
 
     if (emailNotifications !== undefined && typeof emailNotifications !== 'boolean') {
@@ -346,6 +351,7 @@ router.put('/preferences', auth, async (req, res) => {
     if (currency !== undefined) user.preferences.currency = currency;
     if (timezone !== undefined) user.preferences.timezone = timezone;
     if (language !== undefined) user.preferences.language = language;
+    if (dateFormat !== undefined) user.preferences.dateFormat = dateFormat;
     if (emailNotifications !== undefined) user.preferences.emailNotifications = emailNotifications;
 
     await user.save();

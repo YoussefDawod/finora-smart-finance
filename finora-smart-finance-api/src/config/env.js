@@ -8,7 +8,7 @@ const config = {
     nodeEnv: 'development',
     port: process.env.PORT || 5000,
     apiUrl: process.env.API_URL || 'http://localhost:5000',
-    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
     mongodb: {
       uri: process.env.MONGODB_URI,
       db: process.env.MONGODB_DB || 'finora',
@@ -46,6 +46,14 @@ const config = {
       stats: process.env.FEATURE_STATS !== 'false',
       bulkDelete: process.env.FEATURE_BULK_DELETE !== 'false',
     },
+    smtp: {
+      host: process.env.SMTP_HOST || '',
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      user: process.env.SMTP_USER || '',
+      pass: process.env.SMTP_PASS || '',
+      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.app>',
+    },
   },
 
   production: {
@@ -79,6 +87,14 @@ const config = {
       stats: process.env.FEATURE_STATS !== 'false',
       bulkDelete: process.env.FEATURE_BULK_DELETE === 'true', // Disabled by default
     },
+    smtp: {
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.app>',
+    },
   },
 
   test: {
@@ -111,6 +127,14 @@ const config = {
     features: {
       stats: true,
       bulkDelete: true,
+    },
+    smtp: {
+      host: '',
+      port: 587,
+      secure: false,
+      user: '',
+      pass: '',
+      from: '"Finora Test" <test@finora.app>',
     },
   },
 };

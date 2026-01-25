@@ -3,16 +3,17 @@
  * @description Modern registration form with step indicator and smooth animations
  * 
  * STEPS:
- * 1. Personal Info (Name, Email)
+ * 1. Personal Info (Name required, Email OPTIONAL)
  * 2. Password (Password, Confirm Password with strength indicator)
- * 3. Terms & Conditions
+ * 3. Terms & Conditions (+ Warning if no email)
  * 
  * @module components/auth/MultiStepRegisterForm
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiUser, 
@@ -24,7 +25,8 @@ import {
   FiChevronRight,
   FiChevronLeft,
   FiShield,
-  FiAlertCircle
+  FiAlertCircle,
+  FiAlertTriangle
 } from 'react-icons/fi';
 import styles from './MultiStepRegisterForm.module.scss';
 
@@ -58,6 +60,8 @@ export default function MultiStepRegisterForm() {
   const { register } = useAuth();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.dir() === 'rtl';
 
   // ============================================
   // STATE
@@ -66,10 +70,11 @@ export default function MultiStepRegisterForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    email: '', // Optional
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
+    understoodNoEmailReset: false, // Nur relevant wenn keine Email
   });
 
   const [errors, setErrors] = useState({});
@@ -80,35 +85,51 @@ export default function MultiStepRegisterForm() {
   const [apiError, setApiError] = useState('');
 
   const totalSteps = 3;
+  const hasEmail = formData.email.trim().length > 0;
+
+  // Reset understoodNoEmailReset wenn Email eingegeben wird
+  useEffect(() => {
+    if (hasEmail && formData.understoodNoEmailReset) {
+      setFormData(prev => ({ ...prev, understoodNoEmailReset: false }));
+    }
+  }, [hasEmail, formData.understoodNoEmailReset]);
 
   // ============================================
   // VALIDATION
   // ============================================
 
   const validateName = (name) => {
-    if (!name) return 'Name ist erforderlich';
-    if (name.length < 2) return 'Mindestens 2 Zeichen';
-    if (name.length > 50) return 'Maximal 50 Zeichen';
+    if (!name) return t('auth.register.validation.nameRequired');
+    if (name.length < 3) return t('auth.register.validation.nameMin');
+    if (name.length > 50) return t('auth.register.validation.nameMax');
+    // Erlaubte Zeichen: Buchstaben (inkl. Umlaute), Zahlen, Leerzeichen, Bindestriche
+    if (!/^[a-zA-ZäöüÄÖÜß0-9\s-]+$/.test(name)) {
+      return t('auth.register.validation.nameChars');
+    }
     return '';
   };
 
   const validateEmail = (email) => {
-    if (!email) return 'E-Mail ist erforderlich';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Ungültige E-Mail';
+    // Email ist optional - nur validieren wenn eingegeben
+    if (!email || email.trim() === '') return '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return t('auth.register.validation.emailInvalid');
     return '';
   };
 
   const validatePassword = (password) => {
-    if (!password) return 'Passwort ist erforderlich';
-    if (password.length < 8) return 'Mindestens 8 Zeichen';
-    const strength = calculatePasswordStrength(password);
-    if (strength.level === 'weak') return 'Zu schwach';
+    if (!password) return t('auth.register.validation.passwordRequired');
+    if (password.length < 8) return t('auth.register.validation.passwordMin');
+    if (!/[A-Z]/.test(password)) return t('auth.register.validation.passwordUpper');
+    if (!/\d/.test(password)) return t('auth.register.validation.passwordNumber');
+    if (!/[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password)) {
+      return t('auth.register.validation.passwordSpecial');
+    }
     return '';
   };
 
   const validateConfirmPassword = (confirmPassword, password) => {
-    if (!confirmPassword) return 'Bestätigung erforderlich';
-    if (confirmPassword !== password) return 'Passwörter stimmen nicht überein';
+    if (!confirmPassword) return t('auth.register.validation.confirmRequired');
+    if (confirmPassword !== password) return t('auth.register.validation.passwordMismatch');
     return '';
   };
 
@@ -126,7 +147,11 @@ export default function MultiStepRegisterForm() {
       if (passwordError) newErrors.password = passwordError;
       if (confirmError) newErrors.confirmPassword = confirmError;
     } else if (step === 2) {
-      if (!formData.agreeToTerms) newErrors.agreeToTerms = 'Zustimmung erforderlich';
+      if (!formData.agreeToTerms) newErrors.agreeToTerms = t('auth.register.validation.termsRequired');
+      // Wenn keine Email: Checkbox für "Verstanden" ist erforderlich
+      if (!hasEmail && !formData.understoodNoEmailReset) {
+        newErrors.understoodNoEmailReset = t('auth.register.validation.noEmailConfirm');
+      }
     }
 
     setErrors((prev) => ({ ...prev, ...newErrors }));
@@ -182,7 +207,7 @@ export default function MultiStepRegisterForm() {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, totalSteps - 1));
     } else {
-      toast.warning('Bitte füllen Sie alle Felder korrekt aus');
+      toast.warning(t('auth.register.validation.stepInvalid'));
     }
   };
 
@@ -194,7 +219,7 @@ export default function MultiStepRegisterForm() {
     e.preventDefault();
 
     if (!validateStep(currentStep)) {
-      toast.warning('Bitte stimmen Sie den Bedingungen zu');
+      toast.warning(t('auth.register.validation.formInvalid'));
       return;
     }
 
@@ -202,14 +227,26 @@ export default function MultiStepRegisterForm() {
     setApiError('');
 
     try {
-      await register(formData.email, formData.password, formData.name);
-      toast.success('Registrierung erfolgreich! Bitte bestätigen Sie Ihre E-Mail.');
-      navigate('/verify-email', { state: { email: formData.email } });
+      // Registrierung mit optionaler Email
+      await register({
+        name: formData.name.trim(),
+        password: formData.password,
+        email: hasEmail ? formData.email.trim() : undefined,
+        understoodNoEmailReset: !hasEmail ? formData.understoodNoEmailReset : undefined,
+      });
+      
+      if (hasEmail) {
+        toast.success(t('auth.register.successVerifyEmail'));
+        navigate('/verify-email', { state: { email: formData.email } });
+      } else {
+        toast.success(t('auth.register.successWelcome'));
+        navigate('/dashboard');
+      }
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
-        'Registrierung fehlgeschlagen';
+        t('auth.register.error');
 
       setApiError(errorMessage);
       toast.error(errorMessage);
@@ -227,12 +264,12 @@ export default function MultiStepRegisterForm() {
   const getStrengthLabel = (level) => {
     const labels = {
       none: '',
-      weak: 'Schwach',
-      medium: 'Mittel',
-      strong: 'Stark',
-      excellent: 'Exzellent',
+      weak: t('auth.register.strength.weak'),
+      medium: t('auth.register.strength.medium'),
+      strong: t('auth.register.strength.strong'),
+      excellent: t('auth.register.strength.excellent'),
     };
-    return labels[level];
+    return labels[level] || '';
   };
 
   // ============================================
@@ -270,9 +307,9 @@ export default function MultiStepRegisterForm() {
   // ============================================
 
   const steps = [
-    { icon: FiUser, label: 'Daten' },
-    { icon: FiLock, label: 'Passwort' },
-    { icon: FiShield, label: 'Abschluss' },
+    { icon: FiUser, label: t('auth.register.steps.data') },
+    { icon: FiLock, label: t('auth.register.steps.password') },
+    { icon: FiShield, label: t('auth.register.steps.finish') },
   ];
 
   // ============================================
@@ -290,17 +327,19 @@ export default function MultiStepRegisterForm() {
 
           return (
             <div key={index} className={styles.stepItem}>
-              <button
-                type="button"
-                className={`${styles.stepCircle} ${isCompleted ? styles.completed : ''} ${isCurrent ? styles.current : ''}`}
-                onClick={() => goToStep(index)}
-                disabled={index > currentStep + 1}
-              >
-                {isCompleted ? <FiCheck /> : <Icon />}
-              </button>
-              <span className={`${styles.stepLabel} ${isCurrent ? styles.active : ''}`}>
-                {step.label}
-              </span>
+              <div className={styles.stepCore}>
+                <button
+                  type="button"
+                  className={`${styles.stepCircle} ${isCompleted ? styles.completed : ''} ${isCurrent ? styles.current : ''}`}
+                  onClick={() => goToStep(index)}
+                  disabled={index > currentStep + 1}
+                >
+                  {isCompleted ? <FiCheck /> : <Icon />}
+                </button>
+                <span className={`${styles.stepLabel} ${isCurrent ? styles.active : ''}`}>
+                  {step.label}
+                </span>
+              </div>
               {index < steps.length - 1 && (
                 <div className={`${styles.stepLine} ${isCompleted ? styles.completed : ''}`} />
               )}
@@ -339,42 +378,47 @@ export default function MultiStepRegisterForm() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className={styles.stepPane}
             >
-              <h3 className={styles.stepTitle}>Persönliche Daten</h3>
-              <p className={styles.stepDescription}>Erzählen Sie uns etwas über sich.</p>
+              <h3 className={styles.stepTitle}>{t('auth.register.step1.title')}</h3>
+              <p className={styles.stepDescription}>{t('auth.register.step1.description')}</p>
 
               {/* Name Field */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-name" className={styles.label}>Vollständiger Name</label>
+                <label htmlFor="register-name" className={styles.label}>
+                  {t('auth.register.step1.usernameLabel')} <span className={styles.required}>*</span>
+                </label>
                 <div className={`${styles.inputWrapper} ${errors.name && touched.name ? styles.error : ''}`}>
                   <FiUser className={styles.inputIcon} />
                   <input
                     id="register-name"
                     type="text"
                     name="name"
-                    placeholder="Max Mustermann"
+                    placeholder={t('auth.register.step1.usernamePlaceholder')}
                     value={formData.name}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     disabled={isLoading}
-                    autoComplete="name"
+                    autoComplete="username"
                     className={styles.input}
                   />
                 </div>
                 {errors.name && touched.name && (
                   <span className={styles.errorMessage}>{errors.name}</span>
                 )}
+                <span className={styles.hint}>{t('auth.register.step1.usernameHint')}</span>
               </div>
 
-              {/* Email Field */}
+              {/* Email Field - OPTIONAL */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-email" className={styles.label}>E-Mail-Adresse</label>
+                <label htmlFor="register-email" className={styles.label}>
+                  {t('auth.register.step1.emailLabel')} <span className={styles.optional}>{t('auth.register.step1.optional')}</span>
+                </label>
                 <div className={`${styles.inputWrapper} ${errors.email && touched.email ? styles.error : ''}`}>
                   <FiMail className={styles.inputIcon} />
                   <input
                     id="register-email"
                     type="email"
                     name="email"
-                    placeholder="name@beispiel.de"
+                    placeholder={t('auth.register.step1.emailPlaceholder')}
                     value={formData.email}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -386,6 +430,9 @@ export default function MultiStepRegisterForm() {
                 {errors.email && touched.email && (
                   <span className={styles.errorMessage}>{errors.email}</span>
                 )}
+                <span className={styles.hint}>
+                  {t('auth.register.step1.emailHint')}
+                </span>
               </div>
             </motion.div>
           )}
@@ -402,19 +449,19 @@ export default function MultiStepRegisterForm() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className={styles.stepPane}
             >
-              <h3 className={styles.stepTitle}>Passwort erstellen</h3>
-              <p className={styles.stepDescription}>Wählen Sie ein sicheres Passwort.</p>
+              <h3 className={styles.stepTitle}>{t('auth.register.step2.title')}</h3>
+              <p className={styles.stepDescription}>{t('auth.register.step2.description')}</p>
 
               {/* Password Field */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-password" className={styles.label}>Passwort</label>
+                <label htmlFor="register-password" className={styles.label}>{t('auth.register.step2.passwordLabel')}</label>
                 <div className={`${styles.inputWrapper} ${errors.password && touched.password ? styles.error : ''}`}>
                   <FiLock className={styles.inputIcon} />
                   <input
                     id="register-password"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
-                    placeholder="Mindestens 8 Zeichen"
+                    placeholder={t('auth.register.step2.passwordPlaceholder')}
                     value={formData.password}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -453,14 +500,14 @@ export default function MultiStepRegisterForm() {
 
               {/* Confirm Password Field */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-confirm-password" className={styles.label}>Passwort bestätigen</label>
+                <label htmlFor="register-confirm-password" className={styles.label}>{t('auth.register.step2.confirmLabel')}</label>
                 <div className={`${styles.inputWrapper} ${errors.confirmPassword && touched.confirmPassword ? styles.error : ''}`}>
                   <FiLock className={styles.inputIcon} />
                   <input
                     id="register-confirm-password"
                     type={showConfirmPassword ? 'text' : 'password'}
                     name="confirmPassword"
-                    placeholder="Passwort wiederholen"
+                    placeholder={t('auth.register.step2.confirmPlaceholder')}
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -496,16 +543,25 @@ export default function MultiStepRegisterForm() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className={styles.stepPane}
             >
-              <h3 className={styles.stepTitle}>Fast geschafft!</h3>
-              <p className={styles.stepDescription}>Akzeptieren Sie unsere Bedingungen.</p>
+              <h3 className={styles.stepTitle}>{t('auth.register.step3.title')}</h3>
+              <p className={styles.stepDescription}>{t('auth.register.step3.description')}</p>
+
+              {/* Warning wenn keine Email */}
+              {!hasEmail && (
+                <div className={styles.warningBox}>
+                  <FiAlertTriangle className={styles.warningIcon} />
+                  <div className={styles.warningContent}>
+                    <h4>{t('auth.register.step3.noEmailTitle')}</h4>
+                    <p>
+                      <Trans i18nKey="auth.register.step3.noEmailText" components={{ strong: <strong /> }} />
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className={styles.termsBox}>
-                <h4>Nutzungsbedingungen</h4>
-                <p>
-                  Mit der Registrierung akzeptieren Sie unsere Allgemeinen Geschäftsbedingungen
-                  und Datenschutzrichtlinien. Sie sind verantwortlich für alle Aktivitäten
-                  unter Ihrem Konto.
-                </p>
+                <h4>{t('auth.register.step3.termsTitle')}</h4>
+                <p>{t('auth.register.step3.termsText')}</p>
               </div>
 
               <label className={`${styles.checkbox} ${errors.agreeToTerms ? styles.error : ''}`}>
@@ -520,12 +576,31 @@ export default function MultiStepRegisterForm() {
                   <FiCheck />
                 </span>
                 <span className={styles.checkboxText}>
-                  Ich akzeptiere die{' '}
+                  {t('auth.register.step3.termsAccept')}{' '}
                   <a href="/terms" target="_blank" rel="noopener noreferrer">
-                    Nutzungsbedingungen
+                    {t('auth.register.step3.termsLink')}
                   </a>
                 </span>
               </label>
+
+              {/* Checkbox für "Verstanden" wenn keine Email */}
+              {!hasEmail && (
+                <label className={`${styles.checkbox} ${styles.warningCheckbox} ${errors.understoodNoEmailReset ? styles.error : ''}`}>
+                  <input
+                    type="checkbox"
+                    name="understoodNoEmailReset"
+                    checked={formData.understoodNoEmailReset}
+                    onChange={handleChange}
+                    disabled={isLoading}
+                  />
+                  <span className={styles.checkmark}>
+                    <FiCheck />
+                  </span>
+                  <span className={styles.checkboxText}>
+                    {t('auth.register.step3.noEmailConfirm')}
+                  </span>
+                </label>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -540,8 +615,8 @@ export default function MultiStepRegisterForm() {
             onClick={handlePrev}
             disabled={isLoading}
           >
-            <FiChevronLeft />
-            <span>Zurück</span>
+            {isRtl ? <FiChevronRight /> : <FiChevronLeft />}
+            <span>{t('auth.register.navigation.back')}</span>
           </button>
         )}
 
@@ -552,23 +627,23 @@ export default function MultiStepRegisterForm() {
             onClick={handleNext}
             disabled={isLoading}
           >
-            <span>Weiter</span>
-            <FiChevronRight />
+            <span>{t('auth.register.navigation.next')}</span>
+            {isRtl ? <FiChevronLeft /> : <FiChevronRight />}
           </button>
         ) : (
           <button
             type="submit"
             className={styles.submitButton}
-            disabled={isLoading || !formData.agreeToTerms}
+            disabled={isLoading || !formData.agreeToTerms || (!hasEmail && !formData.understoodNoEmailReset)}
           >
             {isLoading ? (
               <>
                 <span className={styles.spinner} />
-                <span>Registrieren...</span>
+                <span>{t('auth.register.navigation.submitting')}</span>
               </>
             ) : (
               <>
-                <span>Konto erstellen</span>
+                <span>{t('auth.register.navigation.submit')}</span>
                 <FiCheck />
               </>
             )}

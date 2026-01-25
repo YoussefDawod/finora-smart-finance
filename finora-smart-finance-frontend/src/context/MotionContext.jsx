@@ -35,6 +35,7 @@ const MEDIA_QUERY = '(prefers-reduced-motion: reduce)';
 // 📦 CONTEXT
 // ============================================
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const MotionContext = createContext(undefined);
 
 // ============================================
@@ -98,12 +99,7 @@ export function MotionProvider({ children }) {
 // 🪝 CUSTOM HOOK
 // ============================================
 
-/**
- * useMotion Hook
- * Access motion preferences from MotionContext
- * 
- * @returns {{ prefersReducedMotion: boolean, shouldAnimate: boolean }}
- */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useMotion = () => {
   const context = useContext(MotionContext);
   

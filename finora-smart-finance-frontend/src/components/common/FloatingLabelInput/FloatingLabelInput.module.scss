@@ -224,3 +224,24 @@
     transition: none;
   }
 }
+
+// ============================================
+// RTL SUPPORT
+// ============================================
+:global([dir='rtl']) {
+  .label {
+    left: auto;
+    right: var(--space-md);
+    transform-origin: right center;
+  }
+
+  .required {
+    margin-left: 0;
+    margin-right: var(--space-3xs);
+  }
+
+  .inputWrapper:has(.iconLeft) .label {
+    left: auto;
+    right: var(--space-2xl);
+  }
+}

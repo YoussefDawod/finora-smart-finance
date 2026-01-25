@@ -5,24 +5,30 @@
  * @module utils/formatters
  */
 
+import { getLocaleForLanguage, getUserPreferences } from './userPreferences';
+
 /**
  * Format number as currency using Intl
  * @param {number} amount
- * @param {string} [currency='EUR']
+ * @param {string} [currency] - Optional currency override
  * @returns {string}
  */
-export function formatCurrency(amount, currency = 'EUR') {
+export function formatCurrency(amount, currency) {
   if (typeof amount !== 'number' || Number.isNaN(amount)) return '';
 
   try {
-    return new Intl.NumberFormat(undefined, {
+    const preferences = getUserPreferences();
+    const effectiveCurrency = currency || preferences.currency || 'EUR';
+    const locale = getLocaleForLanguage(preferences.language);
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency,
+      currency: effectiveCurrency,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
   } catch (error) {
-    return `${amount.toFixed(2)} ${currency}`;
+    const fallbackCurrency = currency || 'EUR';
+    return `${amount.toFixed(2)} ${fallbackCurrency}`;
   }
 }
 
@@ -36,12 +42,19 @@ export function formatDate(date, format = 'short') {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (!(d instanceof Date) || Number.isNaN(d.getTime())) return '';
 
-  const options =
-    format === 'long'
-      ? { day: '2-digit', month: 'long', year: 'numeric' }
-      : { day: '2-digit', month: 'short', year: 'numeric' };
+  const preferences = getUserPreferences();
+  const locale = getLocaleForLanguage(preferences.language);
+  const dateFormat = preferences.dateFormat || 'iso';
 
-  return new Intl.DateTimeFormat('de-DE', options).format(d);
+  if (format === 'short') {
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return dateFormat === 'dmy' ? `${day}.${month}.${year}` : `${year}-${month}-${day}`;
+  }
+
+  const options = { day: '2-digit', month: 'long', year: 'numeric' };
+  return new Intl.DateTimeFormat(locale, options).format(d);
 }
 
 /**
@@ -50,11 +63,14 @@ export function formatDate(date, format = 'short') {
  * @param {string} [locale='de-DE']
  * @returns {string}
  */
-export function formatTime(date, locale = 'de-DE') {
+export function formatTime(date, locale = null) {
   const d = typeof date === 'string' ? new Date(date) : date;
   if (!(d instanceof Date) || Number.isNaN(d.getTime())) return '';
 
-  return new Intl.DateTimeFormat(locale, {
+  const preferences = getUserPreferences();
+  const effectiveLocale = locale || getLocaleForLanguage(preferences.language);
+
+  return new Intl.DateTimeFormat(effectiveLocale, {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
@@ -67,9 +83,11 @@ export function formatTime(date, locale = 'de-DE') {
  * @param {string} [locale='de-DE']
  * @returns {string}
  */
-export function formatAmount(amount, locale = 'de-DE') {
+export function formatAmount(amount, locale = null) {
   if (typeof amount !== 'number' || Number.isNaN(amount)) return '';
-  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(amount);
+  const preferences = getUserPreferences();
+  const effectiveLocale = locale || getLocaleForLanguage(preferences.language);
+  return new Intl.NumberFormat(effectiveLocale, { maximumFractionDigits: 2 }).format(amount);
 }
 
 /**

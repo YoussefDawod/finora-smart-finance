@@ -3,12 +3,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuth } from '@/hooks';
 import { MainLayout } from '@/components/layout';
 import AuthPage from '@/pages/AuthPage';
+import EmailVerificationPage from '@/pages/EmailVerificationPage';
 import VerifyEmailPage from '@/pages/VerifyEmailPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import TermsPage from '@/pages/TermsPage';
 import DashboardPage from '@/pages/DashboardPage';
 import TransactionsPage from '@/pages/TransactionsPage';
-import SettingsPage from '@/pages/SettingsPage';
+import SettingsPage from '@/pages/SettingsPage/SettingsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ProfilePage from '@/pages/ProfilePage';
 
@@ -41,6 +42,13 @@ const PublicRoute = ({ children }) => {
   }
 
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+};
+
+const VerifyEmailWrapper = () => {
+  const location = useLocation();
+  const params = new globalThis.URLSearchParams(location.search);
+  const hasResult = params.has('success') || params.has('error');
+  return hasResult ? <EmailVerificationPage /> : <VerifyEmailPage />;
 };
 
 function AnimatedRoutes() {
@@ -79,7 +87,7 @@ function AnimatedRoutes() {
           element={(
             <PublicRoute>
               <PageTransition>
-                <VerifyEmailPage />
+                <VerifyEmailWrapper />
               </PageTransition>
             </PublicRoute>
           )}

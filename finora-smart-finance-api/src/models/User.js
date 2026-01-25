@@ -12,17 +12,26 @@ const RefreshTokenSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema(
   {
+    // Name ist Pflicht und unique (für Login)
+    name: { 
+      type: String, 
+      required: [true, 'Name ist erforderlich'],
+      trim: true,
+      minlength: [3, 'Name muss mindestens 3 Zeichen haben'],
+      maxlength: [50, 'Name darf maximal 50 Zeichen haben'],
+      match: [/^[a-zA-ZäöüÄÖÜß0-9\s\-]+$/, 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten']
+      // Index defined separately below with unique constraint
+    },
+    // Email ist optional (für Password-Reset)
     email: { 
       type: String, 
-      required: true, 
-      unique: true, 
+      required: false,
       lowercase: true, 
       trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'E-Mail ist ungültig'],
-      index: true
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'E-Mail ist ungültig']
+      // Index defined separately below with sparse+unique constraint
     },
     passwordHash: { type: String, required: true },
-    name: { type: String, default: '' },
     lastName: { type: String, default: '' },
     avatar: { type: String, default: null },
     phone: { 
@@ -31,6 +40,9 @@ const UserSchema = new mongoose.Schema(
       match: [/^[\d\s\-\+\(\)]+$|^$/, 'Telefonnummer hat ungültiges Format']
     },
     isVerified: { type: Boolean, default: false },
+    
+    // Flag: User hat bei Registration Checkbox bestätigt (kein Email = kein Reset)
+    understoodNoEmailReset: { type: Boolean, default: false },
 
     verificationToken: String,
     verificationExpires: Date,
@@ -41,7 +53,6 @@ const UserSchema = new mongoose.Schema(
     emailChangeToken: String,
     emailChangeNewEmail: String,
     emailChangeExpires: Date,
-    newEmailPending: String,
 
     preferences: {
       theme: { 
@@ -61,7 +72,12 @@ const UserSchema = new mongoose.Schema(
       language: { 
         type: String, 
         default: 'de',
-        enum: ['en', 'de', 'fr']
+        enum: ['en', 'de', 'fr', 'ar', 'ka']
+      },
+      dateFormat: {
+        type: String,
+        default: 'iso',
+        enum: ['iso', 'dmy']
       },
       emailNotifications: { type: Boolean, default: true },
     },
@@ -81,6 +97,8 @@ const UserSchema = new mongoose.Schema(
 // Indexes
 UserSchema.index({ emailChangeToken: 1 }, { sparse: true });
 UserSchema.index({ lastLogin: 1 });
+UserSchema.index({ name: 1 }, { unique: true });
+UserSchema.index({ email: 1 }, { unique: true, sparse: true }); // sparse: erlaubt null-Werte
 
 // Pre-save Hook: Hash password wenn neu oder geändert
 UserSchema.pre('save', async function () {
@@ -103,7 +121,8 @@ UserSchema.pre('save', async function () {
   if (this.preferences) {
     const validCurrencies = ['USD', 'EUR', 'GBP', 'CHF', 'JPY'];
     const validThemes = ['light', 'dark', 'system'];
-    const validLanguages = ['en', 'de', 'fr'];
+    const validLanguages = ['en', 'de', 'fr', 'ar', 'ka'];
+    const validDateFormats = ['iso', 'dmy'];
 
     if (this.preferences.currency && !validCurrencies.includes(this.preferences.currency)) {
       throw new Error('Ungültige Währung');
@@ -113,6 +132,9 @@ UserSchema.pre('save', async function () {
     }
     if (this.preferences.language && !validLanguages.includes(this.preferences.language)) {
       throw new Error('Ungültige Sprache');
+    }
+    if (this.preferences.dateFormat && !validDateFormats.includes(this.preferences.dateFormat)) {
+      throw new Error('Ungültiges Datumsformat');
     }
   }
 });
@@ -129,6 +151,34 @@ UserSchema.methods.toJSON = function () {
   delete obj.emailChangeToken;
   delete obj.__v;
   return obj;
+};
+
+// hasEmail: Prüfe ob User eine Email hat
+UserSchema.methods.hasEmail = function () {
+  return !!this.email && this.email.length > 0;
+};
+
+// canResetPassword: Prüfe ob User Password zurücksetzen kann
+UserSchema.methods.canResetPassword = function () {
+  return this.hasEmail() && this.isVerified;
+};
+
+// generateEmailAddToken: Token für nachträgliches Email-Hinzufügen
+UserSchema.methods.generateEmailAddToken = function (email) {
+  const token = crypto.randomBytes(32).toString('hex');
+  this.emailChangeToken = crypto.createHash('sha256').update(token).digest('hex');
+  this.emailChangeNewEmail = email;
+  this.emailChangeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+  return token;
+};
+
+// removeEmail: Email entfernen (mit Warnung)
+UserSchema.methods.removeEmail = function () {
+  this.email = null;
+  this.isVerified = false;
+  this.emailChangeToken = undefined;
+  this.emailChangeNewEmail = undefined;
+  this.emailChangeExpires = undefined;
 };
 
 // comparePassword: Verifiziere password
@@ -150,7 +200,6 @@ UserSchema.methods.generateEmailChangeToken = function (newEmail) {
   const token = crypto.randomBytes(32).toString('hex');
   this.emailChangeToken = crypto.createHash('sha256').update(token).digest('hex');
   this.emailChangeNewEmail = newEmail;
-  this.newEmailPending = newEmail;
   this.emailChangeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
   return token;
 };

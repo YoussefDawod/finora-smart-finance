@@ -24,6 +24,8 @@ export const CURRENCIES = [
 export const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'de', label: 'Deutsch' },
+  { code: 'ar', label: 'العربية' },
+  { code: 'ka', label: 'ქართული' },
   { code: 'fr', label: 'Français' },
 ];
 
@@ -36,6 +38,5 @@ export const ROUTES = {
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   TRANSACTIONS: '/transactions',
-  SETTINGS: '/settings',
   NOT_FOUND: '/404',
 };

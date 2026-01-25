@@ -42,7 +42,7 @@
   height: 3px;
   background: var(--primary);
   transform: translateY(-50%);
-  transition: width var(--d-normal) ease-out;
+  transition: width var(--duration-normal) ease-out;
   z-index: 1;
 }
 
@@ -113,7 +113,7 @@
 // ============================================
 .stepContent {
   min-height: 200px;
-  animation: fadeIn var(--d-normal) ease-out;
+  animation: fadeIn var(--duration-normal) ease-out;
 }
 
 // ============================================

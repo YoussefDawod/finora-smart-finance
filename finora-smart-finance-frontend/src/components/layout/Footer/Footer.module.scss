@@ -77,3 +77,21 @@
 .copyright {
   color: var(--tx-muted);
 }
+
+// ============================================
+// RTL SUPPORT
+// ============================================
+:global([dir='rtl']) .footer {
+  transition: padding-right 0.3s ease;
+  padding-left: var(--space-lg);
+
+  &.sidebarExpanded {
+    padding-left: var(--space-lg);
+    padding-right: var(--sidebar-width, 280px);
+  }
+
+  &.sidebarCollapsed {
+    padding-left: var(--space-lg);
+    padding-right: var(--sidebar-collapsed-width, 72px);
+  }
+}

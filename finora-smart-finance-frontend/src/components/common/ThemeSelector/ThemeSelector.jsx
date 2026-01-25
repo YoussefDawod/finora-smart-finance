@@ -12,6 +12,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/hooks/useTheme';
 import { FiSun, FiMoon, FiMonitor, FiCheck } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +20,7 @@ import styles from './ThemeSelector.module.scss';
 
 function ThemeSelector({ isCollapsed = false }) {
   const { theme, useGlass, systemPreference, isInitialized, setTheme, setGlassEnabled, resetToSystemPreference } = useTheme();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -61,10 +63,16 @@ function ThemeSelector({ isCollapsed = false }) {
   // ============================================
   // THEME OPTIONS
   // ============================================
+  const themeLabels = {
+    light: t('settings.appearance.themeLight'),
+    dark: t('settings.appearance.themeDark'),
+    system: t('settings.appearance.themeSystem'),
+  };
+
   const themes = [
-    { value: 'light', label: 'Hell', icon: FiSun },
-    { value: 'dark', label: 'Dunkel', icon: FiMoon },
-    { value: 'system', label: 'System', icon: FiMonitor },
+    { value: 'light', label: themeLabels.light, icon: FiSun },
+    { value: 'dark', label: themeLabels.dark, icon: FiMoon },
+    { value: 'system', label: themeLabels.system, icon: FiMonitor },
   ];
 
   // ============================================
@@ -77,9 +85,9 @@ function ThemeSelector({ isCollapsed = false }) {
   };
 
   const getCurrentLabel = () => {
-    if (theme === 'dark') return 'Dunkel';
-    if (theme === 'light') return 'Hell';
-    return 'System';
+    if (theme === 'dark') return themeLabels.dark;
+    if (theme === 'light') return themeLabels.light;
+    return themeLabels.system;
   };
 
   // ============================================
@@ -112,7 +120,7 @@ function ThemeSelector({ isCollapsed = false }) {
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         aria-expanded={isOpen}
-        aria-label="Design & Theme"
+        aria-label={t('themeSelector.ariaLabel')}
         title={isCollapsed ? getCurrentLabel() : undefined}
       >
         <span className={styles.triggerIcon}>
@@ -120,7 +128,7 @@ function ThemeSelector({ isCollapsed = false }) {
         </span>
         {!isCollapsed && (
           <>
-            <span className={styles.triggerLabel}>Design & Theme</span>
+            <span className={styles.triggerLabel}>{t('themeSelector.title')}</span>
             <motion.span
               className={styles.triggerArrow}
               animate={{ rotate: isOpen ? 180 : 0 }}
@@ -144,21 +152,21 @@ function ThemeSelector({ isCollapsed = false }) {
           >
             {/* Theme Options Section */}
             <div className={styles.section}>
-              <div className={styles.sectionTitle}>Farbschema</div>
+              <div className={styles.sectionTitle}>{t('themeSelector.colorScheme')}</div>
               <div className={styles.options}>
-                {themes.map((t) => {
-                  const Icon = t.icon;
-                  const isActive = (t.value === 'system' && theme === systemPreference) || theme === t.value;
+                {themes.map((themeOption) => {
+                  const Icon = themeOption.icon;
+                  const isActive = (themeOption.value === 'system' && theme === systemPreference) || theme === themeOption.value;
                   return (
                     <motion.button
-                      key={t.value}
+                      key={themeOption.value}
                       className={`${styles.option} ${isActive ? styles.optionActive : ''}`}
-                      onClick={() => handleThemeSelect(t.value)}
+                      onClick={() => handleThemeSelect(themeOption.value)}
                       whileHover={{ x: 2 }}
                       whileTap={{ scale: 0.96 }}
                     >
                       <Icon size={18} />
-                      <span>{t.label}</span>
+                      <span>{themeOption.label}</span>
                       {isActive && <FiCheck size={16} className={styles.checkmark} />}
                     </motion.button>
                   );
@@ -171,14 +179,14 @@ function ThemeSelector({ isCollapsed = false }) {
 
             {/* Glass Effect Section */}
             <div className={styles.section}>
-              <div className={styles.sectionTitle}>Effekte</div>
+              <div className={styles.sectionTitle}>{t('themeSelector.effects')}</div>
               <motion.button
                 className={styles.toggleOption}
                 onClick={handleGlassToggle}
                 whileHover={{ x: 2 }}
                 whileTap={{ scale: 0.96 }}
               >
-                <span className={styles.toggleLabel}>Glasmorphic</span>
+                <span className={styles.toggleLabel}>{t('themeSelector.glassmorphic')}</span>
                 <div className={`${styles.toggle} ${useGlass ? styles.toggleActive : ''}`}>
                   <motion.div
                     className={styles.toggleThumb}

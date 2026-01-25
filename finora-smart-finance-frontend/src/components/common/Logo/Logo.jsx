@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import styles from './Logo.module.scss';
 
 /**
@@ -11,24 +12,34 @@ import styles from './Logo.module.scss';
  * @param {function} onClick - Click handler
  * @param {boolean} showText - Show brand name and tagline (default: true)
  * @param {string} size - Size variant: 'small', 'default', 'large'
+ * @param {boolean} disableNavigation - Render static logo without link behavior
  */
 export default function Logo({ 
   to = '/dashboard', 
   onClick, 
   showText = true, 
-  size = 'default'
+  size = 'default',
+  disableNavigation = false,
 }) {
+  const { t } = useTranslation();
+  const Component = disableNavigation ? 'div' : Link;
+  const hoverProps = disableNavigation ? {} : {
+    whileHover: { scale: 1.08 },
+    whileTap: { scale: 0.95 },
+  };
+
   return (
-    <Link 
-      to={to} 
-      className={`${styles.logo} ${styles[size]}`} 
-      onClick={onClick} 
-      aria-label="Finora - Smart Finance"
+    <Component 
+      {...(!disableNavigation ? { to } : { role: 'img' })}
+      className={`${styles.logo} ${styles[size]} ${disableNavigation ? styles.isStatic : ''}`} 
+      onClick={disableNavigation ? undefined : onClick} 
+      aria-label={t('common.appName')}
+      tabIndex={disableNavigation ? -1 : 0}
+      aria-disabled={disableNavigation || undefined}
     >
       <motion.div 
         className={styles.iconWrapper}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.95 }}
+        {...hoverProps}
         transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       >
         <svg 
@@ -99,6 +110,6 @@ export default function Logo({
           <span className={styles.tagline}>Smart Finance</span>
         </div>
       )}
-    </Link>
+    </Component>
   );
 }

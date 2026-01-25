@@ -53,28 +53,71 @@
   letter-spacing: 0.05em;
   border: 1px solid color-mix(in srgb, var(--tx) 8%, transparent);
 
+  // Optimierung für mittlere Viewports (900-1024px)
+  @media (max-width: 1024px) and (min-width: 900px) {
+    grid-template-columns: minmax(130px, 1.1fr) minmax(110px, 1.8fr) minmax(95px, 1fr) minmax(95px, 1fr) 75px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
   @include lg {
-    grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.5fr) 100px 90px 70px;
+    grid-template-columns: minmax(120px, 1fr) minmax(110px, 1.6fr) 100px 95px 75px;
     padding: var(--space-sm) var(--space-md);
   }
 
   // Tablet und kleiner: Header ausblenden
-  @media (max-width: 768px) {
+  @include below-md {
     display: none;
   }
 }
 
 // ============================================================================
-// TABLE BODY
+// TABLE BODY (mit Scrollbar)
 // ============================================================================
 .tableBody {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   min-height: 200px;
+  max-height: calc(100vh - 320px); // Viewport-abhängig für Desktop
+  overflow-y: auto;
+  padding-right: var(--space-xs);
+
+  // Custom Scrollbar Styling
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 30%, transparent) color-mix(in srgb, var(--tx) 5%, transparent);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--tx) 5%, transparent);
+    border-radius: var(--r-full);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: var(--r-full);
+    transition: background var(--tr);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 50%, transparent);
+    }
+
+    &:active {
+      background: color-mix(in srgb, var(--primary) 70%, transparent);
+    }
+  }
+
+  @include tablet {
+    max-height: calc(100vh - 280px);
+  }
 
   @include mobile {
     gap: var(--space-md);
+    max-height: calc(100vh - 240px);
+    padding-right: 0;
   }
 }
 
@@ -127,13 +170,20 @@
     outline-offset: var(--focus-o);
   }
 
+  // Optimierung für mittlere Viewports (900-1024px)
+  @media (max-width: 1024px) and (min-width: 900px) {
+    grid-template-columns: minmax(130px, 1.1fr) minmax(110px, 1.8fr) minmax(95px, 1fr) minmax(95px, 1fr) 75px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
   @include lg {
-    grid-template-columns: minmax(120px, 1fr) minmax(100px, 1.5fr) 100px 90px 70px;
+    grid-template-columns: minmax(120px, 1fr) minmax(110px, 1.6fr) 100px 95px 75px;
     padding: var(--space-sm) var(--space-md);
   }
 
   // Mobile Card Layout
-  @media (max-width: 768px) {
+  @include below-md {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
@@ -159,7 +209,7 @@
 .colCategory {
   min-width: 0;
 
-  @media (max-width: 768px) {
+  @include below-md {
     width: 100%;
     padding-bottom: var(--space-sm);
     border-bottom: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
@@ -170,7 +220,7 @@
   flex: 1;
   min-width: 0;
 
-  @media (max-width: 768px) {
+  @include below-md {
     width: 100%;
     padding: var(--space-xs) 0;
   }
@@ -180,7 +230,7 @@
   justify-content: flex-end;
   font-variant-numeric: tabular-nums;
 
-  @media (max-width: 768px) {
+  @include below-md {
     width: 100%;
     justify-content: space-between;
     padding-top: var(--space-sm);
@@ -202,7 +252,7 @@
   color: var(--tx-muted);
   font-size: var(--fs-sm);
 
-  @media (max-width: 768px) {
+  @include below-md {
     width: 100%;
     justify-content: space-between;
 
@@ -220,7 +270,7 @@
 .colActions {
   justify-content: flex-end;
 
-  @media (max-width: 768px) {
+  @include below-md {
     width: 100%;
     justify-content: flex-end;
     padding-top: var(--space-sm);
@@ -236,18 +286,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: var(--fs-lg);
   flex-shrink: 0;
   border-radius: var(--r-lg);
   background: color-mix(in srgb, var(--primary) 8%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
 
-  @media (max-width: 768px) {
-    width: 44px;
-    height: 44px;
-    font-size: 1.4rem;
+  @include below-md {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: var(--fs-xl);
   }
 }
 
@@ -256,7 +306,7 @@
   font-weight: var(--fw-sb);
   color: var(--tx);
 
-  @media (max-width: 768px) {
+  @include below-md {
     font-size: var(--fs-md);
     font-weight: var(--fw-b);
   }
@@ -266,6 +316,12 @@
 // DESCRIPTION
 // ============================================================================
 .description {
+  max-width: 100%;
+
+  // Besseres Text-Overflow-Handling für mittlere Viewports
+  @media (max-width: 1024px) and (min-width: 768px) {
+    font-size: var(--fs-xs);
+  }
   font-size: var(--fs-sm);
   color: var(--tx-muted);
   margin: 0;
@@ -274,7 +330,7 @@
   text-overflow: ellipsis;
   line-height: var(--lh-snug);
 
-  @media (max-width: 768px) {
+  @include below-md {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
@@ -300,7 +356,7 @@
     color: var(--error);
   }
 
-  @media (max-width: 768px) {
+  @include below-md {
     font-size: var(--fs-lg);
   }
 }
@@ -559,36 +615,128 @@
 }
 
 // ============================================================================
-// PAGINATION
+// PAGINATION - MODERN DESIGN
 // ============================================================================
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: var(--space-lg);
   padding: var(--space-md) var(--space-lg);
-  background: color-mix(in srgb, var(--surface-2) 70%, var(--surface));
+  background: var(--surface);
   border-radius: var(--r-xl);
-  border: 1px solid color-mix(in srgb, var(--tx) 8%, transparent);
+  border: 1px solid var(--border);
+  box-shadow: var(--sh-xs);
+  margin-top: var(--space-lg);
 
-  @include mobile {
+  @include tablet {
     flex-wrap: wrap;
     gap: var(--space-md);
     padding: var(--space-md);
   }
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+  }
+}
+
+.paginationLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.pageSizeLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  font-weight: var(--fw-m);
+}
+
+:global([dir='rtl']) .pageSizeLabel {
+  flex-direction: row-reverse;
+}
+
+.pageSizeSelect {
+  appearance: none;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--space-2xs) var(--space-md) var(--space-2xs) var(--space-sm);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  cursor: pointer;
+  min-width: 60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: all var(--tr);
+
+  &:hover {
+    border-color: var(--primary-light);
+    background-color: var(--surface);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+}
+
+:global([dir='rtl']) .pageSizeSelect {
+  background-position: left 8px center;
+  padding: var(--space-2xs) var(--space-sm) var(--space-2xs) var(--space-md);
+}
+
+.paginationCenter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+    order: -1;
+  }
+}
+
+:global([dir='rtl']) .paginationCenter {
+  flex-direction: row-reverse;
 }
 
 .pageInfo {
   font-size: var(--fs-sm);
-  color: var(--tx-muted);
+  color: var(--tx);
   font-weight: var(--fw-m);
-  min-width: 120px;
-  text-align: center;
+  padding: 0 var(--space-sm);
+  white-space: nowrap;
+}
+
+.paginationRight {
+  display: flex;
+  align-items: center;
 
   @include mobile {
     width: 100%;
-    order: -1;
+    justify-content: center;
   }
+}
+
+.totalInfo {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  font-weight: var(--fw-r);
 }
 
 // ============================================================================
@@ -705,5 +853,45 @@
   .skeleton {
     transition: none;
     animation: none;
+  }
+}
+
+// ============================================================================
+// RTL SUPPORT
+// ============================================================================
+:global([dir='rtl']) {
+  .tableBody {
+    padding-right: 0;
+    padding-left: var(--space-xs);
+
+    @include mobile {
+      padding-left: 0;
+    }
+  }
+
+  .tableRow {
+    border-left: 1px solid color-mix(in srgb, var(--tx) 6%, transparent);
+    border-right: 4px solid transparent;
+
+    &.income {
+      border-right-color: var(--success);
+    }
+
+    &.expense {
+      border-right-color: var(--error);
+    }
+  }
+
+  .card {
+    border-left: 1px solid color-mix(in srgb, var(--tx) 8%, transparent);
+    border-right: 4px solid transparent;
+
+    &.income {
+      border-right-color: var(--success);
+    }
+
+    &.expense {
+      border-right-color: var(--error);
+    }
   }
 }

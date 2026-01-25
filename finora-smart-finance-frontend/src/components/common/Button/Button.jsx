@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import styles from './Button.module.scss';
 

@@ -20,6 +20,15 @@ export default [
         localStorage: 'readonly',
         sessionStorage: 'readonly',
         fetch: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+        Intl: 'readonly',
+        // Browser APIs für CSS/Animation
+        getComputedStyle: 'readonly',
+        MutationObserver: 'readonly',
+        requestAnimationFrame: 'readonly',
       },
       parserOptions: {
         ecmaFeatures: {
@@ -42,6 +51,7 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      'no-unused-vars': 'warn',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

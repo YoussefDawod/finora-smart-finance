@@ -11,6 +11,7 @@
  * @module components/common/Spinner
  */
 
+import { useTranslation } from 'react-i18next';
 import './Spinner.scss';
 
 /**
@@ -31,6 +32,7 @@ const Spinner = ({
   color = 'primary',
   className = ''
 }) => {
+  const { t } = useTranslation();
   const sizeMap = {
     sm: '16px',
     md: '24px',
@@ -55,7 +57,7 @@ const Spinner = ({
       }}
       role="status"
       aria-live="polite"
-      aria-label="Lädt..."
+      aria-label={t('common.loading')}
     >
       <div className="spinner-ring" />
     </div>

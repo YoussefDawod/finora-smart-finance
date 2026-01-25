@@ -13,10 +13,18 @@
   gap: var(--space-lg);
   width: 100%;
   padding: var(--space-lg);
+  min-height: 100vh;
+  min-height: 100dvh; // Dynamic viewport height für bessere Mobile-Kompatibilität
 
   @include tablet {
     padding: var(--space-md);
     gap: var(--space-md);
+  }
+
+  @include mobile {
+    padding: var(--space-sm);
+    min-height: 100vh;
+    min-height: 100dvh;
   }
 }
 
@@ -62,11 +70,15 @@
 // FORM SECTION
 // ============================================
 .formSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   padding: var(--space-lg);
   background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
   border-radius: var(--r-lg);
   border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
   box-shadow: var(--sh-md);
+  overflow: visible;
 
   @include tablet {
     padding: var(--space-md);
@@ -149,5 +161,5 @@
   font-size: var(--fs-sm);
   color: var(--tx-muted);
   margin: 0;
-  max-width: 400px;
+  max-width: 25rem; // ~400px
 }

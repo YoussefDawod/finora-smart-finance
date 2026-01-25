@@ -4,15 +4,19 @@
  */
 
 import { FiSearch } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './Search.module.scss';
 
 export default function Search({
   value = '',
   onChange,
   onSubmit,
-  placeholder = 'Transaktionen suchen...',
-  ariaLabel = 'Suche nach Transaktionen',
+  placeholder,
+  ariaLabel,
 }) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('transactions.searchPlaceholder');
+  const resolvedAriaLabel = ariaLabel ?? t('transactions.searchAria');
   const handleSearch = (e) => {
     e.preventDefault();
     onSubmit?.(value?.trim?.() || '');
@@ -25,10 +29,10 @@ export default function Search({
         <input
           type="text"
           className={styles.searchInput}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
-          aria-label={ariaLabel}
+          aria-label={resolvedAriaLabel}
         />
       </div>
     </form>

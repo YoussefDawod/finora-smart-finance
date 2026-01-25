@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import styles from './Textarea.module.scss';
@@ -50,7 +50,6 @@ export const Textarea = forwardRef((
   ref
 ) => {
   const [isFocused, setIsFocused] = useState(false);
-  const hasValue = value?.length > 0;
   const charCount = value?.length || 0;
   const hasError = !!error;
 

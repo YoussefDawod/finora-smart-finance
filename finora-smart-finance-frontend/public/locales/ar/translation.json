@@ -1,0 +1,718 @@
+{
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "transactions": "المعاملات",
+    "settings": "الإعدادات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+  "common": {
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جارٍ الحفظ...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "closeNotification": "إغلاق الإشعار",
+    "confirm": "تأكيد",
+    "backToLogin": "العودة لتسجيل الدخول",
+    "or": "أو",
+    "loading": "جارٍ التحميل...",
+    "loadingContent": "يتم تحميل المحتوى",
+    "seeAll": "عرض الكل",
+    "noData": "لا توجد بيانات",
+    "selectPlaceholder": "اختر خيارًا",
+    "navigation": "التنقل الرئيسي",
+    "expand": "توسيع الشريط الجانبي",
+    "collapse": "طي الشريط الجانبي",
+    "userMenu": "قائمة المستخدم",
+    "menu": "القائمة",
+    "next": "التالي",
+    "back": "رجوع",
+    "complete": "إنهاء",
+    "prevStep": "الخطوة السابقة",
+    "loadingNext": "جارٍ التحقق...",
+    "loadingComplete": "جارٍ الإرسال...",
+    "stepErrorsTitle": "⚠ أخطاء في هذه الخطوة:",
+    "appName": "فينورا - Smart Finance"
+  },
+  "themeSelector": {
+    "title": "التصميم والنسق",
+    "ariaLabel": "التصميم والنسق",
+    "colorScheme": "نظام الألوان",
+    "effects": "التأثيرات",
+    "glassmorphic": "زجاجي"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "تحكّم بالمظهر والتفضيلات وخيارات التصدير في مكان واحد.",
+    "general": {
+      "title": "عام",
+      "description": "اللغة والعملة وتنسيق التاريخ لتقاريرك.",
+      "language": "اللغة",
+      "currency": "العملة",
+      "dateFormat": "تنسيق التاريخ",
+      "languagePlaceholder": "اختر اللغة",
+      "currencyPlaceholder": "اختر العملة",
+      "datePlaceholder": "اختر التنسيق",
+      "dateExample": "مثال: {{value}}",
+      "currencyEUR": "يورو (EUR)",
+      "currencyUSD": "دولار أمريكي (USD)",
+      "dateFormatIso": "YYYY-MM-DD (ISO 8601)",
+      "dateFormatDmy": "DD.MM.YYYY"
+    },
+    "appearance": {
+      "title": "المظهر",
+      "description": "اختر السمة أو اتبع النظام أو فعّل تأثيرات الزجاج.",
+      "themeLight": "فاتح",
+      "themeDark": "داكن",
+      "themeSystem": "النظام",
+      "themeLightDesc": "واجهة واضحة ومضيئة",
+      "themeDarkDesc": "مريح للعين ليلًا",
+      "themeSystemDesc": "اتّباع إعدادات الجهاز",
+      "glassTitle": "تأثير الزجاج",
+      "glassDescription": "يضيف أسطحًا شفافة لمظهر حديث.",
+      "glassAria": "تبديل تأثير الزجاج"
+    },
+    "notifications": {
+      "title": "الإشعارات",
+      "description": "تحكّم بطريقة استلام التحديثات والتقارير.",
+      "emailTitle": "إشعارات البريد الإلكتروني",
+      "emailDescription": "استلم تنبيهات مهمة للحساب والمال عبر البريد الإلكتروني.",
+      "emailAria": "تبديل إشعارات البريد الإلكتروني"
+    },
+    "saved": "تم حفظ التفضيلات بنجاح.",
+    "saveError": "تعذر حفظ التفضيلات."
+  },
+  "dashboard": {
+    "greetingIntro": "مرحبًا بعودتك،",
+    "overview": "هذه نظرة عامة على نشاطك المالي لهذا الشهر",
+    "loading": "جارٍ تحميل لوحة التحكم...",
+    "newTransaction": "معاملة جديدة",
+    "income": "الدخل",
+    "expenses": "المصروفات",
+    "balance": "الرصيد",
+    "netBalance": "صافي الرصيد",
+    "noChange": "بدون تغيير",
+    "vsLastMonth": "مقارنة بالشهر الماضي",
+    "incomeTrendTooltip": "الدخل مقارنة بالشهر الماضي",
+    "expenseTrendTooltip": "المصروفات مقارنة بالشهر الماضي",
+    "balanceTrendTooltip": "الرصيد مقارنة بالشهر الماضي",
+    "chartRatioNote": "النسبة محسوبة من الدخل مقابل المصروفات",
+    "chartsTitle": "الرسوم والتحليلات",
+    "recentTransactions": "أحدث المعاملات",
+    "noTransactions": "لا توجد معاملات بعد",
+    "noTransactionsSub": "أضف أول معاملة لترى النتائج هنا",
+    "noDataTitle": "لا توجد بيانات بعد",
+    "noDataSubtitle": "عند توفر معاملات ستظهر التحليلات والاتجاهات هنا.",
+    "incomeVsExpense": "الدخل مقابل المصروفات",
+    "currentMonth": "الشهر الحالي",
+    "savingsRate": "معدل الادخار",
+    "deficit": "عجز",
+    "monthlyTrend": "الاتجاه الشهري",
+    "lastMonths": "آخر {{count}} شهرًا",
+    "noDataShort": "لا توجد بيانات",
+    "categoriesTitle": "الفئات",
+    "categoriesSubtitle": "نظرة كاملة (الشهر الحالي)",
+    "categoriesTypeLabel": "نوع الفئة",
+    "totalLabel": "الإجمالي",
+    "categoriesLabel": "الفئات",
+    "noCategoryData": "لا توجد بيانات للفئات.",
+    "transactionCount": "{{count}} معاملة",
+    "summaryDefaultTitle": "العنوان",
+    "summaryDefaultValue": "€0.00",
+    "errors": {
+      "load": "فشل تحميل بيانات لوحة التحكم"
+    }
+  },
+  "transactions": {
+    "pageTitle": "المعاملات",
+    "manageSubtitle": "تحكّم في دخلك ومصروفاتك",
+    "searchPlaceholder": "ابحث في المعاملات...",
+    "searchAria": "البحث في المعاملات",
+    "filter": "تصفية",
+    "type": "النوع",
+    "income": "دخل",
+    "expense": "مصروف",
+    "amount": "المبلغ",
+    "amountPlaceholder": "0.00",
+    "amountHint": "أدخل مبلغ المعاملة",
+    "date": "التاريخ",
+    "dateHint": "اختر تاريخ المعاملة",
+    "description": "الوصف",
+    "descriptionPlaceholder": "صف هذه المعاملة...",
+    "descriptionHint": "أدخل تفاصيل المعاملة (حد أقصى 100 حرف)",
+    "category": "الفئة",
+    "categoryPlaceholder": "اختر فئة",
+    "categoryHint": "اختر فئة {{type}}",
+    "notes": "ملاحظات",
+    "addTransaction": "إضافة معاملة",
+    "editTransaction": "تعديل معاملة",
+    "deleteTransaction": "حذف المعاملة",
+    "updateAction": "تحديث",
+    "editAction": "تعديل",
+    "deleteAction": "حذف",
+    "actions": "الإجراءات",
+    "deleteConfirm": "هل تريد الحذف؟",
+    "deleteSuccess": "تم حذف المعاملة",
+    "deleteError": "فشل الحذف",
+    "emptyTitle": "لا توجد معاملات",
+    "emptySubtitle": "لا توجد معاملات تطابق عوامل التصفية الحالية",
+    "loadErrorTitle": "فشل التحميل",
+    "perPage": "لكل صفحة:",
+    "page": "صفحة",
+    "of": "من",
+    "total": "{{count}} معاملة{{suffix}} إجمالًا",
+    "prevPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "createSuccess": "تم إنشاء المعاملة",
+    "updateSuccess": "تم تحديث المعاملة",
+    "saveError": "فشل الحفظ",
+    "errors": {
+      "load": "فشل تحميل المعاملات",
+      "create": "فشل إنشاء المعاملة",
+      "update": "فشل تحديث المعاملة",
+      "delete": "فشل حذف المعاملة"
+    },
+    "validation": {
+      "typeRequired": "النوع مطلوب",
+      "amountRequired": "المبلغ مطلوب",
+      "amountPositive": "يجب أن يكون المبلغ أكبر من 0",
+      "categoryRequired": "الفئة مطلوبة",
+      "categoryMin": "يجب أن تكون الفئة حرفين على الأقل",
+      "descriptionRequired": "الوصف مطلوب",
+      "descriptionMin": "يجب أن يكون الوصف 3 أحرف على الأقل",
+      "descriptionMax": "يجب ألا يزيد الوصف عن 100 حرف",
+      "dateRequired": "التاريخ مطلوب",
+      "invalidDate": "تاريخ غير صالح"
+    }
+  },
+  "auth": {
+    "verifyEmailTitle": "تأكيد البريد الإلكتروني",
+    "verifyEmailSubtitle": "أدخل الرمز المكون من 6 أرقام من بريدك الإلكتروني.",
+    "verifyEmailSent": "أرسلنا رمزًا إلى {{email}}.",
+    "verifySuccessTitle": "تم تأكيد البريد الإلكتروني",
+    "verifySuccessSubtitle": "تم تأكيد بريدك الإلكتروني {{email}} بنجاح.",
+    "verifySuccessAddNote": "يمكنك الآن إعادة تعيين كلمة المرور.",
+    "verifyErrorTitle": "فشل التحقق",
+    "verifyErrorMissingToken": "لم يتم العثور على رمز التحقق.",
+    "verifyErrorInvalidToken": "الرابط غير صالح أو منتهي الصلاحية.",
+    "verifyErrorServer": "حدث خطأ في الخادم.",
+    "verifyErrorUnknown": "حدث خطأ غير معروف.",
+    "verifyLoadingTitle": "جارٍ التحقق من البريد الإلكتروني...",
+    "verifyLoadingSubtitle": "يرجى الانتظار قليلًا.",
+    "goToProfile": "→ الذهاب إلى الملف الشخصي",
+    "goToDashboard": "→ الذهاب إلى لوحة التحكم",
+    "backToProfile": "← العودة إلى الملف الشخصي",
+    "forgotTitle": "نسيت كلمة المرور؟",
+    "resetTitle": "كلمة مرور جديدة",
+    "resetSubtitle": "أدخل كلمة مرورك الجديدة الآمنة.",
+    "forgotSubtitle": "لا مشكلة! سنرسل لك رابطًا.",
+    "page": {
+      "registerTitle": "إنشاء حساب",
+      "registerSubtitle": "ابدأ مع فينورا في خطوات قليلة.",
+      "loginTitle": "تسجيل الدخول",
+      "loginSubtitle": "مرحبًا بعودتك! سجّل الدخول للمتابعة.",
+      "registerAction": "سجّل"
+    },
+    "layout": {
+      "login": {
+        "headline": "جديد هنا؟",
+        "subline": "أنشئ حسابك المجاني وابدأ التحكم في أموالك اليوم.",
+        "cta": "سجّل الآن"
+      },
+      "register": {
+        "headline": "مرحبًا بعودتك!",
+        "subline": "لديك حساب بالفعل؟ سجّل الدخول لمتابعة إدارة أموالك.",
+        "cta": "إلى تسجيل الدخول"
+      },
+      "forgot": {
+        "headline": "لا مشكلة",
+        "subline": "سنساعدك في استعادة الوصول إلى حسابك.",
+        "cta": "إلى تسجيل الدخول"
+      },
+      "verify": {
+        "headline": "بقيت خطوة",
+        "subline": "قم بتأكيد بريدك الإلكتروني للبدء.",
+        "cta": "إلى تسجيل الدخول"
+      }
+    },
+    "branding": {
+      "badge": "الميزانية • الرؤى • الثقة",
+      "kicker": "Finora • Smart Finance",
+      "login": {
+        "headline": "جديد هنا؟",
+        "subline": "أنشئ حسابك المجاني وابدأ اليوم.",
+        "cta": "سجّل الآن"
+      },
+      "register": {
+        "headline": "مرحبًا بعودتك!",
+        "subline": "لديك حساب بالفعل؟ سجّل الدخول.",
+        "cta": "إلى تسجيل الدخول"
+      },
+      "default": {
+        "headline": "مرحبًا!",
+        "subline": "تابع أموالك بوضوح وأمان.",
+        "cta": "ابدأ الآن"
+      },
+      "highlights": {
+        "track": {
+          "title": "تتبع المعاملات",
+          "desc": "سجّل الدخل والمصروفات خلال ثوانٍ."
+        },
+        "charts": {
+          "title": "الرسوم والاتجاهات",
+          "desc": "تحليلات تفاعلية للميزانية والتوقعات."
+        },
+        "secure": {
+          "title": "تسجيل دخول آمن",
+          "desc": "مبني على JWT وجلسات تحديث آمنة."
+        },
+        "theme": {
+          "title": "الوضع الداكن/الفاتح",
+          "desc": "محسّن لكلا النمطين والأجهزة."
+        }
+      },
+      "footer": "© 2026 Finora. جميع الحقوق محفوظة."
+    },
+    "login": {
+      "username": "اسم المستخدم",
+      "usernamePlaceholder": "اسم المستخدم",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "كلمة المرور",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "rememberMe": "البقاء مسجّلًا",
+      "forgot": "نسيت كلمة المرور؟",
+      "submit": "تسجيل الدخول",
+      "loading": "جارٍ تسجيل الدخول...",
+      "success": "تم تسجيل الدخول بنجاح!",
+      "error": "فشل تسجيل الدخول. حاول مرة أخرى.",
+      "dismissError": "إغلاق الخطأ",
+      "validation": {
+        "usernameRequired": "اسم المستخدم مطلوب",
+        "usernameMin": "3 أحرف على الأقل",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "formInvalid": "يرجى ملء جميع الحقول بشكل صحيح"
+      }
+    },
+    "forgot": {
+      "validation": {
+        "emailRequired": "البريد الإلكتروني مطلوب",
+        "emailInvalid": "بريد إلكتروني غير صالح"
+      },
+      "successToast": "تم إرسال رابط إعادة التعيين!",
+      "errorToast": "فشل الإرسال. حاول لاحقًا.",
+      "successTitle": "تم إرسال البريد الإلكتروني!",
+      "successMessage": "أرسلنا رابط إعادة تعيين كلمة المرور إلى {{email}}.",
+      "successHint": "الرابط صالح لمدة 24 ساعة. تحقق من البريد العشوائي أيضًا.",
+      "useDifferentEmail": "استخدام بريد إلكتروني آخر",
+      "emailLabel": "البريد الإلكتروني",
+      "sending": "جارٍ الإرسال...",
+      "submit": "إرسال رابط إعادة التعيين"
+    },
+    "reset": {
+      "validation": {
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "passwordMin": "8 أحرف على الأقل",
+        "passwordWeak": "ضعيفة جدًا",
+        "confirmRequired": "التأكيد مطلوب",
+        "passwordMismatch": "كلمتا المرور غير متطابقتين",
+        "formInvalid": "يرجى ملء جميع الحقول بشكل صحيح"
+      },
+      "strength": {
+        "weak": "ضعيف",
+        "medium": "متوسط",
+        "strong": "قوي",
+        "excellent": "ممتاز"
+      },
+      "successToast": "تم تغيير كلمة المرور بنجاح!",
+      "errorToast": "فشل إعادة التعيين. قد يكون الرابط منتهيًا.",
+      "successTitle": "تم تغيير كلمة المرور!",
+      "successMessage": "تم تحديث كلمة المرور. سيتم تحويلك لتسجيل الدخول...",
+      "passwordLabel": "كلمة مرور جديدة",
+      "confirmLabel": "تأكيد كلمة المرور",
+      "saving": "جارٍ الحفظ...",
+      "submit": "حفظ كلمة المرور"
+    },
+    "verifyForm": {
+      "successToast": "تم تأكيد البريد الإلكتروني بنجاح!",
+      "errorToast": "فشل التحقق. حاول مرة أخرى.",
+      "successTitle": "تم تأكيد البريد الإلكتروني!",
+      "successMessage": "يتم تحويلك إلى لوحة التحكم...",
+      "digitLabel": "الرقم {{index}}",
+      "loading": "جارٍ التحقق...",
+      "resendPrompt": "لم يصلك الرمز؟",
+      "resendSending": "جارٍ الإرسال...",
+      "resendCountdown": "إعادة الإرسال ({{count}}ث)",
+      "resendAction": "إعادة إرسال الرمز",
+      "spamHint": "تحقق من البريد العشوائي",
+      "resendSuccess": "تم إرسال رمز جديد!",
+      "resendError": "فشل الإرسال. حاول لاحقًا."
+    },
+    "register": {
+      "steps": {
+        "data": "البيانات",
+        "password": "كلمة المرور",
+        "finish": "الإنهاء"
+      },
+      "step1": {
+        "title": "البيانات الشخصية",
+        "description": "أخبرنا قليلًا عنك.",
+        "usernameLabel": "اسم المستخدم",
+        "usernamePlaceholder": "اسم_المستخدم",
+        "usernameHint": "سيُستخدم هذا الاسم لتسجيل الدخول.",
+        "emailLabel": "البريد الإلكتروني",
+        "optional": "(اختياري)",
+        "emailPlaceholder": "name@example.com",
+        "emailHint": "لاستعادة كلمة المرور. بدون بريد إلكتروني لا يمكنك إعادة التعيين."
+      },
+      "step2": {
+        "title": "إنشاء كلمة المرور",
+        "description": "اختر كلمة مرور قوية.",
+        "passwordLabel": "كلمة المرور",
+        "passwordPlaceholder": "8 أحرف على الأقل",
+        "confirmLabel": "تأكيد كلمة المرور",
+        "confirmPlaceholder": "كرر كلمة المرور"
+      },
+      "step3": {
+        "title": "بقيت خطوة!",
+        "description": "وافق على الشروط.",
+        "noEmailTitle": "لم يتم إدخال بريد إلكتروني",
+        "noEmailText": "بدون بريد إلكتروني <strong>لن تتمكن من إعادة تعيين</strong> كلمة المرور إذا نسيتها. يمكنك إضافة بريد لاحقًا في ملفك الشخصي.",
+        "termsTitle": "شروط الاستخدام",
+        "termsText": "بالتسجيل أنت توافق على الشروط وسياسة الخصوصية. أنت مسؤول عن نشاط حسابك.",
+        "termsAccept": "أوافق على",
+        "termsLink": "شروط الاستخدام",
+        "noEmailConfirm": "أفهم أنني لا أستطيع إعادة تعيين كلمة المرور بدون بريد إلكتروني"
+      },
+      "navigation": {
+        "back": "رجوع",
+        "next": "التالي",
+        "submitting": "جارٍ التسجيل...",
+        "submit": "إنشاء حساب"
+      },
+      "strength": {
+        "weak": "ضعيف",
+        "medium": "متوسط",
+        "strong": "قوي",
+        "excellent": "ممتاز"
+      },
+      "validation": {
+        "nameRequired": "الاسم مطلوب",
+        "nameMin": "3 أحرف على الأقل",
+        "nameMax": "50 حرفًا كحد أقصى",
+        "nameChars": "مسموح بالأحرف والأرقام والمسافات والشرطات فقط",
+        "emailInvalid": "بريد إلكتروني غير صالح",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "passwordMin": "8 أحرف على الأقل",
+        "passwordUpper": "مطلوب حرف كبير واحد على الأقل",
+        "passwordNumber": "مطلوب رقم واحد على الأقل",
+        "passwordSpecial": "مطلوب رمز خاص واحد على الأقل",
+        "confirmRequired": "التأكيد مطلوب",
+        "passwordMismatch": "كلمتا المرور غير متطابقتين",
+        "termsRequired": "الموافقة مطلوبة",
+        "noEmailConfirm": "يرجى تأكيد أنك فهمت",
+        "stepInvalid": "يرجى ملء جميع الحقول بشكل صحيح",
+        "formInvalid": "يرجى ملء جميع الحقول المطلوبة"
+      },
+      "successVerifyEmail": "تم التسجيل بنجاح! يرجى تأكيد بريدك الإلكتروني.",
+      "successWelcome": "تم التسجيل بنجاح! مرحبًا بك في فينورا.",
+      "error": "فشل التسجيل"
+    }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "subtitle": "إدارة بياناتك الشخصية وإعدادات الحساب",
+    "badgeVerified": "تم التحقق",
+    "badgeUnverified": "غير مُحقق",
+    "noEmailInline": "لا توجد بريد إلكتروني مسجل",
+    "email": {
+      "title": "إدارة البريد الإلكتروني",
+      "loading": "جارٍ تحميل حالة البريد الإلكتروني...",
+      "currentLabel": "البريد الإلكتروني الحالي",
+      "statusLabel": "الحالة",
+      "verified": "تم التحقق",
+      "pending": "قيد الانتظار",
+      "warningUnverified": "لم يتم التحقق من بريدك الإلكتروني بعد. إعادة تعيين كلمة المرور تعمل فقط بعد التحقق.",
+      "resend": "إعادة الإرسال",
+      "resendSending": "جارٍ الإرسال...",
+      "change": "تغيير البريد الإلكتروني",
+      "remove": "إزالة البريد الإلكتروني",
+      "removing": "جارٍ الإزالة...",
+      "pendingTitle": "بريد إلكتروني معلّق",
+      "pendingSent": "تم إرسال رابط التحقق إلى {{email}}",
+      "spamHint": "تحقق من مجلد البريد العشوائي إذا لم تصل الرسالة.",
+      "pendingResend": "إعادة إرسال رابط التحقق",
+      "pendingResendSending": "جارٍ الإرسال...",
+      "pendingUseDifferent": "استخدام بريد إلكتروني آخر",
+      "noEmailTitle": "لا يوجد بريد إلكتروني",
+      "noEmailDescription": "بدون بريد إلكتروني لا يمكنك إعادة تعيين كلمة المرور إذا نسيتها.",
+      "addEmail": "إضافة بريد إلكتروني"
+    },
+    "personal": {
+      "title": "البيانات الشخصية",
+      "edit": "تعديل",
+      "usernameLabel": "اسم المستخدم",
+      "usernamePlaceholder": "اسم المستخدم",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ...",
+      "cancel": "إلغاء"
+    },
+    "security": {
+      "title": "الأمان",
+      "passwordTitle": "كلمة المرور",
+      "passwordDescription": "غيّر كلمة المرور بانتظام",
+      "change": "تغيير"
+    },
+    "account": {
+      "title": "إدارة الحساب",
+      "logout": "تسجيل الخروج",
+      "delete": "حذف الحساب"
+    },
+    "modals": {
+      "addEmail": {
+        "titleAdd": "إضافة بريد إلكتروني",
+        "titleChange": "تغيير البريد الإلكتروني",
+        "label": "عنوان بريد إلكتروني جديد",
+        "placeholder": "name@example.com",
+        "hint": "ستتلقى رسالة تحقق على هذا العنوان.",
+        "spamHint": "تحقق من البريد العشوائي إذا لم تصل الرسالة.",
+        "cancel": "إلغاء",
+        "submit": "إرسال التحقق",
+        "sending": "جارٍ الإرسال..."
+      },
+      "removeEmail": {
+        "title": "إزالة البريد الإلكتروني",
+        "passwordLabel": "تأكيد كلمة المرور",
+        "passwordPlaceholder": "كلمة المرور الحالية",
+        "confirmLabel": "أفهم: بدون بريد إلكتروني لا يمكن إعادة تعيين كلمة المرور.",
+        "cancel": "إلغاء",
+        "submit": "إزالة البريد الإلكتروني",
+        "removing": "جارٍ الإزالة..."
+      },
+      "changePassword": {
+        "title": "تغيير كلمة المرور",
+        "currentLabel": "كلمة المرور الحالية",
+        "newLabel": "كلمة مرور جديدة",
+        "confirmLabel": "تأكيد كلمة المرور",
+        "cancel": "إلغاء",
+        "submit": "تغيير كلمة المرور",
+        "changing": "جارٍ التغيير..."
+      },
+      "deleteAccount": {
+        "title": "حذف الحساب",
+        "warningPrimary": "لا يمكن التراجع عن هذا الإجراء.",
+        "warningSecondary": "سيتم حذف جميع بياناتك ومعاملاتك وإعداداتك نهائيًا.",
+        "confirmLabel": "اكتب \"{{value}}\" للتأكيد:",
+        "placeholder": "{{value}}",
+        "cancel": "إلغاء",
+        "submit": "حذف الحساب نهائيًا",
+        "confirmValue": "حذف",
+        "confirmError": "يرجى إدخال {{value}}"
+      }
+    },
+    "toasts": {
+      "nameMin": "يجب أن يتكون الاسم من 3 أحرف على الأقل",
+      "nameMax": "يجب ألا يزيد الاسم عن 50 حرفًا",
+      "saved": "تم حفظ الملف الشخصي",
+      "saveError": "فشل الحفظ",
+      "invalidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+      "sameEmail": "يجب أن يختلف البريد الإلكتروني الجديد",
+      "verificationSentChange": "تم إرسال رابط التحقق",
+      "verificationSentAdd": "تم إرسال رسالة التحقق",
+      "spamHint": "يرجى التحقق من مجلد البريد العشوائي",
+      "emailSendError": "تعذر إرسال البريد الإلكتروني",
+      "passwordRequired": "أدخل كلمة المرور",
+      "confirmRemoval": "يرجى تأكيد الإزالة",
+      "emailRemoved": "تمت إزالة البريد الإلكتروني",
+      "emailRemoveError": "تعذر إزالة البريد الإلكتروني",
+      "verificationResent": "تمت إعادة إرسال رسالة التحقق",
+      "verificationResentTo": "تمت إعادة إرسال رسالة التحقق إلى {{email}}!",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين",
+      "passwordWeak": "8 أحرف على الأقل، حرف كبير، رقم ورمز خاص مطلوب",
+      "passwordChanged": "تم تغيير كلمة المرور بنجاح!",
+      "passwordChangeError": "تعذر تغيير كلمة المرور",
+      "accountDeleted": "تم حذف الحساب",
+      "accountDeleteError": "تعذر حذف الحساب"
+    },
+    "deleteAccountTitle": "حذف الحساب",
+    "deleteConfirmLabel": "اكتب \"DELETE\" للتأكيد:",
+    "deleteButton": "حذف الحساب نهائيًا"
+  },
+  "errors": {
+    "notFoundTitle": "الصفحة غير موجودة",
+    "notFoundSubtitle": "هذه الصفحة غير موجودة أو تم نقلها.",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "unauthorizedTitle": "تم رفض الوصول",
+    "unauthorizedSubtitle": "ليس لديك صلاحية للوصول إلى هذه الصفحة.",
+    "serverErrorTitle": "خطأ في الخادم",
+    "serverErrorSubtitle": "عذرًا، حدث خطأ في الخادم.",
+    "statusTitle": "{{code}} - {{title}}"
+  },
+  "terms": {
+    "title": "شروط الاستخدام",
+    "lastUpdated": "آخر تحديث: يناير 2026",
+    "sections": [
+      {
+        "title": "1. النطاق",
+        "paragraphs": [
+          "تنطبق هذه الشروط على استخدام Finora (\"الخدمة\"). باستخدامك للخدمة فإنك توافق على هذه الشروط."
+        ]
+      },
+      {
+        "title": "2. التسجيل والحساب",
+        "paragraphs": [
+          "لاستخدام الخدمة يجب إنشاء حساب. أنت توافق على:"
+        ],
+        "list": [
+          "تقديم معلومات صحيحة وكاملة",
+          "الحفاظ على سرية بيانات الدخول",
+          "إبلاغنا فورًا بأي استخدام غير مصرح به",
+          "إنشاء حساب واحد فقط لكل شخص"
+        ]
+      },
+      {
+        "title": "3. استخدام الخدمة",
+        "paragraphs": [
+          "تساعدك الخدمة على إدارة الدخل والمصروفات. يجب استخدامها لأغراض قانونية فقط.",
+          "ويُحظر بشكل خاص:"
+        ],
+        "list": [
+          "استخدام الخدمة لأنشطة غير قانونية",
+          "رفع برمجيات ضارة أو شيفرات خبيثة",
+          "محاولة الوصول غير المصرح به",
+          "التأثير سلبًا على عمل الخدمة"
+        ]
+      },
+      {
+        "title": "4. الخصوصية",
+        "paragraphs": [
+          "نولي حماية البيانات أهمية كبيرة. تتم معالجة البيانات وفق القوانين المعمول بها. راجع سياسة الخصوصية لمزيد من التفاصيل."
+        ]
+      },
+      {
+        "title": "5. الملكية الفكرية",
+        "paragraphs": [
+          "جميع حقوق الخدمة بما في ذلك التصميم والكود والمحتوى تعود للمشغّل. استخدام الخدمة لا يمنح حقوقًا للعلامات التجارية أو الشعارات."
+        ]
+      },
+      {
+        "title": "6. إخلاء المسؤولية",
+        "paragraphs": [
+          "تُقدَّم الخدمة \"كما هي\" دون ضمانات. لا نضمن:"
+        ],
+        "list": [
+          "توفّر الخدمة دون انقطاع",
+          "خلوها من الأخطاء",
+          "دقة البيانات التي تدخلها"
+        ]
+      },
+      {
+        "title": "7. الإنهاء",
+        "paragraphs": [
+          "يمكنك حذف حسابك في أي وقت من الإعدادات. نحتفظ بالحق في تعليق أو حذف الحسابات المخالفة."
+        ]
+      },
+      {
+        "title": "8. تغييرات الشروط",
+        "paragraphs": [
+          "قد نقوم بتحديث هذه الشروط. سيتم إخطارك بالتغييرات الجوهرية مسبقًا."
+        ]
+      },
+      {
+        "title": "9. أحكام ختامية",
+        "paragraphs": [
+          "تخضع هذه الشروط لقانون جمهورية ألمانيا الاتحادية. إذا أصبح أي بند غير صالح، تبقى باقي البنود سارية."
+        ]
+      }
+    ]
+  },
+  "export": {
+    "title": "تصدير البيانات",
+    "subtitle": "صدّر معاملاتك كملف CSV أو PDF",
+    "csv": {
+      "title": "تصدير CSV",
+      "description": "صدّر جميع المعاملات كملف CSV. مناسب لـ Excel أو جداول البيانات الأخرى.",
+      "button": "تنزيل CSV",
+      "headers": {
+        "date": "التاريخ",
+        "category": "الفئة",
+        "description": "الوصف",
+        "type": "النوع",
+        "amount": "المبلغ ({{currency}})"
+      },
+      "types": {
+        "income": "دخل",
+        "expense": "مصروف"
+      }
+    },
+    "pdf": {
+      "title": "تصدير PDF",
+      "description": "أنشئ تقريرًا قابلًا للطباعة يحتوي على جميع المعاملات ومجمّعًا حسب الأشهر.",
+      "button": "إنشاء PDF",
+      "reportTitle": "Finora Smart Finance - تقرير مالي",
+      "createdLabel": "تم الإنشاء",
+      "summary": {
+        "income": "الدخل",
+        "expense": "المصروفات",
+        "balance": "الرصيد"
+      },
+      "monthSummary": "{{count}} معاملة · الرصيد: {{balance}}",
+      "table": {
+        "date": "التاريخ",
+        "category": "الفئة",
+        "description": "الوصف",
+        "amount": "المبلغ"
+      },
+      "footer": "{{count}} معاملة · © {{year}} Finora",
+      "defaultUserName": "مستخدم",
+      "noDescription": "—"
+    },
+    "toasts": {
+      "noTransactions": "لا توجد معاملات للتصدير",
+      "csvSuccess": "تم تصدير {{count}} معاملة كملف CSV",
+      "csvError": "فشل تصدير CSV",
+      "pdfSuccess": "تم تجهيز {{count}} معاملة لتصدير PDF",
+      "pdfError": "فشل تصدير PDF"
+    }
+  },
+  "filters": {
+    "title": "تصفية",
+    "open": "فتح عوامل التصفية",
+    "period": "الفترة",
+    "type": "النوع",
+    "category": "الفئة",
+    "date": "التاريخ",
+    "from": "من",
+    "to": "إلى",
+    "allCategories": "كل الفئات",
+    "reset": "إعادة ضبط التصفية",
+    "today": "اليوم",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "thisYear": "هذا العام"
+  },
+  "categories": {
+    "salary": "راتب",
+    "freelance": "عمل حر",
+    "investments": "استثمارات",
+    "gift": "هدية",
+    "bonus": "مكافأة",
+    "sideJob": "عمل جانبي",
+    "cashback": "استرداد نقدي",
+    "rental": "إيجار",
+    "groceries": "بقالة",
+    "transport": "مواصلات",
+    "entertainment": "ترفيه",
+    "rent": "إيجار السكن",
+    "insurance": "تأمين",
+    "health": "صحة",
+    "education": "تعليم",
+    "clothing": "ملابس",
+    "travel": "سفر",
+    "electronics": "إلكترونيات",
+    "restaurant": "مطاعم",
+    "sports": "رياضة",
+    "household": "منزل",
+    "other": "أخرى"
+  }
+}

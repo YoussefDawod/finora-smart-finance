@@ -30,6 +30,8 @@ html {
   scroll-behavior: smooth;
 }
 
+
+
 // Body defaults
 body {
   min-height: 100vh;
@@ -44,6 +46,30 @@ body {
     background var(--tr),
     color var(--tr);
   overflow-x: hidden;
+}
+
+// ============================================
+// 🔁 RTL BASE OVERRIDES
+// ============================================
+
+[dir='rtl'] body {
+  direction: rtl;
+}
+
+[dir='rtl'] ul,
+[dir='rtl'] ol {
+  padding-right: var(--space-lg);
+  padding-left: 0;
+}
+
+[dir='rtl'] th,
+[dir='rtl'] td {
+  text-align: right;
+}
+
+[dir='rtl'] input,
+[dir='rtl'] textarea {
+  text-align: right;
 }
 
 // ============================================

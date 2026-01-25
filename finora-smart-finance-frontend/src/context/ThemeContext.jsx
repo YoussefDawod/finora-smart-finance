@@ -34,11 +34,6 @@ const THEMES = {
   DARK: 'dark',
 };
 
-const GLASS_MODES = {
-  ENABLED: 'true',
-  DISABLED: 'false',
-};
-
 const STORAGE_KEYS = {
   THEME: 'et-theme-preference',
   GLASS: 'et-glass-preference',
@@ -74,7 +69,6 @@ export function ThemeProvider({ children }) {
 
   // Refs for cleanup
   const mediaQueryRef = useRef(null);
-  const storageListenerRef = useRef(null);
 
   // ============================================
   // 💾 LOCALSTORAGE HELPERS
@@ -164,7 +158,7 @@ export function ThemeProvider({ children }) {
     setUseGlassState(preferences.useGlass);
     applyThemeToDom(initialTheme, preferences.useGlass);
     setIsInitialized(true);
-  }, []);
+  }, [getSystemPreference, loadPreferences, applyThemeToDom]);
 
   /**
    * System preference listener

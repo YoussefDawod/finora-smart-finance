@@ -205,4 +205,49 @@
   --sidebar-width: 280px;
   --sidebar-collapsed-width: 72px;
   --footer-height: 64px;
+
+  // ==========================================
+  // 🎯 ICON SIZES
+  // ==========================================
+  --icon-size-xs: 1rem;       // 16px
+  --icon-size-sm: 1.25rem;    // 20px
+  --icon-size-md: 1.5rem;     // 24px
+  --icon-size-lg: 2rem;       // 32px
+  --icon-size-xl: 3rem;       // 48px
+
+  // ==========================================
+  // 🔲 OPACITY SCALE
+  // ==========================================
+  --opacity-5: 0.05;
+  --opacity-10: 0.1;
+  --opacity-15: 0.15;
+  --opacity-20: 0.2;
+  --opacity-25: 0.25;
+  --opacity-50: 0.5;
+  --opacity-75: 0.75;
+  --opacity-85: 0.85;
+  --opacity-90: 0.9;
+
+  // ==========================================
+  // 🎨 CONTRAST TEXT COLORS (on colored backgrounds)
+  // ==========================================
+  --text-on-primary: white;
+  --text-on-secondary: white;
+  --text-on-accent: #0f172a;
+  --text-on-surface: var(--tx);
+
+  // ==========================================
+  // 📱 AUTH LAYOUT TOKENS
+  // ==========================================
+  --auth-panel-desktop-width: 50%;
+  --auth-form-height-mobile: 60%;
+  --auth-branding-height-mobile: 40%;
+  --auth-content-max-width: 480px;
+  --auth-content-padding: var(--space-lg);
+  --auth-content-padding-mobile: var(--space-md);
+
+  // ==========================================
+  // 👆 TOUCH TARGET MINIMUM (Accessibility)
+  // ==========================================
+  --touch-target-min: 44px;
 }

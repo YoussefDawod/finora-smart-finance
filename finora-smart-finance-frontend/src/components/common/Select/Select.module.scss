@@ -128,6 +128,11 @@
   }
 }
 
+:global([dir='rtl']) .select {
+  padding-left: var(--space-2xl);
+  padding-right: var(--space-md);
+}
+
 // ============================================
 // SIZE VARIANTS
 // ============================================
@@ -148,6 +153,11 @@
   }
 }
 
+:global([dir='rtl']) .selectGroup.small .select {
+  padding-left: var(--space-xl);
+  padding-right: var(--space-sm);
+}
+
 .selectGroup.medium {
   .selectWrapper {
     min-height: var(--input-h);
@@ -163,6 +173,11 @@
     padding: 0 var(--space-md);
     font-size: var(--fs-sm);
   }
+}
+
+:global([dir='rtl']) .selectGroup.medium .select {
+  padding-left: var(--space-2xl);
+  padding-right: var(--space-md);
 }
 
 .selectGroup.large {
@@ -182,6 +197,11 @@
   }
 }
 
+:global([dir='rtl']) .selectGroup.large .select {
+  padding-left: var(--space-3xl);
+  padding-right: var(--space-lg);
+}
+
 // ============================================
 // DROPDOWN ARROW
 // ============================================
@@ -195,6 +215,11 @@
   pointer-events: none;
   transition: color var(--tr), transform var(--tr);
   font-size: var(--fs-sm);
+}
+
+:global([dir='rtl']) .arrow {
+  right: auto;
+  left: 0;
 }
 
 // ============================================

@@ -1,32 +1,31 @@
 /**
- * AuthPage Styles - Modern Design
+ * AuthPage Styles - Compact Finora Design
  * 
- * DESKTOP (Horizontal 50/50):
- * - Form Panel: 50% width, left side
- * - Branding Panel: 50% width, right side with mesh gradient
- * - Panels slide horizontally to swap positions
- * 
- * MOBILE (Vertical 60/40):
- * - Form Panel: 60% height, top
- * - Branding Panel: 40% height, bottom
- * - Panels slide vertically to swap positions
- * 
- * ALL COLORS from CSS variables - no hardcoded values!
+ * GOALS:
+ * - NO scrolling on any viewport (content fits)
+ * - Desktop: Content vertically CENTERED
+ * - Mobile: Content fills space without overflow
+ * - Minimal gaps, professional look
  */
 
+@use '../../styles/mixins' as *;
+
 // ============================================
-// DESKTOP LAYOUT
+// DESKTOP PAGE CONTAINER
 // ============================================
 .authPage {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--bg-primary);
 }
 
-// Form Panel - Desktop (50% left)
+// ============================================
+// DESKTOP: FORM PANEL (50% left)
+// ============================================
 .formPanel {
   position: absolute;
   top: 0;
@@ -34,15 +33,16 @@
   width: 50%;
   height: 100%;
   display: flex;
-  align-items: center;
+  align-items: center;  // Vertically centered!
   justify-content: center;
   background: var(--bg-primary);
   z-index: 5;
   will-change: transform;
 }
 
-// Branding Panel - Desktop (50% right)
-// Modern mesh gradient background with animated glow
+// ============================================
+// DESKTOP: BRANDING PANEL (50% right)
+// ============================================
 .brandingPanel {
   position: absolute;
   top: 0;
@@ -52,48 +52,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center;  // Vertically centered!
   z-index: 10;
   overflow: hidden;
   will-change: transform;
   
-  // Multi-layer gradient background
   background: 
-    // Subtle radial glow at top
-    radial-gradient(
-      ellipse 80% 50% at 50% 0%,
-      color-mix(in srgb, var(--primary) 25%, transparent) 0%,
-      transparent 50%
-    ),
-    // Main gradient
-    linear-gradient(
-      145deg,
-      var(--primary) 0%,
-      color-mix(in srgb, var(--primary) 70%, var(--secondary)) 50%,
-      var(--secondary) 100%
-    );
+    radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in srgb, var(--primary) 25%, transparent) 0%, transparent 50%),
+    linear-gradient(145deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 70%, var(--secondary)) 50%, var(--secondary) 100%);
   
-  // Subtle animated pattern overlay
   &::before {
     content: '';
     position: absolute;
     inset: 0;
     background: 
-      radial-gradient(
-        circle at 20% 80%,
-        color-mix(in srgb, var(--accent) 20%, transparent) 0%,
-        transparent 40%
-      ),
-      radial-gradient(
-        circle at 80% 20%,
-        color-mix(in srgb, var(--info) 15%, transparent) 0%,
-        transparent 40%
-      );
+      radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--info) 15%, transparent) 0%, transparent 40%);
     opacity: 0.8;
     pointer-events: none;
   }
   
-  // Noise texture for depth
   &::after {
     content: '';
     position: absolute;
@@ -106,75 +84,90 @@
 }
 
 // ============================================
-// MOBILE LAYOUT
+// MOBILE PAGE CONTAINER
 // ============================================
 .authPageMobile {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
-  height: 100dvh;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  
+  @supports (height: 100dvh) {
+    height: 100dvh;
+  }
+  
   overflow: hidden;
   background: var(--bg-primary);
 }
 
-// Form Panel - Mobile (60% top)
+// ============================================
+// MOBILE: FORM PANEL (60% top)
+// ============================================
 .formPanelMobile {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 60%;
   display: flex;
-  align-items: center;
+  align-items: center;  // Vertically centered!
   justify-content: center;
   background: var(--bg-primary);
   z-index: 5;
   will-change: transform;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+  flex: 1 1 60%;
+  min-height: 0;
 }
 
-// Branding Panel - Mobile (40% bottom)
+// ============================================
+// MOBILE: BRANDING PANEL (40% bottom)
+// ============================================
 .brandingPanelMobile {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 40%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center;  // Vertically centered!
   z-index: 10;
   overflow: hidden;
   will-change: transform;
+  flex: 0 0 40%;
   
-  // Vertical gradient for mobile
   background: 
-    radial-gradient(
-      ellipse 100% 60% at 50% 100%,
-      color-mix(in srgb, var(--accent) 20%, transparent) 0%,
-      transparent 60%
-    ),
-    linear-gradient(
-      180deg,
-      var(--primary) 0%,
-      var(--secondary) 100%
-    );
+    radial-gradient(ellipse 100% 60% at 50% 100%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 60%),
+    linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.registerMode {
+  .formPanelMobile {
+    order: 2;
+    flex-basis: 60%;
+  }
+
+  .brandingPanelMobile {
+    order: 1;
+    flex-basis: 40%;
+  }
 }
 
 // ============================================
-// SHARED: FORM INNER CONTAINER
+// FORM INNER CONTAINER
 // ============================================
 .formInner {
   width: 100%;
-  max-width: 420px;
-  padding: 2rem;
+  max-width: 380px;
+  padding: var(--space-sm);
 
-  .formPanelMobile & {
-    max-width: 100%;
-    padding: 1.25rem 1.5rem;
+  @include lg {
+    max-width: 400px;
+    padding: var(--space-md);
+  }
+
+  @media (max-width: 480px) {
+    max-width: 360px;
+    padding: var(--space-2xs);
   }
 }
 
@@ -183,42 +176,57 @@
 }
 
 // ============================================
-// SHARED: HEADER
+// HEADER
 // ============================================
 .header {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-sm);
 
-  .formPanelMobile & {
-    margin-bottom: 1rem;
+  @include lg {
+    margin-bottom: var(--space-md);
+  }
+
+  @media (max-width: 480px) {
+    margin-bottom: var(--space-2xs);
   }
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.375rem;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin-bottom: var(--space-2xs);
+  letter-spacing: var(--ls-tight);
+  line-height: var(--lh-tight);
 
-  .formPanelMobile & {
-    font-size: 1.375rem;
+  @include lg {
+    font-size: var(--fs-2xl);
+    margin-bottom: var(--space-xs);
+  }
+
+  @media (max-width: 480px) {
+    font-size: var(--fs-lg);
+    margin-bottom: var(--space-3xs);
   }
 }
 
 .subtitle {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
   margin: 0;
-  line-height: 1.4;
+  line-height: var(--lh-snug);
 
-  .formPanelMobile & {
-    font-size: 0.8rem;
+  @include lg {
+    font-size: var(--fs-md);
+  }
+
+  @media (max-width: 480px) {
+    font-size: var(--fs-xs);
   }
 }
 
 // ============================================
-// SHARED: BRANDING CONTENT
+// BRANDING CONTENT (if used separately)
 // ============================================
 .brandingContent {
   position: relative;
@@ -227,17 +235,13 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 2rem;
-  max-width: 420px;
-
-  .brandingPanelMobile & {
-    padding: 1rem;
-    max-width: 100%;
-  }
+  padding: var(--space-md);
+  max-width: 100%;
+  width: 100%;
 }
 
 // ============================================
-// SHARED: FLOATING SHAPES - Modern geometric design
+// FLOATING SHAPES
 // ============================================
 .shapesContainer {
   position: absolute;
@@ -248,152 +252,143 @@
 
 .floatingShape {
   position: absolute;
-  border-radius: 50%;
-  
-  // Glassmorphism effect
-  background: 
-    radial-gradient(
-      circle at 30% 30%,
-      color-mix(in srgb, white 20%, transparent) 0%,
-      color-mix(in srgb, white 8%, transparent) 40%,
-      color-mix(in srgb, white 3%, transparent) 100%
-    );
+  border-radius: var(--r-full);
+  background: radial-gradient(circle at 30% 30%, color-mix(in srgb, white 20%, transparent) 0%, color-mix(in srgb, white 8%, transparent) 40%, color-mix(in srgb, white 3%, transparent) 100%);
   backdrop-filter: blur(2px);
   border: 1px solid color-mix(in srgb, white 12%, transparent);
-  box-shadow: 
-    0 8px 32px color-mix(in srgb, var(--shadow) 10%, transparent),
-    inset 0 1px 0 color-mix(in srgb, white 15%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--shadow) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 15%, transparent);
 }
 
 // ============================================
-// SHARED: HEADLINE
+// HEADLINE (in branding)
 // ============================================
 .headline {
-  margin-bottom: 1.25rem;
-
-  .brandingPanelMobile & {
-    margin-bottom: 0.75rem;
-  }
+  margin-bottom: var(--space-sm);
 
   h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: white;
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 8px color-mix(in srgb, var(--shadow) 20%, transparent);
+    font-size: var(--fs-lg);
+    font-weight: var(--fw-b);
+    color: var(--text-on-primary);
+    margin: 0 0 var(--space-2xs);
+    letter-spacing: var(--ls-tight);
 
-    .brandingPanelMobile & {
-      font-size: 1.25rem;
-      margin-bottom: 0.25rem;
+    @include lg {
+      font-size: var(--fs-2xl);
     }
   }
 
   p {
-    font-size: 0.95rem;
-    color: color-mix(in srgb, white 92%, transparent);
+    font-size: var(--fs-sm);
+    color: color-mix(in srgb, white 90%, transparent);
     margin: 0;
-    line-height: 1.5;
-
-    .brandingPanelMobile & {
-      font-size: 0.8rem;
-      line-height: 1.4;
-    }
+    line-height: var(--lh-snug);
   }
 }
 
 // ============================================
-// SHARED: CTA BUTTON - Glassmorphism style
+// CTA BUTTON
 // ============================================
 .ctaButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 2rem;
+  padding: var(--space-xs) var(--space-lg);
+  min-height: 40px;
   background: white;
   color: var(--primary);
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-sm);
   text-decoration: none;
   border-radius: var(--r-lg);
   border: none;
   cursor: pointer;
-  transition: all 0.3s var(--ease-out);
-  box-shadow: 
-    0 4px 16px color-mix(in srgb, var(--shadow) 20%, transparent),
-    0 2px 4px color-mix(in srgb, var(--shadow) 10%, transparent);
+  transition: transform var(--tr-fast), box-shadow var(--tr-fast);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--shadow) 20%, transparent);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      0 8px 24px color-mix(in srgb, var(--shadow) 25%, transparent),
-      0 4px 8px color-mix(in srgb, var(--shadow) 15%, transparent);
-    background: color-mix(in srgb, white 95%, var(--primary));
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--shadow) 25%, transparent);
   }
 
   &:active {
     transform: translateY(0);
   }
-
-  .brandingPanelMobile & {
-    padding: 0.625rem 1.5rem;
-    font-size: 0.85rem;
-  }
+  
+  @include focus-ring;
 }
 
 // ============================================
-// DESKTOP ONLY: FEATURES - Modern pill design
+// FEATURES (Desktop only)
 // ============================================
 .features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  justify-content: center;
-  margin-top: 1.75rem;
+  display: none;
+
+  @include lg {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    justify-content: center;
+    margin-top: var(--space-lg);
+  }
 }
 
 .featurePill {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-sm);
   background: color-mix(in srgb, white 12%, transparent);
   backdrop-filter: blur(12px);
   border: 1px solid color-mix(in srgb, white 18%, transparent);
-  border-radius: 100px;
-  color: white;
-  font-size: 0.8rem;
-  font-weight: 500;
-  transition: all 0.25s var(--ease-out);
-  
-  &:hover {
-    background: color-mix(in srgb, white 18%, transparent);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--shadow) 15%, transparent);
-  }
+  border-radius: var(--r-full);
+  color: var(--text-on-primary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
 }
 
 .featureIcon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   opacity: 0.9;
 }
 
 // ============================================
-// DESKTOP ONLY: FOOTER
+// FOOTER (Desktop only)
 // ============================================
 .brandingFooter {
-  position: absolute;
-  bottom: 1.25rem;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 2;
+  display: none;
 
-  p {
-    font-size: 0.7rem;
-    color: color-mix(in srgb, white 60%, transparent);
-    margin: 0;
+  @include lg {
+    display: block;
+    position: absolute;
+    bottom: var(--space-md);
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 2;
+
+    p {
+      font-size: var(--fs-2xs);
+      color: color-mix(in srgb, white 50%, transparent);
+      margin: 0;
+    }
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .formPanel,
+  .brandingPanel,
+  .formPanelMobile,
+  .brandingPanelMobile {
+    transition: none !important;
+  }
+  
+  .ctaButton,
+  .featurePill {
+    transition: none;
   }
 }

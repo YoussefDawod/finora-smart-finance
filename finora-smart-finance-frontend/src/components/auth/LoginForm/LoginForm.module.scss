@@ -8,6 +8,8 @@
  * - Clear validation states
  */
 
+@use '../../../styles/mixins' as *;
+
 // ============================================
 // FORM CONTAINER
 // ============================================
@@ -15,7 +17,11 @@
 .loginForm {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--space-sm);
+
+  @include lg {
+    gap: var(--space-md);
+  }
 }
 
 // ============================================
@@ -25,11 +31,11 @@
 .errorBanner {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
   background: color-mix(in srgb, var(--error) 8%, transparent);
   border: 1px solid color-mix(in srgb, var(--error) 25%, transparent);
-  border-radius: 0.75rem;
+  border-radius: var(--r-md);
   overflow: hidden;
 }
 
@@ -73,7 +79,7 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--space-2xs);
 }
 
 // ============================================
@@ -81,10 +87,10 @@
 // ============================================
 
 .label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  letter-spacing: var(--ls-tight);
 
   .inputWrapper.error ~ & {
     color: var(--error);
@@ -99,19 +105,19 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--bg-secondary);
-  border: 1.5px solid var(--border-primary);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
   border-radius: var(--r-lg);
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
 
   &:focus-within {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 15%, transparent);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
   }
 
   &.error {
     border-color: var(--error);
-    background: color-mix(in srgb, var(--error) 3%, var(--bg-secondary));
+    background: color-mix(in srgb, var(--error) 3%, var(--surface-2));
 
     &:focus-within {
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 15%, transparent);
@@ -129,14 +135,14 @@
 
 .inputIcon {
   position: absolute;
-  left: 1rem;
-  font-size: 1.125rem;
-  color: var(--text-muted);
+  left: var(--space-md);
+  font-size: var(--fs-lg);
+  color: var(--tx-muted);
   pointer-events: none;
-  transition: color 0.2s ease;
+  transition: color var(--tr-fast);
 
   .inputWrapper:focus-within & {
-    color: var(--accent-primary);
+    color: var(--primary);
   }
 
   .inputWrapper.error & {
@@ -148,12 +154,17 @@
   }
 }
 
+:global([dir='rtl']) .inputIcon {
+  left: auto;
+  right: var(--space-md);
+}
+
 .input {
   width: 100%;
-  height: 3rem;
-  padding: 0 1rem 0 2.75rem;
-  font-size: 1rem;
-  color: var(--text-primary);
+  height: 2.75rem;
+  padding: 0 var(--space-md) 0 2.5rem;
+  font-size: var(--fs-md);
+  color: var(--tx);
   background: transparent;
   border: none;
   outline: none;
@@ -164,17 +175,21 @@
   }
 
   &::placeholder {
-    color: var(--text-muted);
+    color: var(--tx-muted);
   }
 
   // Autofill styling
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    -webkit-text-fill-color: var(--text-primary);
-    -webkit-box-shadow: 0 0 0 1000px var(--bg-secondary) inset;
+    -webkit-text-fill-color: var(--tx);
+    -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
     transition: background-color 5000s ease-in-out 0s;
   }
+}
+
+:global([dir='rtl']) .input {
+  padding: 0 2.5rem 0 var(--space-md);
 }
 
 // ============================================
@@ -188,9 +203,14 @@
   color: var(--success);
 }
 
+:global([dir='rtl']) .statusIcon {
+  right: auto;
+  left: 1rem;
+}
+
 .passwordToggle {
   position: absolute;
-  right: 0.75rem;
+  right: var(--space-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,25 +220,35 @@
   background: transparent;
   border: none;
   border-radius: var(--r-sm);
-  color: var(--text-muted);
+  color: var(--tx-muted);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--tr-fast);
 
   &:hover {
-    color: var(--text-primary);
-    background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+    color: var(--tx);
+    background: color-mix(in srgb, var(--tx) 5%, transparent);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--accent-primary);
+    outline: 2px solid var(--primary);
     outline-offset: 1px;
   }
+}
+
+:global([dir='rtl']) .passwordToggle {
+  right: auto;
+  left: var(--space-sm);
 }
 
 .errorMessage {
   font-size: 0.8125rem;
   color: var(--error);
   padding-left: 0.25rem;
+}
+
+:global([dir='rtl']) .errorMessage {
+  padding-left: 0;
+  padding-right: 0.25rem;
 }
 
 // ============================================
@@ -231,6 +261,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+:global([dir='rtl']) .optionsRow {
+  flex-direction: row-reverse;
 }
 
 // ============================================
@@ -252,28 +286,32 @@
   }
 }
 
+:global([dir='rtl']) .checkbox {
+  flex-direction: row-reverse;
+}
+
 .checkmark {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 1.25rem;
   height: 1.25rem;
-  background: var(--bg-secondary);
-  border: 1.5px solid var(--border-primary);
-  border-radius: 0.375rem;
-  transition: all 0.15s ease;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all var(--tr-fast);
 
   svg {
-    font-size: 0.75rem;
+    font-size: var(--fs-xs);
     color: white;
     opacity: 0;
     transform: scale(0.5);
-    transition: all 0.15s ease;
+    transition: all var(--tr-fast);
   }
 
   .checkbox input:checked + & {
-    background: var(--accent-primary);
-    border-color: var(--accent-primary);
+    background: var(--primary);
+    border-color: var(--primary);
 
     svg {
       opacity: 1;
@@ -282,17 +320,21 @@
   }
 
   .checkbox input:focus-visible + & {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 25%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   .checkbox:hover & {
-    border-color: var(--accent-primary);
+    border-color: var(--primary);
   }
 }
 
 .checkboxLabel {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+:global([dir='rtl']) .checkboxLabel {
+  text-align: right;
 }
 
 // ============================================
@@ -300,21 +342,25 @@
 // ============================================
 
 .forgotLink {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accent-primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--primary);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color var(--tr-fast);
 
   &:hover {
-    color: var(--accent-secondary);
+    color: var(--pri-hover);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--accent-primary);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
     border-radius: 4px;
   }
+}
+
+:global([dir='rtl']) .forgotLink {
+  text-align: right;
 }
 
 // ============================================
@@ -325,22 +371,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   width: 100%;
-  height: 3rem;
-  padding: 0 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  height: 2.75rem;
+  padding: 0 var(--space-lg);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--on-primary);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   border: none;
-  border-radius: 0.75rem;
+  border-radius: var(--r-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--accent-primary) 35%, transparent);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 35%, transparent);
   }
 
   &:active:not(:disabled) {
@@ -353,17 +399,23 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--accent-primary);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 }
 
 .buttonIcon {
-  font-size: 1.125rem;
-  transition: transform 0.2s ease;
+  font-size: var(--fs-lg);
+  transition: transform var(--tr-fast);
 
   .submitButton:hover:not(:disabled) & {
     transform: translateX(2px);
+  }
+}
+
+:global([dir='rtl']) .buttonIcon {
+  .submitButton:hover:not(:disabled) & {
+    transform: translateX(-2px);
   }
 }
 
@@ -374,7 +426,7 @@
 .spinner {
   width: 1.125rem;
   height: 1.125rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid color-mix(in srgb, white 30%, transparent);
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;

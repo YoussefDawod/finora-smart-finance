@@ -1,0 +1,718 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Sign out"
+  },
+  "common": {
+    "saveChanges": "Save changes",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "closeNotification": "Close notification",
+    "confirm": "Confirm",
+    "backToLogin": "Back to login",
+    "or": "or",
+    "loading": "Loading...",
+    "loadingContent": "Content is loading",
+    "seeAll": "View all",
+    "noData": "No data available",
+    "selectPlaceholder": "Select an option",
+    "navigation": "Main navigation",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "userMenu": "User menu",
+    "menu": "Menu",
+    "next": "Next",
+    "back": "Back",
+    "complete": "Complete",
+    "prevStep": "Previous step",
+    "loadingNext": "Checking...",
+    "loadingComplete": "Submitting...",
+    "stepErrorsTitle": "⚠ Errors in this step:",
+    "appName": "Finora - Smart Finance"
+  },
+  "themeSelector": {
+    "title": "Appearance & Theme",
+    "ariaLabel": "Appearance & Theme",
+    "colorScheme": "Color scheme",
+    "effects": "Effects",
+    "glassmorphic": "Glasmorphic"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage appearance, preferences, and export options in one place.",
+    "general": {
+      "title": "General",
+      "description": "Language, currency, and date format for your reports.",
+      "language": "Language",
+      "currency": "Currency",
+      "dateFormat": "Date format",
+      "languagePlaceholder": "Select language",
+      "currencyPlaceholder": "Select currency",
+      "datePlaceholder": "Select format",
+      "dateExample": "Example: {{value}}",
+      "currencyEUR": "Euro (EUR)",
+      "currencyUSD": "US Dollar (USD)",
+      "dateFormatIso": "YYYY-MM-DD (ISO 8601)",
+      "dateFormatDmy": "DD.MM.YYYY"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Pick a theme, follow the system, or enable glass effects.",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System",
+      "themeLightDesc": "Clean, bright surface",
+      "themeDarkDesc": "Easier on the eyes at night",
+      "themeSystemDesc": "Follow device settings",
+      "glassTitle": "Glassmorphic effect",
+      "glassDescription": "Adds translucent surfaces for a modern UI.",
+      "glassAria": "Toggle glassmorphic effect"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Control how you receive updates and reports.",
+      "emailTitle": "Email notifications",
+      "emailDescription": "Receive important account and finance updates by email.",
+      "emailAria": "Toggle email notifications"
+    },
+    "saved": "Preferences saved successfully.",
+    "saveError": "Preferences could not be saved."
+  },
+  "dashboard": {
+    "greetingIntro": "Welcome back,",
+    "overview": "Here is an overview of your financial activity this month",
+    "loading": "Loading dashboard...",
+    "newTransaction": "New transaction",
+    "income": "Income",
+    "expenses": "Expenses",
+    "balance": "Balance",
+    "netBalance": "Net balance",
+    "noChange": "No change",
+    "vsLastMonth": "vs. last month",
+    "incomeTrendTooltip": "Income compared to last month",
+    "expenseTrendTooltip": "Expenses compared to last month",
+    "balanceTrendTooltip": "Balance compared to last month",
+    "chartRatioNote": "Ratio calculated from income vs. expenses",
+    "chartsTitle": "Charts & insights",
+    "recentTransactions": "Recent transactions",
+    "noTransactions": "No transactions yet",
+    "noTransactionsSub": "Add your first transaction to see it here",
+    "noDataTitle": "No data yet",
+    "noDataSubtitle": "Once transactions exist, insights and trends will appear here.",
+    "incomeVsExpense": "Income vs. expenses",
+    "currentMonth": "Current month",
+    "savingsRate": "Savings rate",
+    "deficit": "Deficit",
+    "monthlyTrend": "Monthly trend",
+    "lastMonths": "Last {{count}} months",
+    "noDataShort": "No data",
+    "categoriesTitle": "Categories",
+    "categoriesSubtitle": "Full overview (current month)",
+    "categoriesTypeLabel": "Category type",
+    "totalLabel": "Total",
+    "categoriesLabel": "Categories",
+    "noCategoryData": "No category data available.",
+    "transactionCount": "{{count}} transactions",
+    "summaryDefaultTitle": "Title",
+    "summaryDefaultValue": "€0.00",
+    "errors": {
+      "load": "Failed to load dashboard data"
+    }
+  },
+  "transactions": {
+    "pageTitle": "Transactions",
+    "manageSubtitle": "Manage your income and expenses",
+    "searchPlaceholder": "Search transactions...",
+    "searchAria": "Search transactions",
+    "filter": "Filter",
+    "type": "Type",
+    "income": "Income",
+    "expense": "Expense",
+    "amount": "Amount",
+    "amountPlaceholder": "0.00",
+    "amountHint": "Enter the transaction amount",
+    "date": "Date",
+    "dateHint": "Select the transaction date",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe this transaction...",
+    "descriptionHint": "Add details about the transaction (max 100 characters)",
+    "category": "Category",
+    "categoryPlaceholder": "Choose a category",
+    "categoryHint": "Choose an {{type}} category",
+    "notes": "Notes",
+    "addTransaction": "Add transaction",
+    "editTransaction": "Edit transaction",
+    "deleteTransaction": "Delete transaction",
+    "updateAction": "Update",
+    "editAction": "Edit",
+    "deleteAction": "Delete",
+    "actions": "Actions",
+    "deleteConfirm": "Delete this item?",
+    "deleteSuccess": "Transaction deleted",
+    "deleteError": "Delete failed",
+    "emptyTitle": "No transactions",
+    "emptySubtitle": "No transactions match the current filters",
+    "loadErrorTitle": "Failed to load",
+    "perPage": "Per page:",
+    "page": "Page",
+    "of": "of",
+    "total": "{{count}} transaction{{suffix}} total",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "createSuccess": "Transaction created",
+    "updateSuccess": "Transaction updated",
+    "saveError": "Failed to save",
+    "errors": {
+      "load": "Failed to load transactions",
+      "create": "Failed to create transaction",
+      "update": "Failed to update transaction",
+      "delete": "Failed to delete transaction"
+    },
+    "validation": {
+      "typeRequired": "Type is required",
+      "amountRequired": "Amount is required",
+      "amountPositive": "Amount must be greater than 0",
+      "categoryRequired": "Category is required",
+      "categoryMin": "Category must be at least 2 characters",
+      "descriptionRequired": "Description is required",
+      "descriptionMin": "Description must be at least 3 characters",
+      "descriptionMax": "Description must be at most 100 characters",
+      "dateRequired": "Date is required",
+      "invalidDate": "Invalid date"
+    }
+  },
+  "auth": {
+    "verifyEmailTitle": "Verify email",
+    "verifyEmailSubtitle": "Enter the 6-digit code from your email.",
+    "verifyEmailSent": "We sent a code to {{email}}.",
+    "verifySuccessTitle": "Email verified",
+    "verifySuccessSubtitle": "Your email address {{email}} has been verified.",
+    "verifySuccessAddNote": "You can now reset your password.",
+    "verifyErrorTitle": "Verification failed",
+    "verifyErrorMissingToken": "No verification token found.",
+    "verifyErrorInvalidToken": "The link is invalid or expired.",
+    "verifyErrorServer": "A server error occurred.",
+    "verifyErrorUnknown": "An unknown error occurred.",
+    "verifyLoadingTitle": "Verifying email...",
+    "verifyLoadingSubtitle": "Please wait a moment.",
+    "goToProfile": "→ Go to profile",
+    "goToDashboard": "→ Go to dashboard",
+    "backToProfile": "← Back to profile",
+    "forgotTitle": "Forgot password?",
+    "resetTitle": "New password",
+    "resetSubtitle": "Enter your new secure password.",
+    "forgotSubtitle": "No worries! We will send you a link.",
+    "page": {
+      "registerTitle": "Create account",
+      "registerSubtitle": "Get started with Finora in just a few steps.",
+      "loginTitle": "Sign in",
+      "loginSubtitle": "Welcome back! Sign in to continue.",
+      "registerAction": "Sign up"
+    },
+    "layout": {
+      "login": {
+        "headline": "New here?",
+        "subline": "Create your free account and start taking control of your finances today.",
+        "cta": "Sign up now"
+      },
+      "register": {
+        "headline": "Welcome back!",
+        "subline": "Already have an account? Sign in and keep managing your finances.",
+        "cta": "Go to sign in"
+      },
+      "forgot": {
+        "headline": "No worries",
+        "subline": "We will help you regain access to your account.",
+        "cta": "Go to sign in"
+      },
+      "verify": {
+        "headline": "Almost there",
+        "subline": "Verify your email to get started.",
+        "cta": "Go to sign in"
+      }
+    },
+    "branding": {
+      "badge": "Budget • Insights • Trust",
+      "kicker": "Finora • Smart Finance",
+      "login": {
+        "headline": "New here?",
+        "subline": "Create your free account and get started today.",
+        "cta": "Sign up now"
+      },
+      "register": {
+        "headline": "Welcome back!",
+        "subline": "Already have an account? Sign in.",
+        "cta": "Go to sign in"
+      },
+      "default": {
+        "headline": "Welcome!",
+        "subline": "Keep your finances in check — clear and secure.",
+        "cta": "Get started"
+      },
+      "highlights": {
+        "track": {
+          "title": "Track transactions",
+          "desc": "Capture income & expenses in seconds."
+        },
+        "charts": {
+          "title": "Charts & trends",
+          "desc": "Interactive insights for budgets and forecasts."
+        },
+        "secure": {
+          "title": "Secure sign-in",
+          "desc": "JWT-based, refresh sessions, protected."
+        },
+        "theme": {
+          "title": "Dark/Light mode",
+          "desc": "Optimized for both themes and devices."
+        }
+      },
+      "footer": "© 2026 Finora. All rights reserved."
+    },
+    "login": {
+      "username": "Username",
+      "usernamePlaceholder": "Your username",
+      "password": "Password",
+      "passwordPlaceholder": "Your password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "rememberMe": "Keep me signed in",
+      "forgot": "Forgot password?",
+      "submit": "Sign in",
+      "loading": "Signing in...",
+      "success": "Signed in successfully!",
+      "error": "Sign in failed. Please try again.",
+      "dismissError": "Dismiss error",
+      "validation": {
+        "usernameRequired": "Username is required",
+        "usernameMin": "At least 3 characters",
+        "passwordRequired": "Password is required",
+        "formInvalid": "Please fill all fields correctly"
+      }
+    },
+    "forgot": {
+      "validation": {
+        "emailRequired": "Email is required",
+        "emailInvalid": "Invalid email"
+      },
+      "successToast": "Reset link sent!",
+      "errorToast": "Send failed. Please try again later.",
+      "successTitle": "Email sent!",
+      "successMessage": "We sent a password reset link to {{email}}.",
+      "successHint": "The link is valid for 24 hours. Check your spam folder too.",
+      "useDifferentEmail": "Use a different email",
+      "emailLabel": "Email address",
+      "sending": "Sending...",
+      "submit": "Send reset link"
+    },
+    "reset": {
+      "validation": {
+        "passwordRequired": "Password is required",
+        "passwordMin": "At least 8 characters",
+        "passwordWeak": "Too weak",
+        "confirmRequired": "Confirmation required",
+        "passwordMismatch": "Passwords do not match",
+        "formInvalid": "Please fill all fields correctly"
+      },
+      "strength": {
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "excellent": "Excellent"
+      },
+      "successToast": "Password changed successfully!",
+      "errorToast": "Reset failed. The link may have expired.",
+      "successTitle": "Password changed!",
+      "successMessage": "Your password was updated successfully. Redirecting to sign in...",
+      "passwordLabel": "New password",
+      "confirmLabel": "Confirm password",
+      "saving": "Saving...",
+      "submit": "Save password"
+    },
+    "verifyForm": {
+      "successToast": "Email verified successfully!",
+      "errorToast": "Verification failed. Please try again.",
+      "successTitle": "Email verified!",
+      "successMessage": "Redirecting to the dashboard...",
+      "digitLabel": "Digit {{index}}",
+      "loading": "Verifying...",
+      "resendPrompt": "Didn’t receive a code?",
+      "resendSending": "Sending...",
+      "resendCountdown": "Resend ({{count}}s)",
+      "resendAction": "Resend code",
+      "spamHint": "Check your spam folder",
+      "resendSuccess": "A new code has been sent!",
+      "resendError": "Send failed. Please try again later."
+    },
+    "register": {
+      "steps": {
+        "data": "Details",
+        "password": "Password",
+        "finish": "Finish"
+      },
+      "step1": {
+        "title": "Personal details",
+        "description": "Tell us a bit about yourself.",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "MyUsername",
+        "usernameHint": "This name will be used to sign in.",
+        "emailLabel": "Email address",
+        "optional": "(optional)",
+        "emailPlaceholder": "name@example.com",
+        "emailHint": "For password recovery. Without email you cannot reset your password."
+      },
+      "step2": {
+        "title": "Create password",
+        "description": "Choose a strong password.",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "At least 8 characters",
+        "confirmLabel": "Confirm password",
+        "confirmPlaceholder": "Repeat password"
+      },
+      "step3": {
+        "title": "Almost done!",
+        "description": "Accept our terms.",
+        "noEmailTitle": "No email address provided",
+        "noEmailText": "Without an email address you <strong>cannot reset</strong> your password if you forget it. You can add an email later in your profile.",
+        "termsTitle": "Terms of service",
+        "termsText": "By registering you accept our terms and privacy policy. You are responsible for all activity under your account.",
+        "termsAccept": "I accept the",
+        "termsLink": "terms of service",
+        "noEmailConfirm": "I understand that I cannot reset my password without an email address"
+      },
+      "navigation": {
+        "back": "Back",
+        "next": "Next",
+        "submitting": "Registering...",
+        "submit": "Create account"
+      },
+      "strength": {
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "excellent": "Excellent"
+      },
+      "validation": {
+        "nameRequired": "Name is required",
+        "nameMin": "At least 3 characters",
+        "nameMax": "At most 50 characters",
+        "nameChars": "Only letters, numbers, spaces and hyphens allowed",
+        "emailInvalid": "Invalid email address",
+        "passwordRequired": "Password is required",
+        "passwordMin": "At least 8 characters",
+        "passwordUpper": "At least one uppercase letter required",
+        "passwordNumber": "At least one number required",
+        "passwordSpecial": "At least one special character required",
+        "confirmRequired": "Confirmation required",
+        "passwordMismatch": "Passwords do not match",
+        "termsRequired": "Consent required",
+        "noEmailConfirm": "Please confirm you understand this",
+        "stepInvalid": "Please fill all fields correctly",
+        "formInvalid": "Please fill all required fields"
+      },
+      "successVerifyEmail": "Registration successful! Please verify your email.",
+      "successWelcome": "Registration successful! Welcome to Finora.",
+      "error": "Registration failed"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your personal details and account settings",
+    "badgeVerified": "Verified",
+    "badgeUnverified": "Not verified",
+    "noEmailInline": "No email address on file",
+    "email": {
+      "title": "Email management",
+      "loading": "Loading email status...",
+      "currentLabel": "Current email",
+      "statusLabel": "Status",
+      "verified": "Verified",
+      "pending": "Pending",
+      "warningUnverified": "Your email is not verified yet. Password reset works only after verification.",
+      "resend": "Resend",
+      "resendSending": "Sending...",
+      "change": "Change email",
+      "remove": "Remove email",
+      "removing": "Removing...",
+      "pendingTitle": "Email pending",
+      "pendingSent": "Verification link was sent to {{email}}",
+      "spamHint": "Check your spam folder if the email doesn’t arrive.",
+      "pendingResend": "Resend verification link",
+      "pendingResendSending": "Sending...",
+      "pendingUseDifferent": "Use a different email",
+      "noEmailTitle": "No email address",
+      "noEmailDescription": "Without an email you cannot reset your password if you forget it.",
+      "addEmail": "Add email"
+    },
+    "personal": {
+      "title": "Personal details",
+      "edit": "Edit",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Your username",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "security": {
+      "title": "Security",
+      "passwordTitle": "Password",
+      "passwordDescription": "Change your password regularly",
+      "change": "Change"
+    },
+    "account": {
+      "title": "Account management",
+      "logout": "Sign out",
+      "delete": "Delete account"
+    },
+    "modals": {
+      "addEmail": {
+        "titleAdd": "Add email",
+        "titleChange": "Change email",
+        "label": "New email address",
+        "placeholder": "name@example.com",
+        "hint": "You will receive a verification email at this address.",
+        "spamHint": "Check your spam folder if the email doesn’t arrive.",
+        "cancel": "Cancel",
+        "submit": "Send verification",
+        "sending": "Sending..."
+      },
+      "removeEmail": {
+        "title": "Remove email",
+        "passwordLabel": "Confirm password",
+        "passwordPlaceholder": "Current password",
+        "confirmLabel": "I understand: Without an email, password reset is not possible.",
+        "cancel": "Cancel",
+        "submit": "Remove email",
+        "removing": "Removing..."
+      },
+      "changePassword": {
+        "title": "Change password",
+        "currentLabel": "Current password",
+        "newLabel": "New password",
+        "confirmLabel": "Confirm password",
+        "cancel": "Cancel",
+        "submit": "Change password",
+        "changing": "Changing..."
+      },
+      "deleteAccount": {
+        "title": "Delete account",
+        "warningPrimary": "This action cannot be undone.",
+        "warningSecondary": "All your data, transactions, and settings will be permanently deleted.",
+        "confirmLabel": "Type \"{{value}}\" to confirm:",
+        "placeholder": "{{value}}",
+        "cancel": "Cancel",
+        "submit": "Permanently delete account",
+        "confirmValue": "DELETE",
+        "confirmError": "Please enter {{value}}"
+      }
+    },
+    "toasts": {
+      "nameMin": "Name must be at least 3 characters",
+      "nameMax": "Name must be at most 50 characters",
+      "saved": "Profile saved",
+      "saveError": "Save failed",
+      "invalidEmail": "Please enter a valid email address",
+      "sameEmail": "New email must be different",
+      "verificationSentChange": "Verification link sent",
+      "verificationSentAdd": "Verification email sent",
+      "spamHint": "Please check your spam folder",
+      "emailSendError": "Email could not be sent",
+      "passwordRequired": "Enter password",
+      "confirmRemoval": "Please confirm removal",
+      "emailRemoved": "Email address removed",
+      "emailRemoveError": "Email could not be removed",
+      "verificationResent": "Verification email resent",
+      "verificationResentTo": "Verification email resent to {{email}}!",
+      "passwordMismatch": "Passwords do not match",
+      "passwordWeak": "At least 8 characters, uppercase, number & special character required",
+      "passwordChanged": "Password changed successfully!",
+      "passwordChangeError": "Password could not be changed",
+      "accountDeleted": "Account deleted",
+      "accountDeleteError": "Account could not be deleted"
+    },
+    "deleteAccountTitle": "Delete account",
+    "deleteConfirmLabel": "Type \"DELETE\" to confirm:",
+    "deleteButton": "Permanently delete account"
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundSubtitle": "This page does not exist or was moved.",
+    "backToDashboard": "Back to dashboard",
+    "unauthorizedTitle": "Access denied",
+    "unauthorizedSubtitle": "You do not have access to this page.",
+    "serverErrorTitle": "Server error",
+    "serverErrorSubtitle": "Sorry, there was a server error."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: January 2026",
+    "sections": [
+      {
+        "title": "1. Scope",
+        "paragraphs": [
+          "These terms apply to the use of Finora (the \"Service\"). By registering and using the Service you agree to these terms."
+        ]
+      },
+      {
+        "title": "2. Registration and account",
+        "paragraphs": [
+          "To use the Service you must create an account. You agree to:"
+        ],
+        "list": [
+          "Provide accurate and complete information",
+          "Keep your credentials confidential",
+          "Notify us promptly about unauthorized use",
+          "Create only one account per person"
+        ]
+      },
+      {
+        "title": "3. Use of the Service",
+        "paragraphs": [
+          "The Service helps you manage income and expenses. You may only use it for lawful purposes.",
+          "In particular, it is forbidden to:"
+        ],
+        "list": [
+          "Use the Service for illegal activities",
+          "Upload malware or malicious code",
+          "Attempt to gain unauthorized access",
+          "Disrupt or interfere with the Service"
+        ]
+      },
+      {
+        "title": "4. Privacy",
+        "paragraphs": [
+          "We take data protection seriously. We process personal data according to applicable laws. For details, see our Privacy Policy."
+        ]
+      },
+      {
+        "title": "5. Intellectual property",
+        "paragraphs": [
+          "All rights in the Service, including design, code, and content, belong to the operator. Use of the Service does not grant rights to trademarks, logos, or protected elements."
+        ]
+      },
+      {
+        "title": "6. Disclaimer",
+        "paragraphs": [
+          "The Service is provided \"as is\". We do not guarantee:"
+        ],
+        "list": [
+          "Uninterrupted availability",
+          "Error-free operation",
+          "Accuracy of user-provided data"
+        ]
+      },
+      {
+        "title": "7. Termination",
+        "paragraphs": [
+          "You may delete your account at any time in settings. We may suspend or delete accounts that violate these terms."
+        ]
+      },
+      {
+        "title": "8. Changes to the terms",
+        "paragraphs": [
+          "We may update these terms from time to time. We will notify you of material changes in advance."
+        ]
+      },
+      {
+        "title": "9. Final provisions",
+        "paragraphs": [
+          "The laws of the Federal Republic of Germany apply. If any provision is invalid, the remaining provisions remain effective."
+        ]
+      }
+    ]
+  },
+  "export": {
+    "title": "Data export",
+    "subtitle": "Export your transactions as CSV or PDF",
+    "csv": {
+      "title": "CSV export",
+      "description": "Export all transactions as a CSV file. Ideal for Excel or other spreadsheets.",
+      "button": "Download CSV",
+      "headers": {
+        "statusTitle": "{{code}} - {{title}}",
+        "date": "Date",
+        "category": "Category",
+        "description": "Description",
+        "type": "Type",
+        "amount": "Amount ({{currency}})"
+      },
+      "types": {
+        "income": "Income",
+        "expense": "Expense"
+      }
+    },
+    "pdf": {
+      "title": "PDF export",
+      "description": "Create a printable report with all transactions, grouped by month.",
+      "button": "Create PDF",
+      "reportTitle": "Finora Smart Finance - Financial report",
+      "createdLabel": "Created",
+      "summary": {
+        "income": "Income",
+        "expense": "Expenses",
+        "balance": "Balance"
+      },
+      "monthSummary": "{{count}} transactions · Balance: {{balance}}",
+      "table": {
+        "date": "Date",
+        "category": "Category",
+        "description": "Description",
+        "amount": "Amount"
+      },
+      "footer": "{{count}} transactions · © {{year}} Finora",
+      "defaultUserName": "User",
+      "noDescription": "—"
+    },
+    "toasts": {
+      "noTransactions": "No transactions to export",
+      "csvSuccess": "{{count}} transactions exported as CSV",
+      "csvError": "CSV export failed",
+      "pdfSuccess": "{{count}} transactions prepared for PDF export",
+      "pdfError": "PDF export failed"
+    }
+  },
+  "filters": {
+    "title": "Filter",
+    "open": "Open filters",
+    "period": "Period",
+    "type": "Type",
+    "category": "Category",
+    "date": "Date",
+    "from": "From",
+    "to": "To",
+    "allCategories": "All categories",
+    "reset": "Reset filters",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "thisYear": "This year"
+  },
+  "categories": {
+    "salary": "Salary",
+    "freelance": "Freelance",
+    "investments": "Investments",
+    "gift": "Gift",
+    "bonus": "Bonus",
+    "sideJob": "Side job",
+    "cashback": "Cashback",
+    "rental": "Rental",
+    "groceries": "Groceries",
+    "transport": "Transport",
+    "entertainment": "Entertainment",
+    "rent": "Rent",
+    "insurance": "Insurance",
+    "health": "Health",
+    "education": "Education",
+    "clothing": "Clothing",
+    "travel": "Travel",
+    "electronics": "Electronics",
+    "restaurant": "Restaurant",
+    "sports": "Sports",
+    "household": "Household",
+    "other": "Other"
+  }
+}

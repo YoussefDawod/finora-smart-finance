@@ -16,7 +16,7 @@
   align-items: center;
   justify-content: center;
   z-index: var(--z-overlay);
-  animation: fadeIn var(--d-normal) ease-in-out;
+  animation: fadeIn var(--duration-normal) ease-in-out;
 
   &.fullScreen {
     position: fixed;

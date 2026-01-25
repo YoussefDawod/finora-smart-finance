@@ -11,6 +11,7 @@
  * @module components/common/Skeleton
  */
 
+import { useTranslation } from 'react-i18next';
 import './Skeleton.scss';
 
 /**
@@ -38,6 +39,7 @@ const Skeleton = ({
   borderRadius = 'var(--radius-md)',
   className = ''
 }) => {
+  const { t } = useTranslation();
   return (
     <div className={`skeleton-wrapper ${className}`}>
       {Array.from({ length: count }).map((_, i) => (
@@ -52,7 +54,7 @@ const Skeleton = ({
           }}
           role="status"
           aria-busy="true"
-          aria-label="Inhalt wird geladen"
+          aria-label={t('common.loadingContent')}
         />
       ))}
     </div>

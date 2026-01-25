@@ -16,10 +16,22 @@
   border-radius: var(--r-lg);
   border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
   box-shadow: var(--sh-sm);
+  animation: slideInForm 0.4s ease-out;
 
   @include tablet {
     padding: var(--space-md);
     gap: var(--space-md);
+  }
+}
+
+@keyframes slideInForm {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -70,6 +82,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
 }
 
 .required {
@@ -94,14 +107,14 @@
   justify-content: center;
   gap: var(--space-xs);
   padding: var(--space-md) var(--space-lg);
-  background: var(--surface-2);
-  border: 2px solid transparent;
+  background: color-mix(in srgb, var(--surface-2) 90%, var(--bg) 10%);
+  border: 2px solid color-mix(in srgb, var(--tx) 15%, transparent);
   border-radius: var(--r-md);
   cursor: pointer;
   transition: all var(--tr);
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
-  color: var(--tx-muted);
+  color: var(--tx);
 
   .icon {
     font-size: var(--fs-xl);
@@ -122,6 +135,7 @@
   &:hover:not(:disabled) {
     background: var(--surface);
     border-color: var(--primary);
+    color: var(--tx);
   }
 
   &:disabled {
@@ -355,4 +369,13 @@
   .spinner {
     animation: spin 1.5s linear infinite;
   }
+}
+
+// ============================================
+// RTL SUPPORT
+// ============================================
+:global([dir='rtl']) .select {
+  background-position: left var(--space-md) center;
+  padding-right: var(--space-md);
+  padding-left: var(--space-2xl);
 }

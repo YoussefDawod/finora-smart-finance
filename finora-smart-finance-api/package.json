@@ -6,25 +6,37 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "production": "NODE_ENV=production node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.js\" \"*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"*.js\"",
+    "admin": "node admin-cli.js",
+    "admin:stats": "node admin-cli.js stats",
+    "admin:list": "node admin-cli.js list"
   },
   "keywords": [],
   "author": "Youssef Dawod",
   "license": "ISC",
   "description": "Finora API - REST API für Smart Finance mit Node.js, Express und MongoDB",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "bcryptjs": "^2.4.3",
+    "express-rate-limit": "^8.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.1.2",
+    "nodemailer": "^7.0.12",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "eslint": "^9.39.1",
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
-    "eslint": "^9.39.1"
+    "prettier": "^3.8.1",
+    "supertest": "^7.2.2"
   }
 }

@@ -13,24 +13,26 @@ import { ENDPOINTS } from './endpoints';
  */
 export const authService = {
   /**
-   * Login user
-   * @param {string} email
+   * Login user with name and password
+   * @param {string} name - The username
    * @param {string} password
    * @returns {Promise<AxiosResponse<{ user: object, token: string }>>}
    */
-  login: (email, password) => {
-    return client.post(ENDPOINTS.auth.login, { email, password });
+  login: (name, password) => {
+    return client.post(ENDPOINTS.auth.login, { name, password });
   },
 
   /**
    * Register new user
-   * @param {string} email
-   * @param {string} password
-   * @param {string} name
+   * @param {Object} data - Registration data
+   * @param {string} data.name - Username (required)
+   * @param {string} data.password - Password (required)
+   * @param {string} [data.email] - Email (optional)
+   * @param {boolean} [data.understoodNoEmailReset] - Acknowledged no email (required if no email)
    * @returns {Promise<AxiosResponse<{ user: object, verificationLink?: string }>>}
    */
-  register: (email, password, name) => {
-    return client.post(ENDPOINTS.auth.register, { email, password, name });
+  register: (data) => {
+    return client.post(ENDPOINTS.auth.register, data);
   },
 
   /**
@@ -84,6 +86,95 @@ export const authService = {
    */
   getCurrentUser: () => {
     return client.get(ENDPOINTS.auth.me);
+  },
+
+  /**
+   * Update user profile (name)
+   * @param {Object} data - Profile data
+   * @param {string} data.name - New username
+   * @returns {Promise<AxiosResponse<{ success: boolean, data: object }>>}
+   */
+  updateProfile: (data) => {
+    return client.put(ENDPOINTS.auth.me, data);
+  },
+
+  // ============================================
+  // EMAIL MANAGEMENT (NEW)
+  // ============================================
+
+  /**
+   * Add email to account (for users who registered without email)
+   * @param {string} email
+   * @returns {Promise<AxiosResponse<{ message: string }>>}
+   */
+  addEmail: (email) => {
+    return client.post(ENDPOINTS.auth.addEmail, { email });
+  },
+
+  /**
+   * Change existing email (verified users)
+   * @param {string} newEmail
+   */
+  changeEmail: (newEmail) => {
+    return client.post(ENDPOINTS.auth.changeEmail, { newEmail });
+  },
+
+  /**
+   * Verify newly added email with token
+   * @param {string} token
+   * @returns {Promise<AxiosResponse<{ user: object, message: string }>>}
+   */
+  verifyAddEmail: (token) => {
+    return client.post(ENDPOINTS.auth.verifyAddEmail, { token });
+  },
+
+  /**
+   * Remove email from account
+   * @returns {Promise<AxiosResponse<{ message: string }>>}
+   */
+  removeEmail: (password, confirmRemoval = false) => {
+    return client.delete(ENDPOINTS.auth.removeEmail, { data: { password, confirmRemoval } });
+  },
+
+  /**
+   * Get email status
+   * @returns {Promise<AxiosResponse<{ hasEmail: boolean, isVerified: boolean, canResetPassword: boolean }>>}
+   */
+  getEmailStatus: () => {
+    return client.get(ENDPOINTS.auth.emailStatus);
+  },
+
+  /**
+   * Resend verification email
+   * @returns {Promise<AxiosResponse<{ message: string }>>}
+   */
+  resendVerification: () => {
+    return client.post(ENDPOINTS.auth.resendVerification);
+  },
+
+  /**
+   * Resend verification email for pending email (for already added but unverified emails)
+   * @returns {Promise<AxiosResponse<{ message: string, email: string }>>}
+   */
+  resendAddEmailVerification: () => {
+    return client.post(ENDPOINTS.auth.resendAddEmailVerification);
+  },
+
+  /**
+   * Change password (while logged in)
+   * @param {string} currentPassword
+   * @param {string} newPassword
+   * @returns {Promise<AxiosResponse<{ message: string }>>}
+   */
+  changePassword: (currentPassword, newPassword) => {
+    return client.post(ENDPOINTS.auth.changePassword, { currentPassword, newPassword });
+  },
+
+  /**
+   * Delete account (requires email confirmation)
+   */
+  deleteAccount: (email) => {
+    return client.delete(ENDPOINTS.auth.deleteAccount, { data: { email } });
   },
 };
 

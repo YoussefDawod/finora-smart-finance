@@ -74,13 +74,6 @@ export const copyToClipboard = async (text) => {
 };
 
 export const getRandomColor = () => {
-  const hue = Math.floor(Math.random() * 360);
-  return `hsl(${hue}, 70%, 50%)`;
-};
-/**
- * Get random color
- */
-export const getRandomColor = () => {
   const colors = [
     '#6366f1', '#ec4899', '#10b981', '#f59e0b', 
     '#3b82f6', '#8b5cf6', '#ef4444', '#06b6d4'

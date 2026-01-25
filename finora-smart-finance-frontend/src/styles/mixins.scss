@@ -34,6 +34,10 @@ $bp-2xl: 1536px;
 @mixin tablet { @media (min-width: $bp-sm) and (max-width: ($bp-lg - 1)) { @content; } }
 @mixin desktop { @media (min-width: $bp-lg) { @content; } }
 
+// Below breakpoints (max-width) - für "und kleiner" Szenarien
+@mixin below-md { @media (max-width: $bp-md) { @content; } }
+@mixin below-lg { @media (max-width: ($bp-lg - 1)) { @content; } }
+
 // Custom Breakpoint
 @mixin breakpoint($min: null, $max: null) {
   @if $min and $max {
@@ -614,4 +618,51 @@ $bp-2xl: 1536px;
     // ========== FOCUS RING ==========
     --focus-ring-color: #{$pri};
   }
+}
+
+// ============================================
+// 📱 SCROLLABLE PANEL (Mobile-optimized)
+// ============================================
+@mixin scrollable-panel($max-height: 100%) {
+  max-height: $max-height;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  @include custom-scrollbar;
+}
+
+// ============================================
+// 🔐 AUTH PANEL BASE
+// ============================================
+@mixin auth-panel-base {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: var(--auth-content-padding);
+  
+  @include mobile {
+    padding: var(--auth-content-padding-mobile);
+  }
+}
+
+// ============================================
+// 📱 SAFE VIEWPORT HEIGHT
+// ============================================
+@mixin safe-viewport-height($property: min-height) {
+  #{$property}: 100vh;
+  #{$property}: 100svh;
+  
+  @supports (#{$property}: 100dvh) {
+    #{$property}: 100dvh;
+  }
+}
+
+// ============================================
+// 👆 TOUCH TARGET (Accessibility)
+// ============================================
+@mixin touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
 }

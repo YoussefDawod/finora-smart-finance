@@ -63,6 +63,9 @@ export function useAuth() {
     register: context.register,
     logout: context.logout,
     verifyEmail: context.verifyEmail,
+    refreshUser: context.refreshUser,
+    resendVerification: context.resendVerification,
+    resendVerificationEmail: context.resendVerification, // alias for components expecting old name
     clearError: context.clearError,
     setIsLoading: context.setIsLoading,
   };

@@ -15,6 +15,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import styles from './MultiStepForm.module.scss';
 
 /**
@@ -36,17 +37,21 @@ const MultiStepForm = ({
   onStepChange = null,
   showProgress = true,
   showStepTitles = true,
-  nextLabel = 'Weiter',
-  prevLabel = 'Zurück',
-  completeLabel = 'Fertig',
+  nextLabel,
+  prevLabel,
+  completeLabel,
   canGoBack = true,
   validateStep = null,
   className = '',
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState({});
   const [isValidating, setIsValidating] = useState(false);
+  const resolvedNextLabel = nextLabel ?? t('common.next');
+  const resolvedPrevLabel = prevLabel ?? t('common.back');
+  const resolvedCompleteLabel = completeLabel ?? t('common.complete');
 
   const totalSteps = steps.length;
   const progress = ((currentStep + 1) / totalSteps) * 100;
@@ -185,9 +190,9 @@ const MultiStepForm = ({
           className={styles.prevButton}
           onClick={handlePrev}
           disabled={isFirstStep || !canGoBack || isValidating || isLoading}
-          aria-label="Zum vorherigen Schritt"
+          aria-label={t('common.prevStep')}
         >
-          ← {prevLabel}
+          ← {resolvedPrevLabel}
         </button>
 
         <button
@@ -195,17 +200,17 @@ const MultiStepForm = ({
           className={styles.nextButton}
           onClick={handleNext}
           disabled={isValidating || isLoading}
-          aria-label={isLastStep ? completeLabel : nextLabel}
+          aria-label={isLastStep ? resolvedCompleteLabel : resolvedNextLabel}
         >
           {isValidating || isLoading ? (
             <>
               <span className={styles.spinner} />
-              <span>{isLastStep ? 'Wird registriert...' : 'Wird überprüft...'}</span>
+              <span>{isLastStep ? t('common.loadingComplete') : t('common.loadingNext')}</span>
             </>
           ) : isLastStep ? (
-            completeLabel
+            resolvedCompleteLabel
           ) : (
-            `${nextLabel} →`
+            `${resolvedNextLabel} →`
           )}
         </button>
       </div>
@@ -218,7 +223,7 @@ const MultiStepForm = ({
           animate={{ opacity: 1, y: 0 }}
           role="alert"
         >
-          <span className={styles.errorTitle}>⚠ Fehler in diesem Schritt:</span>
+          <span className={styles.errorTitle}>{t('common.stepErrorsTitle')}</span>
           <ul className={styles.errorList}>
             {Object.entries(errors).map(([key, message]) => (
               <li key={key}>{message}</li>

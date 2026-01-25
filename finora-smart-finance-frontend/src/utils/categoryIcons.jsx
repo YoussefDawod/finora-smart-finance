@@ -3,6 +3,8 @@
  * @description Ersetzt Emojis durch react-icons für konsistentes, professionelles Design
  */
 
+/* eslint-disable react-refresh/only-export-components */
+
 import {
   FiBriefcase,
   FiGift,
@@ -21,6 +23,14 @@ import {
   FiAlertCircle,
   FiInbox,
   FiBarChart2,
+  FiShoppingBag,
+  FiMap,
+  FiMonitor,
+  FiCoffee,
+  FiActivity,
+  FiPackage,
+  FiPercent,
+  FiUsers,
 } from 'react-icons/fi';
 
 // ============================================================================
@@ -30,27 +40,41 @@ import {
 /**
  * Icon-Mapping für Kategorien
  * Jede Kategorie hat ein zugehöriges react-icons Icon
+ * Synchronisiert mit: src/config/categoryConstants.js
  */
 export const CATEGORY_ICONS = {
-  // Einnahmen (Income)
+  // ══════════════════════════════════════════════════════════════════════
+  // EINNAHMEN (Income Categories)
+  // ══════════════════════════════════════════════════════════════════════
   Gehalt: FiBriefcase,
-  Bonus: FiAward,
-  Geschenk: FiGift,
-  Kapitalerträge: FiTrendingUp,
   Freelance: FiCpu,
   Investitionen: FiTrendingUp,
+  Geschenk: FiGift,
+  Bonus: FiAward,
+  Nebenjob: FiUsers,
+  Cashback: FiPercent,
+  Vermietung: FiHome,
 
-  // Ausgaben (Expenses)
+  // ══════════════════════════════════════════════════════════════════════
+  // AUSGABEN (Expense Categories)
+  // ══════════════════════════════════════════════════════════════════════
   Lebensmittel: FiShoppingCart,
   Transport: FiTruck,
   Unterhaltung: FiFilm,
-  Versicherung: FiShield,
   Miete: FiHome,
-  Wohnen: FiHome,
-  Bildung: FiBook,
+  Versicherung: FiShield,
   Gesundheit: FiHeart,
+  Bildung: FiBook,
+  Kleidung: FiShoppingBag,
+  Reisen: FiMap,
+  Elektronik: FiMonitor,
+  Restaurant: FiCoffee,
+  Sport: FiActivity,
+  Haushalt: FiPackage,
 
-  // Sonstiges
+  // ══════════════════════════════════════════════════════════════════════
+  // SONSTIGES (beide Typen)
+  // ══════════════════════════════════════════════════════════════════════
   Sonstiges: FiMoreHorizontal,
 };
 

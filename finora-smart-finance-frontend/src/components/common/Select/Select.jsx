@@ -1,6 +1,7 @@
-import React, { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { FiAlertCircle } from 'react-icons/fi';
+import { FiAlertCircle, FiChevronDown } from 'react-icons/fi';
 import styles from './Select.module.scss';
 
 /**
@@ -35,7 +36,7 @@ export const Select = forwardRef((
   {
     label = '',
     options = [],
-    placeholder = 'Wähle eine Option',
+    placeholder = '',
     value = '',
     onChange = null,
     error = '',
@@ -48,9 +49,11 @@ export const Select = forwardRef((
   },
   ref
 ) => {
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
   const hasError = !!error;
   const hasValue = value && value !== '';
+  const resolvedPlaceholder = placeholder || t('common.selectPlaceholder');
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLERS
@@ -113,9 +116,9 @@ export const Select = forwardRef((
           {...props}
         >
           {/* PLACEHOLDER OPTION */}
-          {placeholder && (
+          {resolvedPlaceholder && (
             <option value="" disabled={!hasValue}>
-              {placeholder}
+              {resolvedPlaceholder}
             </option>
           )}
 
@@ -132,8 +135,9 @@ export const Select = forwardRef((
           className={styles.arrow}
           animate={{ rotate: isFocused ? 180 : 0 }}
           transition={{ duration: 0.2 }}
+          aria-hidden="true"
         >
-          ▼
+          <FiChevronDown />
         </motion.div>
       </div>
 

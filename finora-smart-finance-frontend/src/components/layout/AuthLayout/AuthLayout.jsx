@@ -15,6 +15,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useMotion } from '@/context/MotionContext';
 import { Logo } from '@/components/common';
 import styles from './AuthLayout.module.scss';
@@ -27,6 +28,7 @@ import styles from './AuthLayout.module.scss';
  */
 export default function AuthLayout({ children, variant = 'login' }) {
   const { shouldAnimate } = useMotion();
+  const { t } = useTranslation();
 
   // Determine panel position based on variant
   const isRegister = variant === 'register';
@@ -48,27 +50,27 @@ export default function AuthLayout({ children, variant = 'login' }) {
   // ============================================
   const brandContent = {
     login: {
-      headline: 'Neu hier?',
-      subline: 'Erstellen Sie Ihr kostenloses Konto und starten Sie noch heute mit der Kontrolle Ihrer Finanzen.',
-      ctaText: 'Jetzt registrieren',
+      headline: t('auth.layout.login.headline'),
+      subline: t('auth.layout.login.subline'),
+      ctaText: t('auth.layout.login.cta'),
       ctaLink: '/register',
     },
     register: {
-      headline: 'Willkommen zurück!',
-      subline: 'Sie haben bereits ein Konto? Melden Sie sich an und verwalten Sie Ihre Finanzen weiter.',
-      ctaText: 'Zur Anmeldung',
+      headline: t('auth.layout.register.headline'),
+      subline: t('auth.layout.register.subline'),
+      ctaText: t('auth.layout.register.cta'),
       ctaLink: '/login',
     },
     forgot: {
-      headline: 'Kein Problem',
-      subline: 'Wir helfen Ihnen, wieder Zugang zu Ihrem Konto zu erhalten.',
-      ctaText: 'Zur Anmeldung',
+      headline: t('auth.layout.forgot.headline'),
+      subline: t('auth.layout.forgot.subline'),
+      ctaText: t('auth.layout.forgot.cta'),
       ctaLink: '/login',
     },
     verify: {
-      headline: 'Fast geschafft',
-      subline: 'Bestätigen Sie Ihre E-Mail-Adresse, um loszulegen.',
-      ctaText: 'Zur Anmeldung',
+      headline: t('auth.layout.verify.headline'),
+      subline: t('auth.layout.verify.subline'),
+      ctaText: t('auth.layout.verify.cta'),
       ctaLink: '/login',
     },
   };
@@ -186,15 +188,15 @@ export default function AuthLayout({ children, variant = 'login' }) {
             <div className={styles.features}>
               <div className={styles.featurePill}>
                 <span className={styles.featureIcon}>📊</span>
-                <span>Echtzeit-Analysen</span>
+                <span>{t('auth.layout.features.realtime')}</span>
               </div>
               <div className={styles.featurePill}>
                 <span className={styles.featureIcon}>🔒</span>
-                <span>Sicher & Privat</span>
+                <span>{t('auth.layout.features.secure')}</span>
               </div>
               <div className={styles.featurePill}>
                 <span className={styles.featureIcon}>⚡</span>
-                <span>Blitzschnell</span>
+                <span>{t('auth.layout.features.fast')}</span>
               </div>
             </div>
           </motion.div>
@@ -202,7 +204,7 @@ export default function AuthLayout({ children, variant = 'login' }) {
 
         {/* Footer */}
         <div className={styles.brandingFooter}>
-          <p>© 2026 Finora. Alle Rechte vorbehalten.</p>
+          <p>{t('auth.branding.footer')}</p>
         </div>
       </motion.div>
 

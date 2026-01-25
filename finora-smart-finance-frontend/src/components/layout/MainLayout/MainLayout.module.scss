@@ -42,6 +42,19 @@
   }
 }
 
+:global([dir='rtl']) .mainBody {
+  transition: padding-right 0.3s ease;
+  padding-left: 0;
+}
+
+:global([dir='rtl']) .mainBody.sidebarExpanded {
+  padding-right: var(--sidebar-width, 280px);
+}
+
+:global([dir='rtl']) .mainBody.sidebarCollapsed {
+  padding-right: var(--sidebar-collapsed-width, 72px);
+}
+
 // ============================================
 // CONTENT WRAPPER (Contains main content)
 // ============================================

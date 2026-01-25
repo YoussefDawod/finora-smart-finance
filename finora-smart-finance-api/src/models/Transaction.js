@@ -16,6 +16,7 @@ const transactionSchema = new mongoose.Schema(
     category: {
       type: String,
       enum: [
+        // Ausgaben (Expenses)
         'Lebensmittel',
         'Transport',
         'Unterhaltung',
@@ -23,11 +24,22 @@ const transactionSchema = new mongoose.Schema(
         'Versicherung',
         'Gesundheit',
         'Bildung',
+        'Kleidung',
+        'Reisen',
+        'Elektronik',
+        'Restaurant',
+        'Sport',
+        'Haushalt',
         'Sonstiges',
+        // Einnahmen (Income)
         'Gehalt',
         'Freelance',
         'Investitionen',
         'Geschenk',
+        'Bonus',
+        'Nebenjob',
+        'Cashback',
+        'Vermietung',
       ],
       required: [true, 'Category ist erforderlich'],
       index: true, // Schnellere Queries
@@ -88,6 +100,19 @@ transactionSchema.index({ userId: 1, category: 1, date: -1 }); // User + Categor
 transactionSchema.index({ date: -1 }); // Neueste zuerst
 transactionSchema.index({ category: 1, date: -1 }); // Category + Datum
 transactionSchema.index({ type: 1, date: -1 }); // Type + Datum
+
+// VOLLTEXT-SUCHE: Text-Index für description und category
+// Ermöglicht effiziente Suche mit $text Operator
+transactionSchema.index({ 
+  description: 'text', 
+  category: 'text' 
+}, {
+  weights: {
+    description: 2,  // Beschreibung wichtiger
+    category: 1
+  },
+  name: 'transaction_text_index'
+});
 
 // Virtual: Formatierte Ausgabe
 transactionSchema.virtual('formattedAmount').get(function () {

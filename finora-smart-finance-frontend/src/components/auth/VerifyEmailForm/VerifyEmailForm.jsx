@@ -16,6 +16,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiMail, 
@@ -31,6 +32,7 @@ export default function VerifyEmailForm({ email }) {
   const { verifyEmail, resendVerificationEmail } = useAuth();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
+  const { t } = useTranslation();
   const inputRefs = useRef([]);
 
   // ============================================
@@ -71,7 +73,7 @@ export default function VerifyEmailForm({ email }) {
     try {
       await verifyEmail(fullCode);
       setIsSuccess(true);
-      toast.success('E-Mail erfolgreich bestätigt!');
+      toast.success(t('auth.verifyForm.successToast'));
 
       // Redirect after delay
       window.setTimeout(() => {
@@ -80,7 +82,7 @@ export default function VerifyEmailForm({ email }) {
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
-        'Verifizierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+        t('auth.verifyForm.errorToast');
       setApiError(errorMessage);
       toast.error(errorMessage);
 
@@ -90,7 +92,7 @@ export default function VerifyEmailForm({ email }) {
     } finally {
       setIsLoading(false);
     }
-  }, [verifyEmail, toast, navigate, isLoading]);
+  }, [verifyEmail, toast, navigate, t, isLoading]);
 
   useEffect(() => {
     const fullCode = code.join('');
@@ -185,11 +187,11 @@ export default function VerifyEmailForm({ email }) {
     try {
       await resendVerificationEmail(email);
       setResendCountdown(60);
-      toast.success('Neuer Code wurde gesendet!');
+      toast.success(t('auth.verifyForm.resendSuccess'));
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
-        'Fehler beim Senden. Bitte versuchen Sie es später erneut.';
+        t('auth.verifyForm.resendError');
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -212,9 +214,9 @@ export default function VerifyEmailForm({ email }) {
         <div className={styles.successIcon}>
           <FiCheck />
         </div>
-        <h2 className={styles.successTitle}>E-Mail bestätigt!</h2>
+        <h2 className={styles.successTitle}>{t('auth.verifyForm.successTitle')}</h2>
         <p className={styles.successMessage}>
-          Sie werden zum Dashboard weitergeleitet...
+          {t('auth.verifyForm.successMessage')}
         </p>
       </motion.div>
     );
@@ -264,7 +266,7 @@ export default function VerifyEmailForm({ email }) {
             disabled={isLoading}
             className={`${styles.codeInput} ${digit ? styles.filled : ''}`}
             autoFocus={index === 0}
-            aria-label={`Ziffer ${index + 1}`}
+            aria-label={t('auth.verifyForm.digitLabel', { index: index + 1 })}
           />
         ))}
       </div>
@@ -273,14 +275,14 @@ export default function VerifyEmailForm({ email }) {
       {isLoading && (
         <div className={styles.loadingContainer}>
           <span className={styles.spinner} />
-          <span>Verifiziere...</span>
+          <span>{t('auth.verifyForm.loading')}</span>
         </div>
       )}
 
       {/* Resend Section */}
       <div className={styles.resendSection}>
         <span className={styles.resendText}>
-          Keinen Code erhalten?
+          {t('auth.verifyForm.resendPrompt')}
         </span>
         <button
           type="button"
@@ -291,14 +293,14 @@ export default function VerifyEmailForm({ email }) {
           {resendLoading ? (
             <>
               <span className={styles.resendSpinner} />
-              Senden...
+              {t('auth.verifyForm.resendSending')}
             </>
           ) : resendCountdown > 0 ? (
-            `Erneut senden (${resendCountdown}s)`
+            t('auth.verifyForm.resendCountdown', { count: resendCountdown })
           ) : (
             <>
               <FiRefreshCw className={styles.resendIcon} />
-              Code erneut senden
+              {t('auth.verifyForm.resendAction')}
             </>
           )}
         </button>
@@ -308,7 +310,7 @@ export default function VerifyEmailForm({ email }) {
       {email && (
         <div className={styles.emailHint}>
           <FiMail className={styles.emailIcon} />
-          <span>Prüfen Sie auch Ihren Spam-Ordner</span>
+          <span>{t('auth.verifyForm.spamHint')}</span>
         </div>
       )}
     </div>

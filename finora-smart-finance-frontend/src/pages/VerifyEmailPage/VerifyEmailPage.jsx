@@ -17,7 +17,9 @@ import { motion } from 'framer-motion';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { VerifyEmailForm } from '@/components/auth';
+import Logo from '@/components/common/Logo/Logo';
 import { FiArrowLeft } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import styles from './VerifyEmailPage.module.scss';
 
 export default function VerifyEmailPage() {
@@ -25,6 +27,7 @@ export default function VerifyEmailPage() {
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
   const { shouldAnimate } = useMotion();
+  const { t } = useTranslation();
   
   // Get email from navigation state (passed from registration)
   const email = location.state?.email || '';
@@ -96,11 +99,11 @@ export default function VerifyEmailPage() {
           className={styles.header}
           variants={shouldAnimate ? itemVariants : {}}
         >
-          <h1 className={styles.title}>E-Mail bestätigen</h1>
+          <h1 className={styles.title}>{t('auth.verifyEmailTitle')}</h1>
           <p className={styles.subtitle}>
             {email 
-              ? <>Wir haben einen Code an <strong>{email}</strong> gesendet.</>
-              : 'Geben Sie den 6-stelligen Code aus Ihrer E-Mail ein.'}
+              ? <>{t('auth.verifyEmailSent', { email })}</>
+              : t('auth.verifyEmailSubtitle')}
           </p>
         </motion.header>
 
@@ -114,7 +117,7 @@ export default function VerifyEmailPage() {
           className={styles.divider}
           variants={shouldAnimate ? itemVariants : {}}
         >
-          <span>oder</span>
+          <span>{t('common.or')}</span>
         </motion.div>
 
         {/* Login Link */}
@@ -124,7 +127,7 @@ export default function VerifyEmailPage() {
         >
           <Link to="/login" className={styles.loginLink}>
             <FiArrowLeft className={styles.linkIcon} />
-            Zurück zur Anmeldung
+            {t('common.backToLogin')}
           </Link>
         </motion.div>
       </motion.div>
