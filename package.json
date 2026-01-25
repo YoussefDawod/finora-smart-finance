@@ -18,7 +18,7 @@
     "test:frontend": "npm run test --workspace=finora-smart-finance-frontend",
     "test:api": "npm run test --workspace=finora-smart-finance-api",
     "test": "npm run test:frontend && npm run test:api",
-    "prepare": "husky"
+    "prepare": "node -e \"if (process.env.CI !== 'true') require('child_process').execSync('husky')\""
   },
   "repository": {
     "type": "git",
