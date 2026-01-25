@@ -5,7 +5,7 @@
  */
 
 require('dotenv').config();
-const app = require('./server');
+require('./server');
 
 // We don't need to start the server again - server.js already does this
 // Just let it run

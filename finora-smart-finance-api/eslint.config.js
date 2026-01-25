@@ -20,6 +20,8 @@ module.exports = [
         require: 'readonly',
         module: 'readonly',
         exports: 'readonly',
+        fetch: 'readonly',
+        URLSearchParams: 'readonly',
       },
     },
     rules: {

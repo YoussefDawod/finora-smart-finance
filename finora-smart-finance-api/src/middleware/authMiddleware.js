@@ -14,7 +14,7 @@ module.exports = async function authMiddleware(req, res, next) {
 
     req.user = user;
     next();
-  } catch (err) {
+  } catch {
     return res.status(401).json({ error: 'Unauthorized', code: 'INVALID_TOKEN' });
   }
 };

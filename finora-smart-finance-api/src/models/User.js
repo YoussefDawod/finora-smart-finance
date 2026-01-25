@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
       minlength: [3, 'Name muss mindestens 3 Zeichen haben'],
       maxlength: [50, 'Name darf maximal 50 Zeichen haben'],
-      match: [/^[a-zA-ZäöüÄÖÜß0-9\s\-]+$/, 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten']
+      match: [/^[a-zA-ZäöüÄÖÜß0-9\s-]+$/, 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten']
       // Index defined separately below with unique constraint
     },
     // Email ist optional (für Password-Reset)
@@ -37,7 +37,7 @@ const UserSchema = new mongoose.Schema(
     phone: { 
       type: String, 
       default: null,
-      match: [/^[\d\s\-\+\(\)]+$|^$/, 'Telefonnummer hat ungültiges Format']
+      match: [/^[\d\s+()-]+$|^$/, 'Telefonnummer hat ungültiges Format']
     },
     isVerified: { type: Boolean, default: false },
     
@@ -106,14 +106,10 @@ UserSchema.pre('save', async function () {
     return;
   }
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
-    this.lastPasswordChange = new Date();
-    this.passwordChangedAt = new Date();
-  } catch (error) {
-    throw error;
-  }
+  const salt = await bcrypt.genSalt(10);
+  this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
+  this.lastPasswordChange = new Date();
+  this.passwordChangedAt = new Date();
 });
 
 // Pre-save Hook: Validate preferences structure

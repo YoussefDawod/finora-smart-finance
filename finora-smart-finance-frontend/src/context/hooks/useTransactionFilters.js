@@ -4,7 +4,7 @@
  */
 
 import { useCallback } from 'react';
-import { ACTIONS, initialState } from '../reducers/transactionReducer';
+import { ACTIONS } from '../reducers/transactionReducer';
 
 /**
  * Custom Hook für Transaction Filter & Sort Operations

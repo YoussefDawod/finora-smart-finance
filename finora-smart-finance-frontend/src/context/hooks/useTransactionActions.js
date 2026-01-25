@@ -12,12 +12,11 @@ import { ACTIONS } from '../reducers/transactionReducer';
  * Custom Hook für Transaction CRUD Operations
  * @param {Function} dispatch - Reducer dispatch function
  * @param {Object} state - Current state
- * @param {boolean} isAuthenticated - Auth status
  * @param {Function} fetchDashboardData - Dashboard refresh function
  * @param {Function} fetchTransactions - List refresh function
  * @param {Function} setPage - Pagination setter
  */
-export function useTransactionActions(dispatch, state, { isAuthenticated, fetchDashboardData, fetchTransactions, setPage }) {
+export function useTransactionActions(dispatch, state, { fetchDashboardData, fetchTransactions, setPage }) {
   // ──────────────────────────────────────────────────────────────────────
   // CREATE - Add new transaction
   // ──────────────────────────────────────────────────────────────────────

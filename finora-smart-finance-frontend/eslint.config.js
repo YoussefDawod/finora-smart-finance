@@ -59,4 +59,25 @@ export default [
       'react/prop-types': 'off',
     },
   },
+  // Vitest Test-Dateien
+  {
+    files: ['src/test/**/*.js', 'src/**/*.test.{js,jsx}', 'src/**/__tests__/**/*.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        test: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        global: 'readonly',
+      },
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ];

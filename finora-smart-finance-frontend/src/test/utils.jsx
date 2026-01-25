@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /**
  * @fileoverview Test Utilities
  * @description Hilfreiche Test-Wrapper und Utilities

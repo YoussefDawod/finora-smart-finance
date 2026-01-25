@@ -107,7 +107,7 @@ app.get('/verify-email', async (req, res) => {
     await user.save();
 
     return res.redirect(`${frontend}/verify-email?status=done`);
-  } catch (err) {
+  } catch {
     return res.redirect(`${frontend}/verify-email?status=error`);
   }
 });
