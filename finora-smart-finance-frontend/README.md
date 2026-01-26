@@ -1,75 +1,28 @@
-# Finora Smart Finance – Frontend
+<div align="center">
 
-> 🎨 Modernes React 19 Frontend mit Vite + SCSS Modules
+# 🎨 Finora Frontend
 
-## 🛠️ Tech Stack
+**React 19 • Vite 7 • SCSS Modules • Recharts**
 
-- **React 19** – Latest React with improved performance
-- **Vite 7** – Lightning-fast build tool
-- **SCSS Modules** – Scoped styling with design tokens
-- **React Router 6** – Client-side routing
-- **React Query (TanStack)** – Server state management
-- **Recharts** – Interactive charts & visualizations
-- **Framer Motion** – Smooth animations
-- **i18next** – Internationalization (de/en/ar/ka)
-- **Zod** – Schema validation
+![React](https://img.shields.io/badge/react-19-blue?style=for-the-badge)
+![Vite](https://img.shields.io/badge/vite-7-646cff?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-69_passing-00d084?style=for-the-badge)
 
-## 📁 Struktur
+Modernes Frontend mit Glass-Morphism Design, 4 Sprachen & Dark Mode.
 
-```
-src/
-├── api/                    # API-Client & Services
-│   ├── client.js           # Axios instance with interceptors
-│   ├── authService.js      # Auth API calls
-│   ├── transactionService.js
-│   └── userService.js
-├── components/
-│   ├── auth/               # Login, Register, Password forms
-│   ├── common/             # Button, Input, Modal, Toast, etc.
-│   ├── dashboard/          # SummaryCards, Charts
-│   ├── layout/             # Navbar, Sidebar, Footer
-│   ├── settings/           # Theme, Export, Profile sections
-│   └── transactions/       # TransactionForm, TransactionList
-├── config/                 # App configuration
-├── context/                # React Context (Auth, Theme, Toast)
-│   ├── AuthContext.jsx
-│   ├── ThemeContext.jsx
-│   └── TransactionContext.jsx
-├── hooks/                  # Custom Hooks
-│   ├── useAuth.js
-│   ├── useDebounce.js
-│   ├── useCssVariables.js
-│   ├── useForm.js
-│   ├── useLocalStorage.js
-│   └── useTransactions.js
-├── i18n/                   # Internationalization
-│   └── index.js            # i18next config with http-backend
-├── pages/                  # Route components
-│   ├── AuthPage/
-│   ├── DashboardPage.jsx
-│   ├── ProfilePage/
-│   ├── SettingsPage/
-│   └── TransactionsPage.jsx
-├── styles/                 # Global styles
-│   ├── _variables.scss     # Design tokens
-│   ├── mixins.scss         # SCSS mixins
-│   ├── themes/             # Light/Dark themes
-│   └── index.scss          # Entry point
-├── utils/                  # Utility functions
-│   ├── formatters.js       # Currency, date formatting
-│   ├── validators.js       # Input validation
-│   └── helpers.js          # General helpers
-└── test/                   # Test setup
-    └── setup.js            # Vitest configuration
-```
+[⬅️ Zurück zum Hauptprojekt](../README.md)
 
-## 🚀 Schnellstart
+</div>
+
+---
+
+## 🚀 Quick Start
 
 ```bash
 # Dependencies installieren
 npm install
 
-# Entwicklungsserver starten
+# Dev Server (Port 3000)
 npm run dev
 
 # Production Build
@@ -77,104 +30,158 @@ npm run build
 
 # Tests ausführen
 npm run test
-
-# Tests mit Coverage
-npm run test:coverage
 ```
+
+---
+
+## 🛠️ Tech Stack
+
+**Core:**
+- React 19 – Latest React mit Compiler
+- Vite 7 – ~500KB Bundle
+- SCSS Modules – Scoped Styling
+- React Router 6 – Client-side Routing
+
+**UI/UX:**
+- Recharts 2 – Interactive Charts
+- Framer Motion 11 – Smooth Animations
+- CSS Variables – Design System
+
+**i18n & Validation:**
+- i18next – 4 Sprachen (DE, EN, AR, KA)
+- Zod – Schema Validation
+
+**Testing:**
+- Vitest 4 – Unit Tests (69 passing)
+- React Testing Library – Component Tests
+
+---
+
+## 📁 Projekt-Struktur
+
+<div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5; margin: 15px 0;">
+
+```
+src/
+├── api/              # Axios Client + Services
+├── components/       # React Components
+│   ├── auth/         # Login, Register
+│   ├── common/       # Button, Input, Modal
+│   ├── dashboard/    # Charts, Cards
+│   └── transactions/ # TransactionForm, List
+├── hooks/            # Custom Hooks (useAuth, useForm, etc.)
+├── context/          # React Context (Auth, Theme, Toast)
+├── pages/            # Route Pages
+├── styles/           # SCSS Modules + Design Tokens
+├── i18n/             # 4 Sprachen (HTTP Backend)
+└── utils/            # Helpers, Validators, Formatters
+```
+
+</div>
+
+---
 
 ## 🧪 Testing
 
-- **Vitest** – Unit testing framework
-- **React Testing Library** – Component testing
-- **Jest-DOM** – DOM assertions
+<div style="background: linear-gradient(135deg, #f0fff4 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #059669; margin: 15px 0;">
 
 ```bash
-npm run test           # Run tests
-npm run test:ui        # Interactive UI
-npm run test:coverage  # With coverage report
+npm run test              # Alle Tests
+npm run test:ui           # Interactive UI
+npm run test:coverage     # Mit Coverage Report
 ```
 
-### Test Coverage
+**Test Coverage:**
+- Hooks: ~82%
+- Utils: ~66%
+- Validators: 100%
 
-| Bereich | Coverage |
-|---------|----------|
-| Hooks | ~82% |
-| Utils | ~66% |
-| Validators | 100% |
+</div>
+
+---
 
 ## 🎨 Design System
+
+<div style="background: linear-gradient(135deg, #f0fff9 0%, #ccfbf1 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #0d9488; margin: 15px 0;">
 
 ### CSS Variables (Design Tokens)
 
 ```scss
-// Farben
---primary: #4f46e5;
+// Brand Colors
+--primary: #4f46e5;    // Indigo
+--secondary: #22c55e;  // Green
+--accent: #14b8a6;     // Teal
+
+// Semantic Colors
 --success: #10b981;
 --error: #ef4444;
 --warning: #f59e0b;
 
-// Spacing
---space-xs: 0.25rem;
---space-sm: 0.5rem;
+// Spacing Scale
+--space-xs: 0.5rem;
 --space-md: 1rem;
 --space-lg: 1.5rem;
 
 // Typography
---fs-xs: 0.75rem;
 --fs-sm: 0.875rem;
 --fs-md: 1rem;
---fs-lg: 1.25rem;
+--fs-lg: 1.125rem;
 ```
 
-### Theme Support
+### Themes
 
-- Light Mode (default)
-- Dark Mode
-- Glass Effects (optional)
-- System preference detection
+✅ Light Mode (Default)  
+✅ Dark Mode  
+✅ Glass-Morphism Effects  
+✅ System Preference Detection
 
-## 🌐 i18n (Internationalization)
+</div>
 
-Unterstützte Sprachen:
-- 🇩🇪 Deutsch (de)
-- 🇬🇧 English (en)
-- 🇸🇦 العربية (ar) – RTL
-- 🇬🇪 ქართული (ka)
+---
 
-Übersetzungen werden dynamisch via HTTP-Backend geladen:
-```
-public/locales/{lang}/translation.json
-```
+## 🌐 Internationalization
 
-## 📦 Build & Bundle
+<div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; margin: 15px 0;">
 
-### Chunks (Code Splitting)
+**Unterstützte Sprachen:**
 
-| Chunk | Beschreibung |
-|-------|--------------|
-| vendor | React, React-DOM, Router |
-| motion | Framer Motion |
-| charts | Recharts |
-| icons | React Icons |
-| axios | HTTP Client |
+🇩🇪 **Deutsch** (de)  
+🇬🇧 **English** (en)  
+🇸🇦 **العربية** (ar) – RTL Support  
+🇬🇪 **ქართული** (ka)
 
-### Bundle-Größe
+**i18next HTTP Backend** – Translations on-demand laden
 
-- Main Bundle: ~500 KB (gzipped: ~148 KB)
-- CSS: ~248 KB (gzipped: ~39 KB)
+</div>
 
-## 🔧 Scripts
+---
 
-| Script | Beschreibung |
-|--------|--------------|
-| `npm run dev` | Entwicklungsserver (Port 3000) |
+## 📋 Verfügbare Scripts
+
+| Command | Beschreibung |
+|---------|--------------|
+| `npm run dev` | Dev Server starten (Port 3000) |
 | `npm run build` | Production Build |
 | `npm run preview` | Preview Production Build |
-| `npm run lint` | ESLint prüfen |
-| `npm run lint:fix` | ESLint auto-fix |
-| `npm run format` | Prettier formatieren |
 | `npm run test` | Tests ausführen |
+| `npm run test:ui` | Vitest UI öffnen |
+| `npm run lint` | ESLint Check |
+| `npm run format` | Prettier Format |
 
-## 📝 Lizenz
+---
 
-ISC © Youssef Dawod
+## 🔗 Wichtige Links
+
+- [📖 API Dokumentation](../finora-smart-finance-api/README.md)
+- [📝 Changelog](../CHANGELOG.md)
+- [🐛 Issues](https://github.com/YoussefDawod/expense-tracker/issues)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by Youssef Dawod**
+
+[⬆️ Back to Top](#-finora-frontend)
+
+</div>
