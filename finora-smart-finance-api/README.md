@@ -8,8 +8,6 @@
 ![Express](https://img.shields.io/badge/express-5-blue?style=for-the-badge)
 ![Tests](https://img.shields.io/badge/tests-50_passing-00d084?style=for-the-badge)
 
-REST API mit JWT Authentication, MongoDB & Admin CLI Tools.
-
 [⬅️ Zurück zum Hauptprojekt](../README.md)
 
 </div>
@@ -19,176 +17,153 @@ REST API mit JWT Authentication, MongoDB & Admin CLI Tools.
 ## 🚀 Quick Start
 
 ```bash
-# Dependencies installieren
-npm install
-
-# .env konfigurieren
-cp .env.example .env
+npm install              # Dependencies
+cp .env.example .env     # Config erstellen
 # MONGODB_URI eintragen
-
-# Server starten (Port 5000)
-npm run dev
+npm run dev              # Server starten (Port 5000)
 ```
-
-**Server läuft auf:** http://localhost:5000
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Core:**
-- Express 5 – Modern Web Framework
-- MongoDB 7 – NoSQL Database
-- Mongoose 9 – ODM mit Validation
-- Node.js 18+ – Runtime
-
-**Security:**
-- JWT – Token Authentication
-- Bcrypt – Password Hashing (10 Rounds)
-- CORS – Origin Protection
-- Rate Limiter – Brute-Force Schutz
-
-**Quality:**
-- Jest 30 – Unit Tests (50 passing)
-- Supertest – API Testing
-- ESLint 9 – Code Linting
+| Bereich | Technologie |
+|---------|-------------|
+| **Core** | Express 5, Node.js 18+ |
+| **Database** | MongoDB 7, Mongoose 9 |
+| **Auth** | JWT, Bcrypt (10 Rounds) |
+| **Validation** | Zod |
+| **Testing** | Jest 30, Supertest |
 
 ---
 
-## 📁 Projekt-Struktur
+## 📁 Struktur
 
-> [!NOTE]
-> ```
-> src/
-> ├── controllers/      # Request Handler
-> ├── services/         # Business Logic
-> ├── validators/       # Input Validation (Zod)
-> ├── models/           # Mongoose Schemas
-> ├── routes/           # Express Routes
-> ├── middleware/       # Auth, Error Handler, Rate Limiter
-> └── utils/            # Logger, Email Service
-> ```
-> 
-> **MVC Pattern** – Saubere Trennung von Concerns
+```
+src/
+├── controllers/      # Request Handler
+├── services/         # Business Logic
+├── validators/       # Zod Validation
+├── models/           # Mongoose Schemas
+├── routes/           # Express Routes
+├── middleware/       # Auth, Error, Rate Limiter
+└── utils/            # Logger, Email Service
+```
+
+**Pattern:** MVC (Model-View-Controller)
 
 ---
 
 ## 📡 API Endpoints
 
-> [!TIP]
-> ### Authentication
-> 
-> ```bash
-> POST   /api/auth/register      # User registrieren
-> POST   /api/auth/login         # Login (JWT Token)
-> POST   /api/auth/logout        # Logout
-> POST   /api/auth/refresh       # Token refresh
-> ```
-> 
-> ### Transactions
-> 
-> ```bash
-> GET    /api/transactions       # Alle Transaktionen
-> POST   /api/transactions       # Neue Transaktion
-> GET    /api/transactions/:id   # Einzelne Transaktion
-> PATCH  /api/transactions/:id   # Transaktion updaten
-> DELETE /api/transactions/:id   # Transaktion löschen
-> GET    /api/transactions/stats # Statistiken
-> ```
-> 
-> ### Users
-> 
-> ```bash
-> GET    /api/users/profile      # User-Profil
-> PATCH  /api/users/profile      # Profil updaten
-> DELETE /api/users/account      # Account löschen
-> ```
-> 
-> 📖 **Detaillierte API-Docs:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
+### Authentication
+
+| Method | Endpoint | Beschreibung |
+|--------|----------|-------------|
+| POST | `/api/auth/register` | User registrieren |
+| POST | `/api/auth/login` | Login (JWT Token) |
+| POST | `/api/auth/logout` | Logout |
+| POST | `/api/auth/refresh` | Token refresh |
+
+### Transactions
+
+| Method | Endpoint | Beschreibung |
+|--------|----------|-------------|
+| GET | `/api/transactions` | Alle Transaktionen |
+| POST | `/api/transactions` | Neue Transaktion |
+| GET | `/api/transactions/:id` | Einzelne Transaktion |
+| PATCH | `/api/transactions/:id` | Updaten |
+| DELETE | `/api/transactions/:id` | Löschen |
+| GET | `/api/transactions/stats` | Statistiken |
+
+### Users
+
+| Method | Endpoint | Beschreibung |
+|--------|----------|-------------|
+| GET | `/api/users/profile` | Profil abrufen |
+| PATCH | `/api/users/profile` | Profil updaten |
+| DELETE | `/api/users/account` | Account löschen |
+
+📖 **Detailliert:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
 
 ---
 
-## 🛠️ Admin CLI Tools
+## 🛠️ Admin CLI
 
-> [!IMPORTANT]
-> Entwickler-Tools für User-Verwaltung:
-> 
-> ```bash
-> # User-Übersicht
-> npm run admin:stats
-> 
-> # Alle Users auflisten
-> npm run admin:list
-> 
-> # Passwort zurücksetzen
-> node admin-cli.js reset-password <userId> newPassword123
-> 
-> # User löschen
-> node admin-cli.js delete-user <userId>
-> ```
+```bash
+# User-Statistiken
+npm run admin:stats
+
+# Alle Users auflisten
+npm run admin:list
+
+# Passwort zurücksetzen
+node admin-cli.js reset-password <userId> newPassword
+
+# User löschen
+node admin-cli.js delete-user <userId>
+```
 
 ---
 
 ## 🧪 Testing
 
-<div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; margin: 15px 0;">
-
 ```bash
-> [!TIP]
-> ```bash
-> npm run test              # Alle Tests
-> npm run test:watch        # Watch Mode
-> npm run test:coverage     # Mit Coverage Report
-> ```
-> 
-> **Test Coverage:**
-> - Auth Validation: 20 Tests
-> - Transaction Validation: 30 Tests
-> - Total: 50 Tests passing ✅
-## 🔐 Sicherheits-Features
+npm run test              # Alle Tests
+npm run test:watch        # Watch Mode
+npm run test:coverage     # Coverage Report
+```
 
-✅ **JWT Tokens** – Access (15min) + Refresh (7d)  
-✅ **Bcrypt Hashing** – 10 Rounds Password Encryption  
-✅ **CORS Protection** – Whitelist erlaubter Origins  
-✅ **Rate Limiting** – Max 100 Requests/15min  
-✅ **Input Validation** – Zod Schema Validation  
-✅ **MongoDB Validation** – Schema-Level Protection  
-✅ **HTTP Security Headers** – HSTS, CSP
+| Bereich | Tests |
+|---------|-------|
+| Auth Validation | 20 |
+| Transaction Validation | 30 |
+| **Total** | **50 ✅** |
 
 ---
 
-## 🌍 Environment Variables
+## 🔒 Sicherheit
+
+| Feature | Beschreibung |
+|---------|-------------|
+| 🔐 **JWT** | Access (15min) + Refresh (7d) |
+| 🔒 **Bcrypt** | 10 Rounds Hashing |
+| 🛡️ **CORS** | Origin Whitelist |
+| ⏱️ **Rate Limit** | 100 Requests/15min |
+| ✅ **Validation** | Zod + Mongoose Schema |
+
+---
+
+## 🌍 Environment
 
 ```bash
-# .env Beispiel
 NODE_ENV=development
 PORT=5000
 MONGODB_URI=mongodb://localhost:27017/finora
-JWT_SECRET=your-super-secret-key-min-32-chars
-JWT_REFRESH_SECRET=your-refresh-secret-key
+JWT_SECRET=your-secret-key-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-secret
 CORS_ORIGIN=http://localhost:3000
 ```
 
 ---
 
-## 📋 Verfügbare Scripts
+## 📋 Scripts
 
 | Command | Beschreibung |
 |---------|--------------|
-| `npm run dev` | Server mit Nodemon (Auto-Reload) |
+| `npm run dev` | Nodemon (Auto-Reload) |
 | `npm start` | Production Server |
-| `npm run test` | Tests ausführen |
-| `npm run lint` | ESLint Check |
-| `npm run admin:stats` | User-Statistiken |
-| `npm run admin:list` | Alle Users auflisten |
+| `npm run test` | Tests |
+| `npm run lint` | ESLint |
+| `npm run admin:stats` | User Stats |
+| `npm run admin:list` | User List |
 
 ---
 
-## 🔗 Wichtige Links
+## 🔗 Links
 
-- [📖 Frontend Dokumentation](../finora-smart-finance-frontend/README.md)
+- [📖 Frontend Docs](../finora-smart-finance-frontend/README.md)
 - [📚 API Reference](./docs/ADMIN_API.md)
-- [📝 Changelog](../CHANGELOG.md)
 - [🐛 Issues](https://github.com/YoussefDawod/expense-tracker/issues)
 
 ---
@@ -196,7 +171,5 @@ CORS_ORIGIN=http://localhost:3000
 <div align="center">
 
 **Made with ❤️ by Youssef Dawod**
-
-[⬆️ Back to Top](#️-finora-backend-api)
 
 </div>
