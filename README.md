@@ -20,19 +20,16 @@
 
 **Finora** ist eine Enterprise-ready Finanz-Management-Plattform, die dir hilft, deine Einnahmen und Ausgaben intelligent zu verwalten. Mit wunderschönem Design, Echtzeit-Analysen und Bank-Level Sicherheit – alles was du für vollständige finanzielle Kontrolle brauchst.
 
-<div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px; border-radius: 12px; color: white; margin: 20px 0; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);">
-
-### 🎯 Die Finora Philosophie
-
-**Finanzen sollten nicht kompliziert sein.**
-
-Finora macht dich zum Meister deiner Finanzen mit:
-- 🎨 **Wunderschönem Design** – Freude statt Frustration
-- 🤖 **Intelligenter Automatisierung** – Weniger manuelle Arbeit
-- 📊 **Echten Insights** – Nicht nur Zahlen, sondern Verständnis
-- 🔐 **Vollständiger Sicherheit** – Deine Daten in sicheren Händen
-
-</div>
+> [!TIP]
+> ### 🎯 Die Finora Philosophie
+> 
+> **Finanzen sollten nicht kompliziert sein.**
+>
+> Finora macht dich zum Meister deiner Finanzen mit:
+> - 🎨 **Wunderschönem Design** – Freude statt Frustration
+> - 🤖 **Intelligenter Automatisierung** – Weniger manuelle Arbeit
+> - 📊 **Echten Insights** – Nicht nur Zahlen, sondern Verständnis
+> - 🔐 **Vollständiger Sicherheit** – Deine Daten in sicheren Händen
 
 ---
 
@@ -123,37 +120,25 @@ Finora macht dich zum Meister deiner Finanzen mit:
 
 ## 💎 Warum Finora wählen?
 
-<div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); margin: 15px 0;">
+> [!NOTE]
+> ### 💎 Premium User Experience
+> 
+> Finora fühlt sich gut an – mit sorgfältig gestalteten Komponenten, flüssigen Animationen und durchdachten UX-Patterns. **WCAG 2.1 AA** zertifiziert für volle Barrierefreiheit.
 
-### 💎 Premium User Experience
+> [!TIP]
+> ### 🚀 Developer-Friendly
+> 
+> Saubere, dokumentierte Architektur mit **119 Unit Tests** & **75% Coverage**. MVC-Pattern, einfach zu erweitern.
 
-Finora fühlt sich gut an – mit sorgfältig gestalteten Komponenten, flüssigen Animationen und durchdachten UX-Patterns. **WCAG 2.1 AA** zertifiziert für volle Barrierefreiheit.
+> [!IMPORTANT]
+> ### 🌍 Global Ready
+> 
+> 4 Sprachen + HTTP-Backend für i18n. Multi-Currency Support, RTL-ready, Timezone-aware.
 
-</div>
-
-<div style="background: linear-gradient(135deg, #f0fff4 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #059669; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15); margin: 15px 0;">
-
-### 🚀 Developer-Friendly
-
-Saubere, dokumentierte Architektur mit **119 Unit Tests** & **75% Coverage**. MVC-Pattern, einfach zu erweitern.
-
-</div>
-
-<div style="background: linear-gradient(135deg, #f0fff9 0%, #ccfbf1 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #0d9488; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15); margin: 15px 0;">
-
-### 🌍 Global Ready
-
-4 Sprachen + HTTP-Backend für i18n. Multi-Currency Support, RTL-ready, Timezone-aware.
-
-</div>
-
-<div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; box-shadow: 0 4px 12px rgba(202, 138, 4, 0.15); margin: 15px 0;">
-
-### 🔧 Produktion-Ready
-
-Vollständig getestet mit **GitHub Actions CI/CD**, ESLint + Prettier Linting, Error Tracking & Monitoring.
-
-</div>
+> [!WARNING]
+> ### 🔧 Produktion-Ready
+> 
+> Vollständig getestet mit **GitHub Actions CI/CD**, ESLint + Prettier Linting, Error Tracking & Monitoring.
 
 ---
 
@@ -243,104 +228,85 @@ npm run test
 npm run test:frontend
 
 # Backend Tests nur (Jest)
-npm run test:api
-
-# Code-Qualität prüfen
-npm run lint
-npm run format
-```
-
-### 📊 Qualitätsmetriken
-
-| Metric | Wert | Status |
-|--------|------|--------|
-| **Unit Tests** | 69 Frontend + 50 Backend | ✅ 119 Total |
-| **Test Coverage** | ~75% | ✅ Excellent |
-| **ESLint Errors** | 0 | ✅ Clean |
-| **Type Coverage** | 85% | ✅ Strong |
-| **Build Size** | ~500KB | ✅ Optimized |
-
-</div>
-
----
-
-## 🔒 Sicherheits-Features
-
-<div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #eab308; margin: 20px 0;">
-
-Finora schützt deine finanziellen Daten mit **Enterprise-Grade Sicherheit**:
-
-✅ **JWT Authentication** – Sichere Token mit Access (15min) & Refresh (7d)  
-✅ **Bcrypt Hashing** – Passwörter mit 10 Rounds verschlüsselt  
-✅ **CORS Protection** – Verhindert unauthorized requests  
+> [!TIP]
+> Finora wird mit **119 automatisierten Tests** ausgeliefert:
+> 
+> ```bash
+> npm run test              # Alle Tests
+> npm run test:frontend    # Nur Frontend (Vitest)
+> npm run test:api         # Nur Backend (Jest)
+> npm run lint             # Code-Qualität
+> ```
+> 
+> **Qualitätsmetriken:**
+> 
+> | Metric | Wert | Status |
+> |--------|------|--------|
+> | **Unit Tests** | 69 Frontend + 50 Backend | ✅ 119 Total |
+> | **Test Coverage** | ~75% | ✅ Excellent |
+> | **ESLint Errors** | 0 | ✅ Clean |
+> | **Build Size** | ~500KB | ✅ Optimized |RS Protection** – Verhindert unauthorized requests  
 ✅ **Rate Limiting** – Schutz vor Brute-Force Attacken  
 ✅ **Input Validation** – Alle Daten validiert vor DB-Speicherung  
 ✅ **HTTPS Only** – TLS 1.3 Encryption  
 ✅ **MongoDB Validation** – Schema-Level Datenschutz  
 ✅ **HTTP Security Headers** – HSTS, CSP, X-Frame-Options  
-
-</div>
-
----
-
-## 📊 Tech Stack
-
-**Frontend:** React 19 • Vite 7 • SCSS Modules • Recharts  
-**Backend:** Express 5 • MongoDB • Mongoose • JWT  
-**Quality:** Vitest (Frontend) • Jest (Backend) • ESLint 9 • Prettier 3  
-**DevOps:** GitHub Actions • Husky • lint-staged
-
----
-
+> [!WARNING]
+> Finora schützt deine finanziellen Daten mit **Enterprise-Grade Sicherheit**:
+> 
+> ✅ **JWT Authentication** – Sichere Token mit Access (15min) & Refresh (7d)  
+> ✅ **Bcrypt Hashing** – Passwörter mit 10 Rounds verschlüsselt  
+> ✅ **CORS Protection** – Verhindert unauthorized requests  
+> ✅ **Rate Limiting** – Schutz vor Brute-Force Attacken  
+> ✅ **Input Validation** – Alle Daten validiert vor DB-Speicherung  
+> ✅ **HTTPS Only** – TLS 1.3 Encryption  
+> ✅ **MongoDB Validation** – Schema-Level Datenschutz  
+> ✅ **HTTP Security Headers** – HSTS, CSP, X-Frame-Options
 ## 🤝 Beitragen
 
 Wir freuen uns über Beiträge der Community! 🎉
 
 ### 🔄 Entwicklungs-Workflow
-
-<div style="background: linear-gradient(135deg, #f0fff9 0%, #e0fffb 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #14b8a6; margin: 20px 0;">
-
-```bash
-# 1️⃣ Fork das Projekt auf GitHub
-# https://github.com/YoussefDawod/expense-tracker/fork
-
-# 2️⃣ Clone dein Fork
-git clone https://github.com/YOUR_USERNAME/expense-tracker.git
-cd expense-tracker
-
-# 3️⃣ Feature Branch erstellen
-git checkout -b feature/amazing-feature
-
-# 4️⃣ Code schreiben & testen
-npm run dev:frontend &
-npm run dev:api &
-
-# 5️⃣ Tests durchführen
-npm run test           # Alle Tests
-npm run lint           # Code Qualität checken
-npm run format         # Code formatieren
-
-# 6️⃣ Commit (Pre-commit Hook läuft automatisch!)
-git add .
-git commit -m "feat: add amazing feature"
-
-# 7️⃣ Push & Pull Request
-git push origin feature/amazing-feature
-# → GitHub: Create Pull Request
-```
-
-### ✅ Was wir checken
-
-- ✅ Alle Tests bestehen (Frontend + Backend)
-- ✅ ESLint + Prettier Checks erfolgreich
-- ✅ Build erfolgreich
-- ✅ Code-Style konsistent
-- ✅ Keine Breaking Changes (außer Version Bump)
-
-</div>
-
----
-
+> [!IMPORTANT]
+> Wir freuen uns über Beiträge der Community! 🎉
+> 
+> ### 🔄 Entwicklungs-Workflow
+> 
+> ```bash
+> # 1️⃣ Fork das Projekt auf GitHub
+> # https://github.com/YoussefDawod/expense-tracker/fork
+> 
+> # 2️⃣ Clone dein Fork
+> git clone https://github.com/YOUR_USERNAME/expense-tracker.git
+> cd expense-tracker
+> 
+> # 3️⃣ Feature Branch erstellen
+> git checkout -b feature/amazing-feature
+> 
+> # 4️⃣ Code schreiben & testen
+> npm run dev:frontend &
+> npm run dev:api &
+> 
+> # 5️⃣ Tests durchführen
+> npm run test           # Alle Tests
+> npm run lint           # Code Qualität checken
+> 
+> # 6️⃣ Commit (Pre-commit Hook läuft automatisch!)
+> git add .
+> git commit -m "feat: add amazing feature"
+> 
+> # 7️⃣ Push & Pull Request
+> git push origin feature/amazing-feature
+> # → GitHub: Create Pull Request
+> ```
+> 
+> ### ✅ Was wir checken
+> 
+> - ✅ Alle Tests bestehen (Frontend + Backend)
+> - ✅ ESLint + Prettier Checks erfolgreich
+> - ✅ Build erfolgreich
+> - ✅ Code-Style konsistent
+> - ✅ Keine Breaking Changes (außer Version Bump)
 ## 📝 Changelog & Versionierung
 
 **Version 2.1.0** (Aktuelle Version)

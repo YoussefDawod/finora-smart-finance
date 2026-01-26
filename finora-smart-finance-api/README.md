@@ -57,84 +57,75 @@ npm run dev
 
 ## 📁 Projekt-Struktur
 
-<div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5; margin: 15px 0;">
-
-```
-src/
-├── controllers/      # Request Handler
-├── services/         # Business Logic
-├── validators/       # Input Validation (Zod)
-├── models/           # Mongoose Schemas
-├── routes/           # Express Routes
-├── middleware/       # Auth, Error Handler, Rate Limiter
-└── utils/            # Logger, Email Service
-```
-
-**MVC Pattern** – Saubere Trennung von Concerns
-
-</div>
+> [!NOTE]
+> ```
+> src/
+> ├── controllers/      # Request Handler
+> ├── services/         # Business Logic
+> ├── validators/       # Input Validation (Zod)
+> ├── models/           # Mongoose Schemas
+> ├── routes/           # Express Routes
+> ├── middleware/       # Auth, Error Handler, Rate Limiter
+> └── utils/            # Logger, Email Service
+> ```
+> 
+> **MVC Pattern** – Saubere Trennung von Concerns
 
 ---
 
 ## 📡 API Endpoints
 
-<div style="background: linear-gradient(135deg, #f0fff4 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #059669; margin: 15px 0;">
-
-### Authentication
-
-```bash
-POST   /api/auth/register      # User registrieren
-POST   /api/auth/login         # Login (JWT Token)
-POST   /api/auth/logout        # Logout
-POST   /api/auth/refresh       # Token refresh
-```
-
-### Transactions
-
-```bash
-GET    /api/transactions       # Alle Transaktionen
-POST   /api/transactions       # Neue Transaktion
-GET    /api/transactions/:id   # Einzelne Transaktion
-PATCH  /api/transactions/:id   # Transaktion updaten
-DELETE /api/transactions/:id   # Transaktion löschen
-GET    /api/transactions/stats # Statistiken
-```
-
-### Users
-
-```bash
-GET    /api/users/profile      # User-Profil
-PATCH  /api/users/profile      # Profil updaten
-DELETE /api/users/account      # Account löschen
-```
-
-📖 **Detaillierte API-Docs:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
-
-</div>
+> [!TIP]
+> ### Authentication
+> 
+> ```bash
+> POST   /api/auth/register      # User registrieren
+> POST   /api/auth/login         # Login (JWT Token)
+> POST   /api/auth/logout        # Logout
+> POST   /api/auth/refresh       # Token refresh
+> ```
+> 
+> ### Transactions
+> 
+> ```bash
+> GET    /api/transactions       # Alle Transaktionen
+> POST   /api/transactions       # Neue Transaktion
+> GET    /api/transactions/:id   # Einzelne Transaktion
+> PATCH  /api/transactions/:id   # Transaktion updaten
+> DELETE /api/transactions/:id   # Transaktion löschen
+> GET    /api/transactions/stats # Statistiken
+> ```
+> 
+> ### Users
+> 
+> ```bash
+> GET    /api/users/profile      # User-Profil
+> PATCH  /api/users/profile      # Profil updaten
+> DELETE /api/users/account      # Account löschen
+> ```
+> 
+> 📖 **Detaillierte API-Docs:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
 
 ---
 
 ## 🛠️ Admin CLI Tools
 
-<div style="background: linear-gradient(135deg, #f0fff9 0%, #ccfbf1 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #0d9488; margin: 15px 0;">
-
-Entwickler-Tools für User-Verwaltung:
-
-```bash
-# User-Übersicht
-npm run admin:stats
-
-# Alle Users auflisten
-npm run admin:list
-
-# Passwort zurücksetzen
-node admin-cli.js reset-password <userId> newPassword123
-
-# User löschen
-node admin-cli.js delete-user <userId>
-```
-
-</div>
+> [!IMPORTANT]
+> Entwickler-Tools für User-Verwaltung:
+> 
+> ```bash
+> # User-Übersicht
+> npm run admin:stats
+> 
+> # Alle Users auflisten
+> npm run admin:list
+> 
+> # Passwort zurücksetzen
+> node admin-cli.js reset-password <userId> newPassword123
+> 
+> # User löschen
+> node admin-cli.js delete-user <userId>
+> ```
 
 ---
 
@@ -143,20 +134,17 @@ node admin-cli.js delete-user <userId>
 <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; margin: 15px 0;">
 
 ```bash
-npm run test              # Alle Tests
-npm run test:watch        # Watch Mode
-npm run test:coverage     # Mit Coverage Report
-```
-
-**Test Coverage:**
-- Auth Validation: 20 Tests
-- Transaction Validation: 30 Tests
-- Total: 50 Tests passing ✅
-
-</div>
-
----
-
+> [!TIP]
+> ```bash
+> npm run test              # Alle Tests
+> npm run test:watch        # Watch Mode
+> npm run test:coverage     # Mit Coverage Report
+> ```
+> 
+> **Test Coverage:**
+> - Auth Validation: 20 Tests
+> - Transaction Validation: 30 Tests
+> - Total: 50 Tests passing ✅
 ## 🔐 Sicherheits-Features
 
 ✅ **JWT Tokens** – Access (15min) + Refresh (7d)  

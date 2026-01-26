@@ -59,83 +59,74 @@ npm run test
 
 ## 📁 Projekt-Struktur
 
-<div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5; margin: 15px 0;">
-
-```
-src/
-├── api/              # Axios Client + Services
-├── components/       # React Components
-│   ├── auth/         # Login, Register
-│   ├── common/       # Button, Input, Modal
-│   ├── dashboard/    # Charts, Cards
-│   └── transactions/ # TransactionForm, List
-├── hooks/            # Custom Hooks (useAuth, useForm, etc.)
-├── context/          # React Context (Auth, Theme, Toast)
-├── pages/            # Route Pages
-├── styles/           # SCSS Modules + Design Tokens
-├── i18n/             # 4 Sprachen (HTTP Backend)
-└── utils/            # Helpers, Validators, Formatters
-```
-
-</div>
+> [!NOTE]
+> ```
+> src/
+> ├── api/              # Axios Client + Services
+> ├── components/       # React Components
+> │   ├── auth/         # Login, Register
+> │   ├── common/       # Button, Input, Modal
+> │   ├── dashboard/    # Charts, Cards
+> │   └── transactions/ # TransactionForm, List
+> ├── hooks/            # Custom Hooks (useAuth, useForm, etc.)
+> ├── context/          # React Context (Auth, Theme, Toast)
+> ├── pages/            # Route Pages
+> ├── styles/           # SCSS Modules + Design Tokens
+> ├── i18n/             # 4 Sprachen (HTTP Backend)
+> └── utils/            # Helpers, Validators, Formatters
+> ```
 
 ---
 
 ## 🧪 Testing
 
-<div style="background: linear-gradient(135deg, #f0fff4 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #059669; margin: 15px 0;">
-
-```bash
-npm run test              # Alle Tests
-npm run test:ui           # Interactive UI
-npm run test:coverage     # Mit Coverage Report
-```
-
-**Test Coverage:**
-- Hooks: ~82%
-- Utils: ~66%
-- Validators: 100%
-
-</div>
+> [!TIP]
+> ```bash
+> npm run test              # Alle Tests
+> npm run test:ui           # Interactive UI
+> npm run test:coverage     # Mit Coverage Report
+> ```
+> 
+> **Test Coverage:**
+> - Hooks: ~82%
+> - Utils: ~66%
+> - Validators: 100%
 
 ---
 
 ## 🎨 Design System
 
-<div style="background: linear-gradient(135deg, #f0fff9 0%, #ccfbf1 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #0d9488; margin: 15px 0;">
-
-### CSS Variables (Design Tokens)
-
-```scss
-// Brand Colors
---primary: #4f46e5;    // Indigo
---secondary: #22c55e;  // Green
---accent: #14b8a6;     // Teal
-
-// Semantic Colors
---success: #10b981;
---error: #ef4444;
---warning: #f59e0b;
-
-// Spacing Scale
---space-xs: 0.5rem;
---space-md: 1rem;
---space-lg: 1.5rem;
-
-// Typography
---fs-sm: 0.875rem;
---fs-md: 1rem;
---fs-lg: 1.125rem;
-```
-
-### Themes
-
-✅ Light Mode (Default)  
-✅ Dark Mode  
-✅ Glass-Morphism Effects  
-✅ System Preference Detection
-
-</div>
+> [!NOTE]
+> ### CSS Variables (Design Tokens)
+> 
+> ```scss
+> // Brand Colors
+> --primary: #4f46e5;    // Indigo
+> --secondary: #22c55e;  // Green
+> --accent: #14b8a6;     // Teal
+> 
+> // Semantic Colors
+> --success: #10b981;
+> --error: #ef4444;
+> --warning: #f59e0b;
+> 
+> // Spacing Scale
+> --space-xs: 0.5rem;
+> --space-md: 1rem;
+> --space-lg: 1.5rem;
+> 
+> // Typography
+> --fs-sm: 0.875rem;
+> --fs-md: 1rem;
+> --fs-lg: 1.125rem;
+> ```
+> 
+> ### Themes
+> 
+> ✅ Light Mode (Default)  
+> ✅ Dark Mode  
+> ✅ Glass-Morphism Effects  
+> ✅ System Preference Detection
 
 ---
 
@@ -144,18 +135,15 @@ npm run test:coverage     # Mit Coverage Report
 <div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; margin: 15px 0;">
 
 **Unterstützte Sprachen:**
-
-🇩🇪 **Deutsch** (de)  
-🇬🇧 **English** (en)  
-🇸🇦 **العربية** (ar) – RTL Support  
-🇬🇪 **ქართული** (ka)
-
-**i18next HTTP Backend** – Translations on-demand laden
-
-</div>
-
----
-
+> [!IMPORTANT]
+> **Unterstützte Sprachen:**
+> 
+> 🇩🇪 **Deutsch** (de)  
+> 🇬🇧 **English** (en)  
+> 🇸🇦 **العربية** (ar) – RTL Support  
+> 🇬🇪 **ქართული** (ka)
+> 
+> **i18next HTTP Backend** – Translations on-demand laden
 ## 📋 Verfügbare Scripts
 
 | Command | Beschreibung |
