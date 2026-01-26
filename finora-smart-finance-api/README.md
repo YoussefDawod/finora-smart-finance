@@ -1,304 +1,214 @@
-# Finora API
+<div align="center">
 
-REST-API für Finora - Smart Finance. Gebaut mit Node.js, Express und MongoDB.
+# ⚙️ Finora Backend API
 
-## 🚀 Tech Stack
+**Express 5 • MongoDB • Mongoose • JWT**
 
-- **Runtime:** Node.js
-- **Framework:** Express 5.x
-- **Database:** MongoDB (Mongoose ODM)
-- **Extras:** CORS, dotenv
+![Node](https://img.shields.io/badge/node-18+-green?style=for-the-badge)
+![Express](https://img.shields.io/badge/express-5-blue?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-50_passing-00d084?style=for-the-badge)
 
----
+REST API mit JWT Authentication, MongoDB & Admin CLI Tools.
 
-## 🛠️ **NEU: User-Verwaltung für Entwickler**
+[⬅️ Zurück zum Hauptprojekt](../README.md)
 
-Als Entwickler kannst du jetzt einfach deine User verwalten:
-
-```bash
-# Schnell-Übersicht
-npm run admin:stats
-
-# Alle Users anzeigen
-npm run admin:list
-
-# Passwort zurücksetzen
-node admin-cli.js reset-password <userId> test123
-```
-
-📖 **Vollständige Anleitung:** [SOFORT_STARTEN.md](SOFORT_STARTEN.md)  
-📚 **Dokumentation:** [docs/ADMIN_API.md](docs/ADMIN_API.md)  
-🧪 **REST Beispiele:** [admin-api.http](admin-api.http)
+</div>
 
 ---
 
-## 📦 Installation
+## 🚀 Quick Start
 
 ```bash
-# 1. Repo klonen
-git clone <repo-url>
-cd finora-smart-finance-api
-
-# 2. Dependencies installieren
+# Dependencies installieren
 npm install
 
-# 3. .env Datei erstellen und MongoDB URI eintragen
+# .env konfigurieren
 cp .env.example .env
+# MONGODB_URI eintragen
 
-# 4. Server starten (mit Auto-Reload)
+# Server starten (Port 5000)
 npm run dev
 ```
 
-Server läuft auf: http://localhost:5000
+**Server läuft auf:** http://localhost:5000
 
-## 📡 API-Routen
+---
 
-### Health Check
-- `GET /api/health` - Server-Status und MongoDB-Verbindung
+## 🛠️ Tech Stack
+
+**Core:**
+- Express 5 – Modern Web Framework
+- MongoDB 7 – NoSQL Database
+- Mongoose 9 – ODM mit Validation
+- Node.js 18+ – Runtime
+
+**Security:**
+- JWT – Token Authentication
+- Bcrypt – Password Hashing (10 Rounds)
+- CORS – Origin Protection
+- Rate Limiter – Brute-Force Schutz
+
+**Quality:**
+- Jest 30 – Unit Tests (50 passing)
+- Supertest – API Testing
+- ESLint 9 – Code Linting
+
+---
+
+## 📁 Projekt-Struktur
+
+<div style="background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #4f46e5; margin: 15px 0;">
+
+```
+src/
+├── controllers/      # Request Handler
+├── services/         # Business Logic
+├── validators/       # Input Validation (Zod)
+├── models/           # Mongoose Schemas
+├── routes/           # Express Routes
+├── middleware/       # Auth, Error Handler, Rate Limiter
+└── utils/            # Logger, Email Service
+```
+
+**MVC Pattern** – Saubere Trennung von Concerns
+
+</div>
+
+---
+
+## 📡 API Endpoints
+
+<div style="background: linear-gradient(135deg, #f0fff4 0%, #dbeafe 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #059669; margin: 15px 0;">
+
+### Authentication
+
+```bash
+POST   /api/auth/register      # User registrieren
+POST   /api/auth/login         # Login (JWT Token)
+POST   /api/auth/logout        # Logout
+POST   /api/auth/refresh       # Token refresh
+```
 
 ### Transactions
 
-#### POST /api/transactions
-Neue Transaktion erstellen
-
-**Body:**
-```json
-{
-  "amount": 45.99,
-  "category": "Lebensmittel",
-  "description": "Supermarkt",
-  "type": "expense",
-  "date": "2026-01-07",
-  "tags": ["groceries"],
-  "notes": "Optional"
-}
-```
-**Response:** 201 Created
-
-#### GET /api/transactions
-Alle Transaktionen abrufen (mit Filterung und Paginierung)
-
-**Query Parameter:**
-- `page` (default: 1)
-- `limit` (default: 10, max: 100)
-- `type` (income | expense)
-- `category` (z.B. Lebensmittel)
-- `startDate` (YYYY-MM-DD)
-- `endDate` (YYYY-MM-DD)
-- `sort` (date | amount, default: date)
-- `order` (asc | desc, default: desc)
-
-**Beispiel:**
-```
-GET /api/transactions?type=expense&category=Lebensmittel&page=1&limit=10
-```
-**Response:** 200 OK
-
-#### GET /api/transactions/:id
-Einzelne Transaktion abrufen
-
-**Response:** 200 OK oder 404 Not Found
-
-#### GET /api/transactions/stats/summary
-Zusammenfassung (Einnahmen, Ausgaben, Saldo)
-
-**Query Parameter:**
-- `startDate` (optional)
-- `endDate` (optional)
-
-**Response:**
-```json
-{
-  "totalIncome": 0,
-  "totalExpense": 45.99,
-  "balance": -45.99,
-  "transactionCount": 1
-}
+```bash
+GET    /api/transactions       # Alle Transaktionen
+POST   /api/transactions       # Neue Transaktion
+GET    /api/transactions/:id   # Einzelne Transaktion
+PATCH  /api/transactions/:id   # Transaktion updaten
+DELETE /api/transactions/:id   # Transaktion löschen
+GET    /api/transactions/stats # Statistiken
 ```
 
-#### PUT /api/transactions/:id
-Transaktion aktualisieren (alle Felder optional)
-
-**Body:**
-```json
-{
-  "amount": 99.50,
-  "category": "Transport",
-  "description": "Updated",
-  "notes": "Optional"
-}
-```
-**Response:** 200 OK | 400 Bad Request | 404 Not Found
-
-#### DELETE /api/transactions/:id
-Einzelne Transaktion löschen
-
-**Response:** 200 OK | 404 Not Found
-
-#### DELETE /api/transactions?confirm=true
-Alle Transaktionen löschen (⚠️ GEFÄHRLICH!)
-
-**Query Parameter:**
-- `confirm=true` (erforderlich für Sicherheit)
-
-**Response:** 200 OK | 400 Bad Request
-
-## 👤 User Routes
-
-### GET /api/users/me
-Aktuellen User abrufen (Auth erforderlich)
-
-**Response:** `{ success: true, data: user }`
-
-### PUT /api/users/me
-User-Profil aktualisieren
-
-**Body:**
-```json
-{
-  "name": "John",
-  "lastName": "Doe",
-  "phone": "+49 123 456789",
-  "avatar": "https://..."
-}
-```
-
-### POST /api/users/change-password
-Passwort ändern (Auth erforderlich)
-
-**Body:**
-```json
-{
-  "currentPassword": "old...",
-  "newPassword": "secure...",
-  "confirmPassword": "secure..."
-}
-```
-
-**Validierungen:**
-- Aktuelles Passwort korrekt
-- Neues Passwort ≠ altes Passwort
-- Passwort-Anforderungen: 8+ Zeichen, Groß-, Kleinbuchstaben, Ziffern
-- Passwörter stimmen überein
-
-### POST /api/users/change-email
-Email ändern (mit Verifizierungs-Token)
-
-**Body:**
-```json
-{
-  "newEmail": "new@example.com",
-  "password": "current..."
-}
-```
-
-**Response:** Email-Bestätigung an neue Adresse
-
-### GET /api/users/verify-email-change?token=...
-Email-Change verifizieren (Token aus Email-Link)
-
-**Aktion:**
-- Token validieren
-- Email aktualisieren
-- Tokens entfernen
-
-### PUT /api/users/preferences
-Benutzer-Einstellungen aktualisieren
-
-**Body:**
-```json
-{
-  "theme": "dark",
-  "currency": "EUR",
-  "timezone": "Europe/Berlin",
-  "language": "de",
-  "emailNotifications": true
-}
-```
-
-**Enum-Werte:**
-- theme: `light | dark | system`
-- currency: `USD | EUR | GBP | CHF | JPY`
-- language: `en | de | fr`
-
-### DELETE /api/users/me
-Account permanent löschen (Cascade: alle Transaktionen werden gelöscht)
-
-**Body:** `{ password: "current..." }`
-
-### POST /api/users/export-data
-Alle User-Daten exportieren (JSON-Download)
-
-**Response:** JSON-Datei mit User-Info + alle Transaktionen
-
-### DELETE /api/users/transactions
-Alle Transaktionen löschen (Account bleibt erhalten)
-
-**Body:** `{ password: "current..." }`
-
-**Response:** `{ success: true, data: { deletedCount } }`
-
-## 🏁 Development & Linting
+### Users
 
 ```bash
-# Lint prüfen
-npm run lint
-
-# Lint automatisch beheben
-npm run lint:fix
+GET    /api/users/profile      # User-Profil
+PATCH  /api/users/profile      # Profil updaten
+DELETE /api/users/account      # Account löschen
 ```
 
-## 🚀 Production Deployment
+📖 **Detaillierte API-Docs:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
 
-### Prerequisites
-- Node.js 20+
-- PM2 (`npm install -g pm2`)
-- Nginx reverse proxy
-- SSL Certificate
+</div>
 
-### Server Setup (One-time)
+---
+
+## 🛠️ Admin CLI Tools
+
+<div style="background: linear-gradient(135deg, #f0fff9 0%, #ccfbf1 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #0d9488; margin: 15px 0;">
+
+Entwickler-Tools für User-Verwaltung:
+
 ```bash
-cd /var/www/finora-api
-npm ci --production
-nano .env.production # Add secrets
-pm2 start ecosystem.config.js
-pm2 save
-sudo nano /etc/nginx/sites-available/finora
-sudo systemctl restart nginx
+# User-Übersicht
+npm run admin:stats
+
+# Alle Users auflisten
+npm run admin:list
+
+# Passwort zurücksetzen
+node admin-cli.js reset-password <userId> newPassword123
+
+# User löschen
+node admin-cli.js delete-user <userId>
 ```
 
-### Deploy Updates
+</div>
+
+---
+
+## 🧪 Testing
+
+<div style="background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%); padding: 20px; border-radius: 12px; border-left: 4px solid #ca8a04; margin: 15px 0;">
+
 ```bash
-./deploy.sh
+npm run test              # Alle Tests
+npm run test:watch        # Watch Mode
+npm run test:coverage     # Mit Coverage Report
 ```
 
-### Monitor
+**Test Coverage:**
+- Auth Validation: 20 Tests
+- Transaction Validation: 30 Tests
+- Total: 50 Tests passing ✅
+
+</div>
+
+---
+
+## 🔐 Sicherheits-Features
+
+✅ **JWT Tokens** – Access (15min) + Refresh (7d)  
+✅ **Bcrypt Hashing** – 10 Rounds Password Encryption  
+✅ **CORS Protection** – Whitelist erlaubter Origins  
+✅ **Rate Limiting** – Max 100 Requests/15min  
+✅ **Input Validation** – Zod Schema Validation  
+✅ **MongoDB Validation** – Schema-Level Protection  
+✅ **HTTP Security Headers** – HSTS, CSP
+
+---
+
+## 🌍 Environment Variables
+
 ```bash
-pm2 status
-pm2 logs finora-smart-finance-api
+# .env Beispiel
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/finora
+JWT_SECRET=your-super-secret-key-min-32-chars
+JWT_REFRESH_SECRET=your-refresh-secret-key
+CORS_ORIGIN=http://localhost:3000
 ```
 
-## 🌍 API Live URL
+---
 
-- **Production:** https://api.finora.app/api/transactions
-- **Health Check:** https://api.finora.app/api/health
+## 📋 Verfügbare Scripts
 
-## 📋 Status
+| Command | Beschreibung |
+|---------|--------------|
+| `npm run dev` | Server mit Nodemon (Auto-Reload) |
+| `npm start` | Production Server |
+| `npm run test` | Tests ausführen |
+| `npm run lint` | ESLint Check |
+| `npm run admin:stats` | User-Statistiken |
+| `npm run admin:list` | Alle Users auflisten |
 
-- [x] MongoDB Atlas Cluster verbunden
-- [x] Transaction Model (Mongoose Schema)
-- [x] CRUD Endpoints (POST, GET, PUT, DELETE)
-- [x] User Model mit erweiterten Feldern
-- [x] User Routes (Profile, Settings, Email, Data Export)
-- [x] Fehlerbehandlung & Logging
-- [x] Environment Configuration
-- [x] Production Deployment Setup
-- [ ] Frontend (React + Vite)
+---
 
-## 👨‍💻 Autor
+## 🔗 Wichtige Links
 
-Youssef Dawod
+- [📖 Frontend Dokumentation](../finora-smart-finance-frontend/README.md)
+- [📚 API Reference](./docs/ADMIN_API.md)
+- [📝 Changelog](../CHANGELOG.md)
+- [🐛 Issues](https://github.com/YoussefDawod/expense-tracker/issues)
 
-## 📄 Lizenz
+---
 
-ISC
+<div align="center">
+
+**Made with ❤️ by Youssef Dawod**
+
+[⬆️ Back to Top](#️-finora-backend-api)
+
+</div>
