@@ -18,6 +18,7 @@ import { ALL_CATEGORIES } from '@/config/categoryConstants';
 import Button from '@/components/common/Button/Button';
 import Search from '@/components/common/Search/Search';
 import Filter from '@/components/common/Filter/Filter';
+import Modal from '@/components/common/Modal/Modal';
 import TransactionList from '@/components/transactions/TransactionList/TransactionList';
 import TransactionForm from '@/components/transactions/TransactionForm/TransactionForm';
 import { FiPlus } from 'react-icons/fi';
@@ -79,13 +80,20 @@ const TransactionsPage = () => {
   const handleEdit = (transaction) => {
     setEditingTransaction(transaction);
     setShowForm(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLE SUCCESS
   // ──────────────────────────────────────────────────────────────────────
   const handleFormSuccess = () => {
+    setShowForm(false);
+    setEditingTransaction(null);
+  };
+
+  // ──────────────────────────────────────────────────────────────────────
+  // HANDLE MODAL CLOSE
+  // ──────────────────────────────────────────────────────────────────────
+  const handleModalClose = () => {
     setShowForm(false);
     setEditingTransaction(null);
   };
@@ -137,28 +145,21 @@ const TransactionsPage = () => {
         />
       </motion.div>
 
-      {/* FORM SECTION (wenn geöffnet) */}
-      <AnimatePresence mode="wait">
-        {showForm && (
-          <motion.div
-            key="transaction-form"
-            className={styles.formSection}
-            variants={itemVariants}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20, transition: { duration: 0.2 } }}
-          >
-            <TransactionForm
-              initialData={editingTransaction}
-              onSuccess={handleFormSuccess}
-              onCancel={() => {
-                setShowForm(false);
-                setEditingTransaction(null);
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* TRANSACTION FORM MODAL */}
+      <Modal
+        isOpen={showForm}
+        onClose={handleModalClose}
+        title={editingTransaction ? t('transactions.editTransaction') : t('transactions.addTransaction')}
+        size="medium"
+        closeOnOverlayClick={false}
+        closeOnEsc={true}
+      >
+        <TransactionForm
+          initialData={editingTransaction}
+          onSuccess={handleFormSuccess}
+          onCancel={handleModalClose}
+        />
+      </Modal>
 
       {/* SEARCH & FILTER CONTROLS */}
       <motion.div className={styles.controlsSection} variants={itemVariants}>

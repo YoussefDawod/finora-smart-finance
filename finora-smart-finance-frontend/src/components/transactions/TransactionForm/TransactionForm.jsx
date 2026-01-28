@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { formContainerVariants, formItemVariants, buttonMotionProps } from '@/constants/animations';
-import Select from '@/components/common/Select/Select';
+import CategoryPicker from '@/components/transactions/CategoryPicker/CategoryPicker';
 import Input from '@/components/common/Input/Input';
 import Textarea from '@/components/common/Textarea/Textarea';
 import Button from '@/components/common/Button/Button';
@@ -26,6 +26,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
     categories,
     isLoading,
     error,
+    isDirty,
     isEditMode,
     handleChange,
     handleTypeChange,
@@ -104,18 +105,18 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
         />
       </motion.div>
 
-      {/* CATEGORY SELECT */}
+      {/* CATEGORY PICKER */}
       <motion.div variants={formItemVariants}>
-        <Select
-          label={t('transactions.category')}
-          options={categories.map((cat) => ({ value: cat, label: translateCategory(cat, t) }))}
-          placeholder={t('transactions.categoryPlaceholder')}
+        <CategoryPicker
+          categories={categories}
           value={formData.category}
           onChange={(e) =>
             handleChange({
               target: { name: 'category', value: e.target.value },
             })
           }
+          label={t('transactions.category')}
+          placeholder={t('transactions.categoryPlaceholder')}
           error={errors.category}
           required
           disabled={isLoading}
@@ -175,7 +176,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           type="submit"
           variant="primary"
           size="medium"
-          disabled={isLoading}
+          disabled={isLoading || (isEditMode && !isDirty)}
           loading={isLoading}
           fullWidth
         >

@@ -15,6 +15,7 @@ export { useTransactions } from './useTransactions';
 export { useDebounce } from './useDebounce';
 export { useLocalStorage } from './useLocalStorage';
 export { usePasswordToggle } from './usePasswordToggle';
+export { useProfile } from './useProfile';
 
 // ============================================
 // 📦 EXISTING HOOKS

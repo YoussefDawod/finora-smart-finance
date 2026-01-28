@@ -35,7 +35,7 @@
   white-space: nowrap;
   box-shadow: var(--sh-sm);
 
-  @include mobile {
+  @include below-sm {
     width: 100%;
     justify-content: center;
   }
@@ -78,13 +78,27 @@
   top: calc(100% + var(--space-xs));
   right: 0;
   min-width: 200px;
-  width: min(320px, 80vw);
+  width: min(380px, 90vw);
   background: var(--surface);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
   border-radius: var(--r-lg);
   box-shadow: var(--sh-lg);
   z-index: var(--z-dropdown);
   padding: var(--space-xs);
+
+  // Landscape-Tablets: Mehr Platz
+  @media (max-width: 1023px) and (orientation: landscape) {
+    width: min(450px, 85vw);
+  }
+
+  // Portrait-Tablets: Standard
+  @media (max-width: 1023px) and (orientation: portrait) {
+    width: min(400px, 90vw);
+  }
+
+  @include below-sm {
+    width: min(320px, 80vw);
+  }
 }
 
 :global([dir='rtl']) .filterDropdown {
@@ -100,6 +114,16 @@
   flex-direction: column;
   gap: var(--space-xs);
   padding: var(--space-xs);
+
+  // Landscape-Tablets: Mehr Platz
+  @media (max-width: 1023px) and (orientation: landscape) {
+    padding: var(--space-md);
+  }
+
+  // Portrait-Tablets: Standard
+  @media (max-width: 1023px) and (orientation: portrait) {
+    padding: var(--space-sm);
+  }
 }
 
 .filterTitle {
@@ -180,11 +204,11 @@
 
 .dateRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: var(--space-xs);
 
-  @include mobile {
-    grid-template-columns: 1fr;
+  @include lg {
+    grid-template-columns: 1fr 1fr;
   }
 }
 

@@ -1,0 +1,375 @@
+// ============================================
+// 🎯 CATEGORY PICKER COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PICKER GROUP (Container)
+// ============================================
+.pickerGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  position: relative;
+
+  &.focused {
+    .label {
+      color: var(--primary);
+      font-weight: var(--fw-m);
+    }
+
+    .pickerButton {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 2%, transparent);
+    }
+
+    .chevron {
+      color: var(--primary);
+    }
+  }
+
+  &.hasError {
+    .pickerButton {
+      border-color: var(--error);
+      background: color-mix(in srgb, var(--error) 5%, transparent);
+    }
+
+    .label {
+      color: var(--error);
+    }
+
+    .chevron {
+      color: var(--error);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+// ============================================
+// LABEL
+// ============================================
+.label {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  transition: all var(--tr);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.required {
+  color: var(--error);
+  font-weight: var(--fw-b);
+}
+
+// ============================================
+// PICKER WRAPPER
+// ============================================
+.pickerWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: var(--z-dropdown);
+}
+
+// ============================================
+// PICKER BUTTON (Trigger)
+// ============================================
+.pickerButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--tr);
+  text-align: left;
+
+  &:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    box-shadow: var(--sh-sm);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  &.active {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 5%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// SELECTED VALUE DISPLAY
+// ============================================
+.selectedValue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex: 1;
+  min-width: 0;
+  color: var(--tx);
+
+  svg {
+    flex-shrink: 0;
+    font-size: var(--fs-md);
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// ============================================
+// CHEVRON ICON
+// ============================================
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--fs-md);
+  color: var(--tx-muted);
+  transition: transform var(--tr), color var(--tr);
+}
+
+// ============================================
+// PICKER MENU (Dropdown)
+// ============================================
+.pickerMenu {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  right: 0;
+  min-width: 200px;
+  max-height: 300px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 15%, var(--border));
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  overflow-y: auto;
+  z-index: calc(var(--z-dropdown) + 1);
+  padding: var(--space-xs);
+
+  // Custom Scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--primary) 25%, transparent) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--primary) 25%, transparent);
+    border-radius: var(--r-full);
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 40%, transparent);
+    }
+  }
+
+  @include tablet {
+    max-height: 350px;
+  }
+
+  @include tablet-md {
+    max-height: 400px;
+  }
+
+  @include mobile {
+    max-height: 280px;
+  }
+}
+
+// ============================================
+// MENU ITEM
+// ============================================
+.menuItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  text-align: left;
+
+  &:hover {
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  &.selected {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+    font-weight: var(--fw-m);
+  }
+
+  @include tablet {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  @include mobile {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-xs);
+  }
+}
+
+// ============================================
+// MENU ITEM CONTENT
+// ============================================
+.itemIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--fs-md);
+  color: inherit;
+}
+
+.itemLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.checkmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-b);
+  color: var(--primary);
+  margin-left: var(--space-xs);
+}
+
+// ============================================
+// SIZE VARIANTS
+// ============================================
+.pickerGroup.small .pickerButton {
+  min-height: var(--input-h-sm, auto);
+  padding: var(--space-3xs) var(--space-sm);
+  font-size: var(--fs-xs);
+}
+
+.pickerGroup.medium .pickerButton {
+  min-height: var(--input-h);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--fs-sm);
+}
+
+.pickerGroup.large .pickerButton {
+  min-height: var(--input-h-lg, auto);
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--fs-md);
+}
+
+// ============================================
+// ERROR MESSAGE
+// ============================================
+.error {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--error);
+  margin-top: var(--space-2xs);
+}
+
+// ============================================
+// HINT TEXT
+// ============================================
+.hint {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin-top: var(--space-2xs);
+  line-height: var(--lh-snug);
+}
+
+// ============================================
+// RESPONSIVE ADJUSTMENTS
+// ============================================
+@include tablet {
+  .pickerButton {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-sm);
+  }
+
+  .menuItem {
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
+
+@include mobile {
+  .pickerMenu {
+    max-height: 260px;
+    padding: var(--space-xs);
+  }
+
+  .menuItem {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-xs);
+  }
+
+  .selectedValue {
+    gap: var(--space-xs);
+  }
+}
+
+:global([dir='rtl']) {
+  .pickerButton {
+    flex-direction: row-reverse;
+  }
+
+  .selectedValue {
+    flex-direction: row-reverse;
+  }
+
+  .menuItem {
+    flex-direction: row-reverse;
+  }
+
+  .chevron {
+    margin-left: var(--space-sm);
+  }
+}

@@ -5,10 +5,27 @@
  * Built to harmonize mit Theme-Tokens (keine hart codierten Farben)
  * Fokus auf echte App-Features (Tracking, Charts, sichere Auth, Dark/Light)
  * 
+ * MODES & BUTTONS:
+ * - Login Mode:    Headline "New here?" + Button "Sign up now" → /register
+ * - Register Mode: Headline "Welcome back!" + Button "Go to sign in" → /login
+ * - Forgot Mode:   Headline "Forgot password?" + Button "Back to sign in" → /login
+ * 
  * RESPONSIVE BEHAVIOR:
  * - Desktop (≥1024px): Full panel with all highlights, stats optional
  * - Tablet (768-1023px): 2-column highlights, condensed spacing
  * - Mobile (<768px): Compact essential info, 2x2 highlight grid
+ * 
+ * ANIMATION CONSISTENCY:
+ * - All modes: Identical floating shapes animation (7-11s loop)
+ * - All modes: Identical content fade transition (200ms, AnimatePresence)
+ * 
+ * ARROW DIRECTION (semantisch korrekt):
+ * - Desktop Login:    ← (zeigt nach links, zum statischen Panel)
+ * - Desktop Register: → (zeigt nach rechts, zum Form Panel)
+ * - Desktop Forgot:   → (zeigt nach rechts, zum Form Panel, wie Register)
+ * - Mobile Login:     ↑ (zeigt nach oben, zum Branding)
+ * - Mobile Register:  ↓ (zeigt nach unten, zum Form)
+ * - Mobile Forgot:    ↓ (zeigt nach unten, zum Form, wie Register)
  * 
  * @module components/auth/BrandingPanel
  */
@@ -128,9 +145,13 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
   const isRtl = i18n.dir() === 'rtl';
 
   // Arrow direction based on layout and mode
+  // Desktop: Login points left (←), Register/Forgot point right (→)
+  // Mobile: Login points up (↑), Register/Forgot point down (↓)
+  const isLoginMode = mode === 'login';
+  
   const arrowSymbol = isDesktop
-    ? (mode === 'login' ? (isRtl ? '→' : '←') : (isRtl ? '←' : '→'))
-    : (mode === 'login' ? (isRtl ? '↓' : '↑') : (isRtl ? '↑' : '↓'));
+    ? (isLoginMode ? (isRtl ? '→' : '←') : (isRtl ? '←' : '→'))
+    : (isLoginMode ? (isRtl ? '↓' : '↑') : (isRtl ? '↑' : '↓'));
 
   return (
     <div className={styles.panel}>

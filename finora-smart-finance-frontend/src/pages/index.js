@@ -5,7 +5,6 @@
 
 export { default as AuthPage } from './AuthPage';
 export { default as VerifyEmailPage } from './VerifyEmailPage/VerifyEmailPage';
-export { default as ForgotPasswordPage } from './ForgotPasswordPage/ForgotPasswordPage';
 export { default as TermsPage } from './TermsPage';
 export { default as DashboardPage } from './DashboardPage';
 export { default as TransactionsPage } from './TransactionsPage';

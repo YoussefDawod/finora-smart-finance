@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 /**
  * Custom hook for form handling with validation (supports Zod & custom validators)
@@ -11,6 +11,23 @@ export const useForm = (initialValues = {}, onSubmit, schema) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ──────────────────────────────────────────────────────────────────────
+  // CHECK IF FORM HAS CHANGES (isDirty)
+  // ──────────────────────────────────────────────────────────────────────
+  const isDirty = useMemo(() => {
+    return Object.keys(initialValues).some((key) => {
+      const initialValue = initialValues[key];
+      const currentValue = values[key];
+      
+      // Handle null/undefined as equivalent to empty string
+      const normalizedInitial = initialValue ?? '';
+      const normalizedCurrent = currentValue ?? '';
+      
+      // Convert to string for comparison (handles numbers too)
+      return String(normalizedInitial) !== String(normalizedCurrent);
+    });
+  }, [initialValues, values]);
 
   // ──────────────────────────────────────────────────────────────────────
   // VALIDATE FUNCTION - supports both Zod schemas and custom functions
@@ -129,6 +146,7 @@ export const useForm = (initialValues = {}, onSubmit, schema) => {
     errors,
     touched,
     isSubmitting,
+    isDirty,
     handleChange,
     handleBlur,
     handleSubmit,

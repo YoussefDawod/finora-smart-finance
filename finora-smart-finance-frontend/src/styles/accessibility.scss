@@ -18,10 +18,17 @@
 
 // Enhanced focus-visible for all interactive elements
 :focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
-  box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
-              rgba(var(--primary-rgb), var(--focus-ring-opacity));
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+// Form controls use their own focus styles (handled in component styles)
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: var(--primary);
 }
 
 // ============================================
@@ -45,8 +52,8 @@
   &:focus,
   &:focus-visible {
     top: 0;
-    outline: var(--focus-ring-width) solid var(--on-primary);
-    outline-offset: -4px;
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--on-primary);
   }
 }
 
@@ -163,10 +170,8 @@
 
 // Highlight parent when child has focus
 .focus-within-highlight:focus-within {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
-  box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
-              rgba(var(--primary-rgb), var(--focus-ring-opacity));
+  outline: none;
+  box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 // Border highlight variant
@@ -194,8 +199,8 @@ p a:focus-visible,
 button[aria-label]:focus-visible,
 a[aria-label]:focus-visible,
 [role="button"]:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+  outline: none;
+  box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 // Navigation items
@@ -204,8 +209,8 @@ nav button:focus-visible,
 [role="navigation"] a:focus-visible,
 [role="navigation"] button:focus-visible {
   background: rgba(var(--primary-rgb), 0.1);
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: -2px;
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 // Interactive cards
@@ -227,13 +232,20 @@ body.keyboard-user *:focus-visible {
   animation: focusPulse 300ms ease-out;
 }
 
+// Prevent global focus animation/shadow on text inputs
+body.keyboard-user input:focus-visible,
+body.keyboard-user textarea:focus-visible,
+body.keyboard-user select:focus-visible {
+  animation: none;
+  box-shadow: none;
+}
+
 @keyframes focusPulse {
   0% {
     box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
   }
   100% {
-    box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
-                rgba(var(--primary-rgb), var(--focus-ring-opacity));
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 
@@ -259,8 +271,8 @@ body:not(.keyboard-user) *:focus:not(:focus-visible) {
 
 [role="dialog"] *:focus-visible,
 [role="alertdialog"] *:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+  outline: none;
+  box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 // ============================================
@@ -313,8 +325,9 @@ label[data-required]::after,
   border-color: var(--error) !important;
   
   &:focus-visible {
-    outline-color: var(--error);
-    box-shadow: 0 0 0 3px rgba(var(--error-rgb), 0.2);
+    outline: none;
+    box-shadow: none; // Avoid double red border on error focus
+    border-color: var(--error);
   }
 }
 
@@ -329,8 +342,8 @@ label[data-required]::after,
 // Checkbox & Radio focus
 input[type="checkbox"]:focus-visible,
 input[type="radio"]:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+  outline: none;
+  box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 // ============================================

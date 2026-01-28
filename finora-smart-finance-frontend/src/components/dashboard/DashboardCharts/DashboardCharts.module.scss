@@ -214,7 +214,7 @@
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) rgba(var(--primary-rgb), var(--focus-ring-opacity));
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 
