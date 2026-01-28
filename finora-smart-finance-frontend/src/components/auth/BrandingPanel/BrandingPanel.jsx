@@ -85,7 +85,7 @@ const getFloatingShapes = (isDesktop) => {
   ];
 };
 
-// Content based on mode (login/register)
+// Content based on mode (login/register/forgot)
 const getContent = (mode) => {
   const contentMap = {
     login: {
@@ -100,6 +100,13 @@ const getContent = (mode) => {
       headlineKey: 'auth.branding.register.headline',
       sublineKey: 'auth.branding.register.subline',
       ctaTextKey: 'auth.branding.register.cta',
+      ctaPath: '/login',
+    },
+    forgot: {
+      kickerKey: 'auth.branding.kicker',
+      headlineKey: 'auth.branding.forgot.headline',
+      sublineKey: 'auth.branding.forgot.subline',
+      ctaTextKey: 'auth.branding.forgot.cta',
       ctaPath: '/login',
     },
   };

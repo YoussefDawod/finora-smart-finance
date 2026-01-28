@@ -21,7 +21,11 @@ const config = {
         'http://127.0.0.1:3000', 
         'http://127.0.0.1:3001', 
         'http://127.0.0.1:5173',
-        // Network IPs for mobile testing
+        // Specific network IPs for testing (current network)
+        'http://192.168.188.22:3000',
+        'http://192.168.188.22:3001',
+        'http://192.168.188.22:5173',
+        // Network IPs for mobile testing (regex patterns for any IP in private ranges)
         /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d+$/,
         /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/,
         /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}:\d+$/,

@@ -23,7 +23,9 @@ export const RecentTransactions = () => {
   // ──────────────────────────────────────────────────────────────────────
   // GET RECENT TRANSACTIONS FROM SERVER DATA
   // ──────────────────────────────────────────────────────────────────────
-  const recentTransactions = dashboardData?.recentTransactions || [];
+  const recentTransactions = Array.isArray(dashboardData?.recentTransactions) 
+    ? dashboardData.recentTransactions 
+    : [];
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -129,38 +131,41 @@ export const RecentTransactions = () => {
 
       {/* TRANSACTION LIST */}
       <div className={styles.list}>
-        {recentTransactions.map((transaction) => (
-          <motion.div
-            key={transaction.id}
-            className={`${styles.item} ${styles[transaction.type]}`}
-            variants={itemVariants}
-            whileHover={{ x: 8 }}
-          >
-            {/* ICON & CATEGORY */}
-            <div className={styles.category}>
-              <span className={styles.categoryIcon}>
-                <CategoryIcon category={transaction.category} />
-              </span>
-              <div className={styles.categoryInfo}>
-                <p className={styles.categoryName}>
-                  {translateCategory(transaction.category, t)}
-                </p>
-                <p className={styles.description}>{transaction.description}</p>
+        {recentTransactions.map((transaction, index) => {
+          if (!transaction) return null;
+          return (
+            <motion.div
+              key={transaction.id || index}
+              className={`${styles.item} ${styles[transaction.type]}`}
+              variants={itemVariants}
+              whileHover={{ x: 8 }}
+            >
+              {/* ICON & CATEGORY */}
+              <div className={styles.category}>
+                <span className={styles.categoryIcon}>
+                  <CategoryIcon category={transaction.category} />
+                </span>
+                <div className={styles.categoryInfo}>
+                  <p className={styles.categoryName}>
+                    {translateCategory(transaction.category, t)}
+                  </p>
+                  <p className={styles.description}>{transaction.description}</p>
+                </div>
               </div>
-            </div>
 
-            {/* AMOUNT & DATE */}
-            <div className={styles.details}>
-              <span className={styles.date}>
-                {formatDate(transaction.date, 'short')}
-              </span>
-              <span className={styles.amount}>
-                {transaction.type === 'income' ? '+' : '-'}
-                {formatCurrency(transaction.amount)}
-              </span>
-            </div>
-          </motion.div>
-        ))}
+              {/* AMOUNT & DATE */}
+              <div className={styles.details}>
+                <span className={styles.date}>
+                  {formatDate(transaction.date, 'short')}
+                </span>
+                <span className={styles.amount}>
+                  {transaction.type === 'income' ? '+' : '-'}
+                  {formatCurrency(transaction.amount)}
+                </span>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </motion.div>
   );

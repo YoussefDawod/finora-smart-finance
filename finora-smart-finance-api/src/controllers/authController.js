@@ -156,6 +156,19 @@ async function login(req, res, next) {
     user.lastLogin = new Date();
     await user.save();
 
+    // Sicherheits-Benachrichtigung bei Login (falls aktiviert)
+    if (user.email && user.isVerified) {
+      try {
+        const alertResult = await emailService.sendSecurityAlert(user, 'login', {
+          ip: req.ip,
+          userAgent: req.headers['user-agent'],
+        });
+        logger.info(`Security alert result for user ${user._id}: ${JSON.stringify(alertResult)}`);
+      } catch (notifyError) {
+        logger.warn(`Login notification skipped: ${notifyError.message}`);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       data: authService.buildAuthResponse(tokens, user),
@@ -334,13 +347,24 @@ async function forgotPassword(req, res) {
     }
 
     const user = await User.findOne({ email });
-    if (user) {
-      const resetToken = user.generatePasswordReset();
-      await user.save();
-      await emailService.sendPasswordResetEmail(user, resetToken);
+
+    if (!user) {
+      // Immer Erfolg melden, um Enumeration zu vermeiden
+      return res.status(200).json({ success: true, data: { sent: true } });
     }
 
-    // Always return success to avoid leaking users
+    if (!user.isVerified) {
+      return res.status(400).json({ error: 'Email ist nicht verifiziert. Bitte zuerst verifizieren.', code: 'EMAIL_NOT_VERIFIED' });
+    }
+
+    if (!user.canResetPassword()) {
+      return res.status(400).json({ error: 'Passwort-Reset ist nicht möglich. Bitte verifiziere zuerst deine Email.', code: 'RESET_NOT_ALLOWED' });
+    }
+
+    const resetToken = user.generatePasswordReset();
+    await user.save();
+    await emailService.sendPasswordResetEmail(user, resetToken);
+
     return res.status(200).json({ success: true, data: { sent: true } });
   } catch (err) {
     return res.status(500).json({ error: 'Anfrage fehlgeschlagen', code: 'SERVER_ERROR', message: err.message });
@@ -371,7 +395,17 @@ async function resetPassword(req, res) {
     await user.setPassword(password);
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+    user.refreshTokens = []; // Alle Sessions invalidieren
     await user.save();
+
+    // Sicherheits-Benachrichtigung bei Passwortänderung
+    if (user.email && user.isVerified) {
+      try {
+        await emailService.sendSecurityAlert(user, 'password_change', {});
+      } catch (notifyError) {
+        logger.warn(`Password change notification skipped: ${notifyError.message}`);
+      }
+    }
 
     return res.status(200).json({ success: true, data: { reset: true } });
   } catch (err) {
@@ -769,7 +803,7 @@ async function getEmailStatus(req, res) {
  */
 async function updatePreferences(req, res) {
   try {
-    const { theme, currency, timezone, language, notifications } = req.body || {};
+    const { theme, currency, timezone, language, emailNotifications } = req.body || {};
     const user = req.user;
 
     user.preferences = user.preferences || {};
@@ -786,8 +820,8 @@ async function updatePreferences(req, res) {
     if (language) {
       user.preferences.language = language;
     }
-    if (notifications !== undefined) {
-      user.preferences.notifications = notifications;
+    if (typeof emailNotifications === 'boolean') {
+      user.preferences.emailNotifications = emailNotifications;
     }
 
     await user.save();

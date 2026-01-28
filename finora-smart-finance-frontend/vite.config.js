@@ -42,8 +42,24 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://127.0.0.1:5000',
         changeOrigin: true,
+        secure: false,
+        // Ensure headers are properly forwarded
+        headers: {
+          Connection: 'keep-alive',
+        },
+        configure: (proxy) => {
+          proxy.on('error', (err, req) => {
+            console.error('[Proxy Error]', err.message, req.url);
+          });
+          proxy.on('proxyReq', (proxyReq, req) => {
+            console.log('[Proxy →]', req.method, req.url, 'from:', req.headers.origin || req.headers.host);
+          });
+          proxy.on('proxyRes', (proxyRes, req) => {
+            console.log('[Proxy ←]', proxyRes.statusCode, req.url);
+          });
+        },
       },
     },
   },

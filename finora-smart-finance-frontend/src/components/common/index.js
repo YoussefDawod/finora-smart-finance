@@ -45,3 +45,4 @@ export { default as ThemeSelector } from './ThemeSelector/ThemeSelector';
 
 // Others
 export { default as Divider } from './Divider/Divider';
+export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';

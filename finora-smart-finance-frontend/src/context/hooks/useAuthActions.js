@@ -13,14 +13,14 @@ import { AUTH_ACTIONS } from '../reducers/authReducer';
  * @param {Object} storage - Token storage methods from useAuthStorage
  */
 export function useAuthActions(dispatch, storage) {
-  const { saveToken, saveRefreshToken, getRefreshToken, clearAllTokens } = storage;
+  const { saveToken, saveRefreshToken, getRefreshToken, clearAllTokens, setRememberMe } = storage;
 
   // ============================================
   // LOGIN
   // ============================================
 
   const login = useCallback(
-    async (name, password) => {
+    async (name, password, rememberMe = true) => {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
       dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
 
@@ -28,7 +28,9 @@ export function useAuthActions(dispatch, storage) {
         const response = await authService.login(name, password);
         const { accessToken, refreshToken, user } = response.data.data;
 
-        saveToken(accessToken);
+        // Set storage preference before saving tokens
+        setRememberMe(rememberMe);
+        saveToken(accessToken, rememberMe);
         if (refreshToken) {
           saveRefreshToken(refreshToken);
         }
@@ -45,7 +47,7 @@ export function useAuthActions(dispatch, storage) {
         throw error;
       }
     },
-    [dispatch, saveToken, saveRefreshToken]
+    [dispatch, saveToken, saveRefreshToken, setRememberMe]
   );
 
   // ============================================
@@ -147,6 +149,26 @@ export function useAuthActions(dispatch, storage) {
   }, [dispatch]);
 
   // ============================================
+  // PASSWORD RESET (PUBLIC FLOW)
+  // ============================================
+
+  const forgotPassword = useCallback(async (email) => {
+    try {
+      await authService.forgotPassword(email);
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (token, newPassword) => {
+    try {
+      await authService.resetPassword(token, newPassword);
+    } catch (error) {
+      throw error;
+    }
+  }, []);
+
+  // ============================================
   // RESEND VERIFICATION
   // ============================================
 
@@ -183,6 +205,8 @@ export function useAuthActions(dispatch, storage) {
     verifyEmail,
     refreshUser,
     resendVerification,
+    forgotPassword,
+    resetPassword,
     clearError,
     setIsLoading,
   };

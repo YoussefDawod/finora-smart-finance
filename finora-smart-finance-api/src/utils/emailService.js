@@ -214,7 +214,7 @@ async function sendAddEmailVerification(user, token, newEmail) {
  * @returns {Promise<Object>}
  */
 async function sendPasswordResetEmail(user, token) {
-  const link = buildLink(frontendBaseUrl, '/reset-password', token);
+  const link = buildLink(frontendBaseUrl, '/forgot-password', token);
   const name = user.name || 'Nutzer';
 
   logger.info(`📧 Password Reset: ${user.email} -> ${link}`);
@@ -267,10 +267,152 @@ async function sendWelcomeEmail(user) {
   return { sent: true };
 }
 
+/**
+ * Transaktions-Benachrichtigung senden
+ * @param {Object} user - Der User (mit Email)
+ * @param {Object} transaction - Die Transaktion
+ * @returns {Promise<Object>}
+ */
+async function sendTransactionNotification(user, transaction) {
+  if (!user?.email) {
+    return { sent: false, reason: 'NO_EMAIL' };
+  }
+
+  // Check notification preferences
+  if (!user.preferences?.emailNotifications) {
+    return { sent: false, reason: 'NOTIFICATIONS_DISABLED' };
+  }
+
+  if (user.preferences?.notificationCategories?.transactions === false) {
+    return { sent: false, reason: 'CATEGORY_DISABLED' };
+  }
+
+  const name = user.name || 'Nutzer';
+  const subject = transaction.type === 'income'
+    ? '📈 Neue Einnahme erfasst - Finora'
+    : '📉 Neue Ausgabe erfasst - Finora';
+
+  try {
+    await sendEmail(user.email, subject, templates.transactionNotification(name, transaction));
+    return { sent: true };
+  } catch (error) {
+    logger.error(`Transaction notification failed: ${error.message}`);
+    return { sent: false, error: error.message };
+  }
+}
+
+/**
+ * Sicherheits-Benachrichtigung senden
+ * @param {Object} user - Der User
+ * @param {string} eventType - 'login', 'password_change', 'suspicious'
+ * @param {Object} details - Zusätzliche Details (IP, UserAgent, etc.)
+ * @returns {Promise<Object>}
+ */
+async function sendSecurityAlert(user, eventType, details = {}) {
+  if (!user?.email) {
+    return { sent: false, reason: 'NO_EMAIL' };
+  }
+
+  // Check notification preferences
+  if (!user.preferences?.emailNotifications) {
+    return { sent: false, reason: 'NOTIFICATIONS_DISABLED' };
+  }
+
+  if (user.preferences?.notificationCategories?.security === false) {
+    return { sent: false, reason: 'CATEGORY_DISABLED' };
+  }
+
+  const name = user.name || 'Nutzer';
+  const subjects = {
+    login: '🔐 Neue Anmeldung in deinem Konto - Finora',
+    password_change: '🔒 Passwort geändert - Finora',
+    suspicious: '⚠️ Sicherheitswarnung - Finora',
+  };
+  const subject = subjects[eventType] || '🔐 Sicherheitshinweis - Finora';
+
+  try {
+    await sendEmail(user.email, subject, templates.securityAlert(name, eventType, details));
+    return { sent: true };
+  } catch (error) {
+    logger.error(`Security alert failed: ${error.message}`);
+    return { sent: false, error: error.message };
+  }
+}
+
+/**
+ * Budget-Warnung senden
+ * @param {Object} user - Der User
+ * @param {Object} alertData - { category, spent, budget, percentage }
+ * @returns {Promise<Object>}
+ */
+async function sendBudgetAlert(user, alertData) {
+  if (!user?.email) {
+    return { sent: false, reason: 'NO_EMAIL' };
+  }
+
+  // Check notification preferences
+  if (!user.preferences?.emailNotifications) {
+    return { sent: false, reason: 'NOTIFICATIONS_DISABLED' };
+  }
+
+  if (user.preferences?.notificationCategories?.alerts === false) {
+    return { sent: false, reason: 'CATEGORY_DISABLED' };
+  }
+
+  const name = user.name || 'Nutzer';
+
+  try {
+    await sendEmail(user.email, '⚠️ Budget-Warnung - Finora', templates.budgetAlert(name, alertData));
+    return { sent: true };
+  } catch (error) {
+    logger.error(`Budget alert failed: ${error.message}`);
+    return { sent: false, error: error.message };
+  }
+}
+
+/**
+ * Finanzbericht senden (wöchentlich/monatlich)
+ * @param {Object} user - Der User
+ * @param {Object} reportData - { income, expenses, balance, topCategories, startDate, endDate }
+ * @param {string} period - 'weekly' oder 'monthly'
+ * @returns {Promise<Object>}
+ */
+async function sendFinancialReport(user, reportData, period = 'weekly') {
+  if (!user?.email) {
+    return { sent: false, reason: 'NO_EMAIL' };
+  }
+
+  // Check notification preferences
+  if (!user.preferences?.emailNotifications) {
+    return { sent: false, reason: 'NOTIFICATIONS_DISABLED' };
+  }
+
+  if (user.preferences?.notificationCategories?.reports === false) {
+    return { sent: false, reason: 'CATEGORY_DISABLED' };
+  }
+
+  const name = user.name || 'Nutzer';
+  const subject = period === 'weekly'
+    ? '📊 Dein Wochenbericht - Finora'
+    : '📊 Dein Monatsbericht - Finora';
+
+  try {
+    await sendEmail(user.email, subject, templates.financialReport(name, reportData, period));
+    return { sent: true };
+  } catch (error) {
+    logger.error(`Financial report failed: ${error.message}`);
+    return { sent: false, error: error.message };
+  }
+}
+
 module.exports = {
   sendVerificationEmail,
   sendAddEmailVerification,
   sendPasswordResetEmail,
   sendEmailChangeVerification,
   sendWelcomeEmail,
+  sendTransactionNotification,
+  sendSecurityAlert,
+  sendBudgetAlert,
+  sendFinancialReport,
 };

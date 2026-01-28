@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const auth = require('../middleware/authMiddleware');
 const emailService = require('../utils/emailService');
+const budgetAlertService = require('../services/budgetAlertService');
 const logger = require('../utils/logger');
 
 // Validierung für Passwort-Anforderungen
@@ -308,7 +309,7 @@ router.get('/verify-email-change', async (req, res) => {
 // ============================================================================
 router.put('/preferences', auth, async (req, res) => {
   try {
-    const { theme, currency, timezone, language, dateFormat, emailNotifications } = req.body;
+    const { theme, currency, timezone, language, dateFormat, emailNotifications, notificationCategories, budget } = req.body;
     const user = await User.findById(req.user._id);
 
     if (!user) {
@@ -342,6 +343,45 @@ router.put('/preferences', auth, async (req, res) => {
       errors.push('emailNotifications muss ein Boolean sein');
     }
 
+    // Validate notification categories
+    if (notificationCategories !== undefined) {
+      if (typeof notificationCategories !== 'object') {
+        errors.push('notificationCategories muss ein Objekt sein');
+      } else {
+        const validCategories = ['security', 'transactions', 'reports', 'alerts'];
+        for (const [key, value] of Object.entries(notificationCategories)) {
+          if (!validCategories.includes(key)) {
+            errors.push(`Ungültige Kategorie: ${key}`);
+          } else if (typeof value !== 'boolean') {
+            errors.push(`notificationCategories.${key} muss ein Boolean sein`);
+          }
+        }
+      }
+    }
+
+    // Validate budget settings
+    if (budget !== undefined) {
+      if (typeof budget !== 'object') {
+        errors.push('budget muss ein Objekt sein');
+      } else {
+        if (budget.monthlyLimit !== undefined) {
+          if (typeof budget.monthlyLimit !== 'number' || budget.monthlyLimit < 0) {
+            errors.push('budget.monthlyLimit muss eine positive Zahl sein');
+          }
+        }
+        if (budget.alertThreshold !== undefined) {
+          if (typeof budget.alertThreshold !== 'number' || budget.alertThreshold < 0 || budget.alertThreshold > 100) {
+            errors.push('budget.alertThreshold muss zwischen 0 und 100 liegen');
+          }
+        }
+        if (budget.categoryLimits !== undefined) {
+          if (typeof budget.categoryLimits !== 'object') {
+            errors.push('budget.categoryLimits muss ein Objekt sein');
+          }
+        }
+      }
+    }
+
     if (errors.length > 0) {
       return res.status(400).json({ success: false, message: 'Validierungsfehler', errors });
     }
@@ -353,6 +393,32 @@ router.put('/preferences', auth, async (req, res) => {
     if (language !== undefined) user.preferences.language = language;
     if (dateFormat !== undefined) user.preferences.dateFormat = dateFormat;
     if (emailNotifications !== undefined) user.preferences.emailNotifications = emailNotifications;
+    
+    // Update notification categories
+    if (notificationCategories !== undefined) {
+      if (!user.preferences.notificationCategories) {
+        user.preferences.notificationCategories = {};
+      }
+      for (const [key, value] of Object.entries(notificationCategories)) {
+        user.preferences.notificationCategories[key] = value;
+      }
+    }
+
+    // Update budget settings
+    if (budget !== undefined) {
+      if (!user.preferences.budget) {
+        user.preferences.budget = {};
+      }
+      if (budget.monthlyLimit !== undefined) {
+        user.preferences.budget.monthlyLimit = budget.monthlyLimit;
+      }
+      if (budget.alertThreshold !== undefined) {
+        user.preferences.budget.alertThreshold = budget.alertThreshold;
+      }
+      if (budget.categoryLimits !== undefined) {
+        user.preferences.budget.categoryLimits = new Map(Object.entries(budget.categoryLimits));
+      }
+    }
 
     await user.save();
     logger.info(`User ${user._id} updated preferences`);
@@ -497,6 +563,26 @@ router.delete('/transactions', auth, async (req, res) => {
     });
   } catch (error) {
     logger.error('DELETE /transactions error:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+// ============================================================================
+// GET /api/users/budget-status - Aktuellen Budget-Status abrufen
+// ============================================================================
+router.get('/budget-status', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User nicht gefunden' });
+    }
+
+    const budgetStatus = await budgetAlertService.getBudgetStatus(user);
+
+    res.json({ success: true, data: budgetStatus });
+  } catch (error) {
+    logger.error('GET /budget-status error:', error);
     res.status(500).json({ success: false, message: 'Server error' });
   }
 });

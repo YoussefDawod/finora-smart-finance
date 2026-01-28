@@ -240,6 +240,9 @@ export default function ResetPasswordForm({ token }) {
 
       {/* Password Field */}
       <div className={styles.inputGroup}>
+        <label htmlFor="password" className={styles.label}>
+          {t('auth.reset.passwordLabel')}
+        </label>
         <div className={`${styles.inputWrapper} ${hasPasswordError ? styles.error : ''}`}>
           <FiLock className={styles.inputIcon} />
           <input
@@ -247,7 +250,7 @@ export default function ResetPasswordForm({ token }) {
             name="password"
             type={showPassword ? 'text' : 'password'}
             className={styles.input}
-            placeholder=" "
+            placeholder={t('auth.reset.passwordPlaceholder')}
             value={formData.password}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -255,9 +258,6 @@ export default function ResetPasswordForm({ token }) {
             autoComplete="new-password"
             autoFocus
           />
-          <label htmlFor="password" className={styles.label}>
-            {t('auth.reset.passwordLabel')}
-          </label>
           <button
             type="button"
             className={styles.passwordToggle}
@@ -298,6 +298,9 @@ export default function ResetPasswordForm({ token }) {
 
       {/* Confirm Password Field */}
       <div className={styles.inputGroup}>
+        <label htmlFor="confirmPassword" className={styles.label}>
+          {t('auth.reset.confirmLabel')}
+        </label>
         <div className={`${styles.inputWrapper} ${hasConfirmError ? styles.error : ''}`}>
           <FiLock className={styles.inputIcon} />
           <input
@@ -305,16 +308,13 @@ export default function ResetPasswordForm({ token }) {
             name="confirmPassword"
             type={showConfirmPassword ? 'text' : 'password'}
             className={styles.input}
-            placeholder=" "
+            placeholder={t('auth.reset.confirmPlaceholder')}
             value={formData.confirmPassword}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isLoading}
             autoComplete="new-password"
           />
-          <label htmlFor="confirmPassword" className={styles.label}>
-            {t('auth.reset.confirmLabel')}
-          </label>
           <button
             type="button"
             className={styles.passwordToggle}

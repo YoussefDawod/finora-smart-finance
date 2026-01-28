@@ -32,6 +32,7 @@
     "loadingNext": "Wird überprüft...",
     "loadingComplete": "Wird registriert...",
     "stepErrorsTitle": "⚠ Fehler in diesem Schritt:",
+    "retry": "Erneut versuchen",
     "appName": "Finora - Smart Finance"
   },
   "themeSelector": {
@@ -77,7 +78,27 @@
       "description": "Steuern Sie, wie Sie über Updates und Berichte informiert werden.",
       "emailTitle": "E-Mail-Benachrichtigungen",
       "emailDescription": "Wichtige Hinweise zu Konto und Finanzen per E-Mail erhalten.",
-      "emailAria": "E-Mail-Benachrichtigungen umschalten"
+      "emailAria": "E-Mail-Benachrichtigungen umschalten",
+      "security": {
+        "title": "Sicherheitshinweise",
+        "description": "Anmeldungen, Passwortänderungen und verdächtige Aktivitäten.",
+        "aria": "Sicherheitsbenachrichtigungen umschalten"
+      },
+      "transactions": {
+        "title": "Transaktionen",
+        "description": "Benachrichtigungen bei neuen Einnahmen oder Ausgaben.",
+        "aria": "Transaktionsbenachrichtigungen umschalten"
+      },
+      "reports": {
+        "title": "Berichte",
+        "description": "Wöchentliche und monatliche Finanzübersichten.",
+        "aria": "Berichtsbenachrichtigungen umschalten"
+      },
+      "alerts": {
+        "title": "Warnungen",
+        "description": "Budget-Überschreitungen und ungewöhnliche Aktivitäten.",
+        "aria": "Warnungsbenachrichtigungen umschalten"
+      }
     },
     "saved": "Einstellungen erfolgreich gespeichert.",
     "saveError": "Einstellungen konnten nicht gespeichert werden."
@@ -258,6 +279,11 @@
         "subline": "Sie haben bereits ein Konto? Melden Sie sich an.",
         "cta": "Zur Anmeldung"
       },
+      "forgot": {
+        "headline": "Passwort vergessen?",
+        "subline": "Kein Problem – wir helfen Ihnen, es zurückzusetzen.",
+        "cta": "Zurück zur Anmeldung"
+      },
       "default": {
         "headline": "Willkommen!",
         "subline": "Behalten Sie Ihre Finanzen im Blick – klar und sicher.",
@@ -316,6 +342,7 @@
       "successHint": "Der Link ist 24 Stunden gültig. Prüfen Sie auch Ihren Spam-Ordner.",
       "useDifferentEmail": "Andere E-Mail verwenden",
       "emailLabel": "E-Mail-Adresse",
+      "emailPlaceholder": "name@beispiel.de",
       "sending": "Senden...",
       "submit": "Reset-Link senden"
     },
@@ -339,7 +366,9 @@
       "successTitle": "Passwort geändert!",
       "successMessage": "Ihr Passwort wurde erfolgreich aktualisiert. Sie werden zur Anmeldung weitergeleitet...",
       "passwordLabel": "Neues Passwort",
+      "passwordPlaceholder": "Geben Sie Ihr neues Passwort ein",
       "confirmLabel": "Passwort bestätigen",
+      "confirmPlaceholder": "Passwort erneut eingeben",
       "saving": "Speichern...",
       "submit": "Passwort speichern"
     },

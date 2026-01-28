@@ -22,8 +22,14 @@ const getLocale = () => getLocaleForLanguage(getUserPreferences().language);
  * Formatiert Monat aus Server-Daten (year, month -> "Jan", "Feb" etc.)
  */
 const formatMonthFromData = (year, month) => {
-  const date = new Date(year, month - 1, 1); // month is 1-based from server
-  return new Intl.DateTimeFormat(getLocale(), { month: 'short' }).format(date);
+  if (!year || !month) return '';
+  try {
+    const date = new Date(year, month - 1, 1); // month is 1-based from server
+    return new Intl.DateTimeFormat(getLocale(), { month: 'short' }).format(date);
+  } catch (e) {
+    console.error('Invalid date in formatMonthFromData', year, month, e);
+    return `${month}/${year}`;
+  }
 };
 
 /**
@@ -81,14 +87,17 @@ export const useDashboardChartData = () => {
     }
 
     // Line Chart: Monthly Trend (bereits vom Server aggregiert)
-    const trendData = (dashboardData.monthlyTrend || []).map((item) => ({
-      month: formatMonthFromData(item.year, item.month),
-      income: item.income || 0,
-      expense: item.expense || 0,
-      balance: (item.income || 0) - (item.expense || 0),
-    }));
+    const trendData = (Array.isArray(dashboardData.monthlyTrend) ? dashboardData.monthlyTrend : [])
+      .filter(item => item && typeof item === 'object')
+      .map((item) => ({
+        month: formatMonthFromData(item.year, item.month),
+        income: item.income || 0,
+        expense: item.expense || 0,
+        balance: (item.income || 0) - (item.expense || 0),
+      }));
 
-    const breakdown = dashboardData.categoryBreakdown || [];
+    const breakdown = (Array.isArray(dashboardData.categoryBreakdown) ? dashboardData.categoryBreakdown : [])
+      .filter(item => item && typeof item === 'object');
 
     const categoryExpenseData = breakdown
       .filter((cat) => cat.type === 'expense')

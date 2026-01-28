@@ -32,6 +32,7 @@
     "loadingNext": "Checking...",
     "loadingComplete": "Submitting...",
     "stepErrorsTitle": "⚠ Errors in this step:",
+    "retry": "Try again",
     "appName": "Finora - Smart Finance"
   },
   "themeSelector": {
@@ -77,7 +78,27 @@
       "description": "Control how you receive updates and reports.",
       "emailTitle": "Email notifications",
       "emailDescription": "Receive important account and finance updates by email.",
-      "emailAria": "Toggle email notifications"
+      "emailAria": "Toggle email notifications",
+      "security": {
+        "title": "Security alerts",
+        "description": "Login attempts, password changes, and suspicious activity.",
+        "aria": "Toggle security notifications"
+      },
+      "transactions": {
+        "title": "Transactions",
+        "description": "Get notified about new income or expenses.",
+        "aria": "Toggle transaction notifications"
+      },
+      "reports": {
+        "title": "Reports",
+        "description": "Weekly and monthly financial summaries.",
+        "aria": "Toggle report notifications"
+      },
+      "alerts": {
+        "title": "Alerts",
+        "description": "Budget limits and unusual activity warnings.",
+        "aria": "Toggle alert notifications"
+      }
     },
     "saved": "Preferences saved successfully.",
     "saveError": "Preferences could not be saved."
@@ -248,6 +269,11 @@
         "subline": "Already have an account? Sign in.",
         "cta": "Go to sign in"
       },
+      "forgot": {
+        "headline": "Forgot password?",
+        "subline": "No worries – we'll help you reset it.",
+        "cta": "Back to sign in"
+      },
       "default": {
         "headline": "Welcome!",
         "subline": "Keep your finances in check — clear and secure.",
@@ -306,6 +332,7 @@
       "successHint": "The link is valid for 24 hours. Check your spam folder too.",
       "useDifferentEmail": "Use a different email",
       "emailLabel": "Email address",
+      "emailPlaceholder": "name@example.com",
       "sending": "Sending...",
       "submit": "Send reset link"
     },
@@ -329,7 +356,9 @@
       "successTitle": "Password changed!",
       "successMessage": "Your password was updated successfully. Redirecting to sign in...",
       "passwordLabel": "New password",
+      "passwordPlaceholder": "Enter your new password",
       "confirmLabel": "Confirm password",
+      "confirmPlaceholder": "Enter password again",
       "saving": "Saving...",
       "submit": "Save password"
     },

@@ -10,131 +10,164 @@
  * - Recent Transactions
  */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
 import { SummaryCard, RecentTransactions, DashboardCharts } from '@/components/dashboard';
 import Button from '@/components/common/Button/Button';
 import Spinner from '@/components/common/Spinner/Spinner';
+import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
 import { formatCurrency } from '@/utils/formatters';
 import { FiDollarSign, FiCreditCard, FiTrendingUp, FiPlus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './DashboardPage.module.scss';
+import i18n from '@/i18n';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
-  const { dashboardData, dashboardLoading } = useTransactions();
+  // Wrap content in ErrorBoundary to prevent white screen
+  return (
+    <ErrorBoundary>
+      <DashboardContent />
+    </ErrorBoundary>
+  );
+}
+
+function DashboardContent() {
+  const { user, isAuthenticated } = useAuth();
+  const { dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions } = useTransactions();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // Fallback: ensure data is fetched when arriving on dashboard
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    
+    // Safety check: Prevent infinite loop if dashboardData is null but loading is false
+    // Only fetch if we really have nothing and no error
+    if (!dashboardData && !dashboardLoading && !error) {
+      fetchDashboardData();
+      fetchTransactions();
+    }
+  }, [isAuthenticated, user, dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions]);
 
   // ──────────────────────────────────────────────────────────────────────
   // FORMAT SUMMARY DATA FROM SERVER
   // ──────────────────────────────────────────────────────────────────────
   const summaryData = useMemo(() => {
-    const buildTrendInfo = (percent, mode = 'standard') => {
-      // Kein Trend-Vergleich möglich (Vormonat hatte keine Daten)
-      if (percent === null || percent === undefined) {
-        return {
-          label: null, // Kein Label anzeigen
-          variant: 'neutral',
-          showTrend: false,
-        };
-      }
+    try {
+      const buildTrendInfo = (percent, mode = 'standard') => {
+        // Kein Trend-Vergleich möglich (Vormonat hatte keine Daten)
+        if (percent === null || percent === undefined) {
+          return {
+            label: null, // Kein Label anzeigen
+            variant: 'neutral',
+            showTrend: false,
+          };
+        }
 
-      // Keine Änderung
-      if (percent === 0) {
+        // Keine Änderung
+        if (percent === 0) {
+          return {
+            label: t('dashboard.noChange'),
+            variant: 'neutral',
+            showTrend: true,
+          };
+        }
+
+        let variant = percent > 0 ? 'up' : 'down';
+        // Bei Ausgaben ist "mehr" schlecht (down) und "weniger" gut (up)
+        if (mode === 'expense') {
+          variant = percent > 0 ? 'down' : 'up';
+        }
+
         return {
-          label: t('dashboard.noChange'),
-          variant: 'neutral',
+          label: `${percent > 0 ? '+' : ''}${percent}%`,
+          variant,
           showTrend: true,
         };
-      }
-
-      let variant = percent > 0 ? 'up' : 'down';
-      // Bei Ausgaben ist "mehr" schlecht (down) und "weniger" gut (up)
-      if (mode === 'expense') {
-        variant = percent > 0 ? 'down' : 'up';
-      }
-
-      return {
-        label: `${percent > 0 ? '+' : ''}${percent}%`,
-        variant,
-        showTrend: true,
       };
-    };
 
-    // Fallback wenn keine Daten
-    if (!dashboardData?.summary) {
+      // Fallback wenn keine Daten
+      if (!dashboardData?.summary) {
+        return {
+          income: {
+            value: formatCurrency(0),
+            amount: 0,
+            trend: null,
+            trendLabel: null,
+            trendVariant: 'neutral',
+            trendPercent: null,
+          },
+          expense: {
+            value: formatCurrency(0),
+            amount: 0,
+            trend: null,
+            trendLabel: null,
+            trendVariant: 'neutral',
+            trendPercent: null,
+          },
+          balance: {
+            value: formatCurrency(0),
+            amount: 0,
+            trend: null,
+            trendLabel: null,
+            trendVariant: 'neutral',
+            trendPercent: null,
+          },
+        };
+      }
+
+      const { currentMonth, trends } = dashboardData.summary;
+      
+      const incomeTrend = buildTrendInfo(trends?.income, 'standard');
+      const expenseTrend = buildTrendInfo(trends?.expense, 'expense');
+      const balanceTrend = buildTrendInfo(trends?.balance, currentMonth?.balance >= 0 ? 'standard' : 'expense');
+
+      // Trend-Text nur anzeigen wenn wirklich ein Vergleich möglich ist
+      const getTrendText = (trendInfo) => {
+        return trendInfo.showTrend ? i18n.t('dashboard.vsLastMonth') : null;
+      };
+
       return {
         income: {
-          value: formatCurrency(0),
-          amount: 0,
-          trend: null,
-          trendLabel: null,
-          trendVariant: 'neutral',
-          trendPercent: null,
+          value: formatCurrency(currentMonth?.income || 0),
+          amount: currentMonth?.income || 0,
+          trend: getTrendText(incomeTrend),
+          trendLabel: incomeTrend.label,
+          trendVariant: incomeTrend.variant,
+          trendPercent: trends?.income,
+          trendTooltip: incomeTrend.showTrend ? i18n.t('dashboard.incomeTrendTooltip') : null,
         },
         expense: {
-          value: formatCurrency(0),
-          amount: 0,
-          trend: null,
-          trendLabel: null,
-          trendVariant: 'neutral',
-          trendPercent: null,
+          value: formatCurrency(currentMonth?.expense || 0),
+          amount: currentMonth?.expense || 0,
+          trend: getTrendText(expenseTrend),
+          trendLabel: expenseTrend.label,
+          trendVariant: expenseTrend.variant,
+          trendPercent: trends?.expense,
+          trendTooltip: expenseTrend.showTrend ? i18n.t('dashboard.expenseTrendTooltip') : null,
         },
         balance: {
-          value: formatCurrency(0),
-          amount: 0,
-          trend: null,
-          trendLabel: null,
-          trendVariant: 'neutral',
-          trendPercent: null,
+          value: formatCurrency(currentMonth?.balance || 0),
+          amount: currentMonth?.balance || 0,
+          trend: getTrendText(balanceTrend),
+          trendLabel: balanceTrend.label,
+          trendVariant: balanceTrend.variant,
+          trendPercent: trends?.balance,
+          trendTooltip: balanceTrend.showTrend ? i18n.t('dashboard.balanceTrendTooltip') : null,
         },
       };
+    } catch (err) {
+      console.error("Error calculating summary data", err);
+      // Return safe default keys
+      return {
+        income: { value: "€0,00", amount: 0, trend: null },
+        expense: { value: "€0,00", amount: 0, trend: null },
+        balance: { value: "€0,00", amount: 0, trend: null }
+      };
     }
-
-    const { currentMonth, trends } = dashboardData.summary;
-    
-    const incomeTrend = buildTrendInfo(trends?.income, 'standard');
-    const expenseTrend = buildTrendInfo(trends?.expense, 'expense');
-    const balanceTrend = buildTrendInfo(trends?.balance, currentMonth?.balance >= 0 ? 'standard' : 'expense');
-
-    // Trend-Text nur anzeigen wenn wirklich ein Vergleich möglich ist
-    const getTrendText = (trendInfo) => {
-      return trendInfo.showTrend ? t('dashboard.vsLastMonth') : null;
-    };
-
-    return {
-      income: {
-        value: formatCurrency(currentMonth?.income),
-        amount: currentMonth?.income || 0,
-        trend: getTrendText(incomeTrend),
-        trendLabel: incomeTrend.label,
-        trendVariant: incomeTrend.variant,
-        trendPercent: trends?.income,
-          trendTooltip: incomeTrend.showTrend ? t('dashboard.incomeTrendTooltip') : null,
-      },
-      expense: {
-        value: formatCurrency(currentMonth?.expense),
-        amount: currentMonth?.expense || 0,
-        trend: getTrendText(expenseTrend),
-        trendLabel: expenseTrend.label,
-        trendVariant: expenseTrend.variant,
-        trendPercent: trends?.expense,
-          trendTooltip: expenseTrend.showTrend ? t('dashboard.expenseTrendTooltip') : null,
-      },
-      balance: {
-        value: formatCurrency(currentMonth?.balance),
-        amount: currentMonth?.balance || 0,
-        trend: getTrendText(balanceTrend),
-        trendLabel: balanceTrend.label,
-        trendVariant: balanceTrend.variant,
-        trendPercent: trends?.balance,
-          trendTooltip: balanceTrend.showTrend ? t('dashboard.balanceTrendTooltip') : null,
-      },
-    };
   }, [dashboardData, t]);
 
   // ──────────────────────────────────────────────────────────────────────
@@ -162,7 +195,7 @@ export default function DashboardPage() {
   // ──────────────────────────────────────────────────────────────────────
   // LOADING STATE
   // ──────────────────────────────────────────────────────────────────────
-  if (dashboardLoading && !dashboardData) {
+  if (dashboardLoading) {
     return (
       <div className={styles.loadingContainer}>
         <Spinner size="large" />
@@ -171,19 +204,33 @@ export default function DashboardPage() {
     );
   }
 
+  if (!dashboardData && error) {
+    return (
+      <div className={styles.loadingContainer}>
+        <p>{t('dashboard.errors.load')}</p>
+        <Button variant="secondary" onClick={() => {
+          fetchDashboardData();
+          fetchTransactions();
+        }}>
+          {t('common.retry')}
+        </Button>
+      </div>
+    );
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // RENDER CONTENT
+  // ──────────────────────────────────────────────────────────────────────
   return (
-    <motion.div
-      className={styles.dashboardPage}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className={styles.dashboardPage}>
+
       {/* Header Section */}
       <motion.section className={styles.headerSection} variants={itemVariants}>
         <div className={styles.greeting}>
           <h1 className={styles.greetingTitle}>
             <span className={styles.greetingIntro}>{t('dashboard.greetingIntro')}</span>{' '}
-            <span className={styles.greetingName}>{user?.name?.split(' ')[0]}</span> 👋
+            {/* SAFE CHECK: Ensure split doesn't crash if name is missing */}
+            <span className={styles.greetingName}>{user?.name ? user.name.split(' ')[0] : ''}</span> 👋
           </h1>
           <p>{t('dashboard.overview')}</p>
         </div>
@@ -258,13 +305,17 @@ export default function DashboardPage() {
         <div className={styles.sectionHeader}>
           <h2>{t('dashboard.chartsTitle')}</h2>
         </div>
-        <DashboardCharts />
+        <ErrorBoundary>
+          <DashboardCharts />
+        </ErrorBoundary>
       </motion.section>
 
       {/* Recent Transactions Section */}
       <motion.section className={styles.transactionsSection} variants={itemVariants}>
-        <RecentTransactions limit={5} />
+        <ErrorBoundary>
+          <RecentTransactions limit={5} />
+        </ErrorBoundary>
       </motion.section>
-    </motion.div>
+    </div>
   );
 }
