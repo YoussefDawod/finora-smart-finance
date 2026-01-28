@@ -51,16 +51,6 @@ export default function ForgotPasswordPage() {
   }
 
   // ============================================
-  // SPRING ANIMATION CONFIG
-  // ============================================
-  const springConfig = {
-    type: 'spring',
-    stiffness: 50,
-    damping: 15,
-    mass: 1,
-  };
-
-  // ============================================
   // RENDER FORM CONTENT
   // ============================================
   const renderFormContent = () => (

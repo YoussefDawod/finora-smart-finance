@@ -153,19 +153,11 @@ export function useAuthActions(dispatch, storage) {
   // ============================================
 
   const forgotPassword = useCallback(async (email) => {
-    try {
-      await authService.forgotPassword(email);
-    } catch (error) {
-      throw error;
-    }
+    await authService.forgotPassword(email);
   }, []);
 
   const resetPassword = useCallback(async (token, newPassword) => {
-    try {
-      await authService.resetPassword(token, newPassword);
-    } catch (error) {
-      throw error;
-    }
+    await authService.resetPassword(token, newPassword);
   }, []);
 
   // ============================================

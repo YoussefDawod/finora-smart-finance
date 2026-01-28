@@ -1,12 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useAuth, useMotion } from '@/hooks';
 import { MainLayout } from '@/components/layout';
 import Spinner from '@/components/common/Spinner/Spinner';
 import AuthPage from '@/pages/AuthPage';
 import EmailVerificationPage from '@/pages/EmailVerificationPage';
 import VerifyEmailPage from '@/pages/VerifyEmailPage';
-import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import TermsPage from '@/pages/TermsPage';
 import DashboardPage from '@/pages/DashboardPage';
 import TransactionsPage from '@/pages/TransactionsPage';
@@ -74,14 +73,6 @@ const VerifyEmailWrapper = () => {
 
 function AnimatedRoutes() {
   const location = useLocation();
-  
-  // Use 'auth' key for login/register/forgot-password so they share the same animation context
-  const getRouteKey = (pathname) => {
-    if (pathname === '/login' || pathname === '/register' || pathname.startsWith('/forgot-password')) {
-      return 'auth';
-    }
-    return pathname;
-  };
 
   return (
       <Routes location={location}>
