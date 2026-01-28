@@ -5,6 +5,32 @@
 @use '@/styles/mixins' as *;
 
 // ============================================
+// LOADING CONTAINER
+// ============================================
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background: var(--bg);
+
+  p {
+    font-size: var(--fs-md);
+    color: var(--tx-muted);
+    margin: 0;
+  }
+
+  @include mobile {
+    min-height: 60vh;
+    padding: var(--space-lg);
+  }
+}
+
+// ============================================
 // PAGE CONTAINER
 // ============================================
 .dashboardPage {

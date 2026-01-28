@@ -1,31 +1,33 @@
 /**
- * @fileoverview ForgotPasswordPage Component - Premium Redesign
- * @description Modern password reset page with split-screen layout
+ * @fileoverview ForgotPasswordPage Component - Premium Design
+ * @description Password reset page matching AuthPage design pattern
  * 
- * FEATURES:
- * - Email input to request reset link
- * - New password form (when token present)
- * - Link back to login
- * - Responsive design
+ * ARCHITECTURE:
+ * - Uses useIsDesktop hook for responsive layouts
+ * - Includes BrandingPanel for consistent design
+ * 
+ * DESKTOP (Horizontal 50/50):
+ * - [Form 50%] [Branding 50%]
+ * 
+ * MOBILE (Vertical 60/40):
+ * - [Form 60%] / [Branding 40%]
  * 
  * @module pages/ForgotPasswordPage
  */
 
 import { useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useAuth, useMotion } from '@/hooks';
-import { AuthLayout } from '@/components/layout';
-import { ForgotPasswordRequestForm, ResetPasswordForm } from '@/components/auth';
-import Logo from '@/components/common/Logo/Logo';
-import { FiArrowLeft } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
+import { useAuth, useMotion, useIsDesktop } from '@/hooks';
+import { ForgotPasswordRequestForm, ResetPasswordForm, BrandingPanel } from '@/components/auth';
 import styles from './ForgotPasswordPage.module.scss';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
   const { shouldAnimate } = useMotion();
+  const isDesktop = useIsDesktop();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
   const { t } = useTranslation();
@@ -49,88 +51,71 @@ export default function ForgotPasswordPage() {
   }
 
   // ============================================
-  // ANIMATION VARIANTS
+  // SPRING ANIMATION CONFIG
   // ============================================
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
-    },
+  const springConfig = {
+    type: 'spring',
+    stiffness: 50,
+    damping: 15,
+    mass: 1,
   };
 
   // ============================================
-  // RENDER
+  // RENDER FORM CONTENT
   // ============================================
-
-  return (
-    <AuthLayout variant="forgot">
-      <motion.div 
-        className={styles.forgotPasswordPage}
-        variants={shouldAnimate ? containerVariants : {}}
-        initial="hidden"
-        animate="visible"
+  const renderFormContent = () => (
+    <div className={styles.formInner}>
+      <motion.div
+        key={token ? 'reset-form' : 'forgot-form'}
+        initial={shouldAnimate ? { opacity: 0 } : false}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2 }}
+        className={styles.formWrapper}
       >
-        {/* Mobile Logo */}
-        <motion.div 
-          className={styles.mobileLogo}
-          variants={shouldAnimate ? itemVariants : {}}
-        >
-          <Logo to="/" size="default" showText={true} />
-        </motion.div>
-
-        {/* Header */}
-        <motion.header 
-          className={styles.header}
-          variants={shouldAnimate ? itemVariants : {}}
-        >
+        <header className={styles.header}>
           <h1 className={styles.title}>
             {token ? t('auth.resetTitle') : t('auth.forgotTitle')}
           </h1>
           <p className={styles.subtitle}>
-            {token
-              ? t('auth.resetSubtitle')
-              : t('auth.forgotSubtitle')}
+            {token ? t('auth.resetSubtitle') : t('auth.forgotSubtitle')}
           </p>
-        </motion.header>
-
-        {/* Form */}
-        <motion.div variants={shouldAnimate ? itemVariants : {}}>
-          {token ? <ResetPasswordForm token={token} /> : <ForgotPasswordRequestForm />}
-        </motion.div>
-
-        {/* Divider */}
-        <motion.div 
-          className={styles.divider}
-          variants={shouldAnimate ? itemVariants : {}}
-        >
-          <span>{t('common.or')}</span>
-        </motion.div>
-
-        {/* Login Link */}
-        <motion.div 
-          className={styles.footer}
-          variants={shouldAnimate ? itemVariants : {}}
-        >
-          <Link to="/login" className={styles.loginLink}>
-            <FiArrowLeft className={styles.linkIcon} />
-            {t('common.backToLogin')}
-          </Link>
-        </motion.div>
+        </header>
+        {token ? <ResetPasswordForm token={token} /> : <ForgotPasswordRequestForm />}
       </motion.div>
-    </AuthLayout>
+    </div>
+  );
+
+  // ============================================
+  // DESKTOP LAYOUT (Horizontal 50/50)
+  // ============================================
+  if (isDesktop) {
+    return (
+      <div className={styles.authPage}>
+        {/* Form Panel */}
+        <div className={styles.formPanel}>
+          {renderFormContent()}
+        </div>
+
+        {/* Branding Panel */}
+        <div className={styles.brandingPanel}>
+          <BrandingPanel mode="forgot" isDesktop={isDesktop} />
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================
+  // MOBILE LAYOUT (Vertical 60/40)
+  // ============================================
+  return (
+    <div className={styles.authPageMobile}>
+      <div className={styles.formPanelMobile}>
+        {renderFormContent()}
+      </div>
+
+      <div className={styles.brandingPanelMobile}>
+        <BrandingPanel mode="forgot" isDesktop={isDesktop} />
+      </div>
+    </div>
   );
 }

@@ -14,6 +14,10 @@ import {
   FiSliders,
   FiSun,
   FiDroplet,
+  FiShield,
+  FiDollarSign,
+  FiBarChart2,
+  FiAlertCircle,
 } from 'react-icons/fi';
 import { ExportSection } from '@/components/settings';
 import Select from '@/components/common/Select/Select';
@@ -32,6 +36,13 @@ const DEFAULT_PREFERENCES = {
   currency: 'EUR',
   dateFormat: 'iso',
   emailNotifications: true,
+  // Option C: Category-based notifications
+  notificationCategories: {
+    security: true,      // Login alerts, password changes
+    transactions: true,  // New transactions
+    reports: false,      // Weekly/monthly reports
+    alerts: true,        // Budget warnings, unusual activity
+  },
 };
 
 const LANGUAGE_OPTIONS = [
@@ -117,6 +128,12 @@ export default function SettingsPage() {
       dateFormat: user?.preferences?.dateFormat ?? storedPreferences.dateFormat ?? DEFAULT_PREFERENCES.dateFormat,
       emailNotifications:
         user?.preferences?.emailNotifications ?? storedPreferences.emailNotifications ?? DEFAULT_PREFERENCES.emailNotifications,
+      notificationCategories: {
+        security: user?.preferences?.notificationCategories?.security ?? storedPreferences.notificationCategories?.security ?? DEFAULT_PREFERENCES.notificationCategories.security,
+        transactions: user?.preferences?.notificationCategories?.transactions ?? storedPreferences.notificationCategories?.transactions ?? DEFAULT_PREFERENCES.notificationCategories.transactions,
+        reports: user?.preferences?.notificationCategories?.reports ?? storedPreferences.notificationCategories?.reports ?? DEFAULT_PREFERENCES.notificationCategories.reports,
+        alerts: user?.preferences?.notificationCategories?.alerts ?? storedPreferences.notificationCategories?.alerts ?? DEFAULT_PREFERENCES.notificationCategories.alerts,
+      },
     };
 
     if (i18n.language) {
@@ -155,6 +172,16 @@ export default function SettingsPage() {
     setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const handleCategoryToggle = (category) => () => {
+    setPreferences((prev) => ({
+      ...prev,
+      notificationCategories: {
+        ...prev.notificationCategories,
+        [category]: !prev.notificationCategories[category],
+      },
+    }));
+  };
+
   const handleThemeSelect = (value) => {
     setPreferences((prev) => ({ ...prev, themePreference: value }));
     if (value === 'system') {
@@ -177,6 +204,7 @@ export default function SettingsPage() {
         language: preferences.language,
         dateFormat: preferences.dateFormat,
         emailNotifications: preferences.emailNotifications,
+        notificationCategories: preferences.notificationCategories,
       });
       await refreshUser();
       setInitialPreferences(preferences);
@@ -186,6 +214,7 @@ export default function SettingsPage() {
         language: preferences.language,
         dateFormat: preferences.dateFormat,
         emailNotifications: preferences.emailNotifications,
+        notificationCategories: preferences.notificationCategories,
       });
       await i18n.changeLanguage(preferences.language);
       success(t('settings.saved'));
@@ -345,6 +374,7 @@ export default function SettingsPage() {
           </div>
 
           <div className={styles.sectionBody}>
+            {/* Master Toggle */}
             <div className={styles.switchRow}>
               <div className={styles.switchInfo}>
                 <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
@@ -361,6 +391,95 @@ export default function SettingsPage() {
                 <span className={styles.switchThumb} />
               </button>
             </div>
+
+            {/* Category Toggles - Only visible when master toggle is on */}
+            {preferences.emailNotifications && (
+              <div className={styles.categoryToggles}>
+                {/* Security Notifications */}
+                <div className={styles.switchRow}>
+                  <div className={styles.switchInfo}>
+                    <div className={styles.switchTitle}>
+                      <FiShield aria-hidden="true" />
+                      {t('settings.notifications.security.title')}
+                    </div>
+                    <p>{t('settings.notifications.security.description')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={`${styles.switch} ${preferences.notificationCategories.security ? styles.switchOn : ''}`}
+                    onClick={handleCategoryToggle('security')}
+                    role="switch"
+                    aria-checked={preferences.notificationCategories.security}
+                    aria-label={t('settings.notifications.security.aria')}
+                  >
+                    <span className={styles.switchThumb} />
+                  </button>
+                </div>
+
+                {/* Transaction Notifications */}
+                <div className={styles.switchRow}>
+                  <div className={styles.switchInfo}>
+                    <div className={styles.switchTitle}>
+                      <FiDollarSign aria-hidden="true" />
+                      {t('settings.notifications.transactions.title')}
+                    </div>
+                    <p>{t('settings.notifications.transactions.description')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={`${styles.switch} ${preferences.notificationCategories.transactions ? styles.switchOn : ''}`}
+                    onClick={handleCategoryToggle('transactions')}
+                    role="switch"
+                    aria-checked={preferences.notificationCategories.transactions}
+                    aria-label={t('settings.notifications.transactions.aria')}
+                  >
+                    <span className={styles.switchThumb} />
+                  </button>
+                </div>
+
+                {/* Weekly Reports */}
+                <div className={styles.switchRow}>
+                  <div className={styles.switchInfo}>
+                    <div className={styles.switchTitle}>
+                      <FiBarChart2 aria-hidden="true" />
+                      {t('settings.notifications.reports.title')}
+                    </div>
+                    <p>{t('settings.notifications.reports.description')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={`${styles.switch} ${preferences.notificationCategories.reports ? styles.switchOn : ''}`}
+                    onClick={handleCategoryToggle('reports')}
+                    role="switch"
+                    aria-checked={preferences.notificationCategories.reports}
+                    aria-label={t('settings.notifications.reports.aria')}
+                  >
+                    <span className={styles.switchThumb} />
+                  </button>
+                </div>
+
+                {/* Budget Alerts */}
+                <div className={styles.switchRow}>
+                  <div className={styles.switchInfo}>
+                    <div className={styles.switchTitle}>
+                      <FiAlertCircle aria-hidden="true" />
+                      {t('settings.notifications.alerts.title')}
+                    </div>
+                    <p>{t('settings.notifications.alerts.description')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className={`${styles.switch} ${preferences.notificationCategories.alerts ? styles.switchOn : ''}`}
+                    onClick={handleCategoryToggle('alerts')}
+                    role="switch"
+                    aria-checked={preferences.notificationCategories.alerts}
+                    aria-label={t('settings.notifications.alerts.aria')}
+                  >
+                    <span className={styles.switchThumb} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className={styles.sectionFooter}>

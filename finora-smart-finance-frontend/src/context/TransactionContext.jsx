@@ -32,8 +32,8 @@ function TransactionProvider({ children }) {
   // HOOKS
   // ──────────────────────────────────────────────────────────────────────
 
-  // Fetch Operations
-  const { fetchDashboardData, fetchTransactions } = useTransactionFetch(dispatch, state, isAuthenticated);
+  // Fetch Operations (no longer needs isAuthenticated - check happens in useEffect)
+  const { fetchDashboardData, fetchTransactions } = useTransactionFetch(dispatch, state);
 
   // Pagination
   const { setPage, setLimit, nextPage, prevPage } = useTransactionPagination(dispatch, state.pagination);
@@ -53,23 +53,29 @@ function TransactionProvider({ children }) {
   // EFFECTS
   // ──────────────────────────────────────────────────────────────────────
 
-  // 1. Bei Login: Dashboard-Daten laden
+  // 1. Bei Login: Dashboard-Daten und Transaktionen initial laden
   useEffect(() => {
     if (isAuthenticated && user) {
+      // Beide Fetches parallel starten
       fetchDashboardData();
-    }
-  }, [isAuthenticated, user, fetchDashboardData]);
-
-  // 2. Bei Filter/Sort/Page-Änderung: Transaktionen neu laden
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      if (isInitialMount.current) {
-        isInitialMount.current = false;
-        fetchTransactions();
-        return;
-      }
       fetchTransactions();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
+
+  // 2. Bei Filter/Sort/Page-Änderung: Transaktionen neu laden (nicht beim Mount)
+  useEffect(() => {
+    // Skip if not authenticated
+    if (!isAuthenticated || !user) return;
+    
+    // Skip initial mount - already handled by effect above
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    fetchTransactions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAuthenticated,
     user,
@@ -78,7 +84,6 @@ function TransactionProvider({ children }) {
     state.sortOrder,
     state.pagination.page,
     state.pagination.limit,
-    fetchTransactions,
   ]);
 
   // ──────────────────────────────────────────────────────────────────────

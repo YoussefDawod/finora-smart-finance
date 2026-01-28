@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useAuth } from '@/hooks';
+import { useAuth, useMotion } from '@/hooks';
 import { MainLayout } from '@/components/layout';
+import Spinner from '@/components/common/Spinner/Spinner';
 import AuthPage from '@/pages/AuthPage';
 import EmailVerificationPage from '@/pages/EmailVerificationPage';
 import VerifyEmailPage from '@/pages/VerifyEmailPage';
@@ -13,22 +14,42 @@ import SettingsPage from '@/pages/SettingsPage/SettingsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ProfilePage from '@/pages/ProfilePage';
 
-const PageTransition = ({ children }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -8 }}
-    transition={{ duration: 0.28, ease: 'easeOut' }}
+const PageTransition = ({ children }) => {
+  const { shouldAnimate } = useMotion();
+
+  return (
+    <motion.div
+      initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
+      animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 1 }}
+      exit={shouldAnimate ? { opacity: 0, y: -8 } : { opacity: 1 }}
+      transition={shouldAnimate ? { duration: 0.28, ease: 'easeOut' } : { duration: 0 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+const AuthLoadingScreen = () => (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      gap: '12px',
+      background: 'var(--bg)',
+    }}
   >
-    {children}
-  </motion.div>
+    <Spinner size="large" />
+  </div>
 );
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return null;
+    return <AuthLoadingScreen />;
   }
 
   return isAuthenticated ? children : <Navigate to="/login" replace />;
@@ -38,7 +59,7 @@ const PublicRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return null;
+    return <AuthLoadingScreen />;
   }
 
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
@@ -54,17 +75,16 @@ const VerifyEmailWrapper = () => {
 function AnimatedRoutes() {
   const location = useLocation();
   
-  // Use 'auth' key for login/register so AuthPage doesn't remount
+  // Use 'auth' key for login/register/forgot-password so they share the same animation context
   const getRouteKey = (pathname) => {
-    if (pathname === '/login' || pathname === '/register') {
+    if (pathname === '/login' || pathname === '/register' || pathname.startsWith('/forgot-password')) {
       return 'auth';
     }
     return pathname;
   };
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={getRouteKey(location.pathname)}>
+      <Routes location={location}>
         {/* Auth Routes - Single AuthPage handles both login and register */}
         <Route
           path="/login"
@@ -96,9 +116,7 @@ function AnimatedRoutes() {
           path="/forgot-password"
           element={(
             <PublicRoute>
-              <PageTransition>
-                <ForgotPasswordPage />
-              </PageTransition>
+              <AuthPage />
             </PublicRoute>
           )}
         />
@@ -152,7 +170,6 @@ function AnimatedRoutes() {
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={(<PageTransition><NotFoundPage /></PageTransition>)} />
       </Routes>
-    </AnimatePresence>
   );
 }
 

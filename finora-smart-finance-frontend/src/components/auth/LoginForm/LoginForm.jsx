@@ -142,14 +142,24 @@ export default function LoginForm() {
     setApiError('');
 
     try {
-      await login(formData.name, formData.password);
+      await login(formData.name, formData.password, formData.rememberMe);
       toast.success(t('auth.login.success'));
-      // AuthContext will handle redirect
+      // No manual navigation here - AuthContext updates trigger PublicRoute to redirect
     } catch (error) {
-      const errorMessage = 
-        error?.response?.data?.message || 
-        error?.response?.data?.error ||
-        t('auth.login.error');
+      // Extract detailed error message for debugging
+      const errorDetail = error?.response?.data?.message 
+        || error?.response?.data?.error
+        || error?.message
+        || 'Unknown error';
+      
+      // Show more details in API error for debugging network issues
+      const networkInfo = error?.code === 'ERR_NETWORK' 
+        ? ' (Netzwerkfehler - Server nicht erreichbar)'
+        : error?.code === 'ECONNABORTED'
+          ? ' (Timeout - Server antwortet nicht)'
+          : '';
+      
+      const errorMessage = errorDetail + networkInfo;
       
       setApiError(errorMessage);
       toast.error(errorMessage);

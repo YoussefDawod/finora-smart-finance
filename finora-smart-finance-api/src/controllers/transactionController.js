@@ -5,6 +5,9 @@
 
 const Transaction = require('../models/Transaction');
 const transactionService = require('../services/transactionService');
+const emailService = require('../utils/emailService');
+const budgetAlertService = require('../services/budgetAlertService');
+const logger = require('../utils/logger');
 const {
   validateObjectId,
   validatePagination,
@@ -87,7 +90,8 @@ async function getDashboard(req, res) {
  */
 async function createTransaction(req, res) {
   try {
-    const userId = req.user._id;
+    const user = req.user;
+    const userId = user._id;
     const validation = validateCreateTransaction(req.body);
 
     if (!validation.valid) {
@@ -102,6 +106,29 @@ async function createTransaction(req, res) {
       userId,
       ...validation.data,
     });
+
+    // Transaktions-Benachrichtigung (prüft automatisch Benutzereinstellungen)
+    if (user.email && user.isVerified) {
+      try {
+        await emailService.sendTransactionNotification(user, transaction);
+      } catch (notifyError) {
+        logger.warn(`Transaction notification skipped: ${notifyError.message}`);
+      }
+
+      // Budget-Alert prüfen (nur für Ausgaben, benötigt Budget-Limit)
+      try {
+        await budgetAlertService.checkBudgetAfterTransaction(user, transaction);
+      } catch (budgetError) {
+        logger.warn(`Budget alert check failed: ${budgetError.message}`);
+      }
+
+      // Negatives Saldo Alert prüfen (für alle Ausgaben)
+      try {
+        await budgetAlertService.checkNegativeBalanceAlert(user, transaction);
+      } catch (negativeBalanceError) {
+        logger.warn(`Negative balance alert check failed: ${negativeBalanceError.message}`);
+      }
+    }
 
     res.status(201).json({
       success: true,

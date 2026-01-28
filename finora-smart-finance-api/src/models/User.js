@@ -80,6 +80,20 @@ const UserSchema = new mongoose.Schema(
         enum: ['iso', 'dmy']
       },
       emailNotifications: { type: Boolean, default: true },
+      notificationCategories: {
+        security: { type: Boolean, default: true },
+        transactions: { type: Boolean, default: true },
+        reports: { type: Boolean, default: false },
+        alerts: { type: Boolean, default: true },
+      },
+      // Budget-Einstellungen für Alerts
+      budget: {
+        monthlyLimit: { type: Number, default: 0 }, // 0 = kein Limit
+        alertThreshold: { type: Number, default: 80, min: 0, max: 100 }, // Warnung bei X% erreicht
+        categoryLimits: { type: Map, of: Number, default: {} }, // Limits pro Kategorie
+        lastAlertSent: { type: Date, default: null }, // Verhindert Spam (Budget-Limit)
+        lastNegativeBalanceAlert: { type: Date, default: null }, // Verhindert Spam (Negatives Saldo)
+      },
     },
 
     lastLogin: { type: Date, default: null },

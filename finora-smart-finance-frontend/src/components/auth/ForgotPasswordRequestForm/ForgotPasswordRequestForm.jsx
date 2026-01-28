@@ -165,6 +165,9 @@ export default function ForgotPasswordRequestForm() {
 
       {/* Email Field */}
       <div className={styles.inputGroup}>
+        <label htmlFor="email" className={styles.label}>
+          {t('auth.forgot.emailLabel')}
+        </label>
         <div className={`${styles.inputWrapper} ${hasError ? styles.error : ''}`}>
           <FiMail className={styles.inputIcon} />
           <input
@@ -172,7 +175,7 @@ export default function ForgotPasswordRequestForm() {
             name="email"
             type="email"
             className={styles.input}
-            placeholder=" "
+            placeholder={t('auth.forgot.emailPlaceholder')}
             value={email}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -180,9 +183,6 @@ export default function ForgotPasswordRequestForm() {
             autoComplete="email"
             autoFocus
           />
-          <label htmlFor="email" className={styles.label}>
-            {t('auth.forgot.emailLabel')}
-          </label>
         </div>
         <AnimatePresence>
           {hasError && (

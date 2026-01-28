@@ -30,8 +30,18 @@ function AuthProvider({ children }) {
   const { getToken, clearAllTokens } = storage;
 
   // Auth Actions
-  const { login, register, logout, verifyEmail, refreshUser, resendVerification, clearError, setIsLoading } =
-    useAuthActions(dispatch, storage);
+  const {
+    login,
+    register,
+    logout,
+    verifyEmail,
+    refreshUser,
+    resendVerification,
+    forgotPassword,
+    resetPassword,
+    clearError,
+    setIsLoading,
+  } = useAuthActions(dispatch, storage);
 
   // ──────────────────────────────────────────────────────────────────────
   // AUTO-LOGIN ON MOUNT
@@ -89,6 +99,8 @@ function AuthProvider({ children }) {
     setIsLoading,
     refreshUser,
     resendVerification,
+    forgotPassword,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

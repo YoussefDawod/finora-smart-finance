@@ -20,6 +20,7 @@ import { isUnauthorized, isForbidden, isNetworkError } from './errorHandler';
 
 /**
  * Create axios instance with config
+ * Note: withCredentials is NOT needed since we use localStorage for tokens, not cookies
  */
 const client = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -48,19 +49,29 @@ const dispatchToast = (type, message, duration = 5000) => {
 // ============================================
 
 /**
+ * Get auth token from storage
+ * Checks both localStorage and sessionStorage (for rememberMe support)
+ * @returns {string|null} The auth token or null
+ */
+const getAuthToken = () => {
+  try {
+    return globalThis.localStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY) || 
+           globalThis.sessionStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Request Interceptor
  * Injects auth token into every request
  */
 client.interceptors.request.use(
   (config) => {
-    try {
-      const token = globalThis.localStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY);
+    const token = getAuthToken();
 
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      // Token retrieval failed silently
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     logRequest(config.method?.toUpperCase?.() || 'GET', config.url, config.data);
@@ -107,7 +118,9 @@ client.interceptors.response.use(
 
     if (isUnauthorized(error)) {
       try {
+        // Clear token from both storages
         globalThis.localStorage?.removeItem(API_CONFIG.TOKEN_STORAGE_KEY);
+        globalThis.sessionStorage?.removeItem(API_CONFIG.TOKEN_STORAGE_KEY);
         globalThis.window?.dispatchEvent(new CustomEvent('auth:unauthorized'));
       } catch (err) {
         globalThis.console?.warn('Failed to handle 401 error:', err);

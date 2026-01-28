@@ -17,6 +17,9 @@ const userRoutes = require('./src/routes/users');
 const adminRoutes = require('./src/routes/admin');
 const User = require('./src/models/User');
 
+// Services
+const reportScheduler = require('./src/services/reportScheduler');
+
 const app = express();
 
 // CORS muss ZUERST kommen - vor allen anderen Middlewares
@@ -131,15 +134,66 @@ app.use((req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-// Start Server
-const server = app.listen(config.port, () => {
+// Start Server - listen on all interfaces (0.0.0.0) for network access
+const server = app.listen(config.port, '0.0.0.0', () => {
   logger.info(`🚀 Server started successfully`, {
     port: config.port,
     environment: config.nodeEnv,
     nodeVersion: process.version,
     mongoUrl: config.mongodb.uri.substring(0, 40) + '...',
   });
+
+  // Starte Report Scheduler (nur in Produktion oder explizit aktiviert)
+  if (config.nodeEnv === 'production' || process.env.ENABLE_REPORT_SCHEDULER === 'true') {
+    initializeReportScheduler();
+  }
 });
+
+/**
+ * Initialisiert den Report Scheduler
+ * - Wöchentliche Reports: Jeden Montag um 8:00 Uhr
+ * - Monatliche Reports: Am 1. jedes Monats um 8:00 Uhr
+ */
+function initializeReportScheduler() {
+  logger.info('📊 Initializing report scheduler...');
+
+  const ONE_HOUR = 60 * 60 * 1000;
+  let lastWeeklyCheck = null;
+  let lastMonthlyCheck = null;
+
+  // Prüfe stündlich ob Reports gesendet werden müssen
+  setInterval(async () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sonntag, 1 = Montag
+    const dayOfMonth = now.getDate();
+    const hour = now.getHours();
+    const dateKey = now.toISOString().split('T')[0];
+
+    // Wöchentlicher Report: Montag um 8:00 Uhr
+    if (dayOfWeek === 1 && hour >= 8 && lastWeeklyCheck !== dateKey) {
+      lastWeeklyCheck = dateKey;
+      logger.info('📊 Triggering weekly reports...');
+      try {
+        await reportScheduler.sendWeeklyReports();
+      } catch (error) {
+        logger.error('Weekly report scheduler error:', error);
+      }
+    }
+
+    // Monatlicher Report: 1. des Monats um 8:00 Uhr
+    if (dayOfMonth === 1 && hour >= 8 && lastMonthlyCheck !== dateKey) {
+      lastMonthlyCheck = dateKey;
+      logger.info('📊 Triggering monthly reports...');
+      try {
+        await reportScheduler.sendMonthlyReports();
+      } catch (error) {
+        logger.error('Monthly report scheduler error:', error);
+      }
+    }
+  }, ONE_HOUR);
+
+  logger.info('📊 Report scheduler active - Weekly: Mondays 8:00, Monthly: 1st of month 8:00');
+}
 
 // Graceful Shutdown
 process.on('SIGTERM', gracefulShutdown);
