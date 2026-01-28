@@ -446,8 +446,7 @@
     box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
   }
   100% {
-    box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
-                rgba(var(--primary-rgb), var(--focus-ring-opacity));
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 

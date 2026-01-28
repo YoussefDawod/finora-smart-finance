@@ -212,9 +212,11 @@
   align-items: center;
   justify-content: center;
   color: var(--tx-muted);
+  background: transparent; // Verhindert Überdeckung von border-radius
   pointer-events: none;
   transition: color var(--tr), transform var(--tr);
   font-size: var(--fs-sm);
+  z-index: 1;
 }
 
 :global([dir='rtl']) .arrow {

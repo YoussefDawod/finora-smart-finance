@@ -2,18 +2,42 @@
  * @fileoverview AuthPage Component - Unified Auth Layout
  * 
  * ARCHITECTURE:
+ * - Single unified page for ALL auth modes: Login, Register, and Forgot Password
  * - Uses useIsDesktop hook to render ONLY ONE layout (no duplicate IDs)
- * - Supports Login, Register, and ForgotPassword modes
+ * - Supports 3 modes + optional token for password reset
+ * 
+ * MODES:
+ * - Login:    /login
+ * - Register: /register
+ * - Forgot:   /forgot-password (with optional ?token=xyz for password reset)
  * 
  * DESKTOP (Horizontal 50/50):
- * - Login mode:    [Form 50%] [Branding 50%]
- * - Register mode: [Branding 50%] [Form 50%]
- * - Forgot mode:   [Form 50%] [Branding 50%] (same as login)
+ * - Login mode:    [Form 50%] [Branding 50%] (statisch, x: 0%)
+ * - Register mode: [Branding 50%] [Form 50%] (animiert: Form x: 100%, Branding x: -100%)
+ * - Forgot mode:   [Branding 50%] [Form 50%] (animiert: Form x: 100%, Branding x: -100%, wie Register)
  * 
  * MOBILE (Vertical 60/40):
- * - Login mode:    [Form 60%] / [Branding 40%]
- * - Register mode: [Branding 40%] / [Form 60%]
- * - Forgot mode:   [Form 60%] / [Branding 40%] (same as login)
+ * - Login mode:    [Form 60%] / [Branding 40%] (Branding UNTEN)
+ * - Register mode: [Branding 40%] / [Form 60%] (Branding OBEN, animated order swap)
+ * - Forgot mode:   [Branding 40%] / [Form 60%] (Branding OBEN, animated order swap wie Register)
+ * 
+ * ANIMATIONS:
+ * - Desktop: Register/Forgot Mode → Spring-based panel slide animation (x translation 100%)
+ * - Desktop: Login Mode → Static panels at x: 0%, only form content fades
+ * - Mobile: Register/Forgot Mode → CSS order property swap (Branding nach oben)
+ * - Mobile: Login Mode → Static (Branding unten)
+ * - Floating Shapes: Continuous loop (7-11s), all modes identical
+ * - Form Content: Fade in/out (200ms) on mode/token change
+ * 
+ * ÜBERGÄNGE (alle animiert):
+ * - Login ↔ Register: Desktop panels slide | Mobile Branding up/down
+ * - Login ↔ Forgot:   Desktop panels slide | Mobile Branding up/down
+ * - Register ↔ Forgot: Form content fade (both panels in same position)
+ * 
+ * BUTTONS IN BRANDING PANEL:
+ * - Login Mode:    "Sign up now" → /register (Arrow: ←/↑)
+ * - Register Mode: "Go to sign in" → /login (Arrow: →/↓)
+ * - Forgot Mode:   "Back to sign in" → /login (Arrow: ←/↓)
  * 
  * @module pages/AuthPage
  */
@@ -44,8 +68,11 @@ export default function AuthPage() {
   // Mode für BrandingPanel
   const mode = isRegisterMode ? 'register' : isForgotMode ? 'forgot' : 'login';
   
-  // Für Animation: Register ist "rechts", Login/Forgot sind "links"
-  const isPanelRight = isRegisterMode;
+  // Für Animation: 
+  // Desktop: Register/Forgot sind "rechts" (Form slides to 100%), nur Login ist "links" (0%)
+  // Mobile: Register/Forgot haben Branding "oben" (order swap), nur Login hat Branding "unten"
+  const isPanelRight = isRegisterMode || isForgotMode; // Desktop: Panel-Animation für Register & Forgot
+  const isPanelTop = isRegisterMode || isForgotMode; // Mobile: Branding oben für Register & Forgot
 
   // Auto-redirect if authenticated
   useEffect(() => {
@@ -58,13 +85,13 @@ export default function AuthPage() {
   useEffect(() => {
     const htmlElement = document.documentElement;
 
-    if (!isDesktop && !isPanelRight) {
-      // Mobile in login/forgot mode: Branding panel is at bottom
+    if (!isDesktop && !isPanelTop) {
+      // Mobile in login mode only: Branding panel is at bottom
       htmlElement.setAttribute('data-auth-branding-bottom', 'true');
     } else {
       htmlElement.removeAttribute('data-auth-branding-bottom');
     }
-  }, [isDesktop, isPanelRight]);
+  }, [isDesktop, isPanelTop]);
 
   // Loading state
   if (isLoading) {
@@ -165,7 +192,7 @@ export default function AuthPage() {
   // MOBILE LAYOUT (Vertical 60/40)
   // ============================================
   return (
-    <div className={`${styles.authPageMobile} ${isPanelRight ? styles.registerMode : ''}`}>
+    <div className={`${styles.authPageMobile} ${isPanelTop ? styles.registerMode : ''}`}>
       <motion.div 
         layout
         className={styles.formPanelMobile}

@@ -29,6 +29,11 @@
     .textareaWrapper {
       border-color: var(--error);
       background: color-mix(in srgb, var(--error) 5%, transparent);
+
+      &:focus-within {
+        border-color: var(--error);
+        
+      }
     }
 
     .label {
@@ -65,10 +70,17 @@
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   transition: all var(--tr);
-  overflow: hidden;
+  overflow: hidden; // Verhindert dass Icons die Ecken überdecken
 
   &:hover:not(:has(:disabled)) {
     border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  &:focus-within {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 2%, transparent);
+    
+    outline: none;
   }
 }
 

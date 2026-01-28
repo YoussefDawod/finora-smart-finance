@@ -10,28 +10,19 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  padding: var(--space-lg);
-  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
-  border-radius: var(--r-lg);
-  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
-  box-shadow: var(--sh-sm);
-  animation: slideInForm 0.4s ease-out;
+  gap: var(--space-md); // Reduziert von lg zu md
+  padding: 0; // Kein Padding - Modal body hat bereits Padding
+  background: transparent; // Transparent - Modal hat bereits Hintergrund
+  border-radius: 0; // Kein Border-Radius - Modal hat bereits Radius
+  border: none; // Kein Border - Modal hat bereits Border
+  box-shadow: none; // Kein Schatten - Modal hat bereits Schatten
+
+  @include mobile {
+    gap: var(--space-sm); // Noch kompakter auf Mobile
+  }
 
   @include tablet {
-    padding: var(--space-md);
     gap: var(--space-md);
-  }
-}
-
-@keyframes slideInForm {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -72,7 +63,7 @@
 .typeSelector {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs); // Reduziert von sm zu xs
 }
 
 .label {
@@ -105,8 +96,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-xs);
-  padding: var(--space-md) var(--space-lg);
+  gap: var(--space-2xs); // Reduziert von xs zu 2xs
+  padding: var(--space-sm) var(--space-md); // Reduziert von md/lg zu sm/md
   background: color-mix(in srgb, var(--surface-2) 90%, var(--bg) 10%);
   border: 2px solid color-mix(in srgb, var(--tx) 15%, transparent);
   border-radius: var(--r-md);
@@ -117,7 +108,16 @@
   color: var(--tx);
 
   .icon {
-    font-size: var(--fs-xl);
+    font-size: var(--fs-lg); // Reduziert von xl zu lg
+  }
+
+  @include mobile {
+    padding: var(--space-xs) var(--space-sm); // Noch kompakter auf Mobile
+    font-size: var(--fs-xs);
+
+    .icon {
+      font-size: var(--fs-md);
+    }
   }
 
   &.income.active {
@@ -155,7 +155,7 @@
 .fieldGroup {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-2xs); // Reduziert von xs zu 2xs
 }
 
 .fieldRow {
@@ -264,12 +264,14 @@
 // ============================================
 .actions {
   display: flex;
-  gap: var(--space-md);
-  padding-top: var(--space-md);
+  gap: var(--space-sm); // Reduziert von md zu sm
+  padding-top: var(--space-sm); // Reduziert von md zu sm
   border-top: 1px solid var(--border);
 
   @include mobile {
     flex-direction: column;
+    gap: var(--space-xs); // Noch kompakter auf Mobile
+    padding-top: var(--space-xs);
   }
 }
 

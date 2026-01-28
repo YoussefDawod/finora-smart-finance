@@ -16,7 +16,7 @@
 // Breakpoint Values (müssen als SCSS-Variablen existieren für @media)
 $bp-xs: 480px;
 $bp-sm: 640px;
-$bp-md: 768px;
+$bp-md: 750px;   // Größere Tablets (10+ Zoll)
 $bp-lg: 1024px;
 $bp-xl: 1280px;
 $bp-2xl: 1536px;
@@ -32,9 +32,11 @@ $bp-2xl: 1536px;
 // Legacy (max-width) - für spezielle Fälle
 @mixin mobile { @media (max-width: ($bp-sm - 1)) { @content; } }
 @mixin tablet { @media (min-width: $bp-sm) and (max-width: ($bp-lg - 1)) { @content; } }
+@mixin tablet-md { @media (min-width: $bp-md) and (max-width: ($bp-lg - 1)) { @content; } }  // Größere Tablets
 @mixin desktop { @media (min-width: $bp-lg) { @content; } }
 
 // Below breakpoints (max-width) - für "und kleiner" Szenarien
+@mixin below-sm { @media (max-width: ($bp-sm - 1)) { @content; } }
 @mixin below-md { @media (max-width: $bp-md) { @content; } }
 @mixin below-lg { @media (max-width: ($bp-lg - 1)) { @content; } }
 
@@ -52,6 +54,27 @@ $bp-2xl: 1536px;
 // ============================================
 // ♿ ACCESSIBILITY & MOTION
 // ============================================
+
+// Orientation-basierte Queries (für Tablets)
+@mixin portrait {
+  @media (orientation: portrait) { @content; }
+}
+
+@mixin landscape {
+  @media (orientation: landscape) { @content; }
+}
+
+// Kombinierte Mixin: Tablet Portrait + Mobile (Card-Layout)
+@mixin card-view {
+  @media (max-width: 1023px) and (orientation: portrait) { @content; }
+  @include mobile { @content; }
+}
+
+// Kombinierte Mixin: Tablet Landscape + Desktop (Table-Layout)  
+@mixin table-view {
+  @media (min-width: 1024px) { @content; }
+  @media (max-width: 1023px) and (orientation: landscape) { @content; }
+}
 
 @mixin reduced-motion {
   @media (prefers-reduced-motion: reduce) { @content; }
@@ -248,31 +271,28 @@ $bp-2xl: 1536px;
 @mixin focus-ring {
   &:focus { outline: none; }
   &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--focus-ring-color);
-    outline-offset: var(--focus-ring-offset);
-    box-shadow: 0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
-                rgba(var(--primary-rgb), var(--focus-ring-opacity));
+    outline: none;
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 
 @mixin focus-ring-inset {
   &:focus { 
     outline: none; 
-    border-color: var(--focus-ring-color);
-    box-shadow: 0 0 0 calc(var(--focus-ring-width) + 1px) 
-                rgba(var(--primary-rgb), var(--focus-ring-opacity)); 
+    border-color: var(--primary);
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
   &:focus-visible { 
-    outline: var(--focus-ring-width) solid var(--focus-ring-color); 
-    outline-offset: 0; 
+    outline: none;
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 
 @mixin focus-ring-custom($color) {
   &:focus { outline: none; }
   &:focus-visible {
-    outline: var(--focus-ring-width) solid $color;
-    outline-offset: var(--focus-ring-offset);
+    outline: none;
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, $color 12%, transparent);
   }
 }
 
@@ -389,8 +409,8 @@ $bp-2xl: 1536px;
   }
 
   &:focus-visible {
-    outline: var(--focus-ring-width) solid var(--primary);
-    outline-offset: 0;
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
   }
 
   &:disabled {
@@ -398,6 +418,16 @@ $bp-2xl: 1536px;
     cursor: not-allowed;
     background: var(--surface-2);
   }
+}
+
+// Input Icon - Safe für absolute Positionierung in Inputs
+@mixin input-icon {
+  position: absolute;
+  background: transparent; // Verhindert Überdeckung von border-radius
+  color: var(--tx-muted);
+  pointer-events: none;
+  z-index: 1;
+  transition: color var(--tr-fast);
 }
 
 // ============================================

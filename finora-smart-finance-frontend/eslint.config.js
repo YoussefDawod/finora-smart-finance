@@ -59,12 +59,12 @@ export default [
       'react/prop-types': 'off',
     },
   },
-  // Vitest Test-Dateien
+  // Jest Test-Dateien
   {
-    files: ['src/test/**/*.js', 'src/**/*.test.{js,jsx}', 'src/**/__tests__/**/*.{js,jsx}'],
+    files: ['__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
     languageOptions: {
       globals: {
-        vi: 'readonly',
+        jest: 'readonly',
         describe: 'readonly',
         it: 'readonly',
         expect: 'readonly',

@@ -53,6 +53,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
   const {
     values: formData,
     errors,
+    isDirty,
     handleChange,
     handleSubmit: onFormSubmit,
     resetForm,
@@ -124,6 +125,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
     categories,
     isLoading,
     error,
+    isDirty,
     isEditMode: !!initialData?.id,
 
     // Handlers

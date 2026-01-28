@@ -53,20 +53,28 @@
   letter-spacing: 0.05em;
   border: 1px solid color-mix(in srgb, var(--tx) 8%, transparent);
 
-  // Optimierung für mittlere Viewports (900-1024px)
-  @media (max-width: 1024px) and (min-width: 900px) {
-    grid-template-columns: minmax(130px, 1.1fr) minmax(110px, 1.8fr) minmax(95px, 1fr) minmax(95px, 1fr) 75px;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-  }
-
+  // Desktop und Landscape-Tablets: Tabelle zeigen
   @include lg {
     grid-template-columns: minmax(120px, 1fr) minmax(110px, 1.6fr) 100px 95px 75px;
     padding: var(--space-sm) var(--space-md);
   }
 
-  // Tablet und kleiner: Header ausblenden
-  @include below-md {
+  // Landscape-Modus auf Tablets: Kompakte Tabelle
+  @media (max-width: 1023px) and (orientation: landscape) {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) minmax(100px, 1.4fr) minmax(85px, 0.9fr) minmax(85px, 0.9fr) 65px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-2xs);
+  }
+
+  // Portrait-Modus auf Tablets + Mobile: Header verstecken (Card-Layout)
+  @media (max-width: 1023px) and (orientation: portrait) {
+    display: none;
+  }
+
+  // Mobile (klein): Immer verstecken
+  @include mobile {
     display: none;
   }
 }
@@ -110,8 +118,17 @@
     }
   }
 
-  @include tablet {
+  // Landscape-Tablets: Tabellen-Layout
+  @media (max-width: 1023px) and (orientation: landscape) {
     max-height: calc(100vh - 280px);
+    gap: var(--space-sm);
+  }
+
+  // Portrait-Tablets + Mobile: Card-Layout
+  @media (max-width: 1023px) and (orientation: portrait) {
+    gap: var(--space-md);
+    max-height: calc(100vh - 240px);
+    padding-right: 0;
   }
 
   @include mobile {
@@ -137,6 +154,23 @@
   cursor: pointer;
   transition: all var(--tr);
   position: relative;
+
+  // Landscape-Tablets: Kompakte Tabelle
+  @media (max-width: 1023px) and (orientation: landscape) {
+    grid-template-columns: minmax(110px, 1fr) minmax(100px, 1.4fr) minmax(85px, 0.9fr) minmax(85px, 0.9fr) 65px;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--fs-sm);
+  }
+
+  // Portrait-Tablets + Mobile: Card-Layout (wird durch transactionCard überschrieben)
+  @media (max-width: 1023px) and (orientation: portrait) {
+    display: none;
+  }
+
+  @include mobile {
+    display: none;
+  }
 
   // Type variants
   &.income {
@@ -170,20 +204,22 @@
     outline-offset: var(--focus-o);
   }
 
-  // Optimierung für mittlere Viewports (900-1024px)
-  @media (max-width: 1024px) and (min-width: 900px) {
-    grid-template-columns: minmax(130px, 1.1fr) minmax(110px, 1.8fr) minmax(95px, 1fr) minmax(95px, 1fr) 75px;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-  }
-
   @include lg {
     grid-template-columns: minmax(120px, 1fr) minmax(110px, 1.6fr) 100px 95px 75px;
     padding: var(--space-sm) var(--space-md);
   }
 
-  // Mobile Card Layout
-  @include below-md {
+  // Portrait-Tablets + Mobile: Card Layout
+  @media (max-width: 1023px) and (orientation: portrait) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    border-radius: var(--r-xl);
+    box-shadow: var(--sh-sm);
+  }
+
+  @include mobile {
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
@@ -209,7 +245,7 @@
 .colCategory {
   min-width: 0;
 
-  @include below-md {
+  @include card-view {
     width: 100%;
     padding-bottom: var(--space-sm);
     border-bottom: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
@@ -220,7 +256,7 @@
   flex: 1;
   min-width: 0;
 
-  @include below-md {
+  @include card-view {
     width: 100%;
     padding: var(--space-xs) 0;
   }
@@ -230,7 +266,7 @@
   justify-content: flex-end;
   font-variant-numeric: tabular-nums;
 
-  @include below-md {
+  @include card-view {
     width: 100%;
     justify-content: space-between;
     padding-top: var(--space-sm);
@@ -252,7 +288,7 @@
   color: var(--tx-muted);
   font-size: var(--fs-sm);
 
-  @include below-md {
+  @include card-view {
     width: 100%;
     justify-content: space-between;
 
@@ -270,7 +306,7 @@
 .colActions {
   justify-content: flex-end;
 
-  @include below-md {
+  @include card-view {
     width: 100%;
     justify-content: flex-end;
     padding-top: var(--space-sm);
@@ -294,7 +330,7 @@
   background: color-mix(in srgb, var(--primary) 8%, var(--surface));
   border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
 
-  @include below-md {
+  @include card-view {
     width: 2.75rem;
     height: 2.75rem;
     font-size: var(--fs-xl);
@@ -306,7 +342,7 @@
   font-weight: var(--fw-sb);
   color: var(--tx);
 
-  @include below-md {
+  @include card-view {
     font-size: var(--fs-md);
     font-weight: var(--fw-b);
   }
@@ -330,7 +366,7 @@
   text-overflow: ellipsis;
   line-height: var(--lh-snug);
 
-  @include below-md {
+  @include card-view {
     white-space: normal;
     overflow: visible;
     text-overflow: unset;
@@ -356,7 +392,7 @@
     color: var(--error);
   }
 
-  @include below-md {
+  @include card-view {
     font-size: var(--fs-lg);
   }
 }
