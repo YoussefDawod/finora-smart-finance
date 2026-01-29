@@ -10,7 +10,7 @@ import authService from '@/api/authService';
 
 export function useProfile() {
   const { user, refreshUser } = useAuth();
-  const toast = useToast();
+  useToast();
 
   // ============================================
   // PROFILE FORM STATE

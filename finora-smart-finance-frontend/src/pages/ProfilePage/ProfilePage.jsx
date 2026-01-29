@@ -55,7 +55,6 @@ export default function ProfilePage() {
     handleRemoveEmail,
     handleResendVerification,
     handleResendAddEmailVerification,
-    passwordForm,
     isChangingPassword,
     handleChangePassword,
   } = useProfile();

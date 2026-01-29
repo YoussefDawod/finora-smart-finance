@@ -59,11 +59,12 @@ export default [
       'react/prop-types': 'off',
     },
   },
-  // Jest Test-Dateien
+  // Jest & Vitest Test-Dateien
   {
-    files: ['__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}'],
+    files: ['__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}', '**/test/**/*.js'],
     languageOptions: {
       globals: {
+        // Jest
         jest: 'readonly',
         describe: 'readonly',
         it: 'readonly',
@@ -74,6 +75,8 @@ export default [
         beforeEach: 'readonly',
         afterEach: 'readonly',
         global: 'readonly',
+        // Vitest
+        vi: 'readonly',
       },
     },
     rules: {

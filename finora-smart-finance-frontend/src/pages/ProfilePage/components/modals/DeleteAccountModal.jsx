@@ -3,7 +3,7 @@
  * Modal for permanently deleting user account
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';

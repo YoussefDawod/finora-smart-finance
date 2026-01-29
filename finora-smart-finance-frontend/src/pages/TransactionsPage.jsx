@@ -11,7 +11,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useDebounce, useIsMobile } from '@/hooks';
 import { ALL_CATEGORIES } from '@/config/categoryConstants';

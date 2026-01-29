@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useTransactionForm } from '@/hooks/useTransactionForm';
-import { translateCategory } from '@/utils/categoryTranslations';
 import { formContainerVariants, formItemVariants, buttonMotionProps } from '@/constants/animations';
 import CategoryPicker from '@/components/transactions/CategoryPicker/CategoryPicker';
 import Input from '@/components/common/Input/Input';

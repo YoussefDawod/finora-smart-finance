@@ -12,7 +12,6 @@ import styles from '../ProfilePage.module.scss';
 
 export function EmailManager({
   emailStatus,
-  isAddingEmail,
   isRemovingEmail,
   isResendingVerification,
   onAddEmail,
