@@ -15,6 +15,39 @@ const {
   validateUpdateTransaction,
 } = require('../validators/transactionValidation');
 
+function handleServerError(res, context, error) {
+  logger.error(`${context} error:`, error);
+  return res.status(500).json({
+    error: 'Serverfehler',
+    code: 'SERVER_ERROR',
+    message: error.message,
+  });
+}
+
+async function getOwnedTransactionOrFail(id, userId, res) {
+  const idValidation = validateObjectId(id);
+  if (!idValidation.valid) {
+    res.status(400).json({ error: idValidation.error, code: 'INVALID_ID' });
+    return null;
+  }
+
+  const transaction = await Transaction.findById(id);
+  if (!transaction) {
+    res.status(404).json({ error: 'Transaktion nicht gefunden', code: 'NOT_FOUND' });
+    return null;
+  }
+
+  if (!transactionService.isOwner(transaction, userId)) {
+    res.status(403).json({
+      error: 'Sie haben keine Berechtigung, diese Transaktion zu sehen',
+      code: 'FORBIDDEN',
+    });
+    return null;
+  }
+
+  return transaction;
+}
+
 // ============================================
 // STATS ENDPOINTS
 // ============================================
@@ -28,35 +61,13 @@ async function getSummary(req, res) {
     const userId = req.user._id;
     const { startDate, endDate } = req.query;
 
-    // Build date filter
-    const dateFilter = {};
-    if (startDate || endDate) {
-      dateFilter.date = {};
-      if (startDate) {
-        const start = new Date(startDate);
-        if (!isNaN(start.getTime())) {
-          dateFilter.date.$gte = start;
-        }
-      }
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        if (!isNaN(end.getTime())) {
-          dateFilter.date.$lte = end;
-        }
-      }
-    }
+    const dateFilter = transactionService.buildTransactionFilter(userId, { startDate, endDate });
 
     const stats = await transactionService.getSummaryStats(userId, dateFilter);
 
     res.json({ success: true, data: stats });
   } catch (error) {
-    console.error('GET /api/transactions/stats/summary Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Berechnen der Zusammenfassung',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'GET /api/transactions/stats/summary', error);
   }
 }
 
@@ -71,12 +82,7 @@ async function getDashboard(req, res) {
 
     res.json({ success: true, data });
   } catch (error) {
-    console.error('GET /api/transactions/stats/dashboard Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Laden der Dashboard-Daten',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'GET /api/transactions/stats/dashboard', error);
   }
 }
 
@@ -136,7 +142,7 @@ async function createTransaction(req, res) {
       message: 'Transaktion erstellt',
     });
   } catch (error) {
-    console.error('POST /api/transactions Error:', error);
+    logger.error('POST /api/transactions Error:', error);
 
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err) => err.message);
@@ -190,12 +196,7 @@ async function getTransactions(req, res) {
       ...(req.query.search && { searchQuery: req.query.search }),
     });
   } catch (error) {
-    console.error('GET /api/transactions Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Abrufen der Transaktionen',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'GET /api/transactions', error);
   }
 }
 
@@ -208,41 +209,15 @@ async function getTransactionById(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const idValidation = validateObjectId(id);
-    if (!idValidation.valid) {
-      return res.status(400).json({
-        error: idValidation.error,
-        code: 'INVALID_ID',
-      });
-    }
-
-    const transaction = await Transaction.findById(id);
-
-    if (!transaction) {
-      return res.status(404).json({
-        error: 'Transaktion nicht gefunden',
-        code: 'NOT_FOUND',
-      });
-    }
-
-    if (!transactionService.isOwner(transaction, userId)) {
-      return res.status(403).json({
-        error: 'Sie haben keine Berechtigung, diese Transaktion zu sehen',
-        code: 'FORBIDDEN',
-      });
-    }
+    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    if (!transaction) return;
 
     res.json({
       success: true,
       data: transactionService.formatTransaction(transaction),
     });
   } catch (error) {
-    console.error('GET /api/transactions/:id Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Abrufen der Transaktion',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'GET /api/transactions/:id', error);
   }
 }
 
@@ -255,29 +230,8 @@ async function updateTransaction(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const idValidation = validateObjectId(id);
-    if (!idValidation.valid) {
-      return res.status(400).json({
-        error: idValidation.error,
-        code: 'INVALID_ID',
-      });
-    }
-
-    const transaction = await Transaction.findById(id);
-
-    if (!transaction) {
-      return res.status(404).json({
-        error: 'Transaktion nicht gefunden',
-        code: 'NOT_FOUND',
-      });
-    }
-
-    if (!transactionService.isOwner(transaction, userId)) {
-      return res.status(403).json({
-        error: 'Sie haben keine Berechtigung, diese Transaktion zu ändern',
-        code: 'FORBIDDEN',
-      });
-    }
+    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    if (!transaction) return;
 
     const validation = validateUpdateTransaction(req.body);
     if (!validation.valid) {
@@ -298,7 +252,7 @@ async function updateTransaction(req, res) {
       message: 'Transaktion aktualisiert',
     });
   } catch (error) {
-    console.error('PUT /api/transactions/:id Error:', error);
+    logger.error('PUT /api/transactions/:id Error:', error);
 
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err) => err.message);
@@ -326,29 +280,8 @@ async function deleteTransaction(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const idValidation = validateObjectId(id);
-    if (!idValidation.valid) {
-      return res.status(400).json({
-        error: idValidation.error,
-        code: 'INVALID_ID',
-      });
-    }
-
-    const transaction = await Transaction.findById(id);
-
-    if (!transaction) {
-      return res.status(404).json({
-        error: 'Transaktion nicht gefunden',
-        code: 'NOT_FOUND',
-      });
-    }
-
-    if (!transactionService.isOwner(transaction, userId)) {
-      return res.status(403).json({
-        error: 'Sie haben keine Berechtigung, diese Transaktion zu löschen',
-        code: 'FORBIDDEN',
-      });
-    }
+    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    if (!transaction) return;
 
     await Transaction.findByIdAndDelete(id);
 
@@ -361,12 +294,7 @@ async function deleteTransaction(req, res) {
       },
     });
   } catch (error) {
-    console.error('DELETE /api/transactions/:id Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Löschen der Transaktion',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'DELETE /api/transactions/:id', error);
   }
 }
 
@@ -397,12 +325,7 @@ async function deleteAllTransactions(req, res) {
       },
     });
   } catch (error) {
-    console.error('DELETE /api/transactions Error:', error);
-    res.status(500).json({
-      error: 'Fehler beim Löschen aller Transaktionen',
-      code: 'SERVER_ERROR',
-      message: error.message,
-    });
+    handleServerError(res, 'DELETE /api/transactions', error);
   }
 }
 

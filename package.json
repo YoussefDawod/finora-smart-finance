@@ -36,15 +36,15 @@
   },
   "lint-staged": {
     "finora-smart-finance-frontend/src/**/*.{js,jsx}": [
-      "eslint --fix",
-      "prettier --write"
+      "cd finora-smart-finance-frontend && eslint --fix",
+      "cd finora-smart-finance-frontend && prettier --write"
     ],
     "finora-smart-finance-frontend/src/**/*.{scss,css}": [
-      "prettier --write"
+      "cd finora-smart-finance-frontend && prettier --write"
     ],
     "finora-smart-finance-api/**/*.js": [
-      "eslint --fix",
-      "prettier --write"
+      "cd finora-smart-finance-api && eslint --fix",
+      "cd finora-smart-finance-api && prettier --write"
     ]
   }
 }

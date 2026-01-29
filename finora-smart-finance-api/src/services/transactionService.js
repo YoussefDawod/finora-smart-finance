@@ -4,6 +4,7 @@
  */
 
 const Transaction = require('../models/Transaction');
+const { buildDateRangeFilter } = require('../utils/dateFilter');
 
 /**
  * Baut ein Filter-Objekt für Transaktions-Queries
@@ -30,23 +31,8 @@ function buildTransactionFilter(userId, params = {}) {
     filter.category = category;
   }
 
-  // Date Range Filter
-  if (startDate || endDate) {
-    filter.date = {};
-    if (startDate) {
-      const start = new Date(startDate);
-      if (!isNaN(start.getTime())) {
-        filter.date.$gte = start;
-      }
-    }
-    if (endDate) {
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999);
-      if (!isNaN(end.getTime())) {
-        filter.date.$lte = end;
-      }
-    }
-  }
+  const dateRangeFilter = buildDateRangeFilter({ startDate, endDate });
+  Object.assign(filter, dateRangeFilter);
 
   return filter;
 }

@@ -3,6 +3,17 @@ const router = express.Router();
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const logger = require('../utils/logger');
+const { sanitizeUser, sanitizeUsers } = require('../utils/userSanitizer');
+const {
+  validateUserQuery,
+  validateCreateUser,
+  validateUpdateUser,
+} = require('../validators/adminValidation');
+
+function handleServerError(res, context, error) {
+  logger.error(`${context} error:`, error);
+  return res.status(500).json({ success: false, message: error.message });
+}
 
 // ⚠️ SECURITY: Diese Routen sind NUR für Development!
 // In Production sollten sie deaktiviert oder mit Admin-Auth geschützt sein
@@ -20,68 +31,29 @@ router.use((req, res, next) => {
   next();
 });
 
-// Sensitive Fields entfernen (optional - für bessere Übersicht)
-function sanitizeUser(user, showSensitive = false) {
-  const obj = user.toObject();
-  if (!showSensitive) {
-    delete obj.passwordHash;
-    delete obj.twoFactorSecret;
-    delete obj.verificationToken;
-    delete obj.verificationExpires;
-    delete obj.passwordResetToken;
-    delete obj.passwordResetExpires;
-    delete obj.emailChangeToken;
-    delete obj.emailChangeNewEmail;
-    delete obj.emailChangeExpires;
-    delete obj.newEmailPending;
-    delete obj.refreshTokens;
-  }
-  delete obj.__v;
-  return obj;
-}
 
 // ============================================================================
 // 📊 GET /api/admin/users - Alle Users auflisten
 // ============================================================================
 router.get('/users', async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 50, 
-      search = '', 
-      sortBy = 'createdAt',
-      order = 'desc',
-      isVerified,
-      showSensitive = false 
-    } = req.query;
+    const { errors, query, pagination, sort, showSensitive } = validateUserQuery(req.query || {});
 
-    const query = {};
-    
-    // Suchfilter
-    if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-      ];
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: 'Validierungsfehler', errors });
     }
 
-    // Verifikationsfilter
-    if (isVerified !== undefined) {
-      query.isVerified = isVerified === 'true';
-    }
-
-    const skip = (page - 1) * limit;
-    const sortOrder = order === 'asc' ? 1 : -1;
+    const { page, limit, skip } = pagination;
 
     const [users, total] = await Promise.all([
       User.find(query)
-        .sort({ [sortBy]: sortOrder })
+        .sort(sort)
         .skip(skip)
-        .limit(parseInt(limit)),
-      User.countDocuments(query)
+        .limit(limit),
+      User.countDocuments(query),
     ]);
 
-    const sanitizedUsers = users.map(u => sanitizeUser(u, showSensitive === 'true'));
+    const sanitizedUsers = sanitizeUsers(users, { includeSensitive: showSensitive });
 
     res.json({
       success: true,
@@ -89,15 +61,14 @@ router.get('/users', async (req, res) => {
         users: sanitizedUsers,
         pagination: {
           total,
-          page: parseInt(page),
+          page,
           pages: Math.ceil(total / limit),
-          limit: parseInt(limit)
-        }
-      }
+          limit,
+        },
+      },
     });
   } catch (error) {
-    logger.error('Admin: Get users error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Get users', error);
   }
 });
 
@@ -117,7 +88,7 @@ router.get('/users/:id', async (req, res) => {
     res.json({
       success: true,
       data: {
-        user: sanitizeUser(user, true), // Mit allen Feldern
+        user: sanitizeUser(user, { includeSensitive: true }), // Mit allen Feldern
         stats: {
           transactionCount,
           memberSince: user.createdAt,
@@ -126,8 +97,7 @@ router.get('/users/:id', async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Admin: Get user error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Get user', error);
   }
 });
 
@@ -170,12 +140,11 @@ router.get('/stats', async (req, res) => {
           usersLast30Days,
           totalTransactions
         },
-        recentUsers: recentUsers.map(u => sanitizeUser(u))
+        recentUsers: sanitizeUsers(recentUsers)
       }
     });
   } catch (error) {
-    logger.error('Admin: Get stats error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Get stats', error);
   }
 });
 
@@ -184,34 +153,31 @@ router.get('/stats', async (req, res) => {
 // ============================================================================
 router.post('/users', async (req, res) => {
   try {
-    const { name, password, email, isVerified = false, lastName, phone } = req.body || {};
+    const { errors, data } = validateCreateUser(req.body || {});
 
-    if (!name || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Felder name und password sind erforderlich'
-      });
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: 'Validierungsfehler', errors });
     }
 
-    const existsByName = await User.findOne({ name });
+    const existsByName = await User.findOne({ name: data.name });
     if (existsByName) {
       return res.status(409).json({ success: false, message: 'Name ist bereits vergeben' });
     }
 
-    if (email) {
-      const existsByEmail = await User.findOne({ email });
+    if (data.email) {
+      const existsByEmail = await User.findOne({ email: data.email });
       if (existsByEmail) {
         return res.status(409).json({ success: false, message: 'E-Mail ist bereits vergeben' });
       }
     }
 
     const user = new User({
-      name: name.trim(),
-      email: email ? String(email).toLowerCase().trim() : undefined,
-      passwordHash: password, // wird im Model via pre-save Hook gehasht
-      isVerified: !!isVerified,
-      lastName: lastName || '',
-      phone: phone || null,
+      name: data.name,
+      email: data.email,
+      passwordHash: data.password, // wird im Model via pre-save Hook gehasht
+      isVerified: data.isVerified ?? false,
+      lastName: data.lastName || '',
+      phone: data.phone || null,
     });
 
     await user.save();
@@ -219,11 +185,10 @@ router.post('/users', async (req, res) => {
     return res.status(201).json({
       success: true,
       message: 'User erfolgreich erstellt',
-      data: sanitizeUser(user)
+      data: sanitizeUser(user),
     });
   } catch (error) {
-    logger.error('Admin: Create user error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Create user', error);
   }
 });
 
@@ -232,31 +197,35 @@ router.post('/users', async (req, res) => {
 // ============================================================================
 router.patch('/users/:id', async (req, res) => {
   try {
-    const { name, email, isVerified, lastName, phone } = req.body;
-    const user = await User.findById(req.params.id);
+    const { errors, updates } = validateUpdateUser(req.body || {});
 
+    if (errors.length > 0) {
+      return res.status(400).json({ success: false, message: 'Validierungsfehler', errors });
+    }
+
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User nicht gefunden' });
     }
 
-    // Felder aktualisieren
-    if (name !== undefined) user.name = name;
-    if (email !== undefined) user.email = email || null;
-    if (isVerified !== undefined) user.isVerified = isVerified;
-    if (lastName !== undefined) user.lastName = lastName;
-    if (phone !== undefined) user.phone = phone;
+    if (updates.email !== undefined && updates.email !== null) {
+      const existsByEmail = await User.findOne({ email: updates.email, _id: { $ne: user._id } });
+      if (existsByEmail) {
+        return res.status(409).json({ success: false, message: 'E-Mail ist bereits vergeben' });
+      }
+    }
 
+    Object.assign(user, updates);
     await user.save();
     logger.info(`Admin: User ${user._id} updated`);
 
     res.json({
       success: true,
       message: 'User erfolgreich aktualisiert',
-      data: sanitizeUser(user)
+      data: sanitizeUser(user),
     });
   } catch (error) {
-    logger.error('Admin: Update user error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Update user', error);
   }
 });
 
@@ -283,12 +252,11 @@ router.delete('/users/:id', async (req, res) => {
       message: 'User und alle Transaktionen erfolgreich gelöscht',
       data: {
         deletedUser: user.name,
-        deletedTransactions: deletedTransactions.deletedCount
-      }
+        deletedTransactions: deletedTransactions.deletedCount,
+      },
     });
   } catch (error) {
-    logger.error('Admin: Delete user error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Delete user', error);
   }
 });
 
@@ -324,8 +292,7 @@ router.post('/users/:id/reset-password', async (req, res) => {
       message: 'Passwort erfolgreich zurückgesetzt'
     });
   } catch (error) {
-    logger.error('Admin: Reset password error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Reset password', error);
   }
 });
 
@@ -360,8 +327,7 @@ router.delete('/users', async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Admin: Delete all users error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    handleServerError(res, 'Admin: Delete all users', error);
   }
 });
 
