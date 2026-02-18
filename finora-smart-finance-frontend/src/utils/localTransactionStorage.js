@@ -62,6 +62,7 @@ function writeStorage(transactions) {
     // QuotaExceededError - Speicher ist voll!
     if (e.name === 'QuotaExceededError' || e.code === 22) {
       globalThis.window?.dispatchEvent(
+        // eslint-disable-next-line no-undef
         new CustomEvent('toast:add', {
           detail: {
             type: 'error',
@@ -109,6 +110,7 @@ export function createLocalTransaction(data) {
     // Delay von 2 Sekunden damit User die Transaction erst sieht
     setTimeout(() => {
       globalThis.window?.dispatchEvent(
+        // eslint-disable-next-line no-undef
         new CustomEvent('toast:add', {
           detail: {
             type: 'info',
