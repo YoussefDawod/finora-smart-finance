@@ -76,6 +76,7 @@ export function useAuthStorage() {
         globalThis.sessionStorage?.removeItem(TOKEN_KEY);
         
         // Optional: Event dispatchen für Logout
+        // eslint-disable-next-line no-undef
         globalThis.window?.dispatchEvent(new CustomEvent('auth:token-mismatch'));
         
         return null;

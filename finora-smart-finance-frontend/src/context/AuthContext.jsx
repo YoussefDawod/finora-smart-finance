@@ -3,7 +3,7 @@
  * Schlanker Context Provider mit extrahierten Hooks und Reducer
  */
 
-import { useReducer, useEffect, useCallback, createContext } from 'react';
+import { useReducer, useEffect, createContext } from 'react';
 import authService from '@/api/authService';
 import { persistUserPreferences } from '@/utils/userPreferences';
 import { authReducer, initialState, AUTH_ACTIONS } from './reducers/authReducer';

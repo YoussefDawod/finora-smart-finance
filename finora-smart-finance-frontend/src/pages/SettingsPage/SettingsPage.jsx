@@ -13,7 +13,6 @@ import {
   FiSave,
   FiSliders,
   FiSun,
-  FiDroplet,
   FiShield,
   FiDollarSign,
   FiBarChart2,

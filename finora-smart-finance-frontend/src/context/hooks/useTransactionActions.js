@@ -12,9 +12,9 @@ import { ACTIONS } from '../reducers/transactionReducer';
  * Custom Hook für Transaction CRUD Operations
  * @param {Function} dispatch - Reducer dispatch function
  * @param {Object} state - Current state
- * @param {Object} options - { isAuthenticated, fetchDashboardData, fetchTransactions, setPage }
+ * @param {Object} options - { isAuthenticated, fetchDashboardData, setPage }
  */
-export function useTransactionActions(dispatch, state, { isAuthenticated, fetchDashboardData, fetchTransactions, setPage }) {
+export function useTransactionActions(dispatch, state, { isAuthenticated, fetchDashboardData, setPage }) {
   // ──────────────────────────────────────────────────────────────────────
   // CREATE - Add new transaction (mit Optimistic UI)
   // ──────────────────────────────────────────────────────────────────────
