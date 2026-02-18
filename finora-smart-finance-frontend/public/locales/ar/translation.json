@@ -642,7 +642,7 @@
     "deleteConfirmLabel": "اكتب \"DELETE\" للتأكيد:",
     "deleteButton": "حذف الحساب نهائيًا"
   },
-  "errors": {
+  "errorPages": {
     "notFoundTitle": "الصفحة غير موجودة",
     "notFoundSubtitle": "هذه الصفحة غير موجودة أو تم نقلها.",
     "backToDashboard": "العودة إلى لوحة التحكم",

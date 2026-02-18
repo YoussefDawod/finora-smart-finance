@@ -53,7 +53,7 @@ describe('LoginService', () => {
   // authenticateUser Tests
   // ============================================
   describe('authenticateUser', () => {
-    it('should authenticate user with correct credentials', async () => {
+    it('should authenticate user with correct credentials (by name)', async () => {
       const mockUser = {
         _id: 'user-123',
         name: 'Max Mustermann',
@@ -66,7 +66,25 @@ describe('LoginService', () => {
 
       expect(result.success).toBe(true);
       expect(result.user).toEqual(mockUser);
+      expect(User.findOne).toHaveBeenCalledWith({ name: 'Max Mustermann' });
       expect(mockUser.validatePassword).toHaveBeenCalledWith('CorrectPassword123!');
+    });
+
+    it('should authenticate user with correct credentials (by email)', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        email: 'max@example.com',
+        validatePassword: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('max@example.com', 'CorrectPassword123!');
+
+      expect(result.success).toBe(true);
+      expect(result.user).toEqual(mockUser);
+      expect(User.findOne).toHaveBeenCalledWith({ email: 'max@example.com' });
     });
 
     it('should reject non-existent user', async () => {

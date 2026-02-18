@@ -12,6 +12,7 @@ const {
   validateCreateUser,
   validateUpdateUser,
 } = require('../validators/adminValidation');
+const { validatePassword } = require('../validators/authValidation');
 
 // ⚠️ SECURITY: Diese Routen sind NUR für Development!
 // In Production sollten sie deaktiviert oder mit Admin-Auth geschützt sein
@@ -283,10 +284,11 @@ router.post('/users/:id/reset-password', async (req, res) => {
   try {
     const { newPassword } = req.body;
     
-    if (!newPassword || newPassword.length < 6) {
+    const passwordCheck = validatePassword(newPassword);
+    if (!passwordCheck.valid) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Passwort muss mindestens 6 Zeichen lang sein' 
+        message: passwordCheck.error 
       });
     }
 

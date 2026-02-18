@@ -642,7 +642,7 @@
     "deleteConfirmLabel": "Geben Sie \"LÖSCHEN\" ein, um zu bestätigen:",
     "deleteButton": "Konto unwiderruflich löschen"
   },
-  "errors": {
+  "errorPages": {
     "notFoundTitle": "Seite nicht gefunden",
     "notFoundSubtitle": "Die Seite existiert nicht oder wurde verschoben.",
     "backToDashboard": "Zurück zum Dashboard",
