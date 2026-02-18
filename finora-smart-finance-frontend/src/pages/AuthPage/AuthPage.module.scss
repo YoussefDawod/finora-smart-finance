@@ -167,7 +167,7 @@
 
   @media (max-width: 480px) {
     max-width: 360px;
-    padding: var(--space-2xs);
+    padding: 0 max(var(--space-sm), 16px);
   }
 }
 
@@ -254,7 +254,6 @@
   position: absolute;
   border-radius: var(--r-full);
   background: radial-gradient(circle at 30% 30%, color-mix(in srgb, white 20%, transparent) 0%, color-mix(in srgb, white 8%, transparent) 40%, color-mix(in srgb, white 3%, transparent) 100%);
-  backdrop-filter: blur(2px);
   border: 1px solid color-mix(in srgb, white 12%, transparent);
   box-shadow: 0 8px 32px color-mix(in srgb, var(--shadow) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 15%, transparent);
 }
@@ -338,7 +337,6 @@
   gap: var(--space-2xs);
   padding: var(--space-2xs) var(--space-sm);
   background: color-mix(in srgb, white 12%, transparent);
-  backdrop-filter: blur(12px);
   border: 1px solid color-mix(in srgb, white 18%, transparent);
   border-radius: var(--r-full);
   color: var(--text-on-primary);

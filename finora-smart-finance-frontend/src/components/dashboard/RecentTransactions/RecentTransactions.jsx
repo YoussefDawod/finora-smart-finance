@@ -10,6 +10,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
 import { translateCategory } from '@/utils/categoryTranslations';
+import { SkeletonTableRow } from '@/components/common/Skeleton';
 import { useTranslation } from 'react-i18next';
 import styles from './RecentTransactions.module.scss';
 
@@ -50,13 +51,6 @@ export const RecentTransactions = () => {
     },
   };
 
-  const skeletonVariants = {
-    animate: {
-      opacity: [0.7, 1, 0.7],
-      transition: { duration: 2, repeat: Infinity },
-    },
-  };
-
   // ──────────────────────────────────────────────────────────────────────
   // LOADING STATE
   // ──────────────────────────────────────────────────────────────────────
@@ -64,23 +58,18 @@ export const RecentTransactions = () => {
     return (
       <motion.div
         className={styles.container}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
         <div className={styles.header}>
           <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
         </div>
-        <div className={styles.skeletons}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className={styles.skeleton}
-              variants={skeletonVariants}
-              animate="animate"
-            />
-          ))}
-        </div>
+        <SkeletonTableRow 
+          columns={3} 
+          hasIcon 
+          count={5} 
+          density="compact" 
+        />
       </motion.div>
     );
   }

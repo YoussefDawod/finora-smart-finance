@@ -1,0 +1,88 @@
+// ============================================
+// 💀 SKELETON LOADING COMPONENT
+// ============================================
+// Verwendet CSS Custom Properties aus:
+// - src/styles/variables.scss (--skeleton-from, --skeleton-to, --skeleton-duration)
+// - src/styles/themes/light.scss & dark.scss (Theme-spezifische Werte)
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// WRAPPER
+// ============================================
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.wrapperInline {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  width: auto;
+}
+
+// ============================================
+// BASE SKELETON
+// ============================================
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-from, rgba(0, 0, 0, 0.04)) 0%,
+    var(--skeleton-to, rgba(0, 0, 0, 0.08)) 50%,
+    var(--skeleton-from, rgba(0, 0, 0, 0.04)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer var(--skeleton-duration, 1.5s) ease-in-out infinite;
+  display: block;
+  flex-shrink: 0;
+}
+
+.noAnimation {
+  animation: none;
+  background: var(--skeleton-from, rgba(0, 0, 0, 0.04));
+}
+
+// ============================================
+// SHAPE VARIANTS
+// ============================================
+.line {
+  border-radius: var(--r-md);
+}
+
+.circle {
+  border-radius: var(--r-full);
+}
+
+.rect {
+  border-radius: var(--r-lg);
+}
+
+.text {
+  border-radius: var(--r-sm);
+}
+
+// ============================================
+// ANIMATION
+// ============================================
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .skeleton {
+    animation: none;
+    background: var(--skeleton-from, rgba(0, 0, 0, 0.04));
+    opacity: 0.7;
+  }
+}

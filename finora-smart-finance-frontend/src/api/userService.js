@@ -30,22 +30,19 @@ export const userService = {
   updatePreferences: (data) => client.put(ENDPOINTS.users.updatePreferences, data),
 
   /**
-   * Change password
+   * Change password (Backend erwartet POST)
    * @param {string} currentPassword
    * @param {string} newPassword
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
   changePassword: (currentPassword, newPassword) =>
-    client.put(ENDPOINTS.users.password, { currentPassword, newPassword }),
+    client.post(ENDPOINTS.users.password, { currentPassword, newPassword }),
 
   /**
-   * Change email
-   * @param {string} newEmail
-   * @param {string} password
-   * @returns {Promise<AxiosResponse<{ message: string, pendingEmail?: string }>>}
+   * Get budget status
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  changeEmail: (newEmail, password) =>
-    client.put(ENDPOINTS.users.email, { newEmail, password }),
+  getBudgetStatus: () => client.get(ENDPOINTS.users.budgetStatus),
 
   /**
    * Delete user account
@@ -56,17 +53,16 @@ export const userService = {
     client.delete(ENDPOINTS.users.deleteAccount, { data: { password, confirmation: 'DELETE' } }),
 
   /**
-   * Enable 2FA
-   * @returns {Promise<AxiosResponse<{ secret: string, qrCode: string }>>}
+   * Get newsletter subscription status
+   * @returns {Promise<AxiosResponse<{ subscribed: boolean }>>}
    */
-  enable2FA: () => client.post(ENDPOINTS.users.enable2FA),
+  getNewsletterStatus: () => client.get(ENDPOINTS.newsletter.status),
 
   /**
-   * Verify 2FA
-   * @param {string} token
-   * @returns {Promise<AxiosResponse<{ message: string, backupCodes?: string[] }>>}
+   * Toggle newsletter subscription
+   * @returns {Promise<AxiosResponse<{ subscribed: boolean }>>}
    */
-  verify2FA: (token) => client.post(ENDPOINTS.users.verify2FA, { token }),
+  toggleNewsletter: () => client.post(ENDPOINTS.newsletter.toggle),
 };
 
 export default userService;

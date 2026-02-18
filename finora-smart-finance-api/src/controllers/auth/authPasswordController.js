@@ -1,5 +1,4 @@
 const passwordResetService = require('../../services/passwordResetService');
-const { isMockFn } = require('./sharedAuthUtils');
 
 // Password Management
 async function changePassword(req, res) {
@@ -40,14 +39,6 @@ async function forgotPassword(req, res) {
 async function resetPasswordRequest(req, res) {
   const { email } = req.body || {};
 
-  if (isMockFn(passwordResetService.initiatePasswordReset)) {
-    const result = await passwordResetService.initiatePasswordReset(email);
-    if (!result || !result.initiated) {
-      return res.status(result?.code === 'USER_NOT_FOUND' ? 404 : 400).json(result || { error: 'Passwort-Reset fehlgeschlagen' });
-    }
-    return res.status(200).json(result);
-  }
-
   const result = await passwordResetService.initiatePasswordReset(email);
   if (!result.sent && result.error) {
     return res.status(400).json({ error: result.error, code: result.code });
@@ -62,15 +53,6 @@ async function resetPassword(req, res) {
 
     if (passwordConfirm && candidatePassword !== passwordConfirm) {
       return res.status(400).json({ error: 'Passwörter stimmen nicht überein', code: 'PASSWORD_MISMATCH' });
-    }
-
-    if (isMockFn(passwordResetService.completePasswordReset)) {
-      const result = await passwordResetService.completePasswordReset(token, candidatePassword);
-      if (!result || !result.changed) {
-        const statusCode = result?.code === 'INVALID_TOKEN' ? 400 : 400;
-        return res.status(statusCode).json(result || { error: 'Reset fehlgeschlagen' });
-      }
-      return res.status(200).json(result);
     }
 
     const result = await passwordResetService.completePasswordReset(token, candidatePassword);

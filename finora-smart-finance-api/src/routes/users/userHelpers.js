@@ -1,5 +1,6 @@
 // Shared helpers for user routes
 const User = require('../../models/User');
+const config = require('../../config/env');
 const logger = require('../../utils/logger');
 
 /**
@@ -19,13 +20,17 @@ async function loadUserOr404(userId, res) {
 
 /**
  * Zentrale Server-Error Behandlung
+ * Versteckt error.message in Production
  * @param {Object} res - Express Response
  * @param {string} context - Kontext für Logging
  * @param {Error} error - Fehler-Objekt
  */
 function handleServerError(res, context, error) {
   logger.error(`${context} error:`, error);
-  res.status(500).json({ success: false, message: 'Server error' });
+  res.status(500).json({
+    success: false,
+    message: config.nodeEnv !== 'production' ? error.message : 'Server error',
+  });
 }
 
 module.exports = {

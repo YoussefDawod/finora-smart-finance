@@ -49,10 +49,16 @@ export const transactionService = {
   /**
    * Get aggregated dashboard data (no full transaction list)
    * Returns: summary, trends, category breakdown, recent 5 transactions
+   * @param {Object} options - Optional filter parameters
+   * @param {number} [options.month] - Month (1-12)
+   * @param {number} [options.year] - Year
    * @returns {Promise<AxiosResponse<{ data: DashboardData }>>}
    */
-  getDashboardData: () => {
-    return client.get(`${ENDPOINTS.transactions.list}/stats/dashboard`);
+  getDashboardData: ({ month, year } = {}) => {
+    const params = {};
+    if (month) params.month = month;
+    if (year) params.year = year;
+    return client.get(`${ENDPOINTS.transactions.list}/stats/dashboard`, { params });
   },
 
   /**
@@ -112,27 +118,6 @@ export const transactionService = {
    */
   bulkDelete: (ids) => {
     return client.delete(ENDPOINTS.transactions.bulkDelete, { data: { ids } });
-  },
-
-  /**
-   * Export transactions as data (for PDF generation)
-   * @param {TransactionFilters} filters - Optional filters for export
-   * @param {number} [maxItems=1000] - Max items to export
-   * @returns {Promise<AxiosResponse<{ data: any[], pagination: PaginationMeta }>>}
-   */
-  getExportData: (filters = {}, maxItems = 1000) => {
-    return client.get(ENDPOINTS.transactions.list, { 
-      params: { ...filters, page: 1, limit: Math.min(maxItems, 100) } 
-    });
-  },
-
-  /**
-   * @deprecated Use getDashboardData() instead
-   * Get stats overview
-   */
-  getStats: (period = 'month', startDate, endDate) => {
-    const params = { period, startDate, endDate };
-    return client.get(ENDPOINTS.transactions.stats, { params });
   },
 };
 

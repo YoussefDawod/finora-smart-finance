@@ -5,7 +5,6 @@
  * 
  * FEATURES:
  * - Light/Dark/System Theme Auswahl
- * - Glassmorphic Effect Toggle
  * - Kompaktes, professionelles Design
  * - Responsive & Accessible
  * - Harmonisch mit Gesamtprojekt
@@ -18,8 +17,8 @@ import { FiSun, FiMoon, FiMonitor, FiCheck } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ThemeSelector.module.scss';
 
-function ThemeSelector({ isCollapsed = false }) {
-  const { theme, useGlass, systemPreference, isInitialized, setTheme, setGlassEnabled, resetToSystemPreference } = useTheme();
+function ThemeSelector({ isCollapsed = false, onClose }) {
+  const { theme, systemPreference, isInitialized, setTheme, resetToSystemPreference } = useTheme();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -31,6 +30,7 @@ function ThemeSelector({ isCollapsed = false }) {
     const handleClickOutside = (e) => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setIsOpen(false);
+        onClose?.();
       }
     };
 
@@ -38,7 +38,7 @@ function ThemeSelector({ isCollapsed = false }) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   // ============================================
   // CLOSE ON ESCAPE
@@ -47,6 +47,7 @@ function ThemeSelector({ isCollapsed = false }) {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
+        onClose?.();
       }
     };
 
@@ -54,7 +55,7 @@ function ThemeSelector({ isCollapsed = false }) {
       document.addEventListener('keydown', handleEscape);
       return () => document.removeEventListener('keydown', handleEscape);
     }
-  }, [isOpen]);
+  }, [isOpen, onClose]);
 
   if (!isInitialized) {
     return null;
@@ -100,11 +101,10 @@ function ThemeSelector({ isCollapsed = false }) {
       setTheme(selectedTheme);
     }
     setIsOpen(false);
+    onClose?.();
   };
 
-  const handleGlassToggle = () => {
-    setGlassEnabled(!useGlass);
-  };
+
 
   const CurrentIcon = getCurrentIcon();
 
@@ -174,28 +174,7 @@ function ThemeSelector({ isCollapsed = false }) {
               </div>
             </div>
 
-            {/* Divider */}
-            <div className={styles.divider} />
 
-            {/* Glass Effect Section */}
-            <div className={styles.section}>
-              <div className={styles.sectionTitle}>{t('themeSelector.effects')}</div>
-              <motion.button
-                className={styles.toggleOption}
-                onClick={handleGlassToggle}
-                whileHover={{ x: 2 }}
-                whileTap={{ scale: 0.96 }}
-              >
-                <span className={styles.toggleLabel}>{t('themeSelector.glassmorphic')}</span>
-                <div className={`${styles.toggle} ${useGlass ? styles.toggleActive : ''}`}>
-                  <motion.div
-                    className={styles.toggleThumb}
-                    layout
-                    transition={{ type: 'spring', stiffness: 700, damping: 30 }}
-                  />
-                </div>
-              </motion.button>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>

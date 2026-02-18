@@ -23,8 +23,8 @@ async function sendTransactionNotification(user, transaction) {
 
   const name = user.name || 'Nutzer';
   const subject = transaction.type === 'income'
-    ? '📈 Neue Einnahme erfasst - Finora'
-    : '📉 Neue Ausgabe erfasst - Finora';
+    ? 'Neue Einnahme erfasst - Finora'
+    : 'Neue Ausgabe erfasst - Finora';
 
   try {
     await sendEmail(user.email, subject, templates.transactionNotification(name, transaction));
@@ -57,7 +57,7 @@ async function sendBudgetAlert(user, alertData) {
   const name = user.name || 'Nutzer';
 
   try {
-    await sendEmail(user.email, '⚠️ Budget-Warnung - Finora', templates.budgetAlert(name, alertData));
+    await sendEmail(user.email, 'Budget-Warnung - Finora', templates.budgetAlert(name, alertData));
     return { sent: true };
   } catch (error) {
     logger.error(`Budget alert failed: ${error.message}`);
@@ -87,8 +87,8 @@ async function sendFinancialReport(user, reportData, period = 'weekly') {
 
   const name = user.name || 'Nutzer';
   const subject = period === 'weekly'
-    ? '📊 Dein Wochenbericht - Finora'
-    : '📊 Dein Monatsbericht - Finora';
+    ? 'Dein Wochenbericht - Finora'
+    : 'Dein Monatsbericht - Finora';
 
   try {
     await sendEmail(user.email, subject, templates.financialReport(name, reportData, period));

@@ -13,6 +13,7 @@ export default function Search({
   onSubmit,
   placeholder,
   ariaLabel,
+  isSearching = false,
 }) {
   const { t } = useTranslation();
   const resolvedPlaceholder = placeholder ?? t('transactions.searchPlaceholder');
@@ -23,9 +24,9 @@ export default function Search({
   };
 
   return (
-    <form className={styles.searchForm} onSubmit={handleSearch}>
-      <div className={styles.searchInputWrapper}>
-        <FiSearch className={styles.searchIcon} />
+    <form className={styles.searchForm} onSubmit={handleSearch} role="search">
+      <div className={`${styles.searchInputWrapper} ${isSearching ? styles.searching : ''}`}>
+        <FiSearch className={styles.searchIcon} aria-hidden="true" />
         <input
           type="text"
           className={styles.searchInput}
@@ -33,7 +34,15 @@ export default function Search({
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           aria-label={resolvedAriaLabel}
+          aria-busy={isSearching}
         />
+        {isSearching && (
+          <span 
+            className={styles.searchSpinner} 
+            aria-hidden="true"
+            role="status"
+          />
+        )}
       </div>
     </form>
   );

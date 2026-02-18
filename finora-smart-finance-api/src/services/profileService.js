@@ -14,7 +14,7 @@ const authService = require('./authService');
  * @returns {Object} Sanitized user profile
  */
 function getUserProfile(user) {
-  return authService.sanitizeUser(user);
+  return authService.sanitizeUserForAuth(user);
 }
 
 /**
@@ -45,7 +45,7 @@ async function updateUserProfile(userId, updateData = {}) {
 
   return {
     updated: true,
-    user: authService.sanitizeUser(user),
+    user: authService.sanitizeUserForAuth(user),
   };
 }
 

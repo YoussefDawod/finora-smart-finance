@@ -2,39 +2,11 @@ const User = require('../../models/User');
 const authService = require('../../services/authService');
 const registrationService = require('../../services/registrationService');
 const loginService = require('../../services/loginService');
-const { isMockFn } = require('./sharedAuthUtils');
 
 // Registration & Login
 async function register(req, res) {
   try {
     const { name, password, email, understoodNoEmailReset } = req.body || {};
-
-    if (isMockFn(registrationService.registerUser)) {
-      const result = await registrationService.registerUser(req.body || {}, {
-        userAgent: req.headers['user-agent'],
-        ip: req.ip,
-      });
-
-      if (!result || result.success === undefined) {
-        return res.status(500).json({ success: false, error: 'Registrierung fehlgeschlagen' });
-      }
-
-      if (!result.success) {
-        if (result.code === 'EMAIL_EXISTS') {
-          return res.status(409).json(result);
-        }
-        if (result.code === 'VALIDATION_ERROR') {
-          return res.status(400).json(result);
-        }
-        return res.status(400).json(result);
-      }
-
-      if (result.refreshToken) {
-        res.cookie('refreshToken', result.refreshToken, { httpOnly: true, sameSite: 'lax' });
-      }
-
-      return res.status(201).json({ success: true, ...result });
-    }
 
     const validation = await registrationService.validateRegistrationInput(
       name,
@@ -70,22 +42,6 @@ async function register(req, res) {
 async function login(req, res, next) {
   try {
     const { name, email, password } = req.body || {};
-
-    if (isMockFn(loginService.authenticateUser)) {
-      const result = await loginService.authenticateUser(email || name, password, req.body || {});
-
-      if (!result || !result.success) {
-        const statusCode = result?.code === 'EMAIL_NOT_VERIFIED' ? 403 : result?.code === 'INVALID_CREDENTIALS' ? 401 : 400;
-        return res.status(statusCode).json(result || { success: false, code: 'INVALID_INPUT' });
-      }
-
-      const refreshToken = result.refreshToken || result.tokens?.refreshToken;
-      if (refreshToken) {
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'lax' });
-      }
-
-      return res.status(200).json({ success: true, ...result });
-    }
 
     if ((!name && !email) || !password) {
       return res.status(400).json({ error: 'Name/Email und Passwort erforderlich', code: 'INVALID_INPUT' });

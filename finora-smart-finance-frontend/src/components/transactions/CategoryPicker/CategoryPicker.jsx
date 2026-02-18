@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { CategoryIcon } from '@/utils/categoryIcons';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiChevronDown, FiCheck } from 'react-icons/fi';
 import styles from './CategoryPicker.module.scss';
 
 export const CategoryPicker = ({
@@ -117,7 +117,7 @@ export const CategoryPicker = ({
                     {translateCategory(category, t)}
                   </span>
                   {value === category && (
-                    <span className={styles.checkmark}>✓</span>
+                    <span className={styles.checkmark}><FiCheck /></span>
                   )}
                 </motion.button>
               ))}

@@ -214,13 +214,6 @@ $bp-2xl: 1536px;
   background: radial-gradient(circle, $start, $end);
 }
 
-// Glassmorphism
-@mixin glass($blur: 16px, $opacity: 0.1) {
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
-  background: color-mix(in srgb, var(--background) #{percentage($opacity)}, transparent);
-}
-
 // Shadows (nutzt CSS vars)
 @mixin shadow($level: md) {
   @if $level == sm { box-shadow: var(--sh-sm); }
@@ -506,6 +499,53 @@ $bp-2xl: 1536px;
   );
   background-size: 200% 100%;
   animation: skeleton-loading var(--skeleton-duration) ease-in-out infinite;
+  will-change: background-position;
+}
+
+// ============================================
+// 🚀 ANIMATION PERFORMANCE
+// ============================================
+
+// GPU-beschleunigte Animationen
+@mixin gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+// Will-change für bekannte Animationen (mit auto-reset)
+@mixin will-animate($properties...) {
+  will-change: $properties;
+  
+  // Auto-reset nach Animation (optional via Klasse)
+  &.animation-complete {
+    will-change: auto;
+  }
+}
+
+// Optimierte Shimmer-Animation
+@mixin shimmer-optimized {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--tx) 8%, transparent) 0%,
+    color-mix(in srgb, var(--tx) 15%, transparent) 50%,
+    color-mix(in srgb, var(--tx) 8%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  will-change: background-position;
+  
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    background: color-mix(in srgb, var(--tx) 10%, transparent);
+  }
+}
+
+// Reduzierte Animation für reduced-motion
+@mixin motion-safe($animation) {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: $animation;
+  }
 }
 
 // ============================================

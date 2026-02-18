@@ -1,0 +1,103 @@
+/**
+ * @fileoverview PageFallback Styles
+ * @description Layout-Styles für Lazy-Loading Skeleton-Fallbacks
+ */
+
+/* ============================================
+   SHARED
+   ============================================ */
+
+.contentPage,
+.dashboard,
+.transactions,
+.settings {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--s-lg) var(--s-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================
+   CONTENT PAGE (Terms, Privacy, About, etc.)
+   ============================================ */
+
+.contentHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-sm);
+  margin-bottom: var(--s-xl);
+}
+
+.contentBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.contentSpacer {
+  height: var(--s-lg);
+}
+
+/* ============================================
+   DASHBOARD
+   ============================================ */
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--s-md);
+  margin-bottom: var(--s-lg);
+}
+
+.chartArea {
+  margin-bottom: var(--s-lg);
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-md);
+}
+
+/* ============================================
+   TRANSACTIONS
+   ============================================ */
+
+.filterBar {
+  display: flex;
+  gap: var(--s-sm);
+  margin-bottom: var(--s-lg);
+  flex-wrap: wrap;
+}
+
+.tableRows {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================
+   SETTINGS / PROFILE
+   ============================================ */
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-lg);
+}
+
+.settingsSections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-xl);
+}
+
+.settingsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-sm);
+}

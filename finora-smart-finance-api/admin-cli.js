@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 
 /**
- * 🛠️ Admin CLI Tool für User-Verwaltung
+ * Admin CLI Tool für User-Verwaltung
  * Usage: node admin-cli.js [command] [options]
  */
 
-const API_URL = process.env.API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.API_URL
+  ? `${process.env.API_URL}/api`
+  : 'http://localhost:5000/api';
 
 const commands = {
   help: () => {
     console.log(`
-📋 Admin CLI - User Management Tool
+Admin CLI - User Management Tool
 =====================================
 
 Verfügbare Befehle:
@@ -23,7 +25,7 @@ Verfügbare Befehle:
   node admin-cli.js create <name> <pwd> [email] [--verified] - User anlegen
   node admin-cli.js delete <userId>          - User löschen
   node admin-cli.js reset-password <userId>  - Passwort zurücksetzen
-  node admin-cli.js clean-all                - ALLE Users löschen (⚠️)
+  node admin-cli.js clean-all                - ALLE Users löschen (WARNUNG)
 
 Beispiele:
 
@@ -49,12 +51,12 @@ Beispiele:
     const data = await res.json();
     
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
     const { overview, recentUsers } = data.data;
-    console.log('\n📊 User Statistics');
+    console.log('\nUser Statistics');
     console.log('==================');
     console.log(`Total Users:       ${overview.totalUsers}`);
     console.log(`Verified:          ${overview.verifiedUsers}`);
@@ -63,9 +65,9 @@ Beispiele:
     console.log(`Last 30 days:      ${overview.usersLast30Days}`);
     console.log(`Total Transactions: ${overview.totalTransactions}`);
     
-    console.log('\n👥 Recent Users:');
+    console.log('\nRecent Users:');
     recentUsers.forEach((user, i) => {
-      console.log(`  ${i+1}. ${user.name} (${user.email || 'no email'}) - ${user.isVerified ? '✅' : '⏳'}`);
+      console.log(`  ${i+1}. ${user.name} (${user.email || 'no email'}) - ${user.isVerified ? 'verified' : 'pending'}`);
     });
     console.log('');
   },
@@ -77,7 +79,7 @@ Beispiele:
     const isVerified = args.includes('--verified');
 
     if (!name || !password) {
-      console.error('❌ Usage: node admin-cli.js create <name> <pwd> [email] [--verified]');
+      console.error('Usage: node admin-cli.js create <name> <pwd> [email] [--verified]');
       return;
     }
 
@@ -89,16 +91,16 @@ Beispiele:
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
     const user = data.data;
-    console.log('✅ User erstellt:');
+    console.log('User erstellt:');
     console.log(`   ID: ${user._id}`);
     console.log(`   Name: ${user.name}`);
     console.log(`   Email: ${user.email || 'keine'}`);
-    console.log(`   Verifiziert: ${user.isVerified ? '✅' : '⏳'}`);
+    console.log(`   Verifiziert: ${user.isVerified ? 'Ja' : 'Nein'}`);
   },
 
   list: async (args) => {
@@ -119,18 +121,18 @@ Beispiele:
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
     const { users, pagination } = data.data;
-    console.log(`\n👥 Users (${pagination.total} total)\n`);
+    console.log(`\nUsers (${pagination.total} total)\n`);
     
     users.forEach((user, i) => {
       console.log(`${i+1}. [${user._id}]`);
       console.log(`   Name: ${user.name}${user.lastName ? ' ' + user.lastName : ''}`);
       console.log(`   Email: ${user.email || 'keine'}`);
-      console.log(`   Status: ${user.isVerified ? '✅ Verifiziert' : '⏳ Nicht verifiziert'}`);
+      console.log(`   Status: ${user.isVerified ? 'Verifiziert' : 'Nicht verifiziert'}`);
       console.log(`   Erstellt: ${new Date(user.createdAt).toLocaleDateString('de-DE')}`);
       console.log('');
     });
@@ -139,7 +141,7 @@ Beispiele:
   get: async (args) => {
     const userId = args[0];
     if (!userId) {
-      console.error('❌ User-ID fehlt! Usage: node admin-cli.js get <userId>');
+      console.error('User-ID fehlt! Usage: node admin-cli.js get <userId>');
       return;
     }
 
@@ -147,18 +149,18 @@ Beispiele:
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
     const { user, stats } = data.data;
-    console.log('\n👤 User Details');
+    console.log('\nUser Details');
     console.log('================');
     console.log('ID:           ', user._id);
     console.log('Name:         ', user.name, user.lastName || '');
     console.log('Email:        ', user.email || 'keine');
     console.log('Phone:        ', user.phone || 'keine');
-    console.log('Verified:     ', user.isVerified ? '✅ Ja' : '⏳ Nein');
+    console.log('Verified:     ', user.isVerified ? 'Ja' : 'Nein');
     console.log('Created:      ', new Date(user.createdAt).toLocaleString('de-DE'));
     console.log('Last Login:   ', user.lastLogin ? new Date(user.lastLogin).toLocaleString('de-DE') : 'nie');
     console.log('Transactions: ', stats.transactionCount);
@@ -172,20 +174,20 @@ Beispiele:
   delete: async (args) => {
     const userId = args[0];
     if (!userId) {
-      console.error('❌ User-ID fehlt! Usage: node admin-cli.js delete <userId>');
+      console.error('User-ID fehlt! Usage: node admin-cli.js delete <userId>');
       return;
     }
 
-    console.log('⚠️  Lösche User und alle Transaktionen...');
+    console.log('WARNUNG: Lösche User und alle Transaktionen...');
     const res = await fetch(`${API_URL}/admin/users/${userId}`, { method: 'DELETE' });
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
-    console.log('✅ Erfolgreich gelöscht:');
+    console.log('Erfolgreich gelöscht:');
     console.log('   User:', data.data.deletedUser);
     console.log('   Transaktionen:', data.data.deletedTransactions);
   },
@@ -195,7 +197,7 @@ Beispiele:
     const newPassword = args[1] || 'test123';
 
     if (!userId) {
-      console.error('❌ User-ID fehlt! Usage: node admin-cli.js reset-password <userId> [newPassword]');
+      console.error('User-ID fehlt! Usage: node admin-cli.js reset-password <userId> [newPassword]');
       return;
     }
 
@@ -207,16 +209,15 @@ Beispiele:
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
-    console.log('✅ Passwort erfolgreich zurückgesetzt auf:', newPassword);
+    console.log('Passwort erfolgreich zurückgesetzt auf:', newPassword);
   },
 
   'clean-all': async () => {
-    console.log('\n⚠️ ⚠️ ⚠️  WARNUNG ⚠️ ⚠️ ⚠️');
-    console.log('Dies wird ALLE Users und Transaktionen löschen!');
+    console.log('\nWARNUNG: Dies wird ALLE Users und Transaktionen löschen!');
     console.log('Drücke STRG+C zum Abbrechen...\n');
 
     // In einer echten Anwendung würdest du readline verwenden für Bestätigung
@@ -228,11 +229,11 @@ Beispiele:
     const data = await res.json();
 
     if (!data.success) {
-      console.error('❌ Error:', data.message);
+      console.error('Error:', data.message);
       return;
     }
 
-    console.log('✅ Alle Daten gelöscht:');
+    console.log('Alle Daten gelöscht:');
     console.log('   Users:', data.data.deletedUsers);
     console.log('   Transaktionen:', data.data.deletedTransactions);
   }
@@ -249,7 +250,7 @@ const main = async () => {
 
   const cmd = commands[command];
   if (!cmd) {
-    console.error(`❌ Unbekannter Befehl: ${command}`);
+    console.error(`Unbekannter Befehl: ${command}`);
     console.log('Verwende "node admin-cli.js help" für Hilfe');
     return;
   }
@@ -257,9 +258,9 @@ const main = async () => {
   try {
     await cmd(args);
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error('Error:', error.message);
     if (error.cause?.code === 'ECONNREFUSED') {
-      console.error('💡 Tipp: Ist der API-Server gestartet? (npm run dev)');
+      console.error('Tipp: Ist der API-Server gestartet? (npm run dev)');
     }
   }
 };

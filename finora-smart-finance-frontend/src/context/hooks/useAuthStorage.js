@@ -61,9 +61,28 @@ export function useAuthStorage() {
 
   const getToken = useCallback(() => {
     try {
-      // Check both storages
-      return globalThis.localStorage?.getItem(TOKEN_KEY) || 
-             globalThis.sessionStorage?.getItem(TOKEN_KEY);
+      const localToken = globalThis.localStorage?.getItem(TOKEN_KEY);
+      const sessionToken = globalThis.sessionStorage?.getItem(TOKEN_KEY);
+      
+      // Wenn beide existieren und UNTERSCHIEDLICH sind - WARNUNG!
+      if (localToken && sessionToken && localToken !== sessionToken) {
+        globalThis.console?.error(
+          'Token mismatch between storages detected! Clearing both for security.',
+          { localToken: localToken.slice(0, 10) + '...', sessionToken: sessionToken.slice(0, 10) + '...' }
+        );
+        
+        // Beide clearen - User muss sich neu anmelden
+        globalThis.localStorage?.removeItem(TOKEN_KEY);
+        globalThis.sessionStorage?.removeItem(TOKEN_KEY);
+        
+        // Optional: Event dispatchen für Logout
+        globalThis.window?.dispatchEvent(new CustomEvent('auth:token-mismatch'));
+        
+        return null;
+      }
+      
+      // Normal case: Return token from either storage
+      return localToken || sessionToken;
     } catch (error) {
       globalThis.console?.error('Failed to get token:', error);
       return null;
@@ -93,8 +112,18 @@ export function useAuthStorage() {
 
   const getRefreshToken = useCallback(() => {
     try {
-      return globalThis.localStorage?.getItem(REFRESH_TOKEN_KEY) || 
-             globalThis.sessionStorage?.getItem(REFRESH_TOKEN_KEY);
+      const localRefresh = globalThis.localStorage?.getItem(REFRESH_TOKEN_KEY);
+      const sessionRefresh = globalThis.sessionStorage?.getItem(REFRESH_TOKEN_KEY);
+      
+      // Gleiche Logik wie getToken: Conflict Detection
+      if (localRefresh && sessionRefresh && localRefresh !== sessionRefresh) {
+        globalThis.console?.error('Refresh token mismatch detected! Clearing both.');
+        globalThis.localStorage?.removeItem(REFRESH_TOKEN_KEY);
+        globalThis.sessionStorage?.removeItem(REFRESH_TOKEN_KEY);
+        return null;
+      }
+      
+      return localRefresh || sessionRefresh;
     } catch (error) {
       globalThis.console?.error('Failed to get refresh token:', error);
       return null;

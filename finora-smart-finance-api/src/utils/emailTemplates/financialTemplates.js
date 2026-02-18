@@ -23,7 +23,7 @@ function transactionNotification(name, transaction) {
         <strong>Beschreibung:</strong> ${transaction.description}
       </div>
       <p style="text-align: center;">
-        <a href="${frontendBaseUrl}/transactions" class="button">📊 Zu meinen Transaktionen</a>
+        <a href="${frontendBaseUrl}/transactions" class="button">Zu meinen Transaktionen</a>
       </p>
       <p style="font-size: 14px; color: #6b7280;">
         Wenn diese Buchung nicht von dir stammt, melde dich bitte sofort an und prüfe dein Konto.
@@ -52,7 +52,7 @@ function budgetAlert(name, alertData) {
 
     return baseLayout(`
       <div class="content">
-        <h2>⚠️ Achtung: Negativer Kontostand</h2>
+        <h2>Achtung: Negativer Kontostand</h2>
         <p>Hallo ${name},</p>
         <p>Dein Gesamtsaldo ist ins Minus gerutscht. Hier die Details:</p>
         <div class="warning">
@@ -69,7 +69,7 @@ function budgetAlert(name, alertData) {
         ` : ''}
         <p>Überlege, wie du deine Finanzen wieder ausgleichen kannst. Vielleicht gibt es Ausgaben, die du reduzieren könntest?</p>
         <p style="text-align: center;">
-          <a href="${frontendBaseUrl}/transactions" class="button">📊 Finanzen prüfen</a>
+          <a href="${frontendBaseUrl}/transactions" class="button">Finanzen prüfen</a>
         </p>
       </div>
       <div class="footer">
@@ -87,7 +87,7 @@ function budgetAlert(name, alertData) {
 
   return baseLayout(`
     <div class="content">
-      <h2>${isExceeded ? '🚨 Budget überschritten!' : '⚠️ Budget-Warnung'}</h2>
+      <h2>${isExceeded ? 'Budget überschritten!' : 'Budget-Warnung'}</h2>
       <p>Hallo ${name},</p>
       <p>${isExceeded 
         ? 'Du hast dein monatliches Budget überschritten!' 
@@ -108,7 +108,7 @@ function budgetAlert(name, alertData) {
       ` : ''}
       <p>Überlege, ob du in den verbleibenden Tagen des Monats noch Einsparungspotenzial hast.</p>
       <p style="text-align: center;">
-        <a href="${frontendBaseUrl}/transactions" class="button">📊 Ausgaben prüfen</a>
+        <a href="${frontendBaseUrl}/transactions" class="button">Ausgaben prüfen</a>
       </p>
     </div>
     <div class="footer">
@@ -136,7 +136,7 @@ function financialReport(name, reportData, period = 'weekly') {
 
   return baseLayout(`
     <div class="content">
-      <h2>Dein ${periodLabel} 📊</h2>
+      <h2>Dein ${periodLabel}</h2>
       <p>Hallo ${name},</p>
       <p>hier ist deine Finanzübersicht für den Zeitraum ${startDate} - ${endDate}:</p>
       
@@ -167,7 +167,7 @@ function financialReport(name, reportData, period = 'weekly') {
       ` : ''}
 
       <p style="text-align: center;">
-        <a href="${frontendBaseUrl}/dashboard" class="button">📈 Zum Dashboard</a>
+        <a href="${frontendBaseUrl}/dashboard" class="button">Zum Dashboard</a>
       </p>
     </div>
     <div class="footer">

@@ -12,6 +12,19 @@ import { ACTIONS } from '../reducers/transactionReducer';
  */
 export function useTransactionFilters(dispatch) {
   // ──────────────────────────────────────────────────────────────────────
+  // DASHBOARD MONTH/YEAR
+  // ──────────────────────────────────────────────────────────────────────
+  const setDashboardMonth = useCallback(
+    (month, year) => {
+      dispatch({
+        type: ACTIONS.SET_DASHBOARD_MONTH,
+        payload: { month, year },
+      });
+    },
+    [dispatch]
+  );
+
+  // ──────────────────────────────────────────────────────────────────────
   // FILTER
   // ──────────────────────────────────────────────────────────────────────
   const setFilter = useCallback(
@@ -43,6 +56,7 @@ export function useTransactionFilters(dispatch) {
   }, [dispatch]);
 
   return {
+    setDashboardMonth,
     setFilter,
     setSort,
     clearFilter,

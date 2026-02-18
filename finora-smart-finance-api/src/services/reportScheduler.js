@@ -58,7 +58,7 @@ async function calculateReportData(userId, startDate, endDate) {
  * @returns {Promise<Object>} Ergebnis mit Statistiken
  */
 async function sendWeeklyReports() {
-  logger.info('📊 Starting weekly report distribution...');
+  logger.info('Starting weekly report distribution...');
 
   // Letzte 7 Tage
   const endDate = new Date();
@@ -73,7 +73,7 @@ async function sendWeeklyReports() {
     'preferences.notificationCategories.reports': true,
   });
 
-  logger.info(`📊 Found ${users.length} users eligible for weekly reports`);
+  logger.info(`Found ${users.length} users eligible for weekly reports`);
 
   let sent = 0;
   let failed = 0;
@@ -101,7 +101,7 @@ async function sendWeeklyReports() {
     }
   }
 
-  logger.info(`📊 Weekly reports complete: ${sent} sent, ${skipped} skipped, ${failed} failed`);
+  logger.info(`Weekly reports complete: ${sent} sent, ${skipped} skipped, ${failed} failed`);
   return { sent, skipped, failed, total: users.length };
 }
 
@@ -110,7 +110,7 @@ async function sendWeeklyReports() {
  * @returns {Promise<Object>} Ergebnis mit Statistiken
  */
 async function sendMonthlyReports() {
-  logger.info('📊 Starting monthly report distribution...');
+  logger.info('Starting monthly report distribution...');
 
   // Letzter Monat
   const endDate = new Date();
@@ -125,7 +125,7 @@ async function sendMonthlyReports() {
     'preferences.notificationCategories.reports': true,
   });
 
-  logger.info(`📊 Found ${users.length} users eligible for monthly reports`);
+  logger.info(`Found ${users.length} users eligible for monthly reports`);
 
   let sent = 0;
   let failed = 0;
@@ -153,7 +153,7 @@ async function sendMonthlyReports() {
     }
   }
 
-  logger.info(`📊 Monthly reports complete: ${sent} sent, ${skipped} skipped, ${failed} failed`);
+  logger.info(`Monthly reports complete: ${sent} sent, ${skipped} skipped, ${failed} failed`);
   return { sent, skipped, failed, total: users.length };
 }
 

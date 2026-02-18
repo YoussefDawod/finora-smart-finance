@@ -129,19 +129,6 @@ transactionSchema.pre('validate', async function () {
   }
 });
 
-// Statics: Hilfsmethoden
-transactionSchema.statics.findByCategory = function (category) {
-  return this.find({ category });
-};
-
-transactionSchema.statics.getExpenses = function () {
-  return this.find({ type: 'expense' });
-};
-
-transactionSchema.statics.getIncome = function () {
-  return this.find({ type: 'income' });
-};
-
 // Methods: Instanz-Methoden
 transactionSchema.methods.toJSON = function () {
   return {

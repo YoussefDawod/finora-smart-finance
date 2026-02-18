@@ -29,10 +29,6 @@
   @include mobile {
     padding: var(--space-sm) var(--space-md);
   }
-
-  &.exiting {
-    animation: slideOut var(--duration-normal) ease-in forwards;
-  }
 }
 
 :global([dir='rtl']) .toast {
@@ -235,6 +231,8 @@
 // ============================================
 // ANIMATIONS
 // ============================================
+// Entry animation only - all exit animations are handled
+// via inline CSS transitions in Toast.jsx (phase state machine)
 @keyframes slideIn {
   from {
     transform: translateY(100%);
@@ -246,36 +244,16 @@
   }
 }
 
-@keyframes slideOut {
-  from {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(100%);
-    opacity: 0;
-  }
-}
-
 // ============================================
 // REDUCED MOTION
 // ============================================
 @include reduced-motion {
   .toast {
     animation: fadeIn var(--d-fast) ease-out;
-
-    &.exiting {
-      animation: fadeOut var(--d-fast) ease-in forwards;
-    }
   }
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
   }
 }

@@ -44,7 +44,6 @@
 // 8️⃣ THEMES
 // ============================================
 // Theme-specific CSS custom property overrides
-// Light theme is default, dark/glassmorphic are optional
+// Light theme is default, dark is optional
 @use './themes/light';
 @use './themes/dark';
-@use './themes/glassmorphic';

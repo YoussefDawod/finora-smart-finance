@@ -443,3 +443,42 @@
     transform: rotate(360deg);
   }
 }
+
+// ============================================
+// MOBILE OPTIMIZATION (Phase 7)
+// ============================================
+
+@media (max-width: 480px) {
+  .input {
+    height: max(2.75rem, 48px);
+    min-height: 48px;
+  }
+
+  .inputWrapper {
+    min-height: 48px;
+  }
+
+  .label {
+    font-size: max(var(--fs-sm), 14px);
+  }
+
+  .submitButton {
+    height: max(2.75rem, 48px);
+    min-height: 48px;
+    width: 100%;
+    font-size: max(var(--fs-md), 15px);
+  }
+
+  .errorMessage {
+    font-size: max(var(--fs-xs), 13px);
+    line-height: 1.4;
+  }
+
+  .errorBanner {
+    padding: var(--space-sm);
+  }
+
+  .errorText {
+    font-size: max(0.875rem, 14px);
+  }
+}

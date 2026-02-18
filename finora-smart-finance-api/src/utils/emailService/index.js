@@ -3,6 +3,8 @@ const { sendVerificationEmail, sendAddEmailVerification } = require('./authEmail
 const { sendPasswordResetEmail, sendEmailChangeVerification } = require('./passwordEmails');
 const { sendWelcomeEmail, sendSecurityAlert } = require('./accountEmails');
 const { sendTransactionNotification, sendBudgetAlert, sendFinancialReport } = require('./financialEmails');
+const { sendContactEmail } = require('./contactEmails');
+const { sendNewsletterConfirmation, sendNewsletterWelcome, sendNewsletterGoodbye } = require('./newsletterEmails');
 
 module.exports = {
   sendVerificationEmail,
@@ -14,4 +16,8 @@ module.exports = {
   sendSecurityAlert,
   sendBudgetAlert,
   sendFinancialReport,
+  sendContactEmail,
+  sendNewsletterConfirmation,
+  sendNewsletterWelcome,
+  sendNewsletterGoodbye,
 };

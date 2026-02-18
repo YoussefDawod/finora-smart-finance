@@ -38,11 +38,13 @@ export const Button = forwardRef((
     fullWidth = false,
     className = '',
     children,
+    'aria-label': ariaLabel,
     ...props
   },
   ref
 ) => {
   const isDisabled = disabled || loading;
+  const isIconOnly = icon && !children;
 
   // Animation variants for button
   const whileHoverVariant = !isDisabled ? { scale: 1.02, y: -2 } : {};
@@ -60,6 +62,9 @@ export const Button = forwardRef((
         ${className}
       `.trim()}
       disabled={isDisabled}
+      aria-disabled={isDisabled}
+      aria-busy={loading}
+      aria-label={isIconOnly ? ariaLabel : undefined}
       whileHover={whileHoverVariant}
       whileTap={whileTapVariant}
       transition={{ duration: 0.2 }}
@@ -69,6 +74,7 @@ export const Button = forwardRef((
       {loading && (
         <motion.span
           className={styles.spinner}
+          aria-hidden="true"
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         />
@@ -76,7 +82,7 @@ export const Button = forwardRef((
 
       {/* ICON LEFT */}
       {icon && !loading && (
-        <span className={styles.iconLeft}>{icon}</span>
+        <span className={styles.iconLeft} aria-hidden="true">{icon}</span>
       )}
 
       {/* TEXT */}

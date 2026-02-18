@@ -27,6 +27,7 @@ import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { useTranslation } from 'react-i18next';
 import { ChartTooltip, ChartLegend } from './ChartComponents';
+import { SkeletonChart } from '@/components/common/Skeleton';
 import styles from './DashboardCharts.module.scss';
 
 export default function DashboardCharts() {
@@ -49,9 +50,27 @@ export default function DashboardCharts() {
     incomeTotal,
     savingsRate,
     hasAnyData,
+    loading,
   } = useDashboardChartData();
 
   const lastTrendPoint = trendData.length > 0 ? trendData[trendData.length - 1] : null;
+
+  // Loading-Skeleton für Charts
+  if (loading) {
+    return (
+      <div className={styles.chartsGrid}>
+        <div className={styles.chartCard}>
+          <SkeletonChart variant="pie" hasTitle hasLegend height={isMobile ? 260 : 240} />
+        </div>
+        <div className={styles.chartCard}>
+          <SkeletonChart variant="bar" hasTitle hasLegend height={isMobile ? 260 : 240} />
+        </div>
+        <div className={`${styles.chartCard} ${styles.fullWidth}`}>
+          <SkeletonChart variant="bar" hasTitle hasLegend height={isMobile ? 280 : 300} />
+        </div>
+      </div>
+    );
+  }
 
   if (!hasAnyData) {
     return (

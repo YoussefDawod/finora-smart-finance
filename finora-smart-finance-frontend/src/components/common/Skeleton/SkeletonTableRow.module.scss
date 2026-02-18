@@ -1,0 +1,44 @@
+// ============================================
+// 💀 SKELETON TABLE ROW COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-xs);
+}
+
+.iconCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+// Density Variants
+.compact {
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.spacious {
+  padding: var(--space-md) var(--space-lg);
+}

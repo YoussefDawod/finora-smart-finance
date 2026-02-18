@@ -12,6 +12,7 @@
  */
 
 import axios from 'axios';
+import i18next from 'i18next';
 import { API_CONFIG } from './config';
 import { logRequest, logResponse, logError } from './logger';
 import { isUnauthorized, isForbidden, isNetworkError } from './errorHandler';
@@ -79,7 +80,7 @@ client.interceptors.request.use(
     return config;
   },
   (error) => {
-    dispatchToast('error', 'Unerwarteter Fehler beim Senden der Anfrage');
+    dispatchToast('error', i18next.t('errors.requestFailed'));
     return Promise.reject(error);
   }
 );
@@ -128,20 +129,20 @@ client.interceptors.response.use(
       
       // Only show auth toast if not the initial auth check
       if (shouldShowAuthToast) {
-        dispatchToast('error', 'Authentifizierung erforderlich');
+        dispatchToast('error', i18next.t('errors.authRequired'));
       }
     } else if (isForbidden(error)) {
-      dispatchToast('error', 'Sie haben keine Berechtigung');
+      dispatchToast('error', i18next.t('errors.forbidden'));
     } else if (error?.response?.status === 404) {
-      dispatchToast('error', 'Ressource nicht gefunden');
+      dispatchToast('error', i18next.t('errors.notFound'));
     } else if (error?.response?.status >= 500) {
-      dispatchToast('error', 'Server-Fehler, bitte später versuchen');
+      dispatchToast('error', i18next.t('errors.serverError'));
     } else if (isNetworkError(error)) {
-      dispatchToast('error', 'Keine Verbindung zum Server');
+      dispatchToast('error', i18next.t('errors.networkError'));
     } else if (error?.code === 'ECONNABORTED') {
-      dispatchToast('error', 'Request hat zu lange gedauert');
+      dispatchToast('error', i18next.t('errors.timeout'));
     } else {
-      dispatchToast('error', 'Unerwarteter Fehler');
+      dispatchToast('error', i18next.t('errors.unexpectedError'));
     }
 
     return Promise.reject(error);

@@ -24,32 +24,8 @@ import {
   FiCheck,
   FiX
 } from 'react-icons/fi';
+import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
 import styles from './ResetPasswordForm.module.scss';
-
-// ============================================
-// PASSWORD STRENGTH
-// ============================================
-
-const calculatePasswordStrength = (password) => {
-  if (!password) return { level: 'none', score: 0 };
-
-  const checks = {
-    hasLower: /[a-z]/.test(password),
-    hasUpper: /[A-Z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasSpecial: /[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password),
-    isLongEnough: password.length >= 8,
-  };
-
-  const score = Object.values(checks).filter(Boolean).length * 20;
-
-  let level = 'weak';
-  if (score >= 60) level = 'medium';
-  if (score >= 80) level = 'strong';
-  if (score === 100) level = 'excellent';
-
-  return { level, score };
-};
 
 export default function ResetPasswordForm({ token }) {
   const navigate = useNavigate();
@@ -79,18 +55,27 @@ export default function ResetPasswordForm({ token }) {
   // VALIDATION
   // ============================================
 
+  const passwordErrorMap = {
+    required: t('auth.reset.validation.passwordRequired'),
+    tooShort: t('auth.reset.validation.passwordMin'),
+    noUppercase: t('auth.reset.validation.passwordWeak'),
+    noNumber: t('auth.reset.validation.passwordWeak'),
+    noSpecial: t('auth.reset.validation.passwordWeak'),
+  };
+
   const validatePassword = (password) => {
-    if (!password) return t('auth.reset.validation.passwordRequired');
-    if (password.length < 8) return t('auth.reset.validation.passwordMin');
-    const strength = calculatePasswordStrength(password);
-    if (strength.level === 'weak') return t('auth.reset.validation.passwordWeak');
-    return '';
+    const key = _validatePassword(password);
+    return key ? (passwordErrorMap[key] || key) : '';
+  };
+
+  const confirmErrorMap = {
+    confirmRequired: t('auth.reset.validation.confirmRequired'),
+    mismatch: t('auth.reset.validation.passwordMismatch'),
   };
 
   const validateConfirmPassword = (confirmPassword, password) => {
-    if (!confirmPassword) return t('auth.reset.validation.confirmRequired');
-    if (confirmPassword !== password) return t('auth.reset.validation.passwordMismatch');
-    return '';
+    const key = _validatePasswordMatch(password, confirmPassword);
+    return key ? (confirmErrorMap[key] || key) : '';
   };
 
   const validateForm = () => {

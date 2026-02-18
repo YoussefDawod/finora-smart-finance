@@ -48,6 +48,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useMotion, useIsDesktop } from '@/hooks';
 import { LoginForm, MultiStepRegisterForm, ForgotPasswordRequestForm, ResetPasswordForm, BrandingPanel } from '@/components/auth';
+import { AuthPageSkeleton } from '@/components/common/Skeleton';
 import styles from './AuthPage.module.scss';
 
 export default function AuthPage() {
@@ -93,9 +94,11 @@ export default function AuthPage() {
     }
   }, [isDesktop, isPanelTop]);
 
-  // Loading state
+  // Loading state - Skeleton statt White Screen
   if (isLoading) {
-    return null;
+    // Variant basierend auf dem aktuellen Pfad bestimmen
+    const skeletonVariant = isRegisterMode ? 'register' : isForgotMode ? 'forgot' : 'login';
+    return <AuthPageSkeleton variant={skeletonVariant} showBranding />;
   }
 
   // ============================================

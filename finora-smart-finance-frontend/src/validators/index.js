@@ -6,3 +6,4 @@
  */
 
 export * from './transactionFormSchema';
+export * from './passwordValidation';

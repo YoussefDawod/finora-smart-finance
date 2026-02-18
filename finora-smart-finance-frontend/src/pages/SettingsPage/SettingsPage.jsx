@@ -18,10 +18,13 @@ import {
   FiDollarSign,
   FiBarChart2,
   FiAlertCircle,
+  FiTarget,
+  FiMail,
 } from 'react-icons/fi';
-import { ExportSection } from '@/components/settings';
+import { ExportSection, BudgetSettings } from '@/components/settings';
 import Select from '@/components/common/Select/Select';
 import Button from '@/components/common/Button/Button';
+import AuthRequiredOverlay from '@/components/common/AuthRequiredOverlay/AuthRequiredOverlay';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
@@ -63,8 +66,8 @@ const DATE_FORMAT_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { theme, useGlass, setTheme, resetToSystemPreference, setGlassEnabled } = useTheme();
-  const { user, refreshUser } = useAuth();
+  const { theme, setTheme, resetToSystemPreference } = useTheme();
+  const { user, refreshUser, isAuthenticated } = useAuth();
   const { success, error: showError } = useToast();
   const { t, i18n } = useTranslation();
   const themeOptions = useMemo(() => ([
@@ -91,6 +94,8 @@ export default function SettingsPage() {
   const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [initialPreferences, setInitialPreferences] = useState(DEFAULT_PREFERENCES);
   const [isSaving, setIsSaving] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
 
   const getDatePreview = (format) => {
     const now = new Date();
@@ -117,6 +122,42 @@ export default function SettingsPage() {
       y: 0,
       transition: { duration: 0.3 },
     },
+  };
+
+  // Newsletter-Status laden
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await userService.getNewsletterStatus();
+        if (!cancelled) setNewsletterSubscribed(res.data?.subscribed ?? false);
+      } catch {
+        // Silently ignore — toggle will default to off
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated]);
+
+  const handleNewsletterToggle = async () => {
+    if (!user?.email) {
+      showError(t('settings.notifications.newsletter.noEmail'));
+      return;
+    }
+    setNewsletterLoading(true);
+    try {
+      const res = await userService.toggleNewsletter();
+      setNewsletterSubscribed(res.data?.subscribed ?? false);
+      if (res.data?.subscribed) {
+        success(t('settings.notifications.newsletter.subscribed'));
+      } else {
+        success(t('settings.notifications.newsletter.unsubscribed'));
+      }
+    } catch {
+      showError(t('settings.notifications.newsletter.error'));
+    } finally {
+      setNewsletterLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -191,22 +232,22 @@ export default function SettingsPage() {
     }
   };
 
-  const handleGlassToggle = () => {
-    setGlassEnabled(!useGlass);
-  };
+
 
   const handleSavePreferences = async () => {
     setIsSaving(true);
     try {
-      await userService.updatePreferences({
-        theme: preferences.themePreference,
-        currency: preferences.currency,
-        language: preferences.language,
-        dateFormat: preferences.dateFormat,
-        emailNotifications: preferences.emailNotifications,
-        notificationCategories: preferences.notificationCategories,
-      });
-      await refreshUser();
+      if (isAuthenticated) {
+        await userService.updatePreferences({
+          theme: preferences.themePreference,
+          currency: preferences.currency,
+          language: preferences.language,
+          dateFormat: preferences.dateFormat,
+          emailNotifications: preferences.emailNotifications,
+          notificationCategories: preferences.notificationCategories,
+        });
+        await refreshUser();
+      }
       setInitialPreferences(preferences);
       persistUserPreferences({
         theme: preferences.themePreference,
@@ -339,164 +380,178 @@ export default function SettingsPage() {
                 );
               })}
             </div>
-
-            <div className={styles.switchRow}>
-              <div className={styles.switchInfo}>
-                <div className={styles.switchTitle}>
-                  <FiDroplet aria-hidden="true" />
-                  {t('settings.appearance.glassTitle')}
-                </div>
-                <p>{t('settings.appearance.glassDescription')}</p>
-              </div>
-              <button
-                type="button"
-                className={`${styles.switch} ${useGlass ? styles.switchOn : ''}`}
-                onClick={handleGlassToggle}
-                role="switch"
-                aria-checked={useGlass}
-                aria-label={t('settings.appearance.glassAria')}
-              >
-                <span className={styles.switchThumb} />
-              </button>
-            </div>
           </div>
         </motion.div>
 
+        {/* Notifications Section - Auth required */}
         <motion.div className={styles.sectionCard} variants={itemVariants}>
-          <div className={styles.sectionHeader}>
-            <div className={styles.sectionIcon} aria-hidden="true">
-              <FiBell />
-            </div>
-            <div>
-              <h2>{t('settings.notifications.title')}</h2>
-              <p>{t('settings.notifications.description')}</p>
-            </div>
-          </div>
-
-          <div className={styles.sectionBody}>
-            {/* Master Toggle */}
-            <div className={styles.switchRow}>
-              <div className={styles.switchInfo}>
-                <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
-                <p>{t('settings.notifications.emailDescription')}</p>
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiBell />
+                </div>
+                <div>
+                  <h2>{t('settings.notifications.title')}</h2>
+                  <p>{t('settings.notifications.description')}</p>
+                </div>
               </div>
-              <button
-                type="button"
-                className={`${styles.switch} ${preferences.emailNotifications ? styles.switchOn : ''}`}
-                onClick={handleToggle('emailNotifications')}
-                role="switch"
-                aria-checked={preferences.emailNotifications}
-                aria-label={t('settings.notifications.emailAria')}
-              >
-                <span className={styles.switchThumb} />
-              </button>
-            </div>
-
-            {/* Category Toggles - Only visible when master toggle is on */}
-            {preferences.emailNotifications && (
-              <div className={styles.categoryToggles}>
-                {/* Security Notifications */}
+              <div className={styles.sectionBody}>
                 <div className={styles.switchRow}>
                   <div className={styles.switchInfo}>
-                    <div className={styles.switchTitle}>
-                      <FiShield aria-hidden="true" />
-                      {t('settings.notifications.security.title')}
-                    </div>
-                    <p>{t('settings.notifications.security.description')}</p>
+                    <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
+                    <p>{t('settings.notifications.emailDescription')}</p>
+                  </div>
+                </div>
+              </div>
+            </AuthRequiredOverlay>
+          ) : (
+            <>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiBell />
+                </div>
+                <div>
+                  <h2>{t('settings.notifications.title')}</h2>
+                  <p>{t('settings.notifications.description')}</p>
+                </div>
+              </div>
+
+              <div className={styles.sectionBody}>
+                {/* Master Toggle */}
+                <div className={styles.switchRow}>
+                  <div className={styles.switchInfo}>
+                    <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
+                    <p>{t('settings.notifications.emailDescription')}</p>
                   </div>
                   <button
                     type="button"
-                    className={`${styles.switch} ${preferences.notificationCategories.security ? styles.switchOn : ''}`}
-                    onClick={handleCategoryToggle('security')}
+                    className={`${styles.switch} ${preferences.emailNotifications ? styles.switchOn : ''}`}
+                    onClick={handleToggle('emailNotifications')}
                     role="switch"
-                    aria-checked={preferences.notificationCategories.security}
-                    aria-label={t('settings.notifications.security.aria')}
+                    aria-checked={preferences.emailNotifications}
+                    aria-label={t('settings.notifications.emailAria')}
                   >
                     <span className={styles.switchThumb} />
                   </button>
                 </div>
 
-                {/* Transaction Notifications */}
-                <div className={styles.switchRow}>
-                  <div className={styles.switchInfo}>
-                    <div className={styles.switchTitle}>
-                      <FiDollarSign aria-hidden="true" />
-                      {t('settings.notifications.transactions.title')}
-                    </div>
-                    <p>{t('settings.notifications.transactions.description')}</p>
+                {/* Category Toggles - Only visible when master toggle is on */}
+                {preferences.emailNotifications && (
+                  <div className={styles.categoryToggles}>
+                    {[
+                      { key: 'security', icon: FiShield },
+                      { key: 'transactions', icon: FiDollarSign },
+                      { key: 'reports', icon: FiBarChart2 },
+                      { key: 'alerts', icon: FiAlertCircle },
+                    ].map(({ key, icon: Icon }) => (
+                      <div className={styles.switchRow} key={key}>
+                        <div className={styles.switchInfo}>
+                          <div className={styles.switchTitle}>
+                            <Icon aria-hidden="true" />
+                            {t(`settings.notifications.${key}.title`)}
+                          </div>
+                          <p>{t(`settings.notifications.${key}.description`)}</p>
+                        </div>
+                        <button
+                          type="button"
+                          className={`${styles.switch} ${preferences.notificationCategories[key] ? styles.switchOn : ''}`}
+                          onClick={handleCategoryToggle(key)}
+                          role="switch"
+                          aria-checked={preferences.notificationCategories[key]}
+                          aria-label={t(`settings.notifications.${key}.aria`)}
+                        >
+                          <span className={styles.switchThumb} />
+                        </button>
+                      </div>
+                    ))}
                   </div>
-                  <button
-                    type="button"
-                    className={`${styles.switch} ${preferences.notificationCategories.transactions ? styles.switchOn : ''}`}
-                    onClick={handleCategoryToggle('transactions')}
-                    role="switch"
-                    aria-checked={preferences.notificationCategories.transactions}
-                    aria-label={t('settings.notifications.transactions.aria')}
-                  >
-                    <span className={styles.switchThumb} />
-                  </button>
-                </div>
+                )}
 
-                {/* Weekly Reports */}
-                <div className={styles.switchRow}>
+                {/* Newsletter Toggle — separate from notification preferences */}
+                <div className={styles.switchRow} style={{ marginTop: 'var(--space-md)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--border)' }}>
                   <div className={styles.switchInfo}>
                     <div className={styles.switchTitle}>
-                      <FiBarChart2 aria-hidden="true" />
-                      {t('settings.notifications.reports.title')}
+                      <FiMail aria-hidden="true" />
+                      {t('settings.notifications.newsletter.title')}
                     </div>
-                    <p>{t('settings.notifications.reports.description')}</p>
+                    <p>
+                      {user?.email
+                        ? t('settings.notifications.newsletter.description')
+                        : t('settings.notifications.newsletter.noEmailHint')}
+                    </p>
                   </div>
                   <button
                     type="button"
-                    className={`${styles.switch} ${preferences.notificationCategories.reports ? styles.switchOn : ''}`}
-                    onClick={handleCategoryToggle('reports')}
+                    className={`${styles.switch} ${newsletterSubscribed ? styles.switchOn : ''}`}
+                    onClick={handleNewsletterToggle}
+                    disabled={newsletterLoading || !user?.email}
                     role="switch"
-                    aria-checked={preferences.notificationCategories.reports}
-                    aria-label={t('settings.notifications.reports.aria')}
-                  >
-                    <span className={styles.switchThumb} />
-                  </button>
-                </div>
-
-                {/* Budget Alerts */}
-                <div className={styles.switchRow}>
-                  <div className={styles.switchInfo}>
-                    <div className={styles.switchTitle}>
-                      <FiAlertCircle aria-hidden="true" />
-                      {t('settings.notifications.alerts.title')}
-                    </div>
-                    <p>{t('settings.notifications.alerts.description')}</p>
-                  </div>
-                  <button
-                    type="button"
-                    className={`${styles.switch} ${preferences.notificationCategories.alerts ? styles.switchOn : ''}`}
-                    onClick={handleCategoryToggle('alerts')}
-                    role="switch"
-                    aria-checked={preferences.notificationCategories.alerts}
-                    aria-label={t('settings.notifications.alerts.aria')}
+                    aria-checked={newsletterSubscribed}
+                    aria-label={t('settings.notifications.newsletter.aria')}
                   >
                     <span className={styles.switchThumb} />
                   </button>
                 </div>
               </div>
-            )}
-          </div>
 
-          <div className={styles.sectionFooter}>
-            <Button
-              variant="primary"
-              icon={<FiSave />}
-              onClick={handleSavePreferences}
-              loading={isSaving}
-              disabled={!isDirty || isSaving}
-            >
-              {isSaving ? t('common.saving') : t('common.saveChanges')}
-            </Button>
-          </div>
+              <div className={styles.sectionFooter}>
+                <Button
+                  variant="primary"
+                  icon={<FiSave />}
+                  onClick={handleSavePreferences}
+                  loading={isSaving}
+                  disabled={!isDirty || isSaving}
+                >
+                  {isSaving ? t('common.saving') : t('common.saveChanges')}
+                </Button>
+              </div>
+            </>
+          )}
         </motion.div>
 
+        {/* Budget Section - Auth required */}
+        <motion.div className={styles.sectionCard} variants={itemVariants}>
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiTarget />
+                </div>
+                <div>
+                  <h2>{t('settings.budget.title')}</h2>
+                  <p>{t('settings.budget.description')}</p>
+                </div>
+              </div>
+              <div className={styles.sectionBody} style={{ minHeight: '120px' }} />
+            </AuthRequiredOverlay>
+          ) : (
+            <>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiTarget />
+                </div>
+                <div>
+                  <h2>{t('settings.budget.title')}</h2>
+                  <p>{t('settings.budget.description')}</p>
+                </div>
+              </div>
+              <div className={styles.sectionBody}>
+                <BudgetSettings />
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Export Section - Auth required */}
         <motion.div className={styles.sectionSlot} variants={itemVariants}>
-          <ExportSection />
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <ExportSection />
+            </AuthRequiredOverlay>
+          ) : (
+            <ExportSection />
+          )}
         </motion.div>
       </div>
     </motion.section>

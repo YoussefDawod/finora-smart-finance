@@ -4,6 +4,7 @@
  */
 
 import { useCallback } from 'react';
+import i18n from '@/i18n';
 import authService from '@/api/authService';
 import { AUTH_ACTIONS } from '../reducers/authReducer';
 
@@ -41,7 +42,7 @@ export function useAuthActions(dispatch, storage) {
         });
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || error.message || 'Login fehlgeschlagen. Bitte versuche es erneut.';
+          error.response?.data?.message || error.message || i18n.t('auth.errors.loginFailed');
 
         dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
         throw error;
@@ -76,7 +77,7 @@ export function useAuthActions(dispatch, storage) {
         return user;
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || error.message || 'Registrierung fehlgeschlagen. Bitte versuche es erneut.';
+          error.response?.data?.message || error.message || i18n.t('auth.errors.registerFailed');
 
         dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
         throw error;
@@ -122,7 +123,7 @@ export function useAuthActions(dispatch, storage) {
         });
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || error.message || 'Email-Verifizierung fehlgeschlagen.';
+          error.response?.data?.message || error.message || i18n.t('auth.errors.verifyFailed');
 
         dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage });
         throw error;

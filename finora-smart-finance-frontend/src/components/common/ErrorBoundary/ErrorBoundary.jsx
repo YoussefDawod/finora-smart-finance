@@ -1,4 +1,5 @@
 import React from 'react';
+import i18n from '@/i18n';
 import Button from '@/components/common/Button/Button';
 
 class ErrorBoundary extends React.Component {
@@ -41,7 +42,7 @@ class ErrorBoundary extends React.Component {
             border: '1px solid var(--border-color)',
             margin: '1rem'
         }}>
-          <h2>Something went wrong.</h2>
+          <h2>{i18n.t('common.errors.somethingWrong')}</h2>
           <p style={{ color: 'var(--error-color)', marginBottom: '1rem' }}>
             {this.state.error && this.state.error.toString()}
           </p>
@@ -49,7 +50,7 @@ class ErrorBoundary extends React.Component {
             {this.state.errorInfo && this.state.errorInfo.componentStack}
           </details> */}
           <Button variant="primary" onClick={this.handleRetry}>
-            Try Again
+            {i18n.t('common.retry')}
           </Button>
         </div>
       );

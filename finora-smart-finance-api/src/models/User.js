@@ -100,9 +100,6 @@ const UserSchema = new mongoose.Schema(
     lastPasswordChange: { type: Date, default: null },
     passwordChangedAt: { type: Date, default: null },
 
-    twoFactorEnabled: { type: Boolean, default: false },
-    twoFactorSecret: { type: String, default: null },
-
     refreshTokens: [RefreshTokenSchema],
   },
   { timestamps: true }
@@ -153,7 +150,6 @@ UserSchema.pre('save', async function () {
 UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.passwordHash;
-  delete obj.twoFactorSecret;
   delete obj.verificationToken;
   delete obj.verificationExpires;
   delete obj.passwordResetToken;

@@ -1,8 +1,49 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light" data-glass="false">
+<html lang="de" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!--
+      ============================================
+      CRITICAL: Theme Flash Prevention Script
+      ============================================
+      Dieses Script wird SYNCHRON ausgeführt, BEVOR der Body gerendert wird.
+      Es liest das gespeicherte Theme aus localStorage und wendet es sofort an.
+      Das verhindert den "Flash of Incorrect Theme" (FOIT).
+    -->
+    <script>
+      (function() {
+        try {
+          // Storage Keys (muss mit ThemeContext.jsx übereinstimmen)
+          var THEME_KEY = 'et-theme-preference';
+          
+          // Gespeichertes Theme lesen
+          var savedTheme = localStorage.getItem(THEME_KEY);
+          
+          // Validiere Theme-Wert
+          var validThemes = ['light', 'dark', 'system'];
+          var theme = validThemes.includes(savedTheme) ? savedTheme : 'system';
+          
+          // Bei 'system': System-Präferenz ermitteln
+          if (theme === 'system') {
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            theme = prefersDark ? 'dark' : 'light';
+          }
+          
+          // Sofort auf HTML-Element anwenden (vor Body-Rendering!)
+          document.documentElement.setAttribute('data-theme', theme);
+          
+          // Theme-Color Meta-Tag für Mobile Browser anpassen
+          var themeColorMeta = document.querySelector('meta[name="theme-color"]');
+          if (themeColorMeta) {
+            themeColorMeta.setAttribute('content', theme === 'dark' ? '#1e293b' : '#6366f1');
+          }
+        } catch (e) {
+          // Fallback bei Fehlern - Standard bleibt light
+        }
+      })();
+    </script>
     
     <!-- Primary Meta Tags -->
     <title>Finora | Smart Finance - Intelligente Finanzverwaltung</title>
@@ -63,9 +104,234 @@
       }
     }
     </script>
+    
+    <!-- Critical Skeleton CSS (ausgelagert für bessere Performance) -->
+    <link rel="stylesheet" href="/skeleton.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- 
+        ============================================
+        URL-BASED INITIAL SKELETONS
+        ============================================
+        Verschiedene Skeleton-Layouts für verschiedene Seiten.
+        Das Script oben zeigt nur das passende Skeleton basierend auf der URL.
+        React ersetzt diesen Inhalt automatisch beim Mounten.
+      -->
+      
+      <!-- ==========================================
+           AUTH PAGES SKELETON (Login, Register, Forgot Password)
+           ========================================== -->
+      <div class="initial-skeleton initial-skeleton--auth" 
+           data-route="/login,/register,/forgot-password*,/verify*"
+           aria-busy="true" 
+           aria-label="Authentifizierung wird geladen"
+           style="display: none;">
+        <!-- Form Panel -->
+        <div class="initial-skeleton__auth-form">
+          <div class="initial-skeleton__auth-form-inner">
+            <!-- Logo -->
+            <div class="skel skel--lg" style="width: 120px; height: 40px;"></div>
+            
+            <!-- Title & Subtitle -->
+            <div class="initial-skeleton__rows" style="margin-top: 16px;">
+              <div class="skel" style="width: 200px; height: 32px;"></div>
+              <div class="skel" style="width: 280px; height: 18px;"></div>
+            </div>
+            
+            <!-- Form Fields -->
+            <div class="initial-skeleton__rows" style="margin-top: 8px; gap: 16px;">
+              <div class="skel skel--lg" style="width: 100%; height: 52px;"></div>
+              <div class="skel skel--lg" style="width: 100%; height: 52px;"></div>
+              <div class="skel skel--lg" style="width: 100%; height: 52px;"></div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="skel skel--lg" style="width: 100%; height: 48px; margin-top: 8px;"></div>
+            
+            <!-- Link -->
+            <div class="skel" style="width: 180px; height: 16px; margin: 0 auto;"></div>
+          </div>
+        </div>
+        
+        <!-- Branding Panel -->
+        <div class="initial-skeleton__auth-branding" aria-hidden="true"></div>
+      </div>
+      
+      <!-- ==========================================
+           DASHBOARD SKELETON
+           ========================================== -->
+      <div class="initial-skeleton" 
+           data-route="/,/dashboard"
+           aria-busy="true" 
+           aria-label="Dashboard wird geladen"
+           style="display: none;">
+        <!-- Sidebar (Desktop) -->
+        <aside class="initial-skeleton__sidebar" aria-hidden="true">
+          <div class="skel skel--lg" style="width: 48px; height: 48px;"></div>
+          <div class="initial-skeleton__rows">
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+          </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="initial-skeleton__main">
+          <!-- Header -->
+          <header class="initial-skeleton__header">
+            <div class="skel" style="width: 120px; height: 32px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+          </header>
+          
+          <!-- Content -->
+          <div class="initial-skeleton__content">
+            <!-- Page Title -->
+            <div class="initial-skeleton__rows">
+              <div class="skel" style="width: 200px; height: 28px;"></div>
+              <div class="skel" style="width: 300px; height: 18px;"></div>
+            </div>
+            
+            <!-- Summary Cards -->
+            <div class="initial-skeleton__cards">
+              <div class="initial-skeleton__card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class="skel" style="width: 80px; height: 14px;"></div>
+                  <div class="skel skel--circle" style="width: 36px; height: 36px;"></div>
+                </div>
+                <div class="skel" style="width: 120px; height: 32px;"></div>
+                <div class="skel" style="width: 100px; height: 14px;"></div>
+              </div>
+              <div class="initial-skeleton__card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class="skel" style="width: 80px; height: 14px;"></div>
+                  <div class="skel skel--circle" style="width: 36px; height: 36px;"></div>
+                </div>
+                <div class="skel" style="width: 120px; height: 32px;"></div>
+                <div class="skel" style="width: 100px; height: 14px;"></div>
+              </div>
+              <div class="initial-skeleton__card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div class="skel" style="width: 80px; height: 14px;"></div>
+                  <div class="skel skel--circle" style="width: 36px; height: 36px;"></div>
+                </div>
+                <div class="skel" style="width: 120px; height: 32px;"></div>
+                <div class="skel" style="width: 100px; height: 14px;"></div>
+              </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="initial-skeleton__section">
+              <div class="skel" style="width: 180px; height: 24px;"></div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="skel skel--xl" style="width: 100%; height: 200px;"></div>
+                <div class="skel skel--xl" style="width: 100%; height: 200px;"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+      
+
+      
+      <!-- ==========================================
+           FALLBACK SKELETON (Für alle anderen Seiten)
+           ========================================== -->
+      <div class="initial-skeleton" 
+           data-route="*"
+           aria-busy="true" 
+           aria-label="Seite wird geladen"
+           style="display: none;">
+        <!-- Sidebar (Desktop) -->
+        <aside class="initial-skeleton__sidebar" aria-hidden="true">
+          <div class="skel skel--lg" style="width: 48px; height: 48px;"></div>
+          <div class="initial-skeleton__rows">
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+          </div>
+        </aside>
+        
+        <main class="initial-skeleton__main">
+          <header class="initial-skeleton__header">
+            <div class="skel" style="width: 120px; height: 32px;"></div>
+            <div class="skel skel--circle" style="width: 40px; height: 40px;"></div>
+          </header>
+          
+          <div class="initial-skeleton__content">
+            <div class="initial-skeleton__rows">
+              <div class="skel" style="width: 200px; height: 28px;"></div>
+              <div class="skel" style="width: 300px; height: 18px;"></div>
+            </div>
+            
+            <div class="initial-skeleton__section">
+              <div class="skel" style="width: 160px; height: 24px;"></div>
+              <div class="initial-skeleton__rows">
+                <div class="skel skel--lg" style="width: 100%; height: 56px;"></div>
+                <div class="skel skel--lg" style="width: 100%; height: 56px;"></div>
+                <div class="skel skel--lg" style="width: 100%; height: 56px;"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+      
+      <!-- 
+        URL-Based Skeleton Selection Script
+        Dieses Script wird SYNCHRON ausgeführt, direkt nach den Skeleton-Elementen.
+        Es zeigt nur das Skeleton an, das zur aktuellen URL passt.
+      -->
+      <script>
+        (function() {
+          var path = window.location.pathname;
+          var skeletons = document.querySelectorAll('.initial-skeleton[data-route]');
+          var matched = false;
+          
+          for (var i = 0; i < skeletons.length; i++) {
+            var skeleton = skeletons[i];
+            var routeAttr = skeleton.getAttribute('data-route');
+            if (!routeAttr) continue;
+            
+            var routes = routeAttr.split(',');
+            var isMatch = false;
+            
+            for (var j = 0; j < routes.length; j++) {
+              var route = routes[j].trim();
+              
+              // Wildcard * matcht alles (nur als Fallback)
+              if (route === '*') {
+                if (!matched) isMatch = true;
+                continue;
+              }
+              
+              // Route mit Wildcard am Ende (z.B. /transactions*)
+              if (route.endsWith('*')) {
+                var prefix = route.slice(0, -1);
+                if (path === prefix || path.startsWith(prefix)) {
+                  isMatch = true;
+                  break;
+                }
+              } else {
+                // Exakte Route
+                if (path === route || path === route + '/') {
+                  isMatch = true;
+                  break;
+                }
+              }
+            }
+            
+            if (isMatch && !matched) {
+              skeleton.style.display = 'flex';
+              matched = true;
+            } else {
+              skeleton.style.display = 'none';
+            }
+          }
+        })();
+      </script>
+    </div>
     <!-- Portal roots for overlays - must be after #root for proper z-index stacking -->
     <div id="toast-portal-root"></div>
     <div id="modal-portal-root"></div>

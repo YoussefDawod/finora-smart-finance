@@ -106,7 +106,6 @@
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, black 60%, transparent);
-  backdrop-filter: blur(4px);
   z-index: 1150;
 }
 
@@ -403,6 +402,7 @@
 .logoutBtn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   background: transparent;
@@ -464,6 +464,41 @@
 }
 
 // ============================================
+// LOGIN BUTTON (Gast-Modus)
+// ============================================
+.loginBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--r-md);
+  color: var(--on-primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  min-height: 44px;
+
+  &:hover {
+    background: var(--pri-hover);
+    border-color: var(--pri-hover);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+}
+
+// ============================================
 // SCROLLBAR STYLING
 // ============================================
 .sidebar,
@@ -510,6 +545,5 @@
 @media (prefers-reduced-transparency: reduce) {
   .backdrop {
     background: color-mix(in srgb, black 80%, transparent);
-    backdrop-filter: none;
   }
 }

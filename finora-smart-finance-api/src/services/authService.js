@@ -7,9 +7,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const config = require('../config/env');
 
-// Token TTL Konstanten
-const ACCESS_TTL_SECONDS = 3600; // 1h
-const REFRESH_TTL_SECONDS = 7 * 24 * 3600; // 7d
+// Token TTL aus Config (konfigurierbar via JWT_ACCESS_EXPIRE / JWT_REFRESH_EXPIRE)
+const ACCESS_TTL_SECONDS = config.jwt.accessExpire;
+const REFRESH_TTL_SECONDS = config.jwt.refreshExpire;
 
 /**
  * Generiert einen Access Token für einen User
@@ -42,11 +42,13 @@ function hashToken(token) {
 }
 
 /**
- * Sanitiert User-Daten für die Response
+ * Sanitiert User-Daten für Auth-Responses (Login, Token-Refresh)
+ * Gibt berechnete Felder wie hasEmail, canResetPassword zurück
+ * Für Admin/Profile-Responses stattdessen userSanitizer.sanitizeUser verwenden
  * @param {Object} user - Der User aus der DB
- * @returns {Object} Sichere User-Daten ohne sensible Felder
+ * @returns {Object} Sichere User-Daten mit berechneten Auth-Feldern
  */
-function sanitizeUser(user) {
+function sanitizeUserForAuth(user) {
   const { _id, email, name, isVerified, createdAt, updatedAt, understoodNoEmailReset } = user;
   return {
     id: _id.toString(),
@@ -128,7 +130,7 @@ function buildAuthResponse(tokens, user) {
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
     expiresIn: tokens.expiresIn,
-    user: sanitizeUser(user),
+    user: sanitizeUserForAuth(user),
   };
 }
 
@@ -142,7 +144,7 @@ module.exports = {
   validateRefreshToken,
   
   // User-Funktionen
-  sanitizeUser,
+  sanitizeUserForAuth,
   buildAuthResponse,
   
   // Konstanten

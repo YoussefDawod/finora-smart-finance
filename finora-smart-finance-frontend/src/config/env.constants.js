@@ -19,7 +19,7 @@
  * @property {string} VITE_ENABLE_THEME_SWITCHING - Enable Theme Switching (true/false)
  * @property {string} VITE_AUTH_TOKEN_KEY - LocalStorage Key for Auth Token
  * @property {string} VITE_AUTH_REFRESH_INTERVAL - Auth Token Refresh Interval in ms
- * @property {string} VITE_DEFAULT_THEME - Default Theme (light, dark, glassmorphic)
+ * @property {string} VITE_DEFAULT_THEME - Default Theme (light, dark)
  * @property {string} VITE_SUPPORTED_THEMES - Comma-separated list of supported themes
  * @property {string} VITE_CACHE_ENABLED - Enable Cache (true/false)
  * @property {string} VITE_CACHE_DURATION - Cache Duration in ms
@@ -84,5 +84,4 @@ export const ENVIRONMENTS = {
 export const THEMES = {
   LIGHT: 'light',
   DARK: 'dark',
-  GLASSMORPHIC: 'glassmorphic',
 };

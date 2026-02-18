@@ -1,0 +1,41 @@
+// ============================================
+// 💀 SKELETON CARD COMPONENT
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.value {
+  margin-top: var(--space-xs);
+}
+
+.trend {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+// Size Variants
+.small {
+  padding: var(--space-md);
+  gap: var(--space-sm);
+}
+
+.large {
+  padding: var(--space-xl);
+  gap: var(--space-lg);
+}

@@ -15,11 +15,12 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
-import { SummaryCard, RecentTransactions, DashboardCharts } from '@/components/dashboard';
+import { SummaryCard, RecentTransactions, DashboardCharts, DashboardFilter, BudgetWidget } from '@/components/dashboard';
 import Button from '@/components/common/Button/Button';
-import Spinner from '@/components/common/Spinner/Spinner';
+import Skeleton from '@/components/common/Skeleton/Skeleton';
 import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
 import { formatCurrency } from '@/utils/formatters';
+import { getTimeOfDay, getTimeIcon } from '@/utils/getGreeting';
 import { FiDollarSign, FiCreditCard, FiTrendingUp, FiPlus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './DashboardPage.module.scss';
@@ -37,6 +38,11 @@ export default function DashboardPage() {
 function DashboardContent() {
   const { user, isAuthenticated } = useAuth();
   const { dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions } = useTransactions();
+  const {
+    dashboardMonth,
+    dashboardYear,
+    setDashboardMonth,
+  } = useTransactions();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -193,13 +199,44 @@ function DashboardContent() {
   };
 
   // ──────────────────────────────────────────────────────────────────────
-  // LOADING STATE
+  // LOADING STATE - Skeleton Grid
   // ──────────────────────────────────────────────────────────────────────
   if (dashboardLoading) {
     return (
-      <div className={styles.loadingContainer}>
-        <Spinner size="large" />
-        <p>{t('dashboard.loading')}</p>
+      <div className={styles.dashboardPage} aria-busy="true" aria-label={t('common.loading')}>
+        {/* Header Skeleton */}
+        <section className={styles.headerSection}>
+          <div className={styles.greeting}>
+            <Skeleton width="280px" height="32px" borderRadius="var(--r-md)" />
+            <Skeleton width="180px" height="18px" borderRadius="var(--r-sm)" />
+          </div>
+          <Skeleton width="160px" height="40px" borderRadius="var(--r-lg)" />
+        </section>
+
+        {/* Summary Cards Skeleton Grid */}
+        <section className={styles.summaryGrid}>
+          <SummaryCard isLoading color="income" icon={FiDollarSign} />
+          <SummaryCard isLoading color="expense" icon={FiCreditCard} />
+          <SummaryCard isLoading color="balance" icon={FiTrendingUp} />
+        </section>
+
+        {/* Charts Skeleton */}
+        <section className={styles.chartsGrid}>
+          <div className={styles.section}>
+            <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" />
+            <Skeleton width="100%" height="280px" borderRadius="var(--r-lg)" />
+          </div>
+          <div className={styles.section}>
+            <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" />
+            <Skeleton width="100%" height="280px" borderRadius="var(--r-lg)" />
+          </div>
+        </section>
+
+        {/* Recent Transactions Skeleton */}
+        <section className={styles.section}>
+          <Skeleton width="200px" height="28px" borderRadius="var(--r-md)" />
+          <Skeleton count={5} width="100%" height="64px" gap="var(--space-sm)" borderRadius="var(--r-lg)" />
+        </section>
       </div>
     );
   }
@@ -228,20 +265,43 @@ function DashboardContent() {
       <motion.section className={styles.headerSection} variants={itemVariants}>
         <div className={styles.greeting}>
           <h1 className={styles.greetingTitle}>
-            <span className={styles.greetingIntro}>{t('dashboard.greetingIntro')}</span>{' '}
-            {/* SAFE CHECK: Ensure split doesn't crash if name is missing */}
-            <span className={styles.greetingName}>{user?.name ? user.name.split(' ')[0] : ''}</span> 👋
+            <span className={styles.greetingIcon} aria-hidden="true">
+              {(() => { const Icon = getTimeIcon(getTimeOfDay()); return <Icon />; })()}
+            </span>
+            <span className={styles.greetingIntro}>
+              {t(`dashboard.greeting.${getTimeOfDay()}`)}
+            </span>
+            {user?.name && (
+              <>
+                {', '}
+                <span className={styles.greetingName}>
+                  {user.name.split(' ')[0]}
+                </span>
+              </>
+            )}
           </h1>
           <p>{t('dashboard.overview')}</p>
         </div>
-        <Button
-          variant="primary"
-          size="small"
-          icon={<FiPlus />}
-          onClick={() => navigate('/transactions')}
-        >
-          {t('dashboard.newTransaction')}
-        </Button>
+
+        <div className={styles.headerActions}>
+          <DashboardFilter
+            selectedMonth={dashboardMonth}
+            selectedYear={dashboardYear}
+            onMonthChange={setDashboardMonth}
+            onReset={() => {
+              const now = new Date();
+              setDashboardMonth(now.getMonth() + 1, now.getFullYear());
+            }}
+          />
+          <Button
+            variant="primary"
+            size="small"
+            icon={<FiPlus />}
+            onClick={() => navigate('/transactions')}
+          >
+            {t('dashboard.newTransaction')}
+          </Button>
+        </div>
       </motion.section>
 
       {/* Summary Cards Grid */}
@@ -264,6 +324,7 @@ function DashboardContent() {
             trendTooltip={summaryData.income.trendTooltip}
             color="income"
             size="medium"
+            isLoading={dashboardLoading}
           />
         </motion.div>
 
@@ -280,6 +341,7 @@ function DashboardContent() {
             trendTooltip={summaryData.expense.trendTooltip}
             color="expense"
             size="medium"
+            isLoading={dashboardLoading}
           />
         </motion.div>
 
@@ -296,6 +358,7 @@ function DashboardContent() {
             trendTooltip={summaryData.balance.trendTooltip}
             color="balance"
             size="medium"
+            isLoading={dashboardLoading}
           />
         </motion.div>
       </motion.section>
@@ -307,6 +370,13 @@ function DashboardContent() {
         </div>
         <ErrorBoundary>
           <DashboardCharts />
+        </ErrorBoundary>
+      </motion.section>
+
+      {/* Budget Widget */}
+      <motion.section className={styles.section} variants={itemVariants}>
+        <ErrorBoundary>
+          <BudgetWidget />
         </ErrorBoundary>
       </motion.section>
 

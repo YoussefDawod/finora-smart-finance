@@ -106,8 +106,10 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
   const userName = userInfo?.name || t('export.pdf.defaultUserName');
   const userEmail = userInfo?.email || '';
 
+  const isRTL = language === 'ar';
+
   return `<!DOCTYPE html>
-<html lang="${language}">
+<html lang="${language}"${isRTL ? ' dir="rtl"' : ''}>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

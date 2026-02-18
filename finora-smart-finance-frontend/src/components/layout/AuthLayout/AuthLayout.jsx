@@ -16,8 +16,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useMotion } from '@/context/MotionContext';
+import { useMotion } from '@/hooks/useMotion';
 import { Logo } from '@/components/common';
+import { FiBarChart2, FiShield, FiZap } from 'react-icons/fi';
 import styles from './AuthLayout.module.scss';
 
 /**
@@ -187,15 +188,15 @@ export default function AuthLayout({ children, variant = 'login' }) {
             {/* Feature Pills */}
             <div className={styles.features}>
               <div className={styles.featurePill}>
-                <span className={styles.featureIcon}>📊</span>
+                <span className={styles.featureIcon}><FiBarChart2 /></span>
                 <span>{t('auth.layout.features.realtime')}</span>
               </div>
               <div className={styles.featurePill}>
-                <span className={styles.featureIcon}>🔒</span>
+                <span className={styles.featureIcon}><FiShield /></span>
                 <span>{t('auth.layout.features.secure')}</span>
               </div>
               <div className={styles.featurePill}>
-                <span className={styles.featureIcon}>⚡</span>
+                <span className={styles.featureIcon}><FiZap /></span>
                 <span>{t('auth.layout.features.fast')}</span>
               </div>
             </div>

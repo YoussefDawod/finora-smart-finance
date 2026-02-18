@@ -4,7 +4,6 @@ const logger = require('../../utils/logger');
 const authService = require('../../services/authService');
 const emailVerificationService = require('../../services/emailVerificationService');
 const emailService = require('../../utils/emailService');
-const { isMockFn } = require('./sharedAuthUtils');
 
 // Email Verification
 async function resendVerification(req, res) {
@@ -43,14 +42,6 @@ async function verifyEmail(req, res) {
   try {
     const token = req.body?.token || req.query?.token;
 
-    if (isMockFn(emailVerificationService.verifyEmailByToken) && req.body?.token) {
-      const result = await emailVerificationService.verifyEmailByToken(token);
-      if (!result || !result.verified) {
-        return res.status(400).json(result || { verified: false, code: 'INVALID_TOKEN' });
-      }
-      return res.status(200).json(result);
-    }
-
     if (!token) {
       return res.redirect(`${frontendUrl}/verify-email?error=missing_token&type=initial`);
     }
@@ -82,14 +73,6 @@ async function sendVerificationEmail(req, res) {
 
   if (!user) {
     return res.status(401).json({ error: 'Nicht authentifiziert', code: 'UNAUTHORIZED' });
-  }
-
-  if (isMockFn(emailVerificationService.sendVerificationEmail)) {
-    const result = await emailVerificationService.sendVerificationEmail(user);
-    if (!result || !result.sent) {
-      return res.status(400).json(result || { sent: false });
-    }
-    return res.status(200).json(result);
   }
 
   if (user.isVerified) {

@@ -25,7 +25,7 @@
  * @module ToastContext
  */
 
-import { createContext, useReducer, useCallback, useRef, useEffect } from 'react';
+import { createContext, useReducer, useCallback, useEffect } from 'react';
 
 // ============================================
 // 📋 TOAST TYPES & CONSTANTS
@@ -143,26 +143,6 @@ const ToastContext = createContext(undefined);
  */
 export function ToastProvider({ children }) {
   const [state, dispatch] = useReducer(toastReducer, initialState);
-  
-  // Store timeout IDs for cleanup
-  const timeoutIdsRef = useRef(new Map());
-
-  // ============================================
-  // 🎬 CLEANUP
-  // ============================================
-
-  /**
-   * Cleanup all timeouts on unmount
-   */
-  useEffect(() => {
-    const timeoutMap = timeoutIdsRef.current;
-    return () => {
-      timeoutMap.forEach((timeoutId) => {
-        globalThis.clearTimeout(timeoutId);
-      });
-      timeoutMap.clear();
-    };
-  }, []);
 
   // ============================================
   // 🔔 TOAST ACTIONS
@@ -170,16 +150,11 @@ export function ToastProvider({ children }) {
 
   /**
    * Remove a toast by ID (internal helper)
+   * Auto-dismiss is handled entirely by the Toast component
+   * which calls this after its exit animation completes.
    * @param {string} id - Toast ID
    */
   const removeToastInternal = useCallback((id) => {
-    // Clear timeout if exists
-    const timeoutId = timeoutIdsRef.current.get(id);
-    if (timeoutId) {
-      globalThis.clearTimeout(timeoutId);
-      timeoutIdsRef.current.delete(id);
-    }
-
     dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
   }, []);
 
@@ -222,19 +197,36 @@ export function ToastProvider({ children }) {
 
       dispatch({ type: TOAST_ACTIONS.ADD_TOAST, payload: toast });
 
-      // Auto-dismiss if duration > 0
-      if (duration > 0) {
-        const timeoutId = globalThis.setTimeout(() => {
-          removeToastInternal(id);
-        }, duration);
-
-        timeoutIdsRef.current.set(id, timeoutId);
-      }
+      // Auto-dismiss is handled by the Toast component itself.
+      // The component runs its own timer, plays exit animation,
+      // then calls onClose(id) → removeToast(id) to remove from state.
 
       return id;
     },
-    [removeToastInternal]
+    []
   );
+
+  // ============================================
+  // 🌐 GLOBAL EVENT LISTENER (toast:add)
+  // ============================================
+
+  useEffect(() => {
+    const handleToastAdd = (event) => {
+      const detail = event?.detail || {};
+      const message = detail.message;
+      const type = detail.type || TOAST_TYPES.INFO;
+      const duration = typeof detail.duration === 'number' ? detail.duration : DEFAULT_DURATION;
+      const action = detail.action || null;
+
+      addToast(message, type, duration, action);
+    };
+
+    globalThis.window?.addEventListener('toast:add', handleToastAdd);
+
+    return () => {
+      globalThis.window?.removeEventListener('toast:add', handleToastAdd);
+    };
+  }, [addToast]);
 
   /**
    * Remove a toast by ID
@@ -248,12 +240,6 @@ export function ToastProvider({ children }) {
    * Clear all toasts
    */
   const clearAllToasts = useCallback(() => {
-    // Clear all timeouts
-    timeoutIdsRef.current.forEach((timeoutId) => {
-      globalThis.clearTimeout(timeoutId);
-    });
-    timeoutIdsRef.current.clear();
-
     dispatch({ type: TOAST_ACTIONS.CLEAR_ALL });
   }, []);
 

@@ -160,22 +160,6 @@ export const authService = {
     return client.post(ENDPOINTS.auth.resendAddEmailVerification);
   },
 
-  /**
-   * Change password (while logged in)
-   * @param {string} currentPassword
-   * @param {string} newPassword
-   * @returns {Promise<AxiosResponse<{ message: string }>>}
-   */
-  changePassword: (currentPassword, newPassword) => {
-    return client.post(ENDPOINTS.auth.changePassword, { currentPassword, newPassword });
-  },
-
-  /**
-   * Delete account (requires email confirmation)
-   */
-  deleteAccount: (email) => {
-    return client.delete(ENDPOINTS.auth.deleteAccount, { data: { email } });
-  },
 };
 
 export default authService;
