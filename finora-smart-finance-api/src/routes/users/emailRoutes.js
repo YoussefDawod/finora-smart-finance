@@ -3,11 +3,13 @@ const crypto = require('crypto');
 const router = express.Router();
 const User = require('../../models/User');
 const auth = require('../../middleware/authMiddleware');
+const { emailOperationLimiter } = require('../../middleware/rateLimiter');
 const emailService = require('../../utils/emailService');
 const logger = require('../../utils/logger');
 const { sanitizeUser } = require('../../utils/userSanitizer');
 const { validateEmailChangeInput } = require('../../validators/userValidation');
 const { loadUserOr404, handleServerError } = require('./userHelpers');
+const authEmailAddController = require('../../controllers/auth/authEmailAddController');
 
 // POST /api/users/change-email - Email ändern (mit Verifizierung)
 router.post('/change-email', auth, async (req, res) => {
@@ -88,7 +90,6 @@ router.get('/verify-email-change', async (req, res) => {
       user.emailChangeToken = undefined;
       user.emailChangeNewEmail = undefined;
       user.emailChangeExpires = undefined;
-      user.newEmailPending = undefined;
       await user.save();
       return res.status(400).json({ success: false, message: 'Token ist abgelaufen' });
     }
@@ -99,7 +100,6 @@ router.get('/verify-email-change', async (req, res) => {
     user.emailChangeToken = undefined;
     user.emailChangeNewEmail = undefined;
     user.emailChangeExpires = undefined;
-    user.newEmailPending = undefined;
 
     await user.save();
 
@@ -114,5 +114,27 @@ router.get('/verify-email-change', async (req, res) => {
     handleServerError(res, 'GET /verify-email-change', error);
   }
 });
+
+// ============================================
+// Multi-Email Management Routes
+// ============================================
+
+// POST /api/users/add-email - Zusätzliche Email hinzufügen
+router.post('/add-email', auth, emailOperationLimiter, authEmailAddController.addEmail);
+
+// GET /api/users/verify-add-email - Email-Hinzufügung verifizieren (Link)
+router.get('/verify-add-email', authEmailAddController.verifyAddEmailGet);
+
+// POST /api/users/verify-add-email - Email-Hinzufügung verifizieren (Token)
+router.post('/verify-add-email', authEmailAddController.verifyAddEmailPost);
+
+// DELETE /api/users/remove-email - Zusätzliche Email entfernen
+router.delete('/remove-email', auth, emailOperationLimiter, authEmailAddController.removeEmail);
+
+// POST /api/users/resend-add-email-verification - Verifizierungs-Email erneut senden
+router.post('/resend-add-email-verification', auth, emailOperationLimiter, authEmailAddController.resendAddEmailVerification);
+
+// GET /api/users/email-status - Email-Status abrufen
+router.get('/email-status', auth, authEmailAddController.getEmailStatus);
 
 module.exports = router;

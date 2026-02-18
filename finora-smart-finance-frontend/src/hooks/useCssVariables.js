@@ -70,8 +70,7 @@ export function useCssVariables() {
     // MutationObserver für Theme-Änderungen (data-theme Attribut)
     const observer = new MutationObserver((mutations) => {
       const hasThemeChange = mutations.some(
-        (m) => m.type === 'attributes' && 
-              (m.attributeName === 'data-theme' || m.attributeName === 'data-glass')
+        (m) => m.type === 'attributes' && m.attributeName === 'data-theme'
       );
       if (hasThemeChange) {
         // Kurze Verzögerung, um CSS-Transitions abzuwarten
@@ -81,7 +80,7 @@ export function useCssVariables() {
 
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['data-theme', 'data-glass'],
+      attributeFilter: ['data-theme'],
     });
 
     return () => observer.disconnect();

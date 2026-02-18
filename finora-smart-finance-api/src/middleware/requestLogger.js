@@ -46,7 +46,6 @@ const requestLoggerMiddleware = (req, res, next) => {
 
     // Call original with proper binding
     const result = originalJson.call(this, data);
-    console.log('[LOGGER]  Response sent for', req.method, req.path, 'with status', status);
     return result;
   };
 

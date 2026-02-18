@@ -5,6 +5,8 @@
  * @module api/errorHandler
  */
 
+import i18next from 'i18next';
+
 /* eslint-disable no-undef */
 
 const ERROR_CODES = {
@@ -28,14 +30,14 @@ export function parseApiError(error) {
   if (!error?.response) {
     if (error?.code === 'ECONNABORTED') {
       return {
-        message: 'Request hat zu lange gedauert',
+        message: i18next.t('errors.timeout'),
         code: ERROR_CODES.TIMEOUT,
         status: 0,
       };
     }
 
     return {
-      message: 'Keine Verbindung zum Server',
+      message: i18next.t('errors.networkError'),
       code: ERROR_CODES.NETWORK_ERROR,
       status: 0,
     };
@@ -48,7 +50,7 @@ export function parseApiError(error) {
   if (status === 422) {
     const details = data?.errors || data?.details;
     return {
-      message: details ? `Validierungsfehler: ${JSON.stringify(details)}` : 'Validierungsfehler',
+      message: details ? `${i18next.t('errors.validationError')}: ${JSON.stringify(details)}` : i18next.t('errors.validationError'),
       code: ERROR_CODES.VALIDATION_ERROR,
       status,
       details,
@@ -57,7 +59,7 @@ export function parseApiError(error) {
 
   if (status === 401) {
     return {
-      message: 'Authentifizierung erforderlich',
+      message: i18next.t('errors.authRequired'),
       code: ERROR_CODES.AUTH_ERROR,
       status,
     };
@@ -65,7 +67,7 @@ export function parseApiError(error) {
 
   if (status === 403) {
     return {
-      message: 'Sie haben keine Berechtigung',
+      message: i18next.t('errors.forbidden'),
       code: ERROR_CODES.FORBIDDEN,
       status,
     };
@@ -73,7 +75,7 @@ export function parseApiError(error) {
 
   if (status === 404) {
     return {
-      message: 'Ressource nicht gefunden',
+      message: i18next.t('errors.notFound'),
       code: ERROR_CODES.NOT_FOUND,
       status,
     };
@@ -81,14 +83,14 @@ export function parseApiError(error) {
 
   if (status >= 500) {
     return {
-      message: 'Server-Fehler, bitte später versuchen',
+      message: i18next.t('errors.serverError'),
       code: ERROR_CODES.SERVER_ERROR,
       status,
     };
   }
 
   return {
-    message: messageFromApi || 'Unerwarteter Fehler',
+    message: messageFromApi || i18next.t('errors.unexpectedError'),
     code: ERROR_CODES.UNKNOWN_ERROR,
     status,
   };
@@ -101,17 +103,17 @@ export function parseApiError(error) {
  */
 export function getErrorMessage(code) {
   const map = {
-    [ERROR_CODES.NETWORK_ERROR]: 'Keine Verbindung zum Server',
-    [ERROR_CODES.TIMEOUT]: 'Request hat zu lange gedauert',
-    [ERROR_CODES.VALIDATION_ERROR]: 'Validierungsfehler',
-    [ERROR_CODES.AUTH_ERROR]: 'Authentifizierung erforderlich',
-    [ERROR_CODES.FORBIDDEN]: 'Sie haben keine Berechtigung',
-    [ERROR_CODES.NOT_FOUND]: 'Ressource nicht gefunden',
-    [ERROR_CODES.SERVER_ERROR]: 'Server-Fehler, bitte später versuchen',
-    [ERROR_CODES.UNKNOWN_ERROR]: 'Unerwarteter Fehler',
+    [ERROR_CODES.NETWORK_ERROR]: i18next.t('errors.networkError'),
+    [ERROR_CODES.TIMEOUT]: i18next.t('errors.timeout'),
+    [ERROR_CODES.VALIDATION_ERROR]: i18next.t('errors.validationError'),
+    [ERROR_CODES.AUTH_ERROR]: i18next.t('errors.authRequired'),
+    [ERROR_CODES.FORBIDDEN]: i18next.t('errors.forbidden'),
+    [ERROR_CODES.NOT_FOUND]: i18next.t('errors.notFound'),
+    [ERROR_CODES.SERVER_ERROR]: i18next.t('errors.serverError'),
+    [ERROR_CODES.UNKNOWN_ERROR]: i18next.t('errors.unexpectedError'),
   };
 
-  return map[code] || 'Unerwarteter Fehler';
+  return map[code] || i18next.t('errors.unexpectedError');
 }
 
 /**
@@ -120,7 +122,7 @@ export function getErrorMessage(code) {
  * @param {{ endpoint?: string, method?: string, timestamp?: string }} [context]
  */
 export function logError(error, context = {}) {
-  const isDev = process.env.NODE_ENV !== 'production';
+  const isDev = import.meta.env.DEV;
 
   if (isDev) {
     globalThis.console?.error('API Error:', { error, context });

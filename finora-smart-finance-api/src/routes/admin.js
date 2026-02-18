@@ -1,32 +1,48 @@
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const config = require('../config/env');
 const logger = require('../utils/logger');
 const { sanitizeUser, sanitizeUsers } = require('../utils/userSanitizer');
+const { handleServerError } = require('./users/userHelpers');
 const {
   validateUserQuery,
   validateCreateUser,
   validateUpdateUser,
 } = require('../validators/adminValidation');
 
-function handleServerError(res, context, error) {
-  logger.error(`${context} error:`, error);
-  return res.status(500).json({ success: false, message: error.message });
-}
-
 // ⚠️ SECURITY: Diese Routen sind NUR für Development!
 // In Production sollten sie deaktiviert oder mit Admin-Auth geschützt sein
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
-// Middleware: Nur in Development verfügbar
+// Admin Key from env variable
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
+
 router.use((req, res, next) => {
+  // In production: require API key with timing-safe comparison
   if (!isDevelopment) {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Admin endpoints are only available in development mode' 
-    });
+    const providedKey = req.headers['x-admin-key'];
+    if (!ADMIN_API_KEY || !providedKey) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized: Invalid or missing admin API key'
+      });
+    }
+
+    // Timing-safe comparison to prevent timing attacks
+    const keyBuffer = Buffer.from(ADMIN_API_KEY, 'utf8');
+    const providedBuffer = Buffer.from(String(providedKey), 'utf8');
+
+    if (keyBuffer.length !== providedBuffer.length ||
+        !crypto.timingSafeEqual(keyBuffer, providedBuffer)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized: Invalid or missing admin API key'
+      });
+    }
   }
   next();
 });

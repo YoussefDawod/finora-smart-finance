@@ -170,6 +170,7 @@ const TransactionsPage = () => {
             onSubmit={handleSearchChange}
             placeholder={t('transactions.searchPlaceholder')}
             ariaLabel={t('transactions.searchAria')}
+            isSearching={localSearchQuery !== debouncedSearchQuery}
           />
           <Filter
             value={filter}

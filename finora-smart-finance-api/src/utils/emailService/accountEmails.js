@@ -11,7 +11,7 @@ async function sendWelcomeEmail(user) {
   const name = user.name || 'Nutzer';
 
   try {
-    await sendEmail(user.email, '🎉 Willkommen bei Finora!', templates.welcome(name));
+    await sendEmail(user.email, 'Willkommen bei Finora!', templates.welcome(name));
   } catch (error) {
     logger.error(`Welcome email failed: ${error.message}`);
   }

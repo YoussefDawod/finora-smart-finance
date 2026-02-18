@@ -177,19 +177,6 @@
 }
 
 // ============================================
-// 💎 GLASS CARD
-// ============================================
-
-.glass-card {
-  @include card;
-  backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-saturation, 160%));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-saturation, 160%));
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--sh-md);
-}
-
-// ============================================
 // 📊 STAT CARD
 // ============================================
 

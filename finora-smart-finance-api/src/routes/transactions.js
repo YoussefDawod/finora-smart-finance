@@ -6,12 +6,14 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const transactionController = require('../controllers/transactionController');
 
 // ============================================
-// AUTHENTICATION MIDDLEWARE
-// Alle Routes benötigen gültige JWT-Token
+// RATE LIMITING & AUTHENTICATION MIDDLEWARE
+// Alle Routes benötigen gültige JWT-Token + API Rate Limit
 // ============================================
+router.use(apiLimiter);
 router.use(authMiddleware);
 
 // ============================================

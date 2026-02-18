@@ -115,18 +115,24 @@ async function getSummaryStats(userId, dateFilter = {}) {
 /**
  * Aggregation: Dashboard-Daten
  * @param {string} userId - Die User-ID
+ * @param {Object} options - Optionale Filter
+ * @param {number} options.month - Monat (1-12), default: aktueller Monat
+ * @param {number} options.year - Jahr, default: aktuelles Jahr
  * @returns {Promise<Object>} Dashboard-Daten
  */
-async function getDashboardData(userId) {
+async function getDashboardData(userId, options = {}) {
   const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+  
+  // Verwende übergebenen Monat/Jahr oder aktuelles Datum
+  // Hinweis: month ist 1-basiert (1=Januar), JavaScript Date verwendet 0-basiert
+  const selectedMonth = options.month ? options.month - 1 : now.getMonth();
+  const selectedYear = options.year || now.getFullYear();
 
-  const monthStart = new Date(currentYear, currentMonth, 1);
-  const monthEnd = new Date(currentYear, currentMonth + 1, 0, 23, 59, 59, 999);
-  const lastMonthStart = new Date(currentYear, currentMonth - 1, 1);
-  const lastMonthEnd = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
-  const sixMonthsAgo = new Date(currentYear, currentMonth - 5, 1);
+  const monthStart = new Date(selectedYear, selectedMonth, 1);
+  const monthEnd = new Date(selectedYear, selectedMonth + 1, 0, 23, 59, 59, 999);
+  const lastMonthStart = new Date(selectedYear, selectedMonth - 1, 1);
+  const lastMonthEnd = new Date(selectedYear, selectedMonth, 0, 23, 59, 59, 999);
+  const sixMonthsAgo = new Date(selectedYear, selectedMonth - 5, 1);
 
   // Summary Pipeline
   const summaryPipeline = [
@@ -195,9 +201,9 @@ async function getDashboardData(userId) {
     { $sort: { total: -1 } },
   ];
 
-  // Recent Pipeline
+  // Recent Pipeline - NUR Transaktionen des aktuellen Monats
   const recentPipeline = [
-    { $match: { userId } },
+    { $match: { userId, date: { $gte: monthStart, $lte: monthEnd } } },
     { $sort: { date: -1, createdAt: -1 } },
     { $limit: 5 },
   ];

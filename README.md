@@ -40,7 +40,7 @@
 | 🎯 **Sparziele & Budgets** | Budget-Limits, Progress Tracking, Notifikationen |
 | 🌍 **4 Sprachen** | Deutsch, English, العربية, ქართული (RTL Support) |
 | 🔐 **Bank-Level Sicherheit** | JWT Auth, Bcrypt Hashing, Rate Limiting |
-| 🌙 **Dark Mode** | Glass-Morphism UI, Framer Motion Animationen |
+| 🌙 **Dark Mode** | Framer Motion Animationen |
 
 ---
 

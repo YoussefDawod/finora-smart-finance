@@ -4,6 +4,8 @@ const { verification, emailChange } = require('./authTemplates');
 const { passwordReset } = require('./passwordTemplates');
 const { welcome, securityAlert } = require('./accountTemplates');
 const { transactionNotification, budgetAlert, financialReport } = require('./financialTemplates');
+const { contactForm } = require('./contactTemplates');
+const { newsletterConfirmation, newsletterWelcome, newsletterGoodbye } = require('./newsletterTemplates');
 
 module.exports = {
   baseLayout,
@@ -15,4 +17,8 @@ module.exports = {
   securityAlert,
   budgetAlert,
   financialReport,
+  contactForm,
+  newsletterConfirmation,
+  newsletterWelcome,
+  newsletterGoodbye,
 };

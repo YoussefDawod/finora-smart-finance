@@ -13,7 +13,7 @@
 /* eslint-disable no-undef */
 
 // ============================================
-// 🎨 COLOR PALETTE
+// COLOR PALETTE
 // ============================================
 
 const COLORS = {
@@ -29,18 +29,18 @@ const COLORS = {
 };
 
 // ============================================
-// 📊 LOG LEVELS
+// LOG LEVELS
 // ============================================
 
 const LOG_LEVELS = {
-  DEBUG: { level: 0, icon: '🐛', color: COLORS.CYAN },
-  INFO: { level: 1, icon: 'ℹ️', color: COLORS.BLUE },
-  WARN: { level: 2, icon: '⚠️', color: COLORS.YELLOW },
-  ERROR: { level: 3, icon: '❌', color: COLORS.RED },
+  DEBUG: { level: 0, icon: '[DEBUG]', color: COLORS.CYAN },
+  INFO: { level: 1, icon: '[INFO]', color: COLORS.BLUE },
+  WARN: { level: 2, icon: '[WARN]', color: COLORS.YELLOW },
+  ERROR: { level: 3, icon: '[ERROR]', color: COLORS.RED },
 };
 
 // ============================================
-// ⚙️ CONFIGURATION
+// CONFIGURATION
 // ============================================
 
 const isDevelopment = import.meta.env.DEV;

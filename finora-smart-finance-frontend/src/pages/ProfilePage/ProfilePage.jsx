@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import { useProfile } from '@/hooks/useProfile';
-import authService from '@/api/authService';
+import userService from '@/api/userService';
+import Skeleton from '@/components/common/Skeleton/Skeleton';
 import {
   ProfileHeader,
   ProfileEditForm,
@@ -64,7 +65,7 @@ export default function ProfilePage() {
   // ============================================
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate('/login', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 
@@ -74,7 +75,53 @@ export default function ProfilePage() {
     }
   }, [isAuthenticated, user, fetchEmailStatus]);
 
-  if (isLoading) return null;
+  // ============================================
+  // LOADING SKELETON
+  // ============================================
+  if (isLoading) {
+    return (
+      <section className={styles.profilePage} aria-busy="true" aria-label={t('common.loading')}>
+        {/* Page Header Skeleton */}
+        <div className={styles.pageHeader}>
+          <Skeleton width="200px" height="36px" borderRadius="var(--r-md)" />
+          <Skeleton width="280px" height="22px" borderRadius="var(--r-sm)" />
+        </div>
+
+        {/* Content Skeleton */}
+        <div className={styles.content}>
+          {/* Profile Card Skeleton */}
+          <div className={styles.profileCard}>
+            <div className={styles.profileCardHeader}>
+              <Skeleton variant="rect" width="120px" height="120px" borderRadius="var(--r-lg)" />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                <Skeleton width="180px" height="28px" borderRadius="var(--r-md)" />
+                <Skeleton width="220px" height="18px" borderRadius="var(--r-sm)" />
+                <Skeleton width="100px" height="24px" borderRadius="var(--r-full)" />
+              </div>
+            </div>
+          </div>
+
+          {/* Email Section Skeleton */}
+          <div className={styles.section}>
+            <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" />
+            <Skeleton width="100%" height="80px" borderRadius="var(--r-lg)" />
+          </div>
+
+          {/* Edit Form Skeleton */}
+          <div className={styles.section}>
+            <Skeleton width="160px" height="24px" borderRadius="var(--r-md)" />
+            <Skeleton count={3} width="100%" height="48px" gap="var(--space-md)" borderRadius="var(--r-lg)" />
+          </div>
+
+          {/* Security Section Skeleton */}
+          <div className={styles.section}>
+            <Skeleton width="120px" height="24px" borderRadius="var(--r-md)" />
+            <Skeleton width="100%" height="60px" borderRadius="var(--r-lg)" />
+          </div>
+        </div>
+      </section>
+    );
+  }
   if (!user) return null;
 
   // ============================================
@@ -83,7 +130,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -91,10 +138,10 @@ export default function ProfilePage() {
 
   const handleDeleteAccount = async () => {
     try {
-      await authService.deleteAccount(user.email);
+      await userService.deleteAccount(user.email);
       toast.success(t('profile.toasts.accountDeleted'));
       await logout();
-      navigate('/login', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       return { success: false, error: error.response?.data?.message || t('profile.toasts.accountDeleteError') };
     }

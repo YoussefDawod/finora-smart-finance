@@ -80,7 +80,7 @@ async function checkBudgetAfterTransaction(user, newTransaction) {
       },
     };
 
-    logger.info(`📊 Budget alert triggered for user ${user._id}: ${percentUsed.toFixed(1)}% used`);
+    logger.info(`Budget alert triggered for user ${user._id}: ${percentUsed.toFixed(1)}% used`);
 
     // Sende Alert
     const result = await emailService.sendBudgetAlert(user, alertData);
@@ -213,7 +213,7 @@ async function checkNegativeBalanceAlert(user, newTransaction) {
       alertType: 'negative_balance',
     };
 
-    logger.info(`⚠️ Negative balance alert triggered for user ${user._id}: Balance ${balance}`);
+    logger.info(`Negative balance alert triggered for user ${user._id}: Balance ${balance}`);
 
     // Sende Alert
     const result = await emailService.sendBudgetAlert(user, alertData);

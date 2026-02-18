@@ -64,7 +64,6 @@
   border-radius: var(--r-full);
   background: radial-gradient(circle at 30% 30%, color-mix(in srgb, white 16%, transparent) 0%, color-mix(in srgb, white 6%, transparent) 55%, transparent 100%);
   border: 1px solid color-mix(in srgb, white 10%, transparent);
-  backdrop-filter: blur(10px);
   box-shadow: 0 14px 50px color-mix(in srgb, var(--shadow, currentColor) 12%, transparent);
   opacity: 0.6;
 }
@@ -121,7 +120,6 @@
   font-weight: var(--fw-m);
   letter-spacing: var(--ls-wide);
   text-transform: uppercase;
-  backdrop-filter: blur(8px);
   white-space: nowrap;
 
   @include lg {

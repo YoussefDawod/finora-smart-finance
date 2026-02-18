@@ -1,0 +1,213 @@
+// ============================================
+// 🦴 MODAL SKELETON
+// Loading-Skeleton für Modal-Inhalte
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// SHIMMER ANIMATION
+// ============================================
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// ============================================
+// BASE SKELETON STYLE
+// ============================================
+%skeleton-base {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--tx) 8%, transparent) 0%,
+    color-mix(in srgb, var(--tx) 15%, transparent) 50%,
+    color-mix(in srgb, var(--tx) 8%, transparent) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--r-sm);
+}
+
+// ============================================
+// FORM SKELETON
+// ============================================
+.formSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0;
+}
+
+.fieldsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md);
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  @extend %skeleton-base;
+  height: 14px;
+  width: 80px;
+}
+
+.input {
+  @extend %skeleton-base;
+  height: var(--input-h);
+  width: 100%;
+  border-radius: var(--r-md);
+}
+
+// ============================================
+// CONFIRM SKELETON
+// ============================================
+.confirmSkeleton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) 0;
+  text-align: center;
+}
+
+.iconCircle {
+  @extend %skeleton-base;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+
+.titleLine {
+  @extend %skeleton-base;
+  height: 24px;
+  width: 200px;
+}
+
+.descriptionLine {
+  @extend %skeleton-base;
+  height: 16px;
+  width: 280px;
+}
+
+.descriptionLineShort {
+  @extend %skeleton-base;
+  height: 16px;
+  width: 180px;
+}
+
+// ============================================
+// DETAIL SKELETON
+// ============================================
+.detailSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding: var(--space-md) 0;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.avatar {
+  @extend %skeleton-base;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.subtitleLine {
+  @extend %skeleton-base;
+  height: 14px;
+  width: 120px;
+}
+
+.detailRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.rowLabel {
+  @extend %skeleton-base;
+  height: 14px;
+  width: 100px;
+}
+
+.rowValue {
+  @extend %skeleton-base;
+  height: 16px;
+  width: 140px;
+}
+
+// ============================================
+// ACTIONS (Shared)
+// ============================================
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-sm);
+}
+
+.buttonPrimary {
+  @extend %skeleton-base;
+  height: var(--btn-h);
+  width: 120px;
+  border-radius: var(--r-md);
+}
+
+.buttonSecondary {
+  @extend %skeleton-base;
+  height: var(--btn-h);
+  width: 100px;
+  border-radius: var(--r-md);
+  opacity: 0.6;
+}
+
+.buttonDanger {
+  @extend %skeleton-base;
+  height: var(--btn-h);
+  width: 110px;
+  border-radius: var(--r-md);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--danger) 15%, transparent) 0%,
+    color-mix(in srgb, var(--danger) 25%, transparent) 50%,
+    color-mix(in srgb, var(--danger) 15%, transparent) 100%
+  );
+  background-size: 200% 100%;
+}

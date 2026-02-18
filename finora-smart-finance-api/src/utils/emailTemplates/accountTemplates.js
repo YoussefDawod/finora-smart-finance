@@ -8,17 +8,17 @@ const { baseLayout, frontendBaseUrl } = require('./baseLayout');
 function welcome(name) {
   return baseLayout(`
     <div class="content">
-      <h2>Willkommen bei Finora! 🎉</h2>
+      <h2>Willkommen bei Finora!</h2>
       <p>Hallo ${name},</p>
       <p>deine Email-Adresse wurde erfolgreich bestätigt. Du kannst jetzt alle Funktionen von Finora nutzen:</p>
       <ul>
-        <li>📊 Einnahmen und Ausgaben tracken</li>
-        <li>📈 Finanzübersichten und Charts</li>
-        <li>🔐 Passwort zurücksetzen (falls nötig)</li>
-        <li>⚙️ Profil-Einstellungen anpassen</li>
+        <li>Einnahmen und Ausgaben tracken</li>
+        <li>Finanzübersichten und Charts</li>
+        <li>Passwort zurücksetzen (falls nötig)</li>
+        <li>Profil-Einstellungen anpassen</li>
       </ul>
       <p style="text-align: center;">
-        <a href="${frontendBaseUrl}/dashboard" class="button">🚀 Zum Dashboard</a>
+        <a href="${frontendBaseUrl}/dashboard" class="button">Zum Dashboard</a>
       </p>
     </div>
     <div class="footer">
@@ -37,9 +37,9 @@ function welcome(name) {
  */
 function securityAlert(name, eventType, details = {}) {
   const titles = {
-    login: 'Neue Anmeldung erkannt 🔐',
-    password_change: 'Passwort wurde geändert 🔒',
-    suspicious: 'Verdächtige Aktivität erkannt ⚠️',
+    login: 'Neue Anmeldung erkannt',
+    password_change: 'Passwort wurde geändert',
+    suspicious: 'Verdächtige Aktivität erkannt',
   };
 
   const messages = {
@@ -69,10 +69,10 @@ function securityAlert(name, eventType, details = {}) {
       </div>
       ${eventType === 'suspicious' ? `
       <div class="warning">
-        <strong>⚠️ Warst das nicht du?</strong> Ändere sofort dein Passwort und überprüfe deine letzten Aktivitäten.
+        <strong>Warst das nicht du?</strong> Ändere sofort dein Passwort und überprüfe deine letzten Aktivitäten.
       </div>
       <p style="text-align: center;">
-        <a href="${frontendBaseUrl}/settings" class="button">🔐 Passwort ändern</a>
+        <a href="${frontendBaseUrl}/settings" class="button">Passwort ändern</a>
       </p>
       ` : ''}
       <p style="font-size: 14px; color: #6b7280;">

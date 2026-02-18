@@ -13,16 +13,14 @@ export { useTransactions } from './useTransactions';
 // ============================================
 
 export { useDebounce } from './useDebounce';
-export { useLocalStorage } from './useLocalStorage';
-export { usePasswordToggle } from './usePasswordToggle';
 export { useProfile } from './useProfile';
+export { useBudget } from './useBudget';
 
 // ============================================
 // 📦 EXISTING HOOKS
 // ============================================
 
 export { useForm } from './useForm';
-export { useFetch } from './useFetch';
 export { useMediaQuery, useIsMobile, useIsTablet, useIsDesktop } from './useMediaQuery';
 export { useClickOutside } from './useClickOutside';
 

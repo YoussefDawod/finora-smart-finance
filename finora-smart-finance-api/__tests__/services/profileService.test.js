@@ -32,7 +32,7 @@ describe('ProfileService', () => {
         refreshTokens: ['token1', 'token2'],
       };
 
-      authService.sanitizeUser = jest.fn().mockReturnValue({
+      authService.sanitizeUserForAuth = jest.fn().mockReturnValue({
         _id: 'user-123',
         name: 'Max Mustermann',
         email: 'max@example.com',
@@ -41,7 +41,7 @@ describe('ProfileService', () => {
 
       const result = profileService.getUserProfile(mockUser);
 
-      expect(authService.sanitizeUser).toHaveBeenCalledWith(mockUser);
+      expect(authService.sanitizeUserForAuth).toHaveBeenCalledWith(mockUser);
       expect(result._id).toBe('user-123');
       expect(result.name).toBe('Max Mustermann');
       expect(result.email).toBe('max@example.com');
@@ -60,7 +60,7 @@ describe('ProfileService', () => {
       };
 
       User.findById = jest.fn().mockResolvedValue(mockUser);
-      authService.sanitizeUser = jest.fn().mockReturnValue({
+      authService.sanitizeUserForAuth = jest.fn().mockReturnValue({
         _id: 'user-123',
         name: 'Max Mustermann',
       });

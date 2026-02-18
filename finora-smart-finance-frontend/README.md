@@ -101,7 +101,6 @@ npm run test:coverage     # Coverage Report
 |-------|--------|
 | Light Mode | ✅ Default |
 | Dark Mode | ✅ Supported |
-| Glass-Morphism | ✅ Effects |
 | System Preference | ✅ Auto-detect |
 
 ---

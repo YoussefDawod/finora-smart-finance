@@ -154,9 +154,9 @@ export default function LoginForm() {
       
       // Show more details in API error for debugging network issues
       const networkInfo = error?.code === 'ERR_NETWORK' 
-        ? ' (Netzwerkfehler - Server nicht erreichbar)'
+        ? ` ${t('auth.errors.networkError')}`
         : error?.code === 'ECONNABORTED'
-          ? ' (Timeout - Server antwortet nicht)'
+          ? ` ${t('auth.errors.timeout')}`
           : '';
       
       const errorMessage = errorDetail + networkInfo;

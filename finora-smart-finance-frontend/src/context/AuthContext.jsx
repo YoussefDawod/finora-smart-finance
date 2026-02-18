@@ -3,7 +3,7 @@
  * Schlanker Context Provider mit extrahierten Hooks und Reducer
  */
 
-import { useReducer, useEffect, createContext } from 'react';
+import { useReducer, useEffect, useCallback, createContext } from 'react';
 import authService from '@/api/authService';
 import { persistUserPreferences } from '@/utils/userPreferences';
 import { authReducer, initialState, AUTH_ACTIONS } from './reducers/authReducer';
@@ -71,6 +71,22 @@ function AuthProvider({ children }) {
 
     autoLogin();
   }, [getToken, clearAllTokens]);
+
+  // ──────────────────────────────────────────────────────────────────────
+  // HANDLE 401 UNAUTHORIZED EVENTS (Token Expiry)
+  // ──────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const handleAuthUnauthorized = () => {
+      // Token expired or invalidated - trigger logout
+      dispatch({ type: AUTH_ACTIONS.LOGOUT });
+    };
+
+    globalThis.window?.addEventListener('auth:unauthorized', handleAuthUnauthorized);
+    
+    return () => {
+      globalThis.window?.removeEventListener('auth:unauthorized', handleAuthUnauthorized);
+    };
+  }, []);
 
   // Persist user preferences when user changes
   useEffect(() => {

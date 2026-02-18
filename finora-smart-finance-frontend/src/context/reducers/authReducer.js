@@ -66,6 +66,13 @@ export function authReducer(state, action) {
         error: null,
       };
 
+    case AUTH_ACTIONS.LOGOUT:
+    case AUTH_ACTIONS.AUTO_LOGIN_FAIL:
+      return {
+        ...initialState,
+        isLoading: false,
+      };
+
     case AUTH_ACTIONS.VERIFY_SUCCESS:
       return {
         ...state,
@@ -78,13 +85,6 @@ export function authReducer(state, action) {
       return {
         ...state,
         user: action.payload.user,
-      };
-
-    case AUTH_ACTIONS.LOGOUT:
-    case AUTH_ACTIONS.AUTO_LOGIN_FAIL:
-      return {
-        ...initialState,
-        isLoading: false,
       };
 
     default:

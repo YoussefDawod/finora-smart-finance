@@ -37,6 +37,7 @@ export function useMotion() {
 
   return {
     prefersReducedMotion: context.prefersReducedMotion,
+    shouldAnimate: !context.prefersReducedMotion,
   };
 }
 

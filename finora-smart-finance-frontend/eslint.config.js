@@ -27,6 +27,7 @@ export default [
         Intl: 'readonly',
         // Browser APIs für CSS/Animation
         getComputedStyle: 'readonly',
+        IntersectionObserver: 'readonly',
         MutationObserver: 'readonly',
         requestAnimationFrame: 'readonly',
       },

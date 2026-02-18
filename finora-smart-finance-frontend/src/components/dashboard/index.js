@@ -6,3 +6,5 @@
 export { default as SummaryCard } from './SummaryCard/SummaryCard';
 export { default as RecentTransactions } from './RecentTransactions/RecentTransactions';
 export { default as DashboardCharts } from './DashboardCharts/DashboardCharts';
+export { default as DashboardFilter } from './DashboardFilter/DashboardFilter';
+export { default as BudgetWidget } from './BudgetWidget/BudgetWidget';

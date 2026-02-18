@@ -17,12 +17,6 @@
   animation: backdropFadeIn var(--tr) ease-out;
 }
 
-.modal-backdrop-blur {
-  @include modal-overlay;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
 // ============================================
 // 📦 BASE MODAL
 // ============================================
@@ -30,13 +24,6 @@
 .modal {
   @include modal-base;
   animation: modalEnter var(--tr) ease-out;
-}
-
-[data-glass="true"] .modal {
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  background: var(--surface);
-  border-color: var(--border);
 }
 
 // ============================================

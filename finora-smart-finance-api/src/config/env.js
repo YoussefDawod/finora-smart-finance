@@ -37,10 +37,14 @@ const config = {
     jwt: {
       secret: process.env.JWT_SECRET || 'dev-secret-key-change-in-production',
       expire: process.env.JWT_EXPIRE || '7d',
+      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600,       // 1h in Sekunden
+      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800,   // 7d in Sekunden
     },
     logging: {
       level: process.env.LOG_LEVEL || 'debug',
       dir: process.env.LOG_DIR || './logs',
+      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 14,   // Log-Dateien nach 14 Tagen löschen
+      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 10,     // Einzeldatei max 10 MB
     },
     rateLimit: {
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 min
@@ -52,12 +56,13 @@ const config = {
     },
     smtp: {
       host: process.env.SMTP_HOST || '',
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
+      port: parseInt(process.env.SMTP_PORT) || 465,
+      secure: process.env.SMTP_SECURE !== 'false',
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASS || '',
-      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.app>',
+      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.dawoddev.com>',
     },
+    contactEmail: process.env.CONTACT_EMAIL || 'info@finora.dawoddev.com',
   },
 
   production: {
@@ -78,10 +83,14 @@ const config = {
     jwt: {
       secret: process.env.JWT_SECRET,
       expire: process.env.JWT_EXPIRE || '7d',
+      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600,       // 1h in Sekunden
+      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800,   // 7d in Sekunden
     },
     logging: {
       level: process.env.LOG_LEVEL || 'info',
       dir: process.env.LOG_DIR || './logs',
+      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 30,   // Produktion: 30 Tage aufbewahren
+      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 25,     // Produktion: max 25 MB pro Datei
     },
     rateLimit: {
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
@@ -93,12 +102,13 @@ const config = {
     },
     smtp: {
       host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
+      port: parseInt(process.env.SMTP_PORT) || 465,
+      secure: process.env.SMTP_SECURE !== 'false',
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
-      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.app>',
+      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.dawoddev.com>',
     },
+    contactEmail: process.env.CONTACT_EMAIL || 'info@finora.dawoddev.com',
   },
 
   test: {
@@ -119,10 +129,14 @@ const config = {
     jwt: {
       secret: 'test-secret-key',
       expire: '1h',
+      accessExpire: 3600,       // 1h in Sekunden
+      refreshExpire: 604800,    // 7d in Sekunden
     },
     logging: {
       level: 'error',
       dir: './logs',
+      maxAgeDays: 1,     // Tests: sofort aufräumen
+      maxSizeMB: 5,
     },
     rateLimit: {
       windowMs: 900000,
@@ -138,8 +152,9 @@ const config = {
       secure: false,
       user: '',
       pass: '',
-      from: '"Finora Test" <test@finora.app>',
+      from: '"Finora Test" <test@finora.dawoddev.com>',
     },
+    contactEmail: 'info@finora.dawoddev.com',
   },
 };
 

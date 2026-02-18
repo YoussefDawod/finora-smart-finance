@@ -44,13 +44,13 @@ export const formatMonthLabel = (date) =>
 
 /**
  * Custom Hook für Dashboard-Chart-Daten-Transformation
- * @returns {Object} Transformierte Chart-Daten
+ * @returns {Object} Transformierte Chart-Daten inkl. loading State
  */
 export const useDashboardChartData = () => {
-  const { dashboardData } = useTransactions();
+  const { dashboardData, loading } = useTransactions();
   const { t } = useTranslation();
 
-  return useMemo(() => {
+  const chartData = useMemo(() => {
     // Fallback wenn keine Daten
     if (!dashboardData?.summary) {
       return {
@@ -142,6 +142,8 @@ export const useDashboardChartData = () => {
       hasAnyData,
     };
   }, [dashboardData, t]);
+
+  return { ...chartData, loading };
 };
 
 export default useDashboardChartData;

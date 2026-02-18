@@ -14,6 +14,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { VerifyEmailForm } from '@/components/auth';
@@ -43,11 +44,27 @@ export default function VerifyEmailPage() {
   }, [isAuthenticated, isLoading, navigate]);
 
   // ============================================
-  // LOADING STATE
+  // LOADING STATE - Skeleton statt White Screen
   // ============================================
 
   if (isLoading) {
-    return null;
+    return (
+      <div className={styles.verifyEmailPage} aria-busy="true" aria-label={t('common.loadingContent')}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-lg)', padding: 'var(--space-xl)' }}>
+          <Skeleton width="120px" height="40px" borderRadius="var(--r-lg)" />
+          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-sm)' }}>
+            <Skeleton width="200px" height="28px" borderRadius="var(--r-md)" />
+            <Skeleton width="280px" height="18px" borderRadius="var(--r-sm)" />
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center' }}>
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} width="48px" height="56px" borderRadius="var(--r-md)" />
+            ))}
+          </div>
+          <Skeleton width="140px" height="16px" borderRadius="var(--r-sm)" />
+        </div>
+      </div>
+    );
   }
 
   // ============================================

@@ -24,6 +24,9 @@ jobs:
       - name: Build frontend
         run: npm run build
         working-directory: finora-smart-finance-frontend
+      - name: Run frontend tests
+        run: npx vitest run
+        working-directory: finora-smart-finance-frontend
 
   backend:
     runs-on: ubuntu-latest
@@ -40,3 +43,10 @@ jobs:
       - name: Lint backend
         run: npm run lint
         working-directory: finora-smart-finance-api
+      - name: Run backend tests
+        run: npx jest --forceExit
+        working-directory: finora-smart-finance-api
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-key-ci
+          JWT_REFRESH_SECRET: test-refresh-secret-ci

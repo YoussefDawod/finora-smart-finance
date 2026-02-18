@@ -22,7 +22,43 @@
   display: flex;
   align-items: center;
   border-radius: var(--r-md);
-  overflow: hidden; // Verhindert dass Icons die Ecken überdecken
+  overflow: hidden;
+
+  &.searching {
+    .searchInput {
+      padding-right: var(--space-2xl);
+    }
+
+    .searchIcon {
+      opacity: 0.5;
+    }
+  }
+}
+
+// ============================================
+// SEARCH SPINNER (Loading Indicator)
+// ============================================
+.searchSpinner {
+  position: absolute;
+  right: var(--space-sm);
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  pointer-events: none;
+}
+
+:global([dir='rtl']) .searchSpinner {
+  right: auto;
+  left: var(--space-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ============================================
@@ -33,9 +69,10 @@
   left: var(--space-sm);
   color: color-mix(in srgb, var(--tx) 55%, var(--tx-muted));
   pointer-events: none;
-  background: transparent; // Verhindert Überdeckung von border-radius
+  background: transparent;
   font-size: var(--fs-lg);
   z-index: 1;
+  transition: opacity var(--tr);
 }
 
 :global([dir='rtl']) .searchIcon {

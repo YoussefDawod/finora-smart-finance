@@ -79,7 +79,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
         resetForm();
         onSuccess?.();
       } catch (err) {
-        console.error('❌ [TransactionForm] Submit error:', err);
+        console.error('[TransactionForm] Submit error:', err);
         // Don't show toast for 401/403 - the API client already handles this
         if (err.response?.status !== 401 && err.response?.status !== 403) {
           addToast(

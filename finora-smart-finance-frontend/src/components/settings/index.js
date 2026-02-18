@@ -4,3 +4,4 @@
  */
 
 export { ExportSection } from './ExportSection';
+export { default as BudgetSettings } from './BudgetSettings';

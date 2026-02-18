@@ -11,9 +11,11 @@
     "saving": "Speichern...",
     "cancel": "Abbrechen",
     "close": "Schließen",
+    "closeModal": "Dialog schließen",
     "closeNotification": "Benachrichtigung schließen",
     "confirm": "Bestätigen",
     "backToLogin": "Zurück zur Anmeldung",
+    "goBack": "Zurück",
     "or": "oder",
     "loading": "Lädt...",
     "loadingContent": "Inhalt wird geladen",
@@ -31,16 +33,21 @@
     "prevStep": "Zum vorherigen Schritt",
     "loadingNext": "Wird überprüft...",
     "loadingComplete": "Wird registriert...",
-    "stepErrorsTitle": "⚠ Fehler in diesem Schritt:",
+    "stepErrorsTitle": "Fehler in diesem Schritt:",
     "retry": "Erneut versuchen",
-    "appName": "Finora - Smart Finance"
+    "appName": "Finora - Smart Finance",
+    "errors": {
+      "generic": "Ein Fehler ist aufgetreten",
+      "somethingWrong": "Etwas ist schiefgegangen."
+    },
+    "stepProgress": "Schritt {{current}} von {{total}}",
+    "stepLabel": "Schritt {{step}}",
+    "stepCompleted": "Abgeschlossen"
   },
   "themeSelector": {
     "title": "Design & Theme",
     "ariaLabel": "Design & Theme",
-    "colorScheme": "Farbschema",
-    "effects": "Effekte",
-    "glassmorphic": "Glasmorphic"
+    "colorScheme": "Farbschema"
   },
   "settings": {
     "title": "Einstellungen",
@@ -62,16 +69,13 @@
     },
     "appearance": {
       "title": "Design & Anzeige",
-      "description": "Wählen Sie Theme, folgen Sie dem System oder aktivieren Sie Glass-Effekte.",
+      "description": "Wählen Sie Theme oder folgen Sie dem System.",
       "themeLight": "Hell",
       "themeDark": "Dunkel",
       "themeSystem": "System",
       "themeLightDesc": "Klare, helle Oberfläche",
       "themeDarkDesc": "Schont die Augen bei Nacht",
-      "themeSystemDesc": "Folgt dem Gerätedesign",
-      "glassTitle": "Glassmorphic-Effekt",
-      "glassDescription": "Aktiviert transparente Oberflächen für ein modernes UI-Gefühl.",
-      "glassAria": "Glassmorphic-Effekt umschalten"
+      "themeSystemDesc": "Folgt dem Gerätedesign"
     },
     "notifications": {
       "title": "Benachrichtigungen",
@@ -98,14 +102,41 @@
         "title": "Warnungen",
         "description": "Budget-Überschreitungen und ungewöhnliche Aktivitäten.",
         "aria": "Warnungsbenachrichtigungen umschalten"
+      },
+      "newsletter": {
+        "title": "Newsletter",
+        "description": "Neuigkeiten, Tipps und Updates von Finora per E-Mail erhalten.",
+        "aria": "Newsletter umschalten",
+        "subscribed": "Newsletter erfolgreich abonniert!",
+        "unsubscribed": "Newsletter erfolgreich abgemeldet.",
+        "error": "Fehler beim Ändern des Newsletter-Status.",
+        "noEmail": "Bitte hinterlege zuerst eine E-Mail-Adresse in deinem Profil.",
+        "noEmailHint": "Um den Newsletter hier zu verwalten, hinterlege eine E-Mail-Adresse in deinem Profil. Alternativ kannst du dich im Footer mit einer beliebigen Adresse anmelden."
       }
+    },
+    "budget": {
+      "title": "Budget-Verwaltung",
+      "description": "Legen Sie ein monatliches Ausgabenlimit fest und erhalten Sie Warnungen.",
+      "currentStatus": "Aktueller Stand",
+      "monthlyLimit": "Monatliches Limit",
+      "alertThreshold": "Warnschwelle",
+      "limitHint": "Maximale monatliche Ausgaben in Euro.",
+      "thresholdHint": "Warnung senden, wenn dieser Prozentsatz erreicht wird.",
+      "nearLimit": "Sie nähern sich Ihrem Budgetlimit.",
+      "exceeded": "Budget überschritten!",
+      "saved": "Budget erfolgreich gespeichert.",
+      "saveError": "Budget konnte nicht gespeichert werden.",
+      "cleared": "Budget wurde zurückgesetzt.",
+      "clearError": "Budget konnte nicht zurückgesetzt werden.",
+      "invalidLimit": "Bitte geben Sie ein gültiges Limit ein.",
+      "remove": "Budget entfernen",
+      "loadError": "Budget-Status konnte nicht geladen werden"
     },
     "saved": "Einstellungen erfolgreich gespeichert.",
     "saveError": "Einstellungen konnten nicht gespeichert werden."
   },
   "dashboard": {
-    "greetingIntro": "Willkommen zurück,",
-    "overview": "Hier ist eine Übersicht Ihrer finanziellen Aktivitäten diesen Monat",
+    "overview": "Hier ist dein Finanzüberblick für diesen Monat",
     "loading": "Dashboard wird geladen...",
     "newTransaction": "Neue Transaktion",
     "income": "Einkommen",
@@ -140,8 +171,38 @@
     "transactionCount": "{{count}} Transaktionen",
     "summaryDefaultTitle": "Titel",
     "summaryDefaultValue": "0,00 €",
+    "filter": {
+      "selectPeriod": "Zeitraum wählen",
+      "currentMonth": "Aktueller Monat",
+      "last1Month": "Letzter Monat",
+      "last3Months": "Letzte 3 Monate",
+      "last6Months": "Letzte 6 Monate",
+      "previousMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "goToToday": "Zum aktuellen Monat",
+      "apply": "Anwenden",
+      "reset": "Zurücksetzen"
+    },
     "errors": {
       "load": "Fehler beim Laden der Dashboard-Daten"
+    },
+    "budget": {
+      "title": "Monatsbudget",
+      "noBudget": "Kein Budget festgelegt",
+      "setup": "Budget einrichten",
+      "spent": "Ausgegeben",
+      "remaining": "Verbleibend",
+      "limit": "Limit",
+      "exceeded": "Überschritten",
+      "nearLimit": "Fast erreicht",
+      "onTrack": "Im Plan",
+      "healthy": "Gut"
+    },
+    "greeting": {
+      "morning": "Guten Morgen",
+      "afternoon": "Guten Tag",
+      "evening": "Guten Abend",
+      "night": "Gute Nacht"
     }
   },
   "transactions": {
@@ -207,6 +268,15 @@
     }
   },
   "auth": {
+    "requiredMessage": "Melden Sie sich an oder registrieren Sie sich, um diese Funktion zu nutzen.",
+    "loginOrRegister": "Anmelden / Registrieren",
+    "errors": {
+      "loginFailed": "Login fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "registerFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "verifyFailed": "Email-Verifizierung fehlgeschlagen.",
+      "networkError": "(Netzwerkfehler - Server nicht erreichbar)",
+      "timeout": "(Timeout - Server antwortet nicht)"
+    },
     "verifyEmailTitle": "E-Mail bestätigen",
     "verifyEmailSubtitle": "Geben Sie den 6-stelligen Code aus Ihrer E-Mail ein.",
     "verifyEmailSent": "Wir haben einen Code an {{email}} gesendet.",
@@ -260,11 +330,6 @@
         "secure": "Sicher & Privat",
         "fast": "Blitzschnell"
       }
-    },
-    "features": {
-      "realtime": "რეალურ დროში ანალიზები",
-      "secure": "უსაფრთხო და პირადი",
-      "fast": "ელვის სისწრაფე"
     },
     "branding": {
       "badge": "Budget • Insights • Vertrauen",
@@ -582,10 +647,13 @@
     "notFoundSubtitle": "Die Seite existiert nicht oder wurde verschoben.",
     "backToDashboard": "Zurück zum Dashboard",
     "unauthorizedTitle": "Zugriff verweigert",
-    "unauthorizedSubtitle": "Sie haben keinen Zugriff auf diese Seite.",
+    "unauthorizedSubtitle": "Sie haben keine Berechtigung, auf diese Seite zuzugreifen. Bitte melden Sie sich an oder kontaktieren Sie den Support.",
     "serverErrorTitle": "Serverfehler",
-    "serverErrorSubtitle": "Entschuldigung, es gab einen Fehler auf dem Server.",
-    "statusTitle": "{{code}} - {{title}}"
+    "serverErrorSubtitle": "Entschuldigung, ein unerwarteter Fehler ist aufgetreten. Unsere Techniker wurden benachrichtigt.",
+    "statusTitle": "{{code}} - {{title}}",
+    "needHelp": "Brauchen Sie Hilfe?",
+    "contactSupport": "Support kontaktieren",
+    "persistentIssue": "Problem besteht weiterhin?"
   },
   "terms": {
     "title": "Nutzungsbedingungen",
@@ -673,6 +741,7 @@
       "description": "Exportieren Sie alle Transaktionen als CSV-Datei. Ideal für Excel oder andere Tabellenkalkulationen.",
       "button": "CSV herunterladen",
       "headers": {
+        "statusTitle": "{{code}} - {{title}}",
         "date": "Datum",
         "category": "Kategorie",
         "description": "Beschreibung",
@@ -753,5 +822,273 @@
     "sports": "Sport",
     "household": "Haushalt",
     "other": "Sonstiges"
+  },
+  "guest": {
+    "storageFull": "Speicherplatz voll! Bitte löschen Sie ältere Transaktionen oder melden Sie sich an.",
+    "localStorageWarning": "Ihre Daten werden nur in diesem Tab gespeichert. Erstellen Sie ein Konto für dauerhafte Speicherung und alle Features!"
+  },
+  "errors": {
+    "requestFailed": "Unerwarteter Fehler beim Senden der Anfrage",
+    "authRequired": "Authentifizierung erforderlich",
+    "forbidden": "Sie haben keine Berechtigung",
+    "notFound": "Ressource nicht gefunden",
+    "serverError": "Server-Fehler, bitte später versuchen",
+    "networkError": "Keine Verbindung zum Server",
+    "timeout": "Anfrage hat zu lange gedauert",
+    "unexpectedError": "Unerwarteter Fehler",
+    "validationError": "Validierungsfehler"
+  },
+  "footer": {
+    "allRightsReserved": "Alle Rechte vorbehalten",
+    "terms": "Allgemeine Geschäftsbedingungen",
+    "privacy": "Datenschutzerklärung",
+    "contact": "Kontakt",
+    "navigation": "Footer-Navigation",
+    "brand": {
+      "description": "Intelligente Finanzverwaltung für dein smartes Leben. Behalte den Überblick über deine Finanzen mit Finora."
+    },
+    "newsletter": {
+      "title": "Newsletter abonnieren",
+      "placeholder": "Deine E-Mail-Adresse",
+      "button": "Abonnieren",
+      "success": "Bestätigungs-E-Mail gesendet! Bitte prüfe dein Postfach.",
+      "error": "Ungültige E-Mail-Adresse",
+      "serverError": "Fehler beim Abonnieren. Bitte versuche es später erneut."
+    },
+    "sections": {
+      "product": "Produkt",
+      "company": "Unternehmen",
+      "resources": "Ressourcen",
+      "legal": "Rechtliches"
+    },
+    "links": {
+      "features": "Funktionen",
+      "pricing": "Preise",
+      "about": "Über uns",
+      "blog": "Blog",
+      "help": "Hilfe",
+      "faq": "FAQ"
+    },
+    "social": {
+      "title": "Folge uns",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "ariaGithub": "Besuche uns auf GitHub (öffnet in neuem Tab)",
+      "ariaLinkedin": "Besuche uns auf LinkedIn (öffnet in neuem Tab)"
+    },
+    "contactInfo": {
+      "title": "Kontakt",
+      "email": "E-Mail"
+    },
+    "madeWith": "Entwickelt mit",
+    "byAuthor": "von Youssef Dawod",
+    "backToTop": "Nach oben"
+  },
+  "privacy": {
+    "title": "Datenschutzerklärung",
+    "lastUpdated": "Zuletzt aktualisiert: Februar 2026",
+    "sections": [
+      {
+        "title": "Datenerhebung & Verarbeitung",
+        "paragraphs": ["Wir erheben personenbezogene Daten, die für die Bereitstellung unserer Dienste erforderlich sind. Die Verarbeitung erfolgt gemäß der DSGVO und nur mit Ihrer Einwilligung oder auf gesetzlicher Grundlage."],
+        "list": ["Name und E-Mail-Adresse", "Transaktionsdaten", "Nutzungsstatistiken"]
+      },
+      {
+        "title": "Cookies & Tracking",
+        "paragraphs": ["Wir verwenden ausschließlich technisch notwendige Cookies, um die Funktionalität unserer Anwendung sicherzustellen. Es werden keine Tracking-Cookies oder Cookies von Drittanbietern eingesetzt."]
+      },
+      {
+        "title": "Datenweitergabe",
+        "paragraphs": ["Ihre Daten werden nicht an Dritte weitergegeben, es sei denn, dies ist gesetzlich vorgeschrieben oder für die Erbringung unserer Dienste zwingend erforderlich."]
+      },
+      {
+        "title": "Ihre Rechte (DSGVO)",
+        "paragraphs": ["Gemäß der DSGVO haben Sie folgende Rechte in Bezug auf Ihre personenbezogenen Daten:"],
+        "list": ["Auskunft über Ihre Daten", "Berichtigung Ihrer Daten", "Löschung Ihrer Daten", "Export Ihrer Daten", "Widerspruch gegen die Verarbeitung"]
+      },
+      {
+        "title": "Datensicherheit",
+        "paragraphs": ["Wir setzen branchenübliche Sicherheitsmaßnahmen ein, um Ihre Daten vor unbefugtem Zugriff, Verlust oder Missbrauch zu schützen."]
+      },
+      {
+        "title": "Kontakt bei Datenschutzfragen",
+        "paragraphs": ["Bei Fragen zum Datenschutz können Sie uns jederzeit über unser Kontaktformular erreichen."]
+      }
+    ]
+  },
+  "contact": {
+    "title": "Kontakt",
+    "subtitle": "Haben Sie eine Frage oder Feedback? Wir freuen uns, von Ihnen zu hören.",
+    "form": {
+      "name": "Name",
+      "email": "E-Mail",
+      "category": "Kategorie",
+      "message": "Nachricht",
+      "submit": "Nachricht senden",
+      "sending": "Wird gesendet..."
+    },
+    "categories": {
+      "feedback": "Feedback",
+      "bug": "Fehlerbericht",
+      "feature": "Funktionswunsch",
+      "other": "Sonstiges"
+    },
+    "success": "Ihre Nachricht wurde erfolgreich gesendet! Wir melden uns in Kürze bei Ihnen.",
+    "error": "Die Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."  },
+  "features": {
+    "title": "Funktionen",
+    "subtitle": "Alles, was du f\u00fcr eine intelligente Finanzverwaltung brauchst",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "items": [
+      {
+        "title": "Ausgabenverfolgung",
+        "description": "Verfolge jede Transaktion, kategorisiere deine Ausgaben und erhalte tiefe Einblicke, wohin dein Geld flie\u00dft."
+      },
+      {
+        "title": "Budget-Management",
+        "description": "Setze Budgets f\u00fcr verschiedene Kategorien und erhalte Echtzeit-Benachrichtigungen, wenn du dich deinen Limits n\u00e4herst."
+      },
+      {
+        "title": "Finanzberichte",
+        "description": "Erstelle umfassende Finanzberichte mit anschaulichen Diagrammen, um deine Ausgabenmuster zu visualisieren."
+      },
+      {
+        "title": "Datenexport",
+        "description": "Exportiere deine Finanzdaten als PDF oder CSV f\u00fcr pers\u00f6nliche Unterlagen, Steuererkl\u00e4rung oder Buchhaltung."
+      },
+      {
+        "title": "Mehrsprachig",
+        "description": "Nutze Finora in deiner bevorzugten Sprache \u2014 aktuell werden Deutsch, Englisch, Arabisch und Georgisch unterst\u00fctzt."
+      },
+      {
+        "title": "Sicher & Privat",
+        "description": "Deine Finanzdaten sind verschl\u00fcsselt und sicher. Wir nehmen deinen Datenschutz ernst und teilen niemals deine Daten."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Preise",
+    "subtitle": "Finora ist komplett kostenlos. W\u00e4hle, wie du es nutzen m\u00f6chtest.",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "popular": "Empfohlen",
+    "plans": [
+      {
+        "name": "Gastmodus",
+        "price": "Kostenlos",
+        "description": "Keine Registrierung erforderlich",
+        "features": [
+          "Grundlegende Ausgabenverfolgung",
+          "Nur lokaler Speicher (Browser)",
+          "Begrenzte Transaktionshistorie",
+          "Hell- & Dunkel-Themes",
+          "Kein Konto n\u00f6tig"
+        ],
+        "cta": "Jetzt starten"
+      },
+      {
+        "name": "Vollzugang",
+        "price": "Kostenlos",
+        "description": "Erstelle ein kostenloses Konto",
+        "features": [
+          "Unbegrenzte Ausgabenverfolgung",
+          "Cloud-Speicherung & Synchronisation",
+          "Budget-Benachrichtigungen",
+          "Finanzberichte & Export",
+          "Mehrsprachige Unterst\u00fctzung",
+          "Datensicherung & Schutz",
+          "Zugriff von jedem Ger\u00e4t"
+        ],
+        "cta": "Kostenloses Konto erstellen"
+      }
+    ]
+  },
+  "about": {
+    "title": "\u00dcber Finora",
+    "subtitle": "Intelligente Finanzverwaltung f\u00fcr alle",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "mission": {
+      "title": "Unsere Mission",
+      "description": "Finora wurde entwickelt, um pers\u00f6nliche Finanzverwaltung einfach, zug\u00e4nglich und kostenlos f\u00fcr jeden zu machen. Wir glauben, dass das Verstehen deiner Finanzen keine teure Software oder komplexe Tools erfordern sollte."
+    },
+    "developer": {
+      "title": "Entwickler",
+      "name": "Youssef Dawod",
+      "role": "Full-Stack Developer",
+      "description": "Finora wird von Youssef Dawod entwickelt und gepflegt \u2014 ein leidenschaftlicher Full-Stack-Entwickler, der sich der Erstellung n\u00fctzlicher, sch\u00f6ner und barrierefreier Webanwendungen widmet."
+    },
+    "tech": {
+      "title": "Technologie",
+      "description": "Entwickelt mit modernen Technologien f\u00fcr die bestm\u00f6gliche Benutzererfahrung."
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Tipps, Einblicke und Updates rund um pers\u00f6nliche Finanzen",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "comingSoon": "Demnächst verfügbar",
+    "comingSoonDescription": "Wir arbeiten an gro\u00dfartigem Content \u00fcber pers\u00f6nliche Finanzen, Spartipps und Updates \u00fcber Finora. Bleib dran!"
+  },
+  "help": {
+    "title": "Hilfe-Center",
+    "subtitle": "Finde Antworten und erhalte Unterst\u00fctzung",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "sections": [
+      {
+        "title": "Erste Schritte",
+        "paragraphs": ["Erstelle ein Konto oder nutze den Gastmodus, um sofort mit der Ausgabenverfolgung zu beginnen. Klicke einfach auf 'Transaktion hinzuf\u00fcgen', um deine erste Einnahme oder Ausgabe zu erfassen."]
+      },
+      {
+        "title": "Transaktionen verwalten",
+        "paragraphs": ["Du kannst Transaktionen jederzeit hinzuf\u00fcgen, bearbeiten und l\u00f6schen. Nutze Kategorien, Daten und Beschreibungen, um deine Finanzdaten effektiv zu organisieren."]
+      },
+      {
+        "title": "Budget-Benachrichtigungen",
+        "paragraphs": ["Setze Budgetlimits f\u00fcr verschiedene Kategorien in deinen Einstellungen. Finora benachrichtigt dich, wenn deine Ausgaben sich deinen definierten Limits n\u00e4hern."]
+      },
+      {
+        "title": "Daten exportieren",
+        "paragraphs": ["Exportiere deine Finanzdaten als PDF oder CSV von der Einstellungsseite. Berichte k\u00f6nnen nach Zeitraum und Kategorie gefiltert werden."]
+      },
+      {
+        "title": "Weitere Hilfe ben\u00f6tigt?",
+        "paragraphs": ["Falls du die gesuchte Antwort nicht findest, kontaktiere uns gerne unter info@finora.dawoddev.com."]
+      }
+    ]
+  },
+  "faq": {
+    "title": "H\u00e4ufig gestellte Fragen",
+    "subtitle": "Antworten auf die wichtigsten Fragen",
+    "backLink": "Zur\u00fcck zur Startseite",
+    "questions": [
+      {
+        "question": "Ist Finora wirklich kostenlos?",
+        "answer": "Ja! Finora ist zu 100% kostenlos \u2014 sowohl der Gastmodus als auch der Vollzugang mit einem registrierten Konto."
+      },
+      {
+        "question": "Muss ich ein Konto erstellen?",
+        "answer": "Nein. Du kannst Finora im Gastmodus ohne Registrierung nutzen. Ein kostenloses Konto bietet dir jedoch Cloud-Speicherung, Datensicherung und Zugriff von jedem Ger\u00e4t."
+      },
+      {
+        "question": "Sind meine Finanzdaten sicher?",
+        "answer": "Ja. Alle Daten werden verschl\u00fcsselt und sicher gespeichert. Wir verwenden branchenübliche Sicherheitspraktiken und teilen deine Daten niemals mit Dritten."
+      },
+      {
+        "question": "Welche Sprachen werden unterst\u00fctzt?",
+        "answer": "Finora unterst\u00fctzt derzeit Deutsch, Englisch, Arabisch (RTL) und Georgisch."
+      },
+      {
+        "question": "Kann ich meine Daten exportieren?",
+        "answer": "Ja. Du kannst deine Finanzdaten als PDF oder CSV \u00fcber die Einstellungsseite exportieren."
+      },
+      {
+        "question": "Wie kann ich den Support kontaktieren?",
+        "answer": "Du erreichst uns unter info@finora.dawoddev.com oder \u00fcber das Kontaktformular auf unserer Kontaktseite."
+      }
+    ]  },
+  "newsletter": {
+    "confirmed": "Newsletter erfolgreich bestätigt! Du erhältst ab jetzt unsere Updates.",
+    "unsubscribed": "Newsletter erfolgreich abgemeldet.",
+    "invalid": "Ungültiger oder abgelaufener Link.",
+    "error": "Ein Fehler ist aufgetreten. Bitte versuche es später erneut."
   }
 }

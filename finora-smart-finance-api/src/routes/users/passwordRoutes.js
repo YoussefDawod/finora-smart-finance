@@ -2,12 +2,13 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 const auth = require('../../middleware/authMiddleware');
+const { sensitiveOperationLimiter } = require('../../middleware/rateLimiter');
 const logger = require('../../utils/logger');
 const { validatePasswordChangeInput } = require('../../validators/userValidation');
 const { loadUserOr404, handleServerError } = require('./userHelpers');
 
 // POST /api/users/change-password - Passwort ändern
-router.post('/change-password', auth, async (req, res) => {
+router.post('/change-password', auth, sensitiveOperationLimiter, async (req, res) => {
   try {
     const { errors } = validatePasswordChangeInput(req.body || {});
     const user = await loadUserOr404(req.user._id, res);

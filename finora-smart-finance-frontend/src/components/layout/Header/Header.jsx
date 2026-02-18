@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { FiMenu } from 'react-icons/fi';
 import { Logo, UserMenu } from '@/components/common';
+import Skeleton from '@/components/common/Skeleton/Skeleton';
 import HamburgerMenu from '../HamburgerMenu/HamburgerMenu';
 import styles from './Header.module.scss';
 
@@ -42,7 +43,7 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -78,18 +79,16 @@ export default function Header() {
 
         {/* Right Section: Avatar & User Menu */}
         <div className={styles.headerRight}>
-          {isAuthenticated && !isLoading ? (
+          {isLoading ? (
+            // Loading: Skeleton für Avatar
+            <Skeleton variant="circle" width="40px" height="40px" />
+          ) : isAuthenticated ? (
             <UserMenu user={user} onLogout={handleLogout} />
-          ) : !isLoading ? (
-            <div className={styles.authBtns}>
-              <Link to="/login" className={styles.loginBtn}>
-                {t('auth.page.loginTitle')}
-              </Link>
-              <Link to="/register" className={styles.registerBtn}>
-                {t('auth.page.registerAction')}
-              </Link>
-            </div>
-          ) : null}
+          ) : (
+            <Link to="/login" className={styles.authBtn}>
+              {t('auth.loginOrRegister')}
+            </Link>
+          )}
         </div>
       </header>
 

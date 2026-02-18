@@ -642,7 +642,7 @@
 
 @media (max-width: 480px) {
   .registerForm {
-    gap: var(--space-3xs);
+    gap: var(--space-2xs);
   }
 
   // Step Indicator wird bereits im oberen 480px Block gesetzt
@@ -657,38 +657,57 @@
   }
 
   .input {
-    height: 2.2rem;
+    height: max(2.75rem, 48px);
+    min-height: 48px;
     font-size: var(--fs-sm);
   }
 
+  .inputWrapper {
+    min-height: 48px;
+  }
+
+  .label {
+    font-size: max(var(--fs-sm), 14px);
+  }
+
   .passwordToggle {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 2rem;
+    height: 2rem;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .termsBox,
   .warningBox {
-    padding: var(--space-3xs);
+    padding: var(--space-2xs);
   }
 
   .checkboxText {
-    font-size: 0.7rem;
+    font-size: max(0.7rem, 12px);
+  }
+
+  .errorMessage {
+    font-size: max(var(--fs-xs), 13px);
+    line-height: 1.4;
   }
 
   .navigation {
-    margin-top: 2px;
+    margin-top: var(--space-3xs);
   }
 
   .prevButton {
-    padding: var(--space-2xs) var(--space-xs);
-    font-size: var(--fs-xs);
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--fs-sm);
+    min-height: 44px;
   }
 
   .nextButton,
   .submitButton {
-    height: 2.15rem;
-    font-size: var(--fs-sm);
-    padding: 0 var(--space-sm);
+    height: max(2.75rem, 48px);
+    min-height: 48px;
+    font-size: max(var(--fs-sm), 14px);
+    padding: 0 var(--space-md);
+    width: 100%;
   }
 }
 

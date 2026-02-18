@@ -1,7 +1,7 @@
 /**
  * @fileoverview Theme Context Provider - v2
  * @description Manages global theme state with:
- * - Light/Dark/Glassmorphic themes
+ * - Light/Dark themes
  * - System preference auto-detection
  * - localStorage persistence
  * - Real-time CSS variable switching via data-* attributes
@@ -9,14 +9,12 @@
  * STATE SHAPE:
  * {
  *   theme: 'light' | 'dark',
- *   useGlass: boolean,
  *   systemPreference: 'light' | 'dark',
  *   isInitialized: boolean
  * }
  * 
  * HTML ATTRIBUTES:
  * - data-theme="light|dark" - Theme selection
- * - data-glass="true|false" - Glassmorphic extension
  * 
  * @module ThemeContext
  */
@@ -36,7 +34,6 @@ const THEMES = {
 
 const STORAGE_KEYS = {
   THEME: 'et-theme-preference',
-  GLASS: 'et-glass-preference',
 };
 
 // ============================================
@@ -63,11 +60,10 @@ export function ThemeProvider({ children }) {
   // ============================================
 
   const [theme, setThemeState] = useState(THEMES.LIGHT);
-  const [useGlass, setUseGlassState] = useState(false);
   const [systemPreference, setSystemPreference] = useState(THEMES.LIGHT);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  // Refs for cleanup
+  
+  // for cleanup
   const mediaQueryRef = useRef(null);
 
   // ============================================
@@ -75,26 +71,22 @@ export function ThemeProvider({ children }) {
   // ============================================
 
   /**
-   * Apply both theme and glass attributes to <html>
+   * Apply theme attribute to <html>
    * @param {string} themeValue - 'light' | 'dark'
-   * @param {boolean} glassValue - true | false
    */
-  const applyThemeToDom = useCallback((themeValue, glassValue) => {
+  const applyThemeToDom = useCallback((themeValue) => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
     html.setAttribute('data-theme', themeValue);
-    html.setAttribute('data-glass', glassValue ? 'true' : 'false');
   }, []);
 
   /**
-   * Save both theme and glass preferences
+   * Save theme preference
    * @param {string} themeValue
-   * @param {boolean} glassValue
    */
-  const savePreferences = useCallback((themeValue, glassValue) => {
+  const savePreferences = useCallback((themeValue) => {
     try {
       localStorage.setItem(STORAGE_KEYS.THEME, themeValue);
-      localStorage.setItem(STORAGE_KEYS.GLASS, glassValue ? 'true' : 'false');
     } catch (error) {
       console.error('Failed to save theme preferences:', error);
     }
@@ -102,25 +94,19 @@ export function ThemeProvider({ children }) {
 
   /**
    * Load saved preferences from localStorage
-   * @returns {Object} { theme, useGlass }
+   * @returns {Object} { theme }
    */
   const loadPreferences = useCallback(() => {
     try {
       const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
-      const savedGlass = localStorage.getItem(STORAGE_KEYS.GLASS);
       return {
         theme: savedTheme && Object.values(THEMES).includes(savedTheme) ? savedTheme : null,
-        useGlass: savedGlass === 'true',
       };
     } catch (error) {
       console.error('Failed to load theme preferences:', error);
-      return { theme: null, useGlass: false };
+      return { theme: null };
     }
   }, []);
-
-  // ============================================
-  // 🔍 SYSTEM PREFERENCE DETECTION
-  // ============================================
 
   /**
    * Get system color scheme preference
@@ -155,8 +141,7 @@ export function ThemeProvider({ children }) {
     }
 
     setThemeState(initialTheme);
-    setUseGlassState(preferences.useGlass);
-    applyThemeToDom(initialTheme, preferences.useGlass);
+    applyThemeToDom(initialTheme);
     setIsInitialized(true);
   }, [getSystemPreference, loadPreferences, applyThemeToDom]);
 
@@ -192,11 +177,7 @@ export function ThemeProvider({ children }) {
     const handleStorageChange = (e) => {
       if (e.key === STORAGE_KEYS.THEME && e.newValue) {
         setThemeState(e.newValue);
-        applyThemeToDom(e.newValue, useGlass);
-      } else if (e.key === STORAGE_KEYS.GLASS && e.newValue !== null) {
-        const glassValue = e.newValue === 'true';
-        setUseGlassState(glassValue);
-        applyThemeToDom(theme, glassValue);
+        applyThemeToDom(e.newValue);
       }
     };
 
@@ -205,14 +186,14 @@ export function ThemeProvider({ children }) {
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [useGlass, theme, applyThemeToDom]);
+  }, [theme, applyThemeToDom]);
 
   // ============================================
-  // 🎨 THEME ACTIONS
+  // 🎮 PUBLIC API
   // ============================================
 
   /**
-   * Set theme explicitly
+   * Set theme
    * @param {'light' | 'dark'} newTheme
    */
   const setTheme = useCallback((newTheme) => {
@@ -221,9 +202,9 @@ export function ThemeProvider({ children }) {
       newTheme = THEMES.LIGHT;
     }
     setThemeState(newTheme);
-    applyThemeToDom(newTheme, useGlass);
-    savePreferences(newTheme, useGlass);
-  }, [useGlass, applyThemeToDom, savePreferences]);
+    applyThemeToDom(newTheme);
+    savePreferences(newTheme);
+  }, [applyThemeToDom, savePreferences]);
 
   /**
    * Toggle between light and dark
@@ -233,39 +214,20 @@ export function ThemeProvider({ children }) {
     setTheme(newTheme);
   }, [theme, setTheme]);
 
-  /**
-   * Set glass effect enabled/disabled
-   * @param {boolean} enabled
-   */
-  const setGlassEnabled = useCallback((enabled) => {
-    setUseGlassState(enabled);
-    applyThemeToDom(theme, enabled);
-    savePreferences(theme, enabled);
-  }, [theme, applyThemeToDom, savePreferences]);
-
-  /**
-   * Toggle glass effect on/off
-   */
-  const toggleGlass = useCallback(() => {
-    const newGlass = !useGlass;
-    setGlassEnabled(newGlass);
-  }, [useGlass, setGlassEnabled]);
-
-  /**
-   * Reset to system preference (theme only, keep glass setting)
+/**
+   * Reset to system preference
    */
   const resetToSystemPreference = useCallback(() => {
     setTheme(systemPreference);
   }, [systemPreference, setTheme]);
 
   // ============================================
-  // 📤 CONTEXT VALUE
+  // 🔌 CONTEXT VALUE
   // ============================================
 
   const value = {
     // State
     theme,
-    useGlass,
     systemPreference,
     isDarkMode: theme === THEMES.DARK,
     isInitialized,
@@ -273,8 +235,6 @@ export function ThemeProvider({ children }) {
     // Actions
     setTheme,
     toggleTheme,
-    setGlassEnabled,
-    toggleGlass,
     resetToSystemPreference,
   };
 
@@ -286,4 +246,4 @@ export function ThemeProvider({ children }) {
 }
 
 // Export context for Fast Refresh compatibility
-export { ThemeContext };
+export { ThemeContext }

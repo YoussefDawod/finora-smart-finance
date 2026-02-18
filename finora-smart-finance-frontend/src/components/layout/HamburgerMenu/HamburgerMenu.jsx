@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeSelector, Logo } from '@/components/common';
 import { NAV_ITEMS } from '@/config/navigation';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiLogIn } from 'react-icons/fi';
 import styles from './HamburgerMenu.module.scss';
 
 /**
@@ -80,7 +80,7 @@ export default function HamburgerMenu({ isOpen, onClose }) {
   const handleLogout = useCallback(async () => {
     try {
       await logout();
-      navigate('/login', { replace: true });
+      navigate('/dashboard', { replace: true });
       onClose?.();
     } catch (error) {
       console.error('Logout error:', error);
@@ -178,8 +178,8 @@ export default function HamburgerMenu({ isOpen, onClose }) {
               </nav>
             </div>
 
-            {/* Logout Button */}
-            {isAuthenticated && (
+            {/* Footer: Logout oder Login */}
+            {isAuthenticated ? (
               <div className={styles.menuFooter}>
                 <motion.button
                   className={styles.logoutBtn}
@@ -189,6 +189,18 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                 >
                   <FiLogOut size={20} />
                   <span>{t('nav.logout')}</span>
+                </motion.button>
+              </div>
+            ) : (
+              <div className={styles.menuFooter}>
+                <motion.button
+                  className={styles.loginBtn}
+                  onClick={() => { navigate('/login'); onClose?.(); }}
+                  whileHover={{ x: isRtl ? -8 : 8 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  <FiLogIn size={20} />
+                  <span>{t('auth.loginOrRegister')}</span>
                 </motion.button>
               </div>
             )}

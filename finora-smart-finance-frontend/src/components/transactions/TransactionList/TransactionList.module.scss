@@ -172,6 +172,28 @@
     display: none;
   }
 
+  // Pending (Optimistic UI) - Deleting State
+  &.pending {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        color-mix(in srgb, var(--tx) 5%, transparent) 10px,
+        color-mix(in srgb, var(--tx) 5%, transparent) 20px
+      );
+      border-radius: inherit;
+      animation: pending-shimmer 1s linear infinite;
+    }
+  }
+
   // Type variants
   &.income {
     border-left-color: var(--success);
@@ -463,6 +485,28 @@
 
   &.expense {
     border-left-color: var(--error);
+  }
+
+  // Pending (Optimistic UI) - Deleting State
+  &.pending {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        color-mix(in srgb, var(--tx) 5%, transparent) 10px,
+        color-mix(in srgb, var(--tx) 5%, transparent) 20px
+      );
+      border-radius: inherit;
+      animation: pending-shimmer 1s linear infinite;
+    }
   }
 
   &:active {
@@ -787,28 +831,6 @@
 }
 
 // ============================================================================
-// LOADING STATE (Skeleton)
-// ============================================================================
-.skeletons {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.skeleton {
-  height: 4.5rem;
-  background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
-  background-size: 200% 100%;
-  border-radius: var(--r-lg);
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-// ============================================================================
 // EMPTY STATE
 // ============================================================================
 .emptyContainer {
@@ -885,8 +907,7 @@
   .tableRow,
   .card,
   .editBtn,
-  .deleteBtn,
-  .skeleton {
+  .deleteBtn {
     transition: none;
     animation: none;
   }
@@ -929,5 +950,17 @@
     &.expense {
       border-right-color: var(--error);
     }
+  }
+}
+
+// ============================================================================
+// ANIMATIONS
+// ============================================================================
+@keyframes pending-shimmer {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 0;
   }
 }

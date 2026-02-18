@@ -21,7 +21,7 @@
  * @module MotionContext
  */
 
-import { createContext, useState, useEffect, useContext } from 'react';
+import { createContext, useState, useEffect } from 'react';
 
 // ============================================
 // 🎬 CONSTANTS
@@ -95,20 +95,4 @@ export function MotionProvider({ children }) {
   );
 }
 
-// ============================================
-// 🪝 CUSTOM HOOK
-// ============================================
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useMotion = () => {
-  const context = useContext(MotionContext);
-  
-  if (context === undefined) {
-    throw new Error('useMotion must be used within a MotionProvider');
-  }
-
-  return {
-    prefersReducedMotion: context.prefersReducedMotion,
-    shouldAnimate: !context.prefersReducedMotion,
-  };
-};
+// Hook moved to @/hooks/useMotion.js — import from there.

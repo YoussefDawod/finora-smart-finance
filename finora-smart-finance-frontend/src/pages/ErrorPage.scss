@@ -1,0 +1,185 @@
+// ============================================
+// 🚨 ERROR PAGES (401, 500, Generic)
+// Gemeinsame Styles für alle Error-Seiten
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+  background: var(--bg);
+}
+
+// ============================================
+// CONTENT CARD
+// ============================================
+.error-content {
+  text-align: center;
+  max-width: 480px;
+  padding: var(--space-2xl);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  border: 1px solid var(--border);
+
+  @include mobile {
+    padding: var(--space-lg);
+    margin: var(--space-md);
+  }
+}
+
+// ============================================
+// ICON WRAPPER
+// ============================================
+.error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 5rem;
+  margin: 0 auto var(--space-lg);
+  border-radius: 50%;
+  font-size: 2.5rem;
+
+  &--unauthorized {
+    background: color-mix(in srgb, var(--warning) 15%, transparent);
+    color: var(--warning);
+  }
+
+  &--server-error {
+    background: color-mix(in srgb, var(--danger) 15%, transparent);
+    color: var(--danger);
+  }
+
+  @include mobile {
+    width: 4rem;
+    height: 4rem;
+    font-size: 2rem;
+  }
+}
+
+// ============================================
+// ERROR CODE
+// ============================================
+.error-code {
+  font-size: 4rem;
+  font-weight: var(--fw-b);
+  margin: 0 0 var(--space-xs);
+  line-height: 1;
+
+  &--unauthorized {
+    color: var(--warning);
+  }
+
+  &--server-error {
+    color: var(--danger);
+  }
+
+  @include mobile {
+    font-size: 3rem;
+  }
+}
+
+// ============================================
+// TITLE & SUBTITLE
+// ============================================
+.error-title {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0 0 var(--space-sm);
+
+  @include mobile {
+    font-size: var(--fs-lg);
+  }
+}
+
+.error-subtitle {
+  font-size: var(--fs-base);
+  color: var(--tx-muted);
+  margin: 0 0 var(--space-xl);
+  line-height: 1.6;
+}
+
+// ============================================
+// ACTIONS
+// ============================================
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-width: 200px;
+  height: var(--btn-h);
+  padding: var(--space-sm) var(--space-xl);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-sb);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &--primary {
+    background: var(--primary);
+    color: var(--on-primary);
+
+    &:hover {
+      background: var(--pri-hover);
+    }
+  }
+
+  &--secondary {
+    background: transparent;
+    color: var(--tx-muted);
+    border: 1px solid var(--border);
+
+    &:hover {
+      background: var(--surface-alt);
+      color: var(--tx);
+    }
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  svg {
+    font-size: 1.25em;
+  }
+}
+
+// ============================================
+// HELP TEXT
+// ============================================
+.error-help {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+
+  a {
+    color: var(--primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

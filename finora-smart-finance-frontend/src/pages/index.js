@@ -1,15 +1,14 @@
 /**
  * Pages Export
- * Page-Level Components
+ * 
+ * Kritische Pages (statisch) — werden direkt in AppRoutes.jsx importiert.
+ * Alle anderen Pages werden per React.lazy() on-demand geladen.
+ * 
+ * @see AppRoutes.jsx für die lazy-importierten Pages
  */
 
+// Statisch importierte (kritische) Pages
 export { default as AuthPage } from './AuthPage';
 export { default as VerifyEmailPage } from './VerifyEmailPage/VerifyEmailPage';
-export { default as TermsPage } from './TermsPage';
-export { default as DashboardPage } from './DashboardPage';
-export { default as TransactionsPage } from './TransactionsPage';
-export { default as SettingsPage } from './SettingsPage/SettingsPage';
+export { default as EmailVerificationPage } from './EmailVerificationPage';
 export { default as NotFoundPage } from './NotFoundPage';
-export { default as UnauthorizedPage } from './UnauthorizedPage';
-export { default as ServerErrorPage } from './ServerErrorPage';
-export { default as ProfilePage } from './ProfilePage/ProfilePage';

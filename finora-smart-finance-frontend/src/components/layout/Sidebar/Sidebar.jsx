@@ -5,14 +5,14 @@
  * Mobile: Overlay-Sidebar aus Header/HamburgerMenu geöffnet
  */
 
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeSelector, Logo } from '@/components/common';
 import { NAV_ITEMS } from '@/config/navigation';
-import { FiLogOut, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiLogOut, FiLogIn, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './Sidebar.module.scss';
 
@@ -32,6 +32,24 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
   const sidebarRef = useRef(null);
   const { t, i18n } = useTranslation();
   const isRtl = i18n.dir() === 'rtl';
+  const [autoExpandedForTheme, setAutoExpandedForTheme] = useState(false);
+
+  // ============================================
+  // THEME SELECTOR: Auto-expand sidebar when collapsed
+  // ============================================
+  const handleThemeSectionClick = useCallback(() => {
+    if (isCollapsed) {
+      onToggleCollapse?.(); // Expand sidebar
+      setAutoExpandedForTheme(true);
+    }
+  }, [isCollapsed, onToggleCollapse]);
+
+  const handleThemeClose = useCallback(() => {
+    if (autoExpandedForTheme) {
+      onToggleCollapse?.(); // Re-collapse sidebar
+      setAutoExpandedForTheme(false);
+    }
+  }, [autoExpandedForTheme, onToggleCollapse]);
 
   // ============================================
   // MOBILE: Escape Key Handler
@@ -88,7 +106,7 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
   const handleLogout = useCallback(async () => {
     try {
       await logout();
-      navigate('/login', { replace: true });
+      navigate('/dashboard', { replace: true });
       if (isMobile) {
         onClose?.();
       }
@@ -187,8 +205,8 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
                 </motion.div>
               </nav>
 
-              {/* Mobile Logout */}
-              {isAuthenticated && (
+              {/* Mobile Footer: Logout oder Login */}
+              {isAuthenticated ? (
                 <motion.button
                   className={styles.logoutBtn}
                   onClick={handleLogout}
@@ -197,6 +215,16 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
                 >
                   <FiLogOut size={20} />
                   <span>{t('nav.logout')}</span>
+                </motion.button>
+              ) : (
+                <motion.button
+                  className={styles.loginBtn}
+                  onClick={() => { navigate('/login'); onClose?.(); }}
+                  whileHover={{ x: isRtl ? -8 : 8 }}
+                  whileTap={{ scale: 0.96 }}
+                >
+                  <FiLogIn size={20} />
+                  <span>{t('auth.loginOrRegister')}</span>
                 </motion.button>
               )}
             </motion.aside>
@@ -250,14 +278,14 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
             </React.Fragment>
           );
         })}
-        <div className={styles.themeSection}>
-          <ThemeSelector isCollapsed={isCollapsed} />
+        <div className={styles.themeSection} onClick={handleThemeSectionClick}>
+          <ThemeSelector isCollapsed={isCollapsed} onClose={handleThemeClose} />
         </div>
       </nav>
 
-      {/* Desktop Footer: Logout */}
-      <div className={styles.footer}>
-        {isAuthenticated && (
+      {/* Desktop Footer: Logout oder Login */}
+      {isAuthenticated ? (
+        <div className={styles.footer}>
           <motion.button
             className={styles.logoutBtn}
             onClick={handleLogout}
@@ -270,8 +298,23 @@ function Sidebar({ isOpen, isCollapsed, onClose, onToggleCollapse }) {
             </span>
             {!isCollapsed && <span className={styles.logoutLabel}>{t('nav.logout')}</span>}
           </motion.button>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className={styles.footer}>
+          <motion.button
+            className={styles.loginBtn}
+            onClick={() => navigate('/login')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title={t('auth.loginOrRegister')}
+          >
+            <span className={styles.logoutIcon}>
+              <FiLogIn size={20} />
+            </span>
+            {!isCollapsed && <span className={styles.logoutLabel}>{t('auth.loginOrRegister')}</span>}
+          </motion.button>
+        </div>
+      )}
     </aside>
   );
 }

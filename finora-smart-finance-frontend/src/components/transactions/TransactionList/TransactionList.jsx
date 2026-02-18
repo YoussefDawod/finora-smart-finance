@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from '@/utils/formatters';
 import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
 import { translateCategory } from '@/utils/categoryTranslations';
 import Button from '@/components/common/Button/Button';
+import { SkeletonTableRow } from '@/components/common/Skeleton';
 import { FiEdit2, FiTrash2, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './TransactionList.module.scss';
@@ -126,9 +127,10 @@ export const TransactionList = ({ onEdit = null }) => {
           {transactions.map((transaction) => (
             <motion.div
               key={transaction.id}
-              className={`${styles.tableRow} ${styles[transaction.type]}`}
+              className={`${styles.tableRow} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
               variants={itemVariants}
               layout
+              aria-busy={!!transaction._pending}
             >
               {/* CATEGORY */}
               <div className={styles.colCategory}>
@@ -233,9 +235,10 @@ export const TransactionList = ({ onEdit = null }) => {
         {transactions.map((transaction) => (
           <motion.div
             key={transaction.id}
-            className={`${styles.card} ${styles[transaction.type]}`}
+            className={`${styles.card} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
             variants={itemVariants}
             layout
+            aria-busy={!!transaction._pending}
           >
             <div className={styles.cardHeader}>
               <div className={styles.categoryBadge}>
@@ -331,16 +334,12 @@ export const TransactionList = ({ onEdit = null }) => {
   if (loading) {
     return (
       <div className={styles.container}>
-        <div className={styles.skeletons}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className={styles.skeleton}
-              animate={{ opacity: [0.7, 1, 0.7] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          ))}
-        </div>
+        <SkeletonTableRow 
+          columns={isMobile ? 3 : 5} 
+          hasIcon 
+          count={pageSize || 10} 
+          density="normal" 
+        />
       </div>
     );
   }

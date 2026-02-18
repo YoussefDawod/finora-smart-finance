@@ -13,7 +13,6 @@ function sanitizeUser(user, options = {}) {
 
   if (!includeSensitive) {
     delete obj.passwordHash;
-    delete obj.twoFactorSecret;
     delete obj.verificationToken;
     delete obj.verificationExpires;
     delete obj.passwordResetToken;
@@ -21,7 +20,6 @@ function sanitizeUser(user, options = {}) {
     delete obj.emailChangeToken;
     delete obj.emailChangeNewEmail;
     delete obj.emailChangeExpires;
-    delete obj.newEmailPending;
     delete obj.refreshTokens;
   }
 

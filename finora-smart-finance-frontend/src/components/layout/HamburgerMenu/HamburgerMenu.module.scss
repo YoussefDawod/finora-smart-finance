@@ -11,7 +11,6 @@
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, black 60%, transparent);
-  backdrop-filter: blur(4px);
   z-index: 1150;
 }
 
@@ -147,7 +146,11 @@
 }
 
 .menuFooter {
-  padding: 0 var(--space-md) calc(var(--space-md) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-md) calc(var(--space-md) + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
@@ -283,6 +286,7 @@
 .logoutBtn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   margin: 0;
@@ -331,6 +335,54 @@
 }
 
 // ============================================
+// LOGIN BUTTON (Gast-Modus)
+// ============================================
+.loginBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin: 0;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--r-md);
+  color: var(--on-primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  min-height: 44px;
+  flex-shrink: 0;
+
+  &:hover {
+    background: var(--pri-hover);
+    border-color: var(--pri-hover);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: var(--focus-w) solid var(--focus-c);
+    outline-offset: var(--focus-o);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+  }
+}
+
+:global([dir='rtl']) .loginBtn {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+// ============================================
 // SCROLLBAR STYLING
 // ============================================
 .menu,
@@ -373,6 +425,5 @@
 @media (prefers-reduced-transparency: reduce) {
   .backdrop {
     background: color-mix(in srgb, black 80%, transparent);
-    backdrop-filter: none;
   }
 }

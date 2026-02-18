@@ -101,7 +101,7 @@ function baseLayout(content) {
 <body>
   <div class="container">
     <div class="header">
-      <h1>💰 Finora</h1>
+      <h1>Finora</h1>
     </div>
     ${content}
   </div>

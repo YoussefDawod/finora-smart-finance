@@ -11,9 +11,11 @@
     "saving": "Saving...",
     "cancel": "Cancel",
     "close": "Close",
+    "closeModal": "Close dialog",
     "closeNotification": "Close notification",
     "confirm": "Confirm",
     "backToLogin": "Back to login",
+    "goBack": "Go back",
     "or": "or",
     "loading": "Loading...",
     "loadingContent": "Content is loading",
@@ -31,16 +33,21 @@
     "prevStep": "Previous step",
     "loadingNext": "Checking...",
     "loadingComplete": "Submitting...",
-    "stepErrorsTitle": "⚠ Errors in this step:",
+    "stepErrorsTitle": "Errors in this step:",
     "retry": "Try again",
-    "appName": "Finora - Smart Finance"
+    "appName": "Finora - Smart Finance",
+    "errors": {
+      "generic": "An error occurred",
+      "somethingWrong": "Something went wrong."
+    },
+    "stepProgress": "Step {{current}} of {{total}}",
+    "stepLabel": "Step {{step}}",
+    "stepCompleted": "Completed"
   },
   "themeSelector": {
     "title": "Appearance & Theme",
     "ariaLabel": "Appearance & Theme",
-    "colorScheme": "Color scheme",
-    "effects": "Effects",
-    "glassmorphic": "Glasmorphic"
+    "colorScheme": "Color scheme"
   },
   "settings": {
     "title": "Settings",
@@ -62,16 +69,13 @@
     },
     "appearance": {
       "title": "Appearance",
-      "description": "Pick a theme, follow the system, or enable glass effects.",
+      "description": "Pick a theme or follow the system.",
       "themeLight": "Light",
       "themeDark": "Dark",
       "themeSystem": "System",
       "themeLightDesc": "Clean, bright surface",
       "themeDarkDesc": "Easier on the eyes at night",
-      "themeSystemDesc": "Follow device settings",
-      "glassTitle": "Glassmorphic effect",
-      "glassDescription": "Adds translucent surfaces for a modern UI.",
-      "glassAria": "Toggle glassmorphic effect"
+      "themeSystemDesc": "Follow device settings"
     },
     "notifications": {
       "title": "Notifications",
@@ -98,13 +102,40 @@
         "title": "Alerts",
         "description": "Budget limits and unusual activity warnings.",
         "aria": "Toggle alert notifications"
+      },
+      "newsletter": {
+        "title": "Newsletter",
+        "description": "Receive news, tips and updates from Finora by email.",
+        "aria": "Toggle newsletter",
+        "subscribed": "Successfully subscribed to the newsletter!",
+        "unsubscribed": "Successfully unsubscribed from the newsletter.",
+        "error": "Failed to change newsletter status.",
+        "noEmail": "Please add an email address to your profile first.",
+        "noEmailHint": "To manage the newsletter here, add an email address to your profile. Alternatively, you can subscribe in the footer with any email address."
       }
+    },
+    "budget": {
+      "title": "Budget Management",
+      "description": "Set a monthly spending limit and receive warnings.",
+      "currentStatus": "Current Status",
+      "monthlyLimit": "Monthly Limit",
+      "alertThreshold": "Alert Threshold",
+      "limitHint": "Maximum monthly expenses in your currency.",
+      "thresholdHint": "Send alert when this percentage is reached.",
+      "nearLimit": "You are approaching your budget limit.",
+      "exceeded": "Budget exceeded!",
+      "saved": "Budget saved successfully.",
+      "saveError": "Budget could not be saved.",
+      "cleared": "Budget has been reset.",
+      "clearError": "Budget could not be reset.",
+      "invalidLimit": "Please enter a valid limit.",
+      "remove": "Remove Budget",
+      "loadError": "Failed to load budget status"
     },
     "saved": "Preferences saved successfully.",
     "saveError": "Preferences could not be saved."
   },
   "dashboard": {
-    "greetingIntro": "Welcome back,",
     "overview": "Here is an overview of your financial activity this month",
     "loading": "Loading dashboard...",
     "newTransaction": "New transaction",
@@ -140,8 +171,38 @@
     "transactionCount": "{{count}} transactions",
     "summaryDefaultTitle": "Title",
     "summaryDefaultValue": "€0.00",
+    "filter": {
+      "selectPeriod": "Select period",
+      "currentMonth": "Current month",
+      "last1Month": "Last month",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "goToToday": "Go to current month",
+      "apply": "Apply",
+      "reset": "Reset"
+    },
     "errors": {
       "load": "Failed to load dashboard data"
+    },
+    "budget": {
+      "title": "Monthly Budget",
+      "noBudget": "No budget set",
+      "setup": "Set up budget",
+      "spent": "Spent",
+      "remaining": "Remaining",
+      "limit": "Limit",
+      "exceeded": "Exceeded",
+      "nearLimit": "Near limit",
+      "onTrack": "On track",
+      "healthy": "Healthy"
+    },
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "night": "Good night"
     }
   },
   "transactions": {
@@ -207,6 +268,15 @@
     }
   },
   "auth": {
+    "requiredMessage": "Sign in or register to use this feature.",
+    "loginOrRegister": "Sign in / Register",
+    "errors": {
+      "loginFailed": "Login failed. Please try again.",
+      "registerFailed": "Registration failed. Please try again.",
+      "verifyFailed": "Email verification failed.",
+      "networkError": "(Network error - Server unreachable)",
+      "timeout": "(Timeout - Server not responding)"
+    },
     "verifyEmailTitle": "Verify email",
     "verifyEmailSubtitle": "Enter the 6-digit code from your email.",
     "verifyEmailSent": "We sent a code to {{email}}.",
@@ -254,6 +324,11 @@
         "headline": "Almost there",
         "subline": "Verify your email to get started.",
         "cta": "Go to sign in"
+      },
+      "features": {
+        "realtime": "Real-time analytics",
+        "secure": "Secure & Private",
+        "fast": "Lightning fast"
       }
     },
     "branding": {
@@ -572,9 +647,13 @@
     "notFoundSubtitle": "This page does not exist or was moved.",
     "backToDashboard": "Back to dashboard",
     "unauthorizedTitle": "Access denied",
-    "unauthorizedSubtitle": "You do not have access to this page.",
+    "unauthorizedSubtitle": "You don't have permission to access this page. Please log in or contact support.",
     "serverErrorTitle": "Server error",
-    "serverErrorSubtitle": "Sorry, there was a server error."
+    "serverErrorSubtitle": "Sorry, an unexpected error occurred. Our team has been notified.",
+    "statusTitle": "{{code}} - {{title}}",
+    "needHelp": "Need help?",
+    "contactSupport": "Contact support",
+    "persistentIssue": "Issue persists?"
   },
   "terms": {
     "title": "Terms of Service",
@@ -743,5 +822,275 @@
     "sports": "Sports",
     "household": "Household",
     "other": "Other"
+  },
+  "guest": {
+    "storageFull": "Storage full! Please delete older transactions or sign in.",
+    "localStorageWarning": "Your data is only stored in this tab. Create an account for permanent storage and all features!"
+  },
+  "errors": {
+    "requestFailed": "Unexpected error while sending the request",
+    "authRequired": "Authentication required",
+    "forbidden": "You do not have permission",
+    "notFound": "Resource not found",
+    "serverError": "Server error, please try again later",
+    "networkError": "No connection to the server",
+    "timeout": "Request took too long",
+    "unexpectedError": "Unexpected error",
+    "validationError": "Validation error"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "contact": "Contact",
+    "navigation": "Footer Navigation",
+    "brand": {
+      "description": "Smart financial management for your smart life. Keep track of your finances with Finora."
+    },
+    "newsletter": {
+      "title": "Subscribe to Newsletter",
+      "placeholder": "Your email address",
+      "button": "Subscribe",
+      "success": "Confirmation email sent! Please check your inbox.",
+      "error": "Invalid email address",
+      "serverError": "Failed to subscribe. Please try again later."
+    },
+    "sections": {
+      "product": "Product",
+      "company": "Company",
+      "resources": "Resources",
+      "legal": "Legal"
+    },
+    "links": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "about": "About Us",
+      "blog": "Blog",
+      "help": "Help",
+      "faq": "FAQ"
+    },
+    "social": {
+      "title": "Follow Us",
+      "github": "GitHub",
+      "linkedin": "LinkedIn",
+      "ariaGithub": "Visit us on GitHub (opens in new tab)",
+      "ariaLinkedin": "Visit us on LinkedIn (opens in new tab)"
+    },
+    "contactInfo": {
+      "title": "Contact",
+      "email": "Email"
+    },
+    "madeWith": "Made with",
+    "byAuthor": "by Youssef Dawod",
+    "backToTop": "Back to Top"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: February 2026",
+    "sections": [
+      {
+        "title": "Data Collection & Processing",
+        "paragraphs": ["We collect personal data necessary to provide our services. Data processing is carried out in accordance with the GDPR and only with your consent or on a legal basis."],
+        "list": ["Name and email address", "Transaction data", "Usage statistics"]
+      },
+      {
+        "title": "Cookies & Tracking",
+        "paragraphs": ["We use essential cookies only to ensure the functionality of our application. No tracking cookies or third-party cookies are used."]
+      },
+      {
+        "title": "Data Sharing",
+        "paragraphs": ["Your data is not shared with third parties unless required by law or strictly necessary for providing our services."]
+      },
+      {
+        "title": "Your Rights (GDPR)",
+        "paragraphs": ["Under the GDPR, you have the following rights regarding your personal data:"],
+        "list": ["Access your data", "Correct your data", "Delete your data", "Export your data", "Object to processing"]
+      },
+      {
+        "title": "Data Security",
+        "paragraphs": ["We implement industry-standard security measures to protect your data from unauthorized access, loss, or misuse."]
+      },
+      {
+        "title": "Contact for Privacy Concerns",
+        "paragraphs": ["For privacy-related questions, please contact us via our contact form."]
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Have a question or feedback? We'd love to hear from you.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "category": "Category",
+      "message": "Message",
+      "submit": "Send Message",
+      "sending": "Sending..."
+    },
+    "categories": {
+      "feedback": "Feedback",
+      "bug": "Bug Report",
+      "feature": "Feature Request",
+      "other": "Other"
+    },
+    "success": "Your message has been sent successfully! We'll get back to you soon.",
+    "error": "Failed to send message. Please try again later."
+  },
+  "features": {
+    "title": "Features",
+    "subtitle": "Everything you need for smart financial management",
+    "backLink": "Back to Home",
+    "items": [
+      {
+        "title": "Expense Tracking",
+        "description": "Track every transaction, categorize your spending, and gain deep insights into where your money goes."
+      },
+      {
+        "title": "Budget Management",
+        "description": "Set budgets for different categories and receive real-time alerts when you're close to your limits."
+      },
+      {
+        "title": "Financial Reports",
+        "description": "Generate comprehensive financial reports with beautiful charts and graphs to visualize your spending patterns."
+      },
+      {
+        "title": "Data Export",
+        "description": "Export your financial data as PDF or CSV for personal records, tax preparation, or accounting purposes."
+      },
+      {
+        "title": "Multi-Language Support",
+        "description": "Use Finora in your preferred language \u2014 currently supporting English, German, Arabic, and Georgian."
+      },
+      {
+        "title": "Secure & Private",
+        "description": "Your financial data is encrypted and secure. We take your privacy seriously and never share your data."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Finora is completely free. Choose how you want to use it.",
+    "backLink": "Back to Home",
+    "popular": "Recommended",
+    "plans": [
+      {
+        "name": "Guest Mode",
+        "price": "Free",
+        "description": "No registration required",
+        "features": [
+          "Basic expense tracking",
+          "Local storage only (browser)",
+          "Limited transaction history",
+          "Light & Dark themes",
+          "No account needed"
+        ],
+        "cta": "Start Now"
+      },
+      {
+        "name": "Full Access",
+        "price": "Free",
+        "description": "Create a free account",
+        "features": [
+          "Unlimited expense tracking",
+          "Cloud storage & sync",
+          "Budget alerts & notifications",
+          "Financial reports & export",
+          "Multi-language support",
+          "Data backup & security",
+          "Access from any device"
+        ],
+        "cta": "Create Free Account"
+      }
+    ]
+  },
+  "about": {
+    "title": "About Finora",
+    "subtitle": "Smart financial management for everyone",
+    "backLink": "Back to Home",
+    "mission": {
+      "title": "Our Mission",
+      "description": "Finora was created to make personal financial management simple, accessible, and free for everyone. We believe that understanding your finances shouldn't require expensive software or complex tools."
+    },
+    "developer": {
+      "title": "Developer",
+      "name": "Youssef Dawod",
+      "role": "Full-Stack Developer",
+      "description": "Finora is developed and maintained by Youssef Dawod \u2014 a passionate full-stack developer dedicated to building useful, beautiful, and accessible web applications."
+    },
+    "tech": {
+      "title": "Technology",
+      "description": "Built with modern technologies for the best possible user experience."
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Tips, insights, and updates about personal finance",
+    "backLink": "Back to Home",
+    "comingSoon": "Coming Soon",
+    "comingSoonDescription": "We're working on great content about personal finance, tips for saving money, and updates about Finora. Stay tuned!"
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "Find answers and get support",
+    "backLink": "Back to Home",
+    "sections": [
+      {
+        "title": "Getting Started",
+        "paragraphs": ["Create an account or use Guest Mode to start tracking your expenses immediately. Simply click 'Add Transaction' to record your first income or expense."]
+      },
+      {
+        "title": "Managing Transactions",
+        "paragraphs": ["You can add, edit, and delete transactions at any time. Use categories, dates, and descriptions to organize your financial data effectively."]
+      },
+      {
+        "title": "Budget Alerts",
+        "paragraphs": ["Set budget limits for different categories in your Settings. Finora will alert you when your spending approaches your defined limits."]
+      },
+      {
+        "title": "Exporting Data",
+        "paragraphs": ["Export your financial data as PDF or CSV from the Settings page. Reports can be filtered by date range and category."]
+      },
+      {
+        "title": "Need More Help?",
+        "paragraphs": ["If you can't find the answer you're looking for, please don't hesitate to contact us at info@finora.dawoddev.com."]
+      }
+    ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Quick answers to common questions",
+    "backLink": "Back to Home",
+    "questions": [
+      {
+        "question": "Is Finora really free?",
+        "answer": "Yes! Finora is 100% free \u2014 both Guest Mode and Full Access with a registered account."
+      },
+      {
+        "question": "Do I need to create an account?",
+        "answer": "No. You can use Finora in Guest Mode without registration. However, creating a free account gives you cloud storage, data backup, and access from any device."
+      },
+      {
+        "question": "Is my financial data secure?",
+        "answer": "Yes. All data is encrypted and stored securely. We use industry-standard security practices and never share your data with third parties."
+      },
+      {
+        "question": "Which languages are supported?",
+        "answer": "Finora currently supports English, German, Arabic (RTL), and Georgian."
+      },
+      {
+        "question": "Can I export my data?",
+        "answer": "Yes. You can export your financial data as PDF or CSV from the Settings page."
+      },
+      {
+        "question": "How do I contact support?",
+        "answer": "You can reach us at info@finora.dawoddev.com or use the contact form on our Contact page."
+      }
+    ]
+  },
+  "newsletter": {
+    "confirmed": "Newsletter successfully confirmed! You will now receive our updates.",
+    "unsubscribed": "Successfully unsubscribed from the newsletter.",
+    "invalid": "Invalid or expired link.",
+    "error": "An error occurred. Please try again later."
   }
 }

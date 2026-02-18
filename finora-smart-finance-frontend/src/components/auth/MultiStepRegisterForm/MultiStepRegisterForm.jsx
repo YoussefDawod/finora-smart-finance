@@ -28,32 +28,8 @@ import {
   FiAlertCircle,
   FiAlertTriangle
 } from 'react-icons/fi';
+import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
 import styles from './MultiStepRegisterForm.module.scss';
-
-// ============================================
-// PASSWORD STRENGTH CALCULATOR
-// ============================================
-
-const calculatePasswordStrength = (password) => {
-  if (!password) return { level: 'none', score: 0, checks: {} };
-
-  const checks = {
-    hasLower: /[a-z]/.test(password),
-    hasUpper: /[A-Z]/.test(password),
-    hasNumber: /\d/.test(password),
-    hasSpecial: /[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password),
-    isLongEnough: password.length >= 8,
-  };
-
-  const score = Object.values(checks).filter(Boolean).length * 20;
-
-  let level = 'weak';
-  if (score >= 60) level = 'medium';
-  if (score >= 80) level = 'strong';
-  if (score === 100) level = 'excellent';
-
-  return { level, score, checks };
-};
 
 export default function MultiStepRegisterForm() {
   const navigate = useNavigate();
@@ -116,21 +92,27 @@ export default function MultiStepRegisterForm() {
     return '';
   };
 
+  const passwordErrorMap = {
+    required: t('auth.register.validation.passwordRequired'),
+    tooShort: t('auth.register.validation.passwordMin'),
+    noUppercase: t('auth.register.validation.passwordUpper'),
+    noNumber: t('auth.register.validation.passwordNumber'),
+    noSpecial: t('auth.register.validation.passwordSpecial'),
+  };
+
   const validatePassword = (password) => {
-    if (!password) return t('auth.register.validation.passwordRequired');
-    if (password.length < 8) return t('auth.register.validation.passwordMin');
-    if (!/[A-Z]/.test(password)) return t('auth.register.validation.passwordUpper');
-    if (!/\d/.test(password)) return t('auth.register.validation.passwordNumber');
-    if (!/[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password)) {
-      return t('auth.register.validation.passwordSpecial');
-    }
-    return '';
+    const key = _validatePassword(password);
+    return key ? (passwordErrorMap[key] || key) : '';
+  };
+
+  const confirmErrorMap = {
+    confirmRequired: t('auth.register.validation.confirmRequired'),
+    mismatch: t('auth.register.validation.passwordMismatch'),
   };
 
   const validateConfirmPassword = (confirmPassword, password) => {
-    if (!confirmPassword) return t('auth.register.validation.confirmRequired');
-    if (confirmPassword !== password) return t('auth.register.validation.passwordMismatch');
-    return '';
+    const key = _validatePasswordMatch(password, confirmPassword);
+    return key ? (confirmErrorMap[key] || key) : '';
   };
 
   const validateStep = (step) => {

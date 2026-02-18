@@ -81,20 +81,12 @@
 }
 
 // ============================================
-// AUTH BUTTONS
+// AUTH BUTTON
 // ============================================
-.authBtns {
-  display: flex;
-  gap: var(--space-xs);
+.authBtn {
+  display: inline-flex;
   align-items: center;
-
-  @include mobile {
-    gap: var(--space-2xs);
-  }
-}
-
-.loginBtn,
-.registerBtn {
+  justify-content: center;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--r-sm);
   font-size: var(--fs-sm);
@@ -102,30 +94,18 @@
   transition: all var(--tr);
   text-decoration: none;
   white-space: nowrap;
-
-  @include mobile {
-    padding: var(--space-2xs) var(--space-sm);
-    font-size: var(--fs-xs);
-  }
-}
-
-.loginBtn {
-  background: transparent;
-  color: var(--tx);
-  border: 1px solid var(--border);
-
-  &:hover {
-    background: var(--surface-2);
-  }
-}
-
-.registerBtn {
   background: var(--primary);
   color: var(--on-primary);
   border: 1px solid var(--primary);
 
   &:hover {
     background: var(--pri-hover);
+  }
+
+  @include mobile {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: max(var(--fs-sm), 14px);
   }
 }
 

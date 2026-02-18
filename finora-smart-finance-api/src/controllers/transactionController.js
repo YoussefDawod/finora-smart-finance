@@ -15,12 +15,14 @@ const {
   validateUpdateTransaction,
 } = require('../validators/transactionValidation');
 
+const config = require('../config/env');
+
 function handleServerError(res, context, error) {
   logger.error(`${context} error:`, error);
   return res.status(500).json({
     error: 'Serverfehler',
     code: 'SERVER_ERROR',
-    message: error.message,
+    ...(config.nodeEnv !== 'production' && { message: error.message }),
   });
 }
 
@@ -74,11 +76,31 @@ async function getSummary(req, res) {
 /**
  * GET /api/transactions/stats/dashboard
  * Aggregierte Dashboard-Daten
+ * Query-Parameter:
+ *   - month: Monat (1-12), optional
+ *   - year: Jahr, optional
  */
 async function getDashboard(req, res) {
   try {
     const userId = req.user._id;
-    const data = await transactionService.getDashboardData(userId);
+    const { month, year } = req.query;
+    
+    // Parse month/year wenn vorhanden
+    const options = {};
+    if (month) {
+      const parsedMonth = parseInt(month, 10);
+      if (parsedMonth >= 1 && parsedMonth <= 12) {
+        options.month = parsedMonth;
+      }
+    }
+    if (year) {
+      const parsedYear = parseInt(year, 10);
+      if (parsedYear >= 2000 && parsedYear <= 2100) {
+        options.year = parsedYear;
+      }
+    }
+    
+    const data = await transactionService.getDashboardData(userId, options);
 
     res.json({ success: true, data });
   } catch (error) {
@@ -156,7 +178,7 @@ async function createTransaction(req, res) {
     res.status(500).json({
       error: 'Fehler beim Erstellen der Transaktion',
       code: 'SERVER_ERROR',
-      message: error.message,
+      ...(config.nodeEnv !== 'production' && { message: error.message }),
     });
   }
 }
@@ -266,7 +288,7 @@ async function updateTransaction(req, res) {
     res.status(500).json({
       error: 'Fehler beim Aktualisieren der Transaktion',
       code: 'SERVER_ERROR',
-      message: error.message,
+      ...(config.nodeEnv !== 'production' && { message: error.message }),
     });
   }
 }

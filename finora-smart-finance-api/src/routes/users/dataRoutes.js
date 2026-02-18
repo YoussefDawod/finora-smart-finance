@@ -3,12 +3,13 @@ const router = express.Router();
 const User = require('../../models/User');
 const Transaction = require('../../models/Transaction');
 const auth = require('../../middleware/authMiddleware');
+const { sensitiveOperationLimiter } = require('../../middleware/rateLimiter');
 const dataService = require('../../services/dataService');
 const logger = require('../../utils/logger');
 const { loadUserOr404, handleServerError } = require('./userHelpers');
 
 // DELETE /api/users/me - Account löschen (mit Cascade)
-router.delete('/me', auth, async (req, res) => {
+router.delete('/me', auth, sensitiveOperationLimiter, async (req, res) => {
   try {
     const { password } = req.body;
     const user = await loadUserOr404(req.user._id, res);

@@ -241,77 +241,6 @@
 }
 
 // ============================================
-// TOGGLE OPTION (für Glassmorphic)
-// ============================================
-.toggleOption {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  width: 100%;
-  padding: var(--space-xs) 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--r-sm);
-  color: var(--tx);
-  font-size: var(--fs-sm);
-  cursor: pointer;
-  transition: all var(--tr-fast);
-
-  &:hover {
-    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: -2px;
-  }
-}
-
-.toggleLabel {
-  flex: 1;
-  text-align: left;
-  font-weight: var(--fw-n);
-}
-
-// ============================================
-// TOGGLE SWITCH
-// ============================================
-.toggle {
-  position: relative;
-  width: 40px;
-  height: 22px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-full);
-  cursor: pointer;
-  transition: all var(--tr-fast);
-  flex-shrink: 0;
-}
-
-.toggleActive {
-  background: var(--primary);
-  border-color: var(--primary);
-
-  .toggleThumb {
-    transform: translateX(18px);
-    background: white;
-  }
-}
-
-.toggleThumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  background: var(--tx-muted);
-  border-radius: var(--r-full);
-  transition: all var(--tr-fast);
-  box-shadow: var(--sh-sm);
-}
-
-// ============================================
 // RESPONSIVE
 // ============================================
 @include tablet {
@@ -333,9 +262,7 @@
   .trigger,
   .triggerIcon,
   .triggerArrow,
-  .option,
-  .toggle,
-  .toggleThumb {
+  .option {
     transition: none;
   }
 

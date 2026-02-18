@@ -1,0 +1,196 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.budgetSettings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Status Card
+.statusCard {
+  background: color-mix(in srgb, var(--primary) 6%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: var(--r-lg);
+  padding: var(--space-md);
+}
+
+.statusHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+}
+
+.statusIcon {
+  color: var(--primary);
+}
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 0.5s ease-out;
+}
+
+.progressLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+.percentLabel {
+  font-weight: var(--fw-sb);
+}
+
+.warningMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  padding: var(--space-sm);
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  border-radius: var(--r-md);
+  color: var(--warning);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+}
+
+// Form Section
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  label {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+  }
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  padding-inline-end: var(--space-2xl);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-md);
+  color: var(--tx);
+  transition: border-color var(--tr), box-shadow var(--tr);
+
+  &::placeholder {
+    color: var(--tx-muted);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+}
+
+.inputSuffix {
+  position: absolute;
+  inset-inline-end: var(--space-md);
+  color: var(--tx-muted);
+  font-weight: var(--fw-sb);
+  pointer-events: none;
+}
+
+.hint {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+}
+
+// Threshold Options
+.thresholdOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.thresholdBtn {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-contrast);
+  }
+}
+
+// Actions
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+:global([dir='rtl']) .actions {
+  justify-content: flex-start;
+}

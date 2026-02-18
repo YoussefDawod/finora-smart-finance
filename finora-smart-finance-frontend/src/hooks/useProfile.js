@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { useToast } from './useToast';
 import authService from '@/api/authService';
+import userService from '@/api/userService';
+import { validatePassword } from '@/validators';
 
 export function useProfile() {
   const { user, refreshUser } = useAuth();
@@ -187,14 +189,14 @@ export function useProfile() {
       return { success: false, error: 'passwordMismatch' };
     }
 
-    const strong = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    if (!strong.test(newPassword)) {
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
       return { success: false, error: 'passwordWeak' };
     }
 
     setIsChangingPassword(true);
     try {
-      await authService.changePassword(currentPassword, newPassword);
+      await userService.changePassword(currentPassword, newPassword);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       return { success: true };
     } catch (error) {

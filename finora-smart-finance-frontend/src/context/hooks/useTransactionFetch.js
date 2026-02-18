@@ -6,6 +6,7 @@
 import { useCallback } from 'react';
 import i18n from '@/i18n';
 import { transactionService } from '@/api';
+import { retryAsync } from '@/utils/retry';
 import { ACTIONS, initialState } from '../reducers/transactionReducer';
 
 /**
@@ -14,13 +15,30 @@ import { ACTIONS, initialState } from '../reducers/transactionReducer';
  * @param {Object} state - Current state
  */
 export function useTransactionFetch(dispatch, state) {
+  const shouldRetry = useCallback((error) => {
+    const status = error?.response?.status;
+    return !status || status >= 500 || status === 429;
+  }, []);
+
   // ──────────────────────────────────────────────────────────────────────
   // FETCH DASHBOARD DATA (aggregiert, keine vollen Transaktionen)
+  // Verwendet dashboardMonth und dashboardYear aus dem State
   // ──────────────────────────────────────────────────────────────────────
   const fetchDashboardData = useCallback(async () => {
     dispatch({ type: ACTIONS.FETCH_DASHBOARD_START });
     try {
-      const response = await transactionService.getDashboardData();
+      const response = await retryAsync(
+        () => transactionService.getDashboardData({
+          month: state.dashboardMonth,
+          year: state.dashboardYear,
+        }),
+        {
+          retries: 2,
+          delay: 400,
+          factor: 2,
+          shouldRetry,
+        }
+      );
       dispatch({
         type: ACTIONS.FETCH_DASHBOARD_SUCCESS,
         payload: response.data.data,
@@ -30,7 +48,7 @@ export function useTransactionFetch(dispatch, state) {
       dispatch({ type: ACTIONS.FETCH_DASHBOARD_ERROR, payload: errorMsg });
       console.error('Fetch dashboard error:', err);
     }
-  }, [dispatch]);
+  }, [dispatch, shouldRetry, state.dashboardMonth, state.dashboardYear]);
 
   // ──────────────────────────────────────────────────────────────────────
   // FETCH TRANSACTIONS (paginiert mit Filtern)
@@ -54,7 +72,12 @@ export function useTransactionFetch(dispatch, state) {
         // Entferne undefined-Werte
         Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
 
-        const response = await transactionService.getTransactions(params);
+        const response = await retryAsync(() => transactionService.getTransactions(params), {
+          retries: 2,
+          delay: 400,
+          factor: 2,
+          shouldRetry,
+        });
         dispatch({
           type: ACTIONS.FETCH_LIST_SUCCESS,
           payload: {
@@ -75,6 +98,7 @@ export function useTransactionFetch(dispatch, state) {
       state.sortBy,
       state.sortOrder,
       state.filter,
+      shouldRetry,
     ]
   );
 

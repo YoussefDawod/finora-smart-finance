@@ -11,20 +11,20 @@ export const ENDPOINTS = {
     login: '/api/auth/login',
     logout: '/api/auth/logout',
     verify: '/api/auth/verify-email',
-    changeEmail: '/api/auth/change-email',
     forgotPassword: '/api/auth/forgot-password',
     resetPassword: '/api/auth/reset-password',
     refresh: '/api/auth/refresh',
-    me: '/api/auth/me',
     resendVerification: '/api/auth/resend-verification',
-    changePassword: '/api/auth/change-password',
-    // Email management
-    addEmail: '/api/auth/add-email',
-    verifyAddEmail: '/api/auth/verify-add-email',
-    resendAddEmailVerification: '/api/auth/resend-add-email-verification',
-    removeEmail: '/api/auth/remove-email',
-    emailStatus: '/api/auth/email-status',
-    deleteAccount: '/api/auth/me',
+    // User management routes → delegated to /api/users/*
+    me: '/api/users/me',
+    changeEmail: '/api/users/change-email',
+    changePassword: '/api/users/change-password',
+    addEmail: '/api/users/add-email',
+    verifyAddEmail: '/api/users/verify-add-email',
+    resendAddEmailVerification: '/api/users/resend-add-email-verification',
+    removeEmail: '/api/users/remove-email',
+    emailStatus: '/api/users/email-status',
+    deleteAccount: '/api/users/me',
   },
   transactions: {
     list: '/api/transactions',
@@ -36,14 +36,19 @@ export const ENDPOINTS = {
     stats: '/api/transactions/stats/overview',
   },
   users: {
-    profile: '/api/users/profile',
-    updateProfile: '/api/users/profile',
-    updatePreferences: '/api/users/preferences',
-    password: '/api/users/password',
-    email: '/api/users/email',
-    deleteAccount: '/api/users/account',
-    enable2FA: '/api/users/2fa/enable',
-    verify2FA: '/api/users/2fa/verify',
+    // Korrekte Backend-Endpunkte (gemäß /src/routes/users/)
+    profile: '/api/users/me',           // GET - Profil abrufen
+    updateProfile: '/api/users/me',     // PUT - Profil aktualisieren
+    deleteAccount: '/api/users/me',     // DELETE - Account löschen
+    password: '/api/users/change-password', // POST - Passwort ändern
+    updatePreferences: '/api/users/preferences', // PUT - Einstellungen
+    budgetStatus: '/api/users/budget-status',    // GET - Budget-Status
+  },
+  contact: '/api/contact',
+  newsletter: {
+    subscribe: '/api/newsletter/subscribe',
+    status: '/api/newsletter/status',
+    toggle: '/api/newsletter/toggle',
   },
 };
 
