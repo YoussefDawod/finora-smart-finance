@@ -642,7 +642,7 @@
     "deleteConfirmLabel": "Type \"DELETE\" to confirm:",
     "deleteButton": "Permanently delete account"
   },
-  "errors": {
+  "errorPages": {
     "notFoundTitle": "Page not found",
     "notFoundSubtitle": "This page does not exist or was moved.",
     "backToDashboard": "Back to dashboard",

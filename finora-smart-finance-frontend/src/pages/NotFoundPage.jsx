@@ -8,10 +8,10 @@ const NotFoundPage = () => {
     <div className="not-found-page">
       <div className="not-found-content">
         <h1 className="error-code">404</h1>
-        <h2>{t('errors.notFoundTitle')}</h2>
-        <p>{t('errors.notFoundSubtitle')}</p>
+        <h2>{t('errorPages.notFoundTitle')}</h2>
+        <p>{t('errorPages.notFoundSubtitle')}</p>
         <Link to="/dashboard" className="btn btn-primary">
-          {t('errors.backToDashboard')}
+          {t('errorPages.backToDashboard')}
         </Link>
       </div>
     </div>

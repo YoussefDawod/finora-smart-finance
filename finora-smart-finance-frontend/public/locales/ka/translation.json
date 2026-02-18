@@ -642,7 +642,7 @@
     "deleteConfirmLabel": "აკრიფეთ \"DELETE\" დასადასტურებლად:",
     "deleteButton": "ანგარიშის საბოლოოდ წაშლა"
   },
-  "errors": {
+  "errorPages": {
     "notFoundTitle": "გვერდი ვერ მოიძებნა",
     "notFoundSubtitle": "ეს გვერდი არ არსებობს ან გადატანილია.",
     "backToDashboard": "დაბრუნება დეშბორდზე",

@@ -11,13 +11,15 @@ const logger = require('../utils/logger');
 
 /**
  * Validates login input
+ * @param {string} identifier - Username or email
+ * @param {string} password
  * @returns {Object} { valid: boolean, error?: string, code?: string }
  */
-function validateLoginInput(name, password) {
-  if (!name || !password) {
+function validateLoginInput(identifier, password) {
+  if (!identifier || !password) {
     return {
       valid: false,
-      error: 'Name und Passwort erforderlich',
+      error: 'Name/Email und Passwort erforderlich',
       code: 'INVALID_INPUT',
     };
   }
@@ -25,11 +27,18 @@ function validateLoginInput(name, password) {
 }
 
 /**
- * Authenticates user by name and password
+ * Authenticates user by name or email and password
+ * @param {string} identifier - Username or email address
+ * @param {string} password
  * @returns {Object} { success: boolean, user?: User, error?: string, code?: string }
  */
-async function authenticateUser(name, password) {
-  const user = await User.findOne({ name: name.trim() });
+async function authenticateUser(identifier, password) {
+  const trimmed = identifier.trim();
+  const isEmail = trimmed.includes('@');
+
+  const user = isEmail
+    ? await User.findOne({ email: trimmed.toLowerCase() })
+    : await User.findOne({ name: trimmed });
 
   if (!user) {
     return {

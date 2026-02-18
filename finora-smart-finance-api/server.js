@@ -43,7 +43,6 @@ app.use(requestLoggerMiddleware);
 app.use(express.json());
 
 // Custom mongo sanitizer (Express 5 compatible)
-// express-mongo-sanitize is incompatible with Express 5 (req.query is read-only)
 const sanitizeObject = (obj) => {
   if (!obj || typeof obj !== 'object') return;
   for (const key of Object.keys(obj)) {
@@ -55,17 +54,33 @@ const sanitizeObject = (obj) => {
   }
 };
 
+/**
+ * Check for NoSQL injection keys without modifying the object.
+ * Used for read-only objects like req.query in Express 5.
+ * @returns {boolean} true if dangerous keys found
+ */
+const hasDangerousKeys = (obj) => {
+  if (!obj || typeof obj !== 'object') return false;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith('$') || key.includes('.')) return true;
+    if (typeof obj[key] === 'object' && hasDangerousKeys(obj[key])) return true;
+  }
+  return false;
+};
+
 const mongoSanitizeMiddleware = (req, res, next) => {
   if (req.body) sanitizeObject(req.body);
   if (req.params) sanitizeObject(req.params);
-  // req.query is read-only in Express 5, but its nested values can be sanitized
-  if (req.query) {
-    try {
-      sanitizeObject(req.query);
-    } catch {
-      // Silently skip if query is frozen/read-only
-    }
+
+  // req.query is read-only in Express 5 — reject requests with dangerous keys
+  if (req.query && hasDangerousKeys(req.query)) {
+    logger.warn('Blocked request with NoSQL injection attempt in query params', {
+      ip: req.ip,
+      path: req.path,
+    });
+    return res.status(400).json({ error: 'Invalid query parameters' });
   }
+
   next();
 };
 

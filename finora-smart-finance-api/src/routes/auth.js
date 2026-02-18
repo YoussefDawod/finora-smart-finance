@@ -25,7 +25,7 @@ router.post('/login', loginLimiter, authController.login);
 
 // Token Management
 router.post('/refresh', apiLimiter, authController.refresh);
-router.post('/logout', authController.logout);
+router.post('/logout', apiLimiter, authController.logout);
 
 // Email Verification
 router.get('/verify-email', authController.verifyEmail);
