@@ -15,7 +15,7 @@ describe('escapeHtml', () => {
     expect(escapeHtml('')).toBe('');
     expect(escapeHtml(null)).toBe('');
     expect(escapeHtml(undefined)).toBe('');
-    expect(escapeHtml(0)).toBe('');   // 0 ist falsy → leer (gewollt für Templates)
+    expect(escapeHtml(0)).toBe(''); // 0 ist falsy → leer (gewollt für Templates)
     expect(escapeHtml(false)).toBe(''); // false ist falsy → leer
   });
 
@@ -141,8 +141,10 @@ describe('Email Template XSS Protection (Integration)', () => {
   it('emailChange template should escape name and email', () => {
     const html = emailChange(MALICIOUS_NAME, 'https://example.com/verify', MALICIOUS_EMAIL);
     expect(html).not.toContain('<script>');
-    expect(html).not.toContain('<img');
+    expect(html).not.toContain('<img src=x'); // dangerous unescaped pattern
+    expect(html).not.toContain('onerror=steal()>'); // dangerous unescaped pattern
     expect(html).toContain('&lt;script&gt;');
+    expect(html).toContain('&lt;img src=x onerror=steal()&gt;'); // escaped malicious img
   });
 
   it('passwordReset template should escape name', () => {
@@ -164,10 +166,15 @@ describe('Email Template XSS Protection (Integration)', () => {
       location: '"><svg/onload=alert(1)>',
     });
     expect(html).not.toContain('<script>');
-    expect(html).not.toContain('<img');
+    expect(html).not.toContain('<img src=x'); // dangerous unescaped pattern
+    expect(html).not.toContain('onerror=steal()>'); // dangerous unescaped pattern
+    expect(html).not.toContain('<svg/onload='); // dangerous unescaped pattern
     // baseLayout contains a legitimate inline SVG logo, so check that the
     // malicious onload payload was escaped rather than blocking all <svg> tags
     expect(html).not.toContain('<svg/onload');
+    expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;'); // escaped malicious script
+    expect(html).toContain('&lt;img src=x onerror=steal()&gt;'); // escaped malicious img
+    expect(html).toContain('&lt;svg/onload=alert(1)&gt;'); // escaped malicious svg
   });
 
   it('newUserRegistration template should escape all fields', () => {
@@ -178,7 +185,10 @@ describe('Email Template XSS Protection (Integration)', () => {
       registeredAt: '2026-02-26',
     });
     expect(html).not.toContain('<script>');
-    expect(html).not.toContain('<img');
+    expect(html).not.toContain('<img src=x'); // dangerous unescaped pattern
+    expect(html).not.toContain('onerror=steal()>'); // dangerous unescaped pattern
+    expect(html).toContain('&lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;'); // escaped malicious script
+    expect(html).toContain('&quot;&gt;&lt;img src=x onerror=steal()&gt;'); // escaped malicious img
   });
 
   it('transactionNotification template should escape name and transaction fields', () => {
