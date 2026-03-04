@@ -44,20 +44,33 @@ router.post('/change-password', auth, sensitiveOperationLimiter, async (req, res
     if (!user) return;
 
     if (errors.length > 0) {
-      return sendError(res, req, { error: 'Validierungsfehler', code: 'VALIDATION_ERROR', status: 400, details: errors });
+      return sendError(res, req, {
+        error: 'Validierungsfehler',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+        details: errors,
+      });
     }
 
     // Aktuelles Passwort verifizieren
     const isPasswordValid = await user.comparePassword(req.body.currentPassword);
     if (!isPasswordValid) {
       logger.warn(`Failed password change attempt for user ${user._id}`);
-      return sendError(res, req, { error: 'Aktuelles Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Aktuelles Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     // Neues Passwort == altes Passwort prüfen
     const isSamePassword = await bcrypt.compare(req.body.newPassword, user.passwordHash);
     if (isSamePassword) {
-      return sendError(res, req, { error: 'Neues Passwort muss sich vom aktuellen unterscheiden', code: 'SAME_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Neues Passwort muss sich vom aktuellen unterscheiden',
+        code: 'SAME_PASSWORD',
+        status: 400,
+      });
     }
 
     // Passwort setzen (Hook hasht es) + alle Refresh-Tokens invalidieren

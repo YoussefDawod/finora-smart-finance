@@ -38,7 +38,9 @@ async function subscribe(email, language, authHeader) {
     createdAt: { $gte: oneHourAgo },
   });
   if (recentUnconfirmed >= 50) {
-    logger.warn(`Newsletter subscribe: DB-level rate limit reached (${recentUnconfirmed} unconfirmed/h)`);
+    logger.warn(
+      `Newsletter subscribe: DB-level rate limit reached (${recentUnconfirmed} unconfirmed/h)`
+    );
     return { success: true, message: 'Bestätigungsmail wurde gesendet' }; // Privacy: keine Info-Leaks
   }
 
@@ -51,10 +53,12 @@ async function subscribe(email, language, authHeader) {
 
   const authenticatedUser = await resolveOptionalUser(authHeader);
 
-  const subscriber = existing || new Subscriber({
-    email: email.toLowerCase(),
-    language: language || 'de',
-  });
+  const subscriber =
+    existing ||
+    new Subscriber({
+      email: email.toLowerCase(),
+      language: language || 'de',
+    });
 
   if (existing && language) {
     subscriber.language = language;

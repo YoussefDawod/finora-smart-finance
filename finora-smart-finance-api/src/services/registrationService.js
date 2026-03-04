@@ -8,7 +8,11 @@ const emailService = require('../utils/emailService');
 const authService = require('./authService');
 const auditLogService = require('./auditLogService');
 const config = require('../config/env');
-const { validateName, validatePassword, validateOptionalEmail } = require('../validators/authValidation');
+const {
+  validateName,
+  validatePassword,
+  validateOptionalEmail,
+} = require('../validators/authValidation');
 
 /**
  * Validates registration input data
@@ -51,7 +55,8 @@ async function validateRegistrationInput(name, password, email, understoodNoEmai
   if (!emailValidation.email && !understoodNoEmailReset) {
     return {
       valid: false,
-      error: 'Bitte bestätigen Sie, dass Sie verstanden haben, dass ohne Email kein Passwort-Reset möglich ist',
+      error:
+        'Bitte bestätigen Sie, dass Sie verstanden haben, dass ohne Email kein Passwort-Reset möglich ist',
       code: 'CHECKBOX_REQUIRED',
     };
   }

@@ -40,7 +40,8 @@ async function createCampaign(data, adminId) {
 async function updateCampaign(campaignId, updates) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) return { error: 'Campaign nicht gefunden', code: 'CAMPAIGN_NOT_FOUND' };
-  if (campaign.status !== 'draft') return { error: 'Nur Drafts können bearbeitet werden', code: 'NOT_DRAFT' };
+  if (campaign.status !== 'draft')
+    return { error: 'Nur Drafts können bearbeitet werden', code: 'NOT_DRAFT' };
 
   if (updates.subject !== undefined) campaign.subject = updates.subject;
   if (updates.content !== undefined) campaign.content = updates.content;
@@ -65,9 +66,15 @@ async function updateCampaign(campaignId, updates) {
 async function deleteCampaign(campaignId) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) return { error: 'Campaign nicht gefunden', code: 'CAMPAIGN_NOT_FOUND' };
-  if (campaign.status === 'sending') return { error: 'Kampagne wird gerade gesendet', code: 'CAMPAIGN_SENDING' };
+  if (campaign.status === 'sending')
+    return { error: 'Kampagne wird gerade gesendet', code: 'CAMPAIGN_SENDING' };
 
-  const info = { id: campaign._id, subject: campaign.subject, language: campaign.language, status: campaign.status };
+  const info = {
+    id: campaign._id,
+    subject: campaign.subject,
+    language: campaign.language,
+    status: campaign.status,
+  };
   await Campaign.findByIdAndDelete(campaignId);
   logger.warn(`Campaign deleted: ${campaignId} (was ${campaign.status})`);
   return { deleted: info };
@@ -80,7 +87,10 @@ async function deleteCampaign(campaignId) {
 async function deleteAllCampaigns() {
   const sendingCount = await Campaign.countDocuments({ status: 'sending' });
   if (sendingCount > 0) {
-    return { error: 'Es gibt laufende Sendungen. Bitte warte, bis alle abgeschlossen sind.', code: 'HAS_SENDING' };
+    return {
+      error: 'Es gibt laufende Sendungen. Bitte warte, bis alle abgeschlossen sind.',
+      code: 'HAS_SENDING',
+    };
   }
   const result = await Campaign.deleteMany({});
   logger.warn(`All campaigns deleted (${result.deletedCount} total)`);
@@ -103,7 +113,14 @@ async function getCampaign(campaignId) {
  * @param {Object} options - { page, limit, status, language, search, sort }
  * @returns {Object} { campaigns, pagination }
  */
-async function listCampaigns({ page = 1, limit = 20, status, language, search, sort = '-createdAt' } = {}) {
+async function listCampaigns({
+  page = 1,
+  limit = 20,
+  status,
+  language,
+  search,
+  sort = '-createdAt',
+} = {}) {
   const ALLOWED_SORT = new Set(['createdAt', 'sentAt', 'subject', 'status', 'recipientCount']);
   const sortField = sort.startsWith('-') ? sort.slice(1) : sort;
   const safeSort = ALLOWED_SORT.has(sortField) ? sort : '-createdAt';
@@ -143,7 +160,8 @@ async function listCampaigns({ page = 1, limit = 20, status, language, search, s
 async function sendCampaign(campaignId) {
   const campaign = await Campaign.findById(campaignId);
   if (!campaign) return { error: 'Campaign nicht gefunden', code: 'CAMPAIGN_NOT_FOUND' };
-  if (campaign.status !== 'draft') return { error: 'Campaign nicht versendbar', code: 'INVALID_STATE' };
+  if (campaign.status !== 'draft')
+    return { error: 'Campaign nicht versendbar', code: 'INVALID_STATE' };
 
   // Empfänger ermitteln (nur bestätigte Subscriber)
   const filter = { isConfirmed: true };
@@ -184,7 +202,7 @@ async function sendCampaign(campaignId) {
     }
 
     // Rate-Limiting: 100ms Pause zwischen E-Mails (SMTP-Schutz)
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   // Ergebnis speichern
@@ -202,26 +220,34 @@ async function sendCampaign(campaignId) {
  * @returns {Object} Übersicht: total, drafts, sent, failed, avg recipients
  */
 async function getCampaignStats() {
-  const [totalCount, statusBreakdown, languageBreakdown, recentCampaigns, avgRecipients] = await Promise.all([
-    Campaign.countDocuments(),
-    Campaign.aggregate([
-      { $group: { _id: '$status', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-    ]),
-    Campaign.aggregate([
-      { $group: { _id: '$language', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-    ]),
-    Campaign.find({ status: 'sent' })
-      .sort({ sentAt: -1 })
-      .limit(5)
-      .select('subject sentAt recipientCount successCount failCount language')
-      .lean(),
-    Campaign.aggregate([
-      { $match: { status: 'sent' } },
-      { $group: { _id: null, avg: { $avg: '$recipientCount' }, totalSent: { $sum: '$successCount' }, totalFailed: { $sum: '$failCount' } } },
-    ]),
-  ]);
+  const [totalCount, statusBreakdown, languageBreakdown, recentCampaigns, avgRecipients] =
+    await Promise.all([
+      Campaign.countDocuments(),
+      Campaign.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+      Campaign.aggregate([
+        { $group: { _id: '$language', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+      ]),
+      Campaign.find({ status: 'sent' })
+        .sort({ sentAt: -1 })
+        .limit(5)
+        .select('subject sentAt recipientCount successCount failCount language')
+        .lean(),
+      Campaign.aggregate([
+        { $match: { status: 'sent' } },
+        {
+          $group: {
+            _id: null,
+            avg: { $avg: '$recipientCount' },
+            totalSent: { $sum: '$successCount' },
+            totalFailed: { $sum: '$failCount' },
+          },
+        },
+      ]),
+    ]);
 
   const avg = avgRecipients[0] || { avg: 0, totalSent: 0, totalFailed: 0 };
 

@@ -20,7 +20,7 @@ mongoose.connection.on('reconnected', () => {
   logger.info('MongoDB reconnected successfully');
 });
 
-mongoose.connection.on('error', (err) => {
+mongoose.connection.on('error', err => {
   logger.error('MongoDB connection error', { error: err.message });
 });
 
@@ -51,7 +51,7 @@ async function connectDB(retries = 7) {
         retryIn: `${delaySec} seconds`,
       });
       if (i < retries - 1) {
-        await new Promise((resolve) => setTimeout(resolve, delay));
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }

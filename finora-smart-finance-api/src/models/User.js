@@ -13,32 +13,39 @@ const RefreshTokenSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema(
   {
     // Name ist Pflicht und unique (für Login)
-    name: { 
-      type: String, 
+    name: {
+      type: String,
       required: [true, 'Name ist erforderlich'],
       trim: true,
       minlength: [3, 'Name muss mindestens 3 Zeichen haben'],
       maxlength: [50, 'Name darf maximal 50 Zeichen haben'],
-      match: [/^[a-zA-ZäöüÄÖÜß0-9\s-]+$/, 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten']
+      match: [
+        /^[a-zA-ZäöüÄÖÜß0-9\s-]+$/,
+        'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten',
+      ],
       // Index defined separately below with unique constraint
     },
     // Email ist optional (für Password-Reset)
-    email: { 
-      type: String, 
+    email: {
+      type: String,
       required: false,
-      lowercase: true, 
+      lowercase: true,
       trim: true,
-      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'E-Mail ist ungültig']
+      match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'E-Mail ist ungültig'],
       // Index defined separately below with sparse+unique constraint
     },
     passwordHash: { type: String, required: true },
     lastName: { type: String, default: '', maxlength: [50, 'Nachname darf max. 50 Zeichen haben'] },
-    avatar: { type: String, default: null, maxlength: [2048, 'Avatar-URL darf max. 2048 Zeichen haben'] },
-    phone: { 
-      type: String, 
+    avatar: {
+      type: String,
+      default: null,
+      maxlength: [2048, 'Avatar-URL darf max. 2048 Zeichen haben'],
+    },
+    phone: {
+      type: String,
       default: null,
       maxlength: [20, 'Telefonnummer darf max. 20 Zeichen haben'],
-      match: [/^[\d\s+()-]+$|^$/, 'Telefonnummer hat ungültiges Format']
+      match: [/^[\d\s+()-]+$|^$/, 'Telefonnummer hat ungültiges Format'],
     },
     isVerified: { type: Boolean, default: false },
 
@@ -57,7 +64,7 @@ const UserSchema = new mongoose.Schema(
     // Brute-Force-Schutz: Account-Lockout nach zu vielen Fehlversuchen
     failedLoginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date, default: null },
-    
+
     // Flag: User hat bei Registration Checkbox bestätigt (kein Email = kein Reset)
     understoodNoEmailReset: { type: Boolean, default: false },
 
@@ -72,29 +79,29 @@ const UserSchema = new mongoose.Schema(
     emailChangeExpires: Date,
 
     preferences: {
-      theme: { 
-        type: String, 
-        default: 'system', 
-        enum: ['light', 'dark', 'system']
+      theme: {
+        type: String,
+        default: 'system',
+        enum: ['light', 'dark', 'system'],
       },
-      currency: { 
-        type: String, 
+      currency: {
+        type: String,
         default: 'EUR',
-        enum: ['USD', 'EUR', 'GBP', 'CHF', 'JPY']
+        enum: ['USD', 'EUR', 'GBP', 'CHF', 'JPY'],
       },
-      timezone: { 
-        type: String, 
-        default: 'Europe/Berlin'
+      timezone: {
+        type: String,
+        default: 'Europe/Berlin',
       },
-      language: { 
-        type: String, 
+      language: {
+        type: String,
         default: 'de',
-        enum: ['en', 'de', 'fr', 'ar', 'ka']
+        enum: ['en', 'de', 'fr', 'ar', 'ka'],
       },
       dateFormat: {
         type: String,
         default: 'iso',
-        enum: ['iso', 'dmy']
+        enum: ['iso', 'dmy'],
       },
       emailNotifications: { type: Boolean, default: true },
       notificationCategories: {
@@ -285,7 +292,7 @@ const MAX_ACTIVE_SESSIONS = 5;
 UserSchema.methods.addRefreshToken = function (token, ttlSeconds = 7 * 24 * 3600, meta = {}) {
   // Cleanup: Abgelaufene Tokens entfernen, bevor ein neuer hinzugefügt wird
   const now = Date.now();
-  this.refreshTokens = this.refreshTokens.filter((t) => t.expiresAt > now);
+  this.refreshTokens = this.refreshTokens.filter(t => t.expiresAt > now);
 
   // Session-Limit: Älteste Sessions entfernen, wenn Maximum erreicht
   if (this.refreshTokens.length >= MAX_ACTIVE_SESSIONS) {
@@ -300,7 +307,7 @@ UserSchema.methods.addRefreshToken = function (token, ttlSeconds = 7 * 24 * 3600
 
 UserSchema.methods.removeRefreshToken = function (token) {
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-  this.refreshTokens = this.refreshTokens.filter((t) => t.tokenHash !== tokenHash);
+  this.refreshTokens = this.refreshTokens.filter(t => t.tokenHash !== tokenHash);
 };
 
 UserSchema.statics.findByRefreshToken = async function (token) {

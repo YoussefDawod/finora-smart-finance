@@ -7,7 +7,8 @@ const nodemailer = require('nodemailer');
 const config = require('../../config/env');
 const logger = require('../logger');
 
-const backendBaseUrl = (config.apiUrl && config.apiUrl.replace(/\/api$/, '')) || 'http://localhost:5000';
+const backendBaseUrl =
+  (config.apiUrl && config.apiUrl.replace(/\/api$/, '')) || 'http://localhost:5000';
 const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
 let transporter = null;

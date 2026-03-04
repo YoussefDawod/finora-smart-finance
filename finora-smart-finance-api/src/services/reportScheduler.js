@@ -22,18 +22,18 @@ async function calculateReportData(userId, startDate, endDate) {
   });
 
   const income = transactions
-    .filter((t) => t.type === 'income')
+    .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const expenses = transactions
-    .filter((t) => t.type === 'expense')
+    .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
 
   // Top Kategorien berechnen
   const categoryMap = {};
   transactions
-    .filter((t) => t.type === 'expense')
-    .forEach((t) => {
+    .filter(t => t.type === 'expense')
+    .forEach(t => {
       categoryMap[t.category] = (categoryMap[t.category] || 0) + t.amount;
     });
 

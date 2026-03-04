@@ -7,20 +7,34 @@ async function changePassword(req, res) {
   try {
     const { currentPassword, newPassword } = req.body || {};
     if (!currentPassword || !newPassword) {
-      return sendError(res, req, { error: 'Passwörter erforderlich', code: 'INVALID_INPUT', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwörter erforderlich',
+        code: 'INVALID_INPUT',
+        status: 400,
+      });
     }
 
-    const result = await passwordResetService.changePassword(req.user._id, currentPassword, newPassword);
+    const result = await passwordResetService.changePassword(
+      req.user._id,
+      currentPassword,
+      newPassword
+    );
 
     if (!result.changed) {
       const statusCode = result.code === 'INVALID_PASSWORD' ? 401 : 400;
       return sendError(res, req, { error: result.error, code: result.code, status: statusCode });
     }
 
-    return res.status(200).json({ success: true, changed: true, data: { message: result.message } });
+    return res
+      .status(200)
+      .json({ success: true, changed: true, data: { message: result.message } });
   } catch (err) {
     logger.error('changePassword error:', err);
-    return sendError(res, req, { error: 'Passwortänderung fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Passwortänderung fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -33,7 +47,11 @@ async function forgotPassword(req, res) {
     return res.status(200).json({ success: true, data: { sent: true } });
   } catch (err) {
     logger.error('forgotPassword error:', err);
-    return sendError(res, req, { error: 'Anfrage fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Anfrage fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -43,7 +61,11 @@ async function resetPassword(req, res) {
     const candidatePassword = newPassword || password;
 
     if (passwordConfirm && candidatePassword !== passwordConfirm) {
-      return sendError(res, req, { error: 'Passwörter stimmen nicht überein', code: 'PASSWORD_MISMATCH', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwörter stimmen nicht überein',
+        code: 'PASSWORD_MISMATCH',
+        status: 400,
+      });
     }
 
     const result = await passwordResetService.completePasswordReset(token, candidatePassword);
@@ -55,7 +77,11 @@ async function resetPassword(req, res) {
     return res.status(200).json({ success: true, changed: true, data: { reset: true } });
   } catch (err) {
     logger.error('resetPassword error:', err);
-    return sendError(res, req, { error: 'Passwort-Zurücksetzen fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Passwort-Zurücksetzen fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 

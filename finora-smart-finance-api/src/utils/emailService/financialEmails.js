@@ -22,9 +22,10 @@ async function sendTransactionNotification(user, transaction) {
   }
 
   const name = user.name || 'Nutzer';
-  const subject = transaction.type === 'income'
-    ? 'Neue Einnahme erfasst - Finora'
-    : 'Neue Ausgabe erfasst - Finora';
+  const subject =
+    transaction.type === 'income'
+      ? 'Neue Einnahme erfasst - Finora'
+      : 'Neue Ausgabe erfasst - Finora';
 
   try {
     await sendEmail(user.email, subject, templates.transactionNotification(name, transaction));
@@ -86,9 +87,8 @@ async function sendFinancialReport(user, reportData, period = 'weekly') {
   }
 
   const name = user.name || 'Nutzer';
-  const subject = period === 'weekly'
-    ? 'Dein Wochenbericht - Finora'
-    : 'Dein Monatsbericht - Finora';
+  const subject =
+    period === 'weekly' ? 'Dein Wochenbericht - Finora' : 'Dein Monatsbericht - Finora';
 
   try {
     await sendEmail(user.email, subject, templates.financialReport(name, reportData, period));

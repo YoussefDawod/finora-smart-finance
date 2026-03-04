@@ -343,7 +343,9 @@ async function sendFinalWarning(user, count) {
     details: { transactionCount: count, daysRemaining: FINAL_WARNING_DAYS },
   });
 
-  logger.info(`[Lifecycle] Final warning sent to user ${user._id}: ${count} transactions, ${FINAL_WARNING_DAYS} days remaining`);
+  logger.info(
+    `[Lifecycle] Final warning sent to user ${user._id}: ${count} transactions, ${FINAL_WARNING_DAYS} days remaining`
+  );
 }
 
 /**
@@ -461,7 +463,9 @@ async function sendRetentionEmail(user, type, data) {
   } catch (error) {
     // Modul existiert noch nicht → nur loggen (wird in Phase 7 erstellt)
     if (error.code === 'MODULE_NOT_FOUND') {
-      logger.debug(`[Lifecycle] Email module not yet available (Phase 7), skipping ${type} email for user ${user._id}`);
+      logger.debug(
+        `[Lifecycle] Email module not yet available (Phase 7), skipping ${type} email for user ${user._id}`
+      );
       return { sent: false, reason: 'EMAIL_MODULE_NOT_READY' };
     }
     logger.error(`[Lifecycle] Failed to send ${type} email to user ${user._id}: ${error.message}`);
@@ -560,7 +564,10 @@ async function getLifecycleStatus(user) {
       phase = 'reminding';
       const gracePeriodEnd = new Date(retention.reminderStartedAt);
       gracePeriodEnd.setMonth(gracePeriodEnd.getMonth() + GRACE_PERIOD_MONTHS);
-      const daysToGraceEnd = Math.max(0, Math.ceil((gracePeriodEnd - new Date()) / (1000 * 60 * 60 * 24)));
+      const daysToGraceEnd = Math.max(
+        0,
+        Math.ceil((gracePeriodEnd - new Date()) / (1000 * 60 * 60 * 24))
+      );
       daysUntilFinalWarning = daysToGraceEnd;
       daysUntilDeletion = daysToGraceEnd + FINAL_WARNING_DAYS;
     } else {

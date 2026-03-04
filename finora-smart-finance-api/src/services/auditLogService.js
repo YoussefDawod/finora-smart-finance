@@ -26,7 +26,15 @@ const escapeRegex = require('../utils/escapeRegex');
  * @param {Object} [params.details]     - Zusätzliche Details (vorher/nachher, Grund, etc.)
  * @param {Object} [params.req]         - Express Request (für IP + UserAgent)
  */
-async function log({ action, adminId = null, adminName = 'System/API-Key', targetUserId = null, targetUserName = null, details = {}, req = null }) {
+async function log({
+  action,
+  adminId = null,
+  adminName = 'System/API-Key',
+  targetUserId = null,
+  targetUserName = null,
+  details = {},
+  req = null,
+}) {
   try {
     const entry = new AuditLog({
       action,
@@ -36,8 +44,8 @@ async function log({ action, adminId = null, adminName = 'System/API-Key', targe
       targetUserName: targetUserName || null,
       details,
       requestId: req?.requestId || null,
-      ipAddress: req ? (req.ip || req.connection?.remoteAddress || null) : null,
-      userAgent: req ? (req.headers?.['user-agent'] || null) : null,
+      ipAddress: req ? req.ip || req.connection?.remoteAddress || null : null,
+      userAgent: req ? req.headers?.['user-agent'] || null : null,
     });
 
     await entry.save();
@@ -64,7 +72,17 @@ async function log({ action, adminId = null, adminName = 'System/API-Key', targe
  * @param {string} [options.sort='-createdAt'] - Sortierung
  * @returns {{ logs, pagination }}
  */
-async function getLogs({ page = 1, limit = 50, action, adminId, targetUserId, startDate, endDate, search, sort = '-createdAt' } = {}) {
+async function getLogs({
+  page = 1,
+  limit = 50,
+  action,
+  adminId,
+  targetUserId,
+  startDate,
+  endDate,
+  search,
+  sort = '-createdAt',
+} = {}) {
   // Whitelist erlaubter Sort-Felder — verhindert Sort-Injection
   const ALLOWED_SORT_FIELDS = new Set(['createdAt', 'action', 'adminName', 'targetUserName']);
   const sortField = sort.startsWith('-') ? sort.slice(1) : sort;
@@ -102,7 +120,7 @@ async function getLogs({ page = 1, limit = 50, action, adminId, targetUserId, st
     query.$or = [
       { adminName: regex },
       { targetUserName: regex },
-      { 'details': { $regex: escaped, $options: 'i' } },
+      { details: { $regex: escaped, $options: 'i' } },
     ];
   }
 

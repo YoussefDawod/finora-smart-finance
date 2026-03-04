@@ -22,21 +22,22 @@ const translations = {
     reminder: {
       subject: 'Erinnerung: Alte Transaktionen werden bald gelöscht – Finora',
       title: 'Erinnerung: Daten-Export empfohlen',
-      greeting: (name) => `Hallo ${name},`,
+      greeting: name => `Hallo ${name},`,
       body: (count, oldestDate) =>
         `du hast <strong>${count} Transaktionen</strong>, die älter als 12 Monate sind ` +
         `(älteste vom ${oldestDate}). ` +
         `Diese werden nach Ablauf der Export-Frist automatisch gelöscht, um Speicherplatz freizugeben.`,
-      reminderNote: (num) => `Dies ist Erinnerung Nr. ${num}.`,
+      reminderNote: num => `Dies ist Erinnerung Nr. ${num}.`,
       action: 'Exportiere jetzt deine Daten, um sie dauerhaft zu sichern.',
       button: 'Daten exportieren',
-      footer: 'Du erhältst diese Erinnerung wöchentlich, bis du exportiert hast oder die Frist abläuft.',
+      footer:
+        'Du erhältst diese Erinnerung wöchentlich, bis du exportiert hast oder die Frist abläuft.',
     },
     finalWarning: {
       subject: 'Letzte Warnung: Löschung in 7 Tagen – Finora',
       title: 'Letzte Warnung: Löschung in 7 Tagen',
-      greeting: (name) => `Hallo ${name},`,
-      body: (count) =>
+      greeting: name => `Hallo ${name},`,
+      body: count =>
         `<strong>${count} deiner alten Transaktionen</strong> werden in <strong>7 Tagen endgültig gelöscht</strong>. ` +
         `Die 3-monatige Export-Frist ist abgelaufen.`,
       action: 'Bitte exportiere deine Daten JETZT, falls du sie noch benötigst.',
@@ -46,7 +47,7 @@ const translations = {
     deletionExported: {
       subject: 'Alte Transaktionen gelöscht (Export vorhanden) – Finora',
       title: 'Alte Transaktionen gelöscht',
-      greeting: (name) => `Hallo ${name},`,
+      greeting: name => `Hallo ${name},`,
       body: (count, totalIncome, totalExpense) =>
         `<strong>${count} alte Transaktionen</strong> wurden planmäßig gelöscht. ` +
         `Da du deine Daten vorher exportiert hast, sind keine Informationen verloren gegangen.`,
@@ -60,7 +61,7 @@ const translations = {
     deletionNotExported: {
       subject: 'Alte Transaktionen gelöscht (kein Export) – Finora',
       title: 'Alte Transaktionen gelöscht',
-      greeting: (name) => `Hallo ${name},`,
+      greeting: name => `Hallo ${name},`,
       body: (count, totalIncome, totalExpense) =>
         `<strong>${count} alte Transaktionen</strong> wurden gelöscht. ` +
         `<strong>Leider wurde kein Export durchgeführt</strong> — die Daten sind unwiderruflich verloren.`,
@@ -78,12 +79,12 @@ const translations = {
     reminder: {
       subject: 'Reminder: Old transactions will be deleted soon – Finora',
       title: 'Reminder: Data Export Recommended',
-      greeting: (name) => `Hello ${name},`,
+      greeting: name => `Hello ${name},`,
       body: (count, oldestDate) =>
         `you have <strong>${count} transactions</strong> older than 12 months ` +
         `(oldest from ${oldestDate}). ` +
         `These will be automatically deleted after the export deadline to free up storage.`,
-      reminderNote: (num) => `This is reminder #${num}.`,
+      reminderNote: num => `This is reminder #${num}.`,
       action: 'Export your data now to save it permanently.',
       button: 'Export Data',
       footer: 'You will receive this reminder weekly until you export or the deadline passes.',
@@ -91,8 +92,8 @@ const translations = {
     finalWarning: {
       subject: 'Final Warning: Deletion in 7 days – Finora',
       title: 'Final Warning: Deletion in 7 Days',
-      greeting: (name) => `Hello ${name},`,
-      body: (count) =>
+      greeting: name => `Hello ${name},`,
+      body: count =>
         `<strong>${count} of your old transactions</strong> will be <strong>permanently deleted in 7 days</strong>. ` +
         `The 3-month export period has expired.`,
       action: 'Please export your data NOW if you still need it.',
@@ -102,8 +103,8 @@ const translations = {
     deletionExported: {
       subject: 'Old transactions deleted (export available) – Finora',
       title: 'Old Transactions Deleted',
-      greeting: (name) => `Hello ${name},`,
-      body: (count) =>
+      greeting: name => `Hello ${name},`,
+      body: count =>
         `<strong>${count} old transactions</strong> have been deleted as scheduled. ` +
         `Since you exported your data beforehand, no information has been lost.`,
       stats: (totalIncome, totalExpense) =>
@@ -116,8 +117,8 @@ const translations = {
     deletionNotExported: {
       subject: 'Old transactions deleted (no export) – Finora',
       title: 'Old Transactions Deleted',
-      greeting: (name) => `Hello ${name},`,
-      body: (count) =>
+      greeting: name => `Hello ${name},`,
+      body: count =>
         `<strong>${count} old transactions</strong> have been deleted. ` +
         `<strong>Unfortunately, no export was performed</strong> — the data is irrecoverably lost.`,
       stats: (totalIncome, totalExpense) =>
@@ -134,12 +135,12 @@ const translations = {
     reminder: {
       subject: 'تذكير: سيتم حذف المعاملات القديمة قريبًا – Finora',
       title: 'تذكير: يُنصح بتصدير البيانات',
-      greeting: (name) => `مرحبًا ${name}،`,
+      greeting: name => `مرحبًا ${name}،`,
       body: (count, oldestDate) =>
         `لديك <strong>${count} معاملة</strong> أقدم من 12 شهرًا ` +
         `(أقدمها من ${oldestDate}). ` +
         `سيتم حذفها تلقائيًا بعد انتهاء مهلة التصدير لتحرير مساحة التخزين.`,
-      reminderNote: (num) => `هذا هو التذكير رقم ${num}.`,
+      reminderNote: num => `هذا هو التذكير رقم ${num}.`,
       action: 'قم بتصدير بياناتك الآن لحفظها بشكل دائم.',
       button: 'تصدير البيانات',
       footer: 'ستتلقى هذا التذكير أسبوعيًا حتى تقوم بالتصدير أو تنتهي المهلة.',
@@ -147,8 +148,8 @@ const translations = {
     finalWarning: {
       subject: 'تحذير أخير: الحذف خلال 7 أيام – Finora',
       title: 'تحذير أخير: الحذف خلال 7 أيام',
-      greeting: (name) => `مرحبًا ${name}،`,
-      body: (count) =>
+      greeting: name => `مرحبًا ${name}،`,
+      body: count =>
         `سيتم <strong>حذف ${count} من معاملاتك القديمة نهائيًا خلال 7 أيام</strong>. ` +
         `انتهت مهلة التصدير البالغة 3 أشهر.`,
       action: 'يرجى تصدير بياناتك الآن إذا كنت لا تزال بحاجة إليها.',
@@ -158,8 +159,8 @@ const translations = {
     deletionExported: {
       subject: 'تم حذف المعاملات القديمة (التصدير متاح) – Finora',
       title: 'تم حذف المعاملات القديمة',
-      greeting: (name) => `مرحبًا ${name}،`,
-      body: (count) =>
+      greeting: name => `مرحبًا ${name}،`,
+      body: count =>
         `تم حذف <strong>${count} معاملة قديمة</strong> كما هو مخطط. ` +
         `بما أنك قمت بتصدير بياناتك مسبقًا، لم تُفقد أي معلومات.`,
       stats: (totalIncome, totalExpense) =>
@@ -172,8 +173,8 @@ const translations = {
     deletionNotExported: {
       subject: 'تم حذف المعاملات القديمة (بدون تصدير) – Finora',
       title: 'تم حذف المعاملات القديمة',
-      greeting: (name) => `مرحبًا ${name}،`,
-      body: (count) =>
+      greeting: name => `مرحبًا ${name}،`,
+      body: count =>
         `تم حذف <strong>${count} معاملة قديمة</strong>. ` +
         `<strong>للأسف، لم يتم إجراء أي تصدير</strong> — البيانات مفقودة بشكل لا رجعة فيه.`,
       stats: (totalIncome, totalExpense) =>
@@ -190,21 +191,22 @@ const translations = {
     reminder: {
       subject: 'შეხსენება: ძველი ტრანზაქციები მალე წაიშლება – Finora',
       title: 'შეხსენება: რეკომენდებულია მონაცემთა ექსპორტი',
-      greeting: (name) => `გამარჯობა ${name},`,
+      greeting: name => `გამარჯობა ${name},`,
       body: (count, oldestDate) =>
         `თქვენ გაქვთ <strong>${count} ტრანზაქცია</strong>, რომელიც 12 თვეზე ძველია ` +
         `(უძველესი ${oldestDate}-დან). ` +
         `ისინი ავტომატურად წაიშლება ექსპორტის ვადის ამოწურვის შემდეგ მეხსიერების გასათავისუფლებლად.`,
-      reminderNote: (num) => `ეს არის შეხსენება #${num}.`,
+      reminderNote: num => `ეს არის შეხსენება #${num}.`,
       action: 'ექსპორტირეთ თქვენი მონაცემები ახლავე სამუდამოდ შესანახად.',
       button: 'მონაცემთა ექსპორტი',
-      footer: 'თქვენ მიიღებთ ამ შეხსენებას ყოველკვირეულად, სანამ არ მოახდენთ ექსპორტს ან ვადა არ ამოიწურება.',
+      footer:
+        'თქვენ მიიღებთ ამ შეხსენებას ყოველკვირეულად, სანამ არ მოახდენთ ექსპორტს ან ვადა არ ამოიწურება.',
     },
     finalWarning: {
       subject: 'ბოლო გაფრთხილება: წაშლა 7 დღეში – Finora',
       title: 'ბოლო გაფრთხილება: წაშლა 7 დღეში',
-      greeting: (name) => `გამარჯობა ${name},`,
-      body: (count) =>
+      greeting: name => `გამარჯობა ${name},`,
+      body: count =>
         `<strong>${count} თქვენი ძველი ტრანზაქცია</strong> <strong>სამუდამოდ წაიშლება 7 დღეში</strong>. ` +
         `3-თვიანი ექსპორტის ვადა ამოიწურა.`,
       action: 'გთხოვთ, ექსპორტირეთ თქვენი მონაცემები ახლავე, თუ კიდევ გჭირდებათ.',
@@ -214,8 +216,8 @@ const translations = {
     deletionExported: {
       subject: 'ძველი ტრანზაქციები წაიშალა (ექსპორტი ხელმისაწვდომია) – Finora',
       title: 'ძველი ტრანზაქციები წაიშალა',
-      greeting: (name) => `გამარჯობა ${name},`,
-      body: (count) =>
+      greeting: name => `გამარჯობა ${name},`,
+      body: count =>
         `<strong>${count} ძველი ტრანზაქცია</strong> წაიშალა გეგმის მიხედვით. ` +
         `ვინაიდან თქვენ წინასწარ მოახდინეთ მონაცემთა ექსპორტი, ინფორმაცია არ დაკარგულა.`,
       stats: (totalIncome, totalExpense) =>
@@ -228,8 +230,8 @@ const translations = {
     deletionNotExported: {
       subject: 'ძველი ტრანზაქციები წაიშალა (ექსპორტის გარეშე) – Finora',
       title: 'ძველი ტრანზაქციები წაიშალა',
-      greeting: (name) => `გამარჯობა ${name},`,
-      body: (count) =>
+      greeting: name => `გამარჯობა ${name},`,
+      body: count =>
         `<strong>${count} ძველი ტრანზაქცია</strong> წაიშალა. ` +
         `<strong>სამწუხაროდ, ექსპორტი არ ჩატარებულა</strong> — მონაცემები შეუქცევადად დაიკარგა.`,
       stats: (totalIncome, totalExpense) =>
@@ -266,10 +268,14 @@ function getUserLanguage(user) {
  */
 function getTranslations(lang) {
   switch (lang) {
-    case 'en': return translations.en;
-    case 'ar': return translations.ar;
-    case 'ka': return translations.ka;
-    default: return translations.de;
+    case 'en':
+      return translations.en;
+    case 'ar':
+      return translations.ar;
+    case 'ka':
+      return translations.ka;
+    default:
+      return translations.de;
   }
 }
 
@@ -280,10 +286,14 @@ function getTranslations(lang) {
  */
 function getLocale(lang) {
   switch (lang) {
-    case 'en': return 'en-US';
-    case 'ar': return 'ar-SA';
-    case 'ka': return 'ka-GE';
-    default: return 'de-DE';
+    case 'en':
+      return 'en-US';
+    case 'ar':
+      return 'ar-SA';
+    case 'ka':
+      return 'ka-GE';
+    default:
+      return 'de-DE';
   }
 }
 

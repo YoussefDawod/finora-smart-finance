@@ -16,7 +16,11 @@ async function sendVerificationEmail(user, token) {
   logger.info(`📧 Verification: ${emailAddress} -> ${link}`);
 
   try {
-    const result = await sendEmail(emailAddress, '📧 Bestätige deine Email-Adresse - Finora', templates.verification(name, link));
+    const result = await sendEmail(
+      emailAddress,
+      '📧 Bestätige deine Email-Adresse - Finora',
+      templates.verification(name, link)
+    );
     return { link, ...result };
   } catch (error) {
     logger.error(`Verification email failed: ${error.message}`);
@@ -38,7 +42,11 @@ async function sendAddEmailVerification(user, token, newEmail) {
   logger.info(`📧 Add-Email Verification: ${newEmail} -> ${link}`);
 
   try {
-    const result = await sendEmail(newEmail, '📧 Bestätige deine Email-Adresse - Finora', templates.verification(name, link));
+    const result = await sendEmail(
+      newEmail,
+      '📧 Bestätige deine Email-Adresse - Finora',
+      templates.verification(name, link)
+    );
     return { link, ...result };
   } catch (error) {
     logger.error(`Add-email verification failed: ${error.message}`);

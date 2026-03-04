@@ -29,7 +29,10 @@ function validateName(name) {
     return { valid: false, error: 'Name darf maximal 50 Zeichen haben' };
   }
   if (!/^[\p{L}\p{N}\s-]+$/u.test(trimmed)) {
-    return { valid: false, error: 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten' };
+    return {
+      valid: false,
+      error: 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten',
+    };
   }
   return { valid: true, name: trimmed };
 }

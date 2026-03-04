@@ -15,7 +15,11 @@ async function sendPasswordResetEmail(user, token) {
   logger.info(`Password Reset: ${user.email} -> ${link}`);
 
   try {
-    await sendEmail(user.email, 'Passwort zurücksetzen - Finora', templates.passwordReset(name, link));
+    await sendEmail(
+      user.email,
+      'Passwort zurücksetzen - Finora',
+      templates.passwordReset(name, link)
+    );
   } catch (error) {
     logger.error(`Password reset email failed: ${error.message}`);
   }
@@ -37,7 +41,11 @@ async function sendEmailChangeVerification(user, token, newEmail) {
   logger.info(`Email Change: ${newEmail} -> ${link}`);
 
   try {
-    await sendEmail(newEmail, 'Neue Email-Adresse bestätigen - Finora', templates.emailChange(name, link, newEmail));
+    await sendEmail(
+      newEmail,
+      'Neue Email-Adresse bestätigen - Finora',
+      templates.emailChange(name, link, newEmail)
+    );
   } catch (error) {
     logger.error(`Email change verification failed: ${error.message}`);
   }

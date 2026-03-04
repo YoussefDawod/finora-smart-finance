@@ -18,7 +18,9 @@ const logger = require('../utils/logger');
 async function listUsers(query, pagination, sort, showSensitive) {
   // Schritt 1.6: showSensitive in Production deaktivieren
   if (showSensitive && process.env.NODE_ENV === 'production') {
-    logger.warn('showSensitive=true in Production ignoriert — sensitive Daten werden nicht zurückgegeben');
+    logger.warn(
+      'showSensitive=true in Production ignoriert — sensitive Daten werden nicht zurückgegeben'
+    );
     showSensitive = false;
   }
 
@@ -63,25 +65,37 @@ async function getUserById(userId) {
  * Admin Dashboard Stats
  */
 async function getStats() {
-  const [totalUsers, verifiedUsers, activeUsers, adminUsers, usersLast7Days, usersLast30Days, totalTransactions, recentUsers, userLanguageBreakdown] =
-    await Promise.all([
-      User.countDocuments(),
-      User.countDocuments({ isVerified: true }),
-      User.countDocuments({ isActive: true }),
-      User.countDocuments({ role: 'admin' }),
-      User.countDocuments({
-        createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-      }),
-      User.countDocuments({
-        createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
-      }),
-      Transaction.countDocuments(),
-      User.find().sort({ createdAt: -1 }).limit(5).select('name email createdAt lastLogin isVerified role isActive'),
-      User.aggregate([
-        { $group: { _id: { $ifNull: ['$preferences.language', 'de'] }, count: { $sum: 1 } } },
-        { $sort: { count: -1 } },
-      ]),
-    ]);
+  const [
+    totalUsers,
+    verifiedUsers,
+    activeUsers,
+    adminUsers,
+    usersLast7Days,
+    usersLast30Days,
+    totalTransactions,
+    recentUsers,
+    userLanguageBreakdown,
+  ] = await Promise.all([
+    User.countDocuments(),
+    User.countDocuments({ isVerified: true }),
+    User.countDocuments({ isActive: true }),
+    User.countDocuments({ role: 'admin' }),
+    User.countDocuments({
+      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+    }),
+    User.countDocuments({
+      createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    }),
+    Transaction.countDocuments(),
+    User.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('name email createdAt lastLogin isVerified role isActive'),
+    User.aggregate([
+      { $group: { _id: { $ifNull: ['$preferences.language', 'de'] }, count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]),
+  ]);
 
   return {
     overview: {
@@ -108,41 +122,44 @@ async function getLifecycleStats() {
   const stats = await lifecycleService.getAdminLifecycleStats();
 
   // Parallele Abfragen für alle User-Listen
-  const [usersInFinalWarningPhase, usersInRemindingPhase, usersWithExport, usersApproachingQuota] = await Promise.all([
-    // User in finaler Warnphase (noch nicht gelöscht)
-    User.find({
-      'transactionLifecycle.retentionNotifications.finalWarningSentAt': { $ne: null },
-      'transactionLifecycle.retentionNotifications.deletionExecutedAt': null,
-    })
-      .select('name email transactionLifecycle.retentionNotifications.finalWarningSentAt')
-      .limit(50)
-      .lean(),
+  const [usersInFinalWarningPhase, usersInRemindingPhase, usersWithExport, usersApproachingQuota] =
+    await Promise.all([
+      // User in finaler Warnphase (noch nicht gelöscht)
+      User.find({
+        'transactionLifecycle.retentionNotifications.finalWarningSentAt': { $ne: null },
+        'transactionLifecycle.retentionNotifications.deletionExecutedAt': null,
+      })
+        .select('name email transactionLifecycle.retentionNotifications.finalWarningSentAt')
+        .limit(50)
+        .lean(),
 
-    // User in Erinnerungsphase (Reminder gestartet, aber noch keine finale Warnung)
-    User.find({
-      'transactionLifecycle.retentionNotifications.reminderStartedAt': { $ne: null },
-      'transactionLifecycle.retentionNotifications.finalWarningSentAt': null,
-    })
-      .select('name email transactionLifecycle.retentionNotifications.reminderStartedAt transactionLifecycle.retentionNotifications.reminderCount')
-      .limit(50)
-      .lean(),
+      // User in Erinnerungsphase (Reminder gestartet, aber noch keine finale Warnung)
+      User.find({
+        'transactionLifecycle.retentionNotifications.reminderStartedAt': { $ne: null },
+        'transactionLifecycle.retentionNotifications.finalWarningSentAt': null,
+      })
+        .select(
+          'name email transactionLifecycle.retentionNotifications.reminderStartedAt transactionLifecycle.retentionNotifications.reminderCount'
+        )
+        .limit(50)
+        .lean(),
 
-    // User die exportiert haben
-    User.find({
-      'transactionLifecycle.retentionNotifications.exportConfirmedAt': { $ne: null },
-    })
-      .select('name email transactionLifecycle.retentionNotifications.exportConfirmedAt')
-      .limit(50)
-      .lean(),
+      // User die exportiert haben
+      User.find({
+        'transactionLifecycle.retentionNotifications.exportConfirmedAt': { $ne: null },
+      })
+        .select('name email transactionLifecycle.retentionNotifications.exportConfirmedAt')
+        .limit(50)
+        .lean(),
 
-    // User nahe am monatlichen Quota-Limit
-    User.find({
-      'transactionLifecycle.monthlyTransactionCount': { $gte: 120 },
-    })
-      .select('name email transactionLifecycle.monthlyTransactionCount')
-      .limit(50)
-      .lean(),
-  ]);
+      // User nahe am monatlichen Quota-Limit
+      User.find({
+        'transactionLifecycle.monthlyTransactionCount': { $gte: 120 },
+      })
+        .select('name email transactionLifecycle.monthlyTransactionCount')
+        .limit(50)
+        .lean(),
+    ]);
 
   return {
     ...stats,
@@ -153,26 +170,26 @@ async function getLifecycleStats() {
       reminderCooldownDays: lifecycleService.REMINDER_COOLDOWN_DAYS,
       quotaLimit: 150,
     },
-    usersInFinalWarningPhase: usersInFinalWarningPhase.map((u) => ({
+    usersInFinalWarningPhase: usersInFinalWarningPhase.map(u => ({
       _id: u._id,
       name: u.name,
       email: u.email || null,
       finalWarningSentAt: u.transactionLifecycle?.retentionNotifications?.finalWarningSentAt,
     })),
-    usersInRemindingPhase: usersInRemindingPhase.map((u) => ({
+    usersInRemindingPhase: usersInRemindingPhase.map(u => ({
       _id: u._id,
       name: u.name,
       email: u.email || null,
       reminderStartedAt: u.transactionLifecycle?.retentionNotifications?.reminderStartedAt,
       reminderCount: u.transactionLifecycle?.retentionNotifications?.reminderCount || 0,
     })),
-    usersWithExport: usersWithExport.map((u) => ({
+    usersWithExport: usersWithExport.map(u => ({
       _id: u._id,
       name: u.name,
       email: u.email || null,
       exportConfirmedAt: u.transactionLifecycle?.retentionNotifications?.exportConfirmedAt,
     })),
-    usersApproachingQuota: usersApproachingQuota.map((u) => ({
+    usersApproachingQuota: usersApproachingQuota.map(u => ({
       _id: u._id,
       name: u.name,
       email: u.email || null,
@@ -309,7 +326,9 @@ async function deleteUser(userId) {
 
   await User.findByIdAndDelete(userId);
 
-  logger.warn(`Admin: User ${user._id} deleted with ${deletedTransactions.deletedCount} transactions`);
+  logger.warn(
+    `Admin: User ${user._id} deleted with ${deletedTransactions.deletedCount} transactions`
+  );
 
   return {
     deletedUser: user.name,
@@ -378,7 +397,9 @@ async function banUser(userId, reason = '') {
   user.refreshTokens = [];
   await user.save();
 
-  logger.warn(`Admin: User ${user._id} (${user.name}) banned. Reason: ${reason || 'Kein Grund angegeben'}`);
+  logger.warn(
+    `Admin: User ${user._id} (${user.name}) banned. Reason: ${reason || 'Kein Grund angegeben'}`
+  );
 
   return { user: sanitizeUser(user) };
 }
@@ -438,7 +459,9 @@ async function changeUserRole(userId, newRole, adminId) {
   user.role = newRole;
   await user.save();
 
-  logger.info(`Admin: User ${user._id} (${user.name}) role changed from '${oldRole}' to '${newRole}'`);
+  logger.info(
+    `Admin: User ${user._id} (${user.name}) role changed from '${oldRole}' to '${newRole}'`
+  );
 
   return { user: sanitizeUser(user) };
 }
@@ -455,7 +478,12 @@ async function changeUserRole(userId, newRole, adminId) {
  * @param {string} [options.search] - Suche in name/email
  * @param {string} [options.sort='-transactionCount'] - Sortierung
  */
-async function getUsersWithTransactionStats({ page = 1, limit = 15, search, sort = '-transactionCount' } = {}) {
+async function getUsersWithTransactionStats({
+  page = 1,
+  limit = 15,
+  search,
+  sort = '-transactionCount',
+} = {}) {
   const safePage = Math.max(1, parseInt(page, 10) || 1);
   const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 15));
 
@@ -508,7 +536,15 @@ async function getUsersWithTransactionStats({ page = 1, limit = 15, search, sort
   ];
 
   // Sort — Whitelist erlaubter Felder
-  const ALLOWED_TX_USER_SORT = new Set(['transactionCount', 'totalIncome', 'totalExpense', 'lastTransactionDate', 'name', 'email', 'createdAt']);
+  const ALLOWED_TX_USER_SORT = new Set([
+    'transactionCount',
+    'totalIncome',
+    'totalExpense',
+    'lastTransactionDate',
+    'name',
+    'email',
+    'createdAt',
+  ]);
   const rawSortField = sort.startsWith('-') ? sort.slice(1) : sort;
   const sortField = ALLOWED_TX_USER_SORT.has(rawSortField) ? rawSortField : 'transactionCount';
   const sortDir = sort.startsWith('-') ? -1 : 1;
@@ -549,7 +585,17 @@ async function getUsersWithTransactionStats({ page = 1, limit = 15, search, sort
  * @param {string} [options.search] - Textsuche in description
  * @param {string} [options.sort='-date'] - Sortierung
  */
-async function listTransactions({ page = 1, limit = 50, userId, type, category, startDate, endDate, search, sort = '-date' } = {}) {
+async function listTransactions({
+  page = 1,
+  limit = 50,
+  userId,
+  type,
+  category,
+  startDate,
+  endDate,
+  search,
+  sort = '-date',
+} = {}) {
   // Whitelist erlaubter Sort-Felder — verhindert Sort-Injection
   const ALLOWED_TX_SORT = new Set(['date', 'amount', 'type', 'category', 'createdAt']);
   const txSortField = sort.startsWith('-') ? sort.slice(1) : sort;
@@ -576,7 +622,11 @@ async function listTransactions({ page = 1, limit = 50, userId, type, category, 
   const skip = (safePage - 1) * safeLimit;
 
   const [transactions, total] = await Promise.all([
-    Transaction.find(query).sort(safeSort).skip(skip).limit(safeLimit).populate('userId', 'name email'),
+    Transaction.find(query)
+      .sort(safeSort)
+      .skip(skip)
+      .limit(safeLimit)
+      .populate('userId', 'name email'),
     Transaction.countDocuments(query),
   ]);
 
@@ -617,7 +667,9 @@ async function deleteTransaction(transactionId) {
   };
 
   await Transaction.findByIdAndDelete(transactionId);
-  logger.warn(`Admin: Transaction ${transactionId} deleted (User: ${info.userId}, ${info.type} ${info.amount} ${info.category})`);
+  logger.warn(
+    `Admin: Transaction ${transactionId} deleted (User: ${info.userId}, ${info.type} ${info.amount} ${info.category})`
+  );
 
   return { deleted: info };
 }
@@ -650,7 +702,13 @@ async function getTransactionStats() {
       { $limit: 10 },
     ]),
     Transaction.aggregate([
-      { $group: { _id: null, totalIncome: { $sum: { $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0] } }, totalExpense: { $sum: { $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0] } } } },
+      {
+        $group: {
+          _id: null,
+          totalIncome: { $sum: { $cond: [{ $eq: ['$type', 'income'] }, '$amount', 0] } },
+          totalExpense: { $sum: { $cond: [{ $eq: ['$type', 'expense'] }, '$amount', 0] } },
+        },
+      },
     ]),
   ]);
 
@@ -675,9 +733,22 @@ async function getTransactionStats() {
 /**
  * Alle Newsletter-Abonnenten auflisten (paginiert, filterbar)
  */
-async function listSubscribers({ page = 1, limit = 50, isConfirmed, search, language, sort = '-createdAt' } = {}) {
+async function listSubscribers({
+  page = 1,
+  limit = 50,
+  isConfirmed,
+  search,
+  language,
+  sort = '-createdAt',
+} = {}) {
   // Whitelist erlaubter Sort-Felder — verhindert Sort-Injection
-  const ALLOWED_SUB_SORT = new Set(['createdAt', 'email', 'subscribedAt', 'language', 'isConfirmed']);
+  const ALLOWED_SUB_SORT = new Set([
+    'createdAt',
+    'email',
+    'subscribedAt',
+    'language',
+    'isConfirmed',
+  ]);
   const subSortField = sort.startsWith('-') ? sort.slice(1) : sort;
   const safeSort = ALLOWED_SUB_SORT.has(subSortField) ? sort : '-createdAt';
 
@@ -723,8 +794,9 @@ async function listSubscribers({ page = 1, limit = 50, isConfirmed, search, lang
  * Einzelnen Subscriber abrufen
  */
 async function getSubscriberById(subscriberId) {
-  const subscriber = await Subscriber.findById(subscriberId)
-    .select('-confirmationToken -confirmationExpires -unsubscribeToken');
+  const subscriber = await Subscriber.findById(subscriberId).select(
+    '-confirmationToken -confirmationExpires -unsubscribeToken'
+  );
   if (!subscriber) return null;
   // Migration-Fallback: Bestehende Subscriber ohne confirmedAt
   const sub = subscriber.toObject();
@@ -801,15 +873,17 @@ async function exportUsersCSV() {
     .lean();
 
   const header = 'Name,Email,Role,Verified,Active,Registered,Last Login';
-  const rows = users.map((u) => [
-    csvEscape(u.name),
-    csvEscape(u.email || ''),
-    csvEscape(u.role),
-    u.isVerified ? 'Yes' : 'No',
-    u.isActive !== false ? 'Yes' : 'No',
-    u.createdAt ? new Date(u.createdAt).toISOString() : '',
-    u.lastLogin ? new Date(u.lastLogin).toISOString() : '',
-  ].join(','));
+  const rows = users.map(u =>
+    [
+      csvEscape(u.name),
+      csvEscape(u.email || ''),
+      csvEscape(u.role),
+      u.isVerified ? 'Yes' : 'No',
+      u.isActive !== false ? 'Yes' : 'No',
+      u.createdAt ? new Date(u.createdAt).toISOString() : '',
+      u.lastLogin ? new Date(u.lastLogin).toISOString() : '',
+    ].join(',')
+  );
 
   return `${header}\n${rows.join('\n')}`;
 }
@@ -826,15 +900,17 @@ async function exportTransactionsCSV() {
     .lean();
 
   const header = 'Date,Description,Category,Type,Amount,User Name,User Email';
-  const rows = transactions.map((tx) => [
-    tx.date ? new Date(tx.date).toISOString() : '',
-    csvEscape(tx.description || ''),
-    csvEscape(tx.category || ''),
-    csvEscape(tx.type || ''),
-    tx.amount != null ? tx.amount : '',
-    csvEscape(tx.userId?.name || ''),
-    csvEscape(tx.userId?.email || ''),
-  ].join(','));
+  const rows = transactions.map(tx =>
+    [
+      tx.date ? new Date(tx.date).toISOString() : '',
+      csvEscape(tx.description || ''),
+      csvEscape(tx.category || ''),
+      csvEscape(tx.type || ''),
+      tx.amount != null ? tx.amount : '',
+      csvEscape(tx.userId?.name || ''),
+      csvEscape(tx.userId?.email || ''),
+    ].join(',')
+  );
 
   return `${header}\n${rows.join('\n')}`;
 }
@@ -874,7 +950,8 @@ async function updateSubscriber(subscriberId, updates) {
 async function resendConfirmation(subscriberId) {
   const subscriber = await Subscriber.findById(subscriberId);
   if (!subscriber) return { error: 'Subscriber nicht gefunden', code: 'SUBSCRIBER_NOT_FOUND' };
-  if (subscriber.isConfirmed) return { error: 'Subscriber ist bereits bestätigt', code: 'ALREADY_CONFIRMED' };
+  if (subscriber.isConfirmed)
+    return { error: 'Subscriber ist bereits bestätigt', code: 'ALREADY_CONFIRMED' };
 
   // Neuen Token generieren
   const emailService = require('../utils/emailService');
@@ -883,7 +960,10 @@ async function resendConfirmation(subscriberId) {
   await subscriber.save();
 
   await emailService.sendNewsletterConfirmation(
-    subscriber.email, confirmToken, unsubscribeToken, subscriber.language
+    subscriber.email,
+    confirmToken,
+    unsubscribeToken,
+    subscriber.language
   );
 
   logger.info(`Admin: Resent confirmation to ${subscriber.email}`);
@@ -901,15 +981,17 @@ async function exportSubscribersCSV() {
     .lean();
 
   const header = 'Email,Language,Confirmed,SubscribedAt,ConfirmedAt,CreatedAt,Type';
-  const rows = subscribers.map((s) => [
-    csvEscape(s.email),
-    csvEscape(s.language),
-    s.isConfirmed ? 'Yes' : 'No',
-    s.subscribedAt ? new Date(s.subscribedAt).toISOString() : '',
-    s.confirmedAt ? new Date(s.confirmedAt).toISOString() : '',
-    new Date(s.createdAt).toISOString(),
-    s.userId ? 'Registered' : 'Guest',
-  ].join(','));
+  const rows = subscribers.map(s =>
+    [
+      csvEscape(s.email),
+      csvEscape(s.language),
+      s.isConfirmed ? 'Yes' : 'No',
+      s.subscribedAt ? new Date(s.subscribedAt).toISOString() : '',
+      s.confirmedAt ? new Date(s.confirmedAt).toISOString() : '',
+      new Date(s.createdAt).toISOString(),
+      s.userId ? 'Registered' : 'Guest',
+    ].join(',')
+  );
 
   return `${header}\n${rows.join('\n')}`;
 }

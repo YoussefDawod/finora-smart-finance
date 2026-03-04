@@ -2,9 +2,18 @@
 const { sendVerificationEmail, sendAddEmailVerification } = require('./authEmails');
 const { sendPasswordResetEmail, sendEmailChangeVerification } = require('./passwordEmails');
 const { sendWelcomeEmail, sendSecurityAlert } = require('./accountEmails');
-const { sendTransactionNotification, sendBudgetAlert, sendFinancialReport } = require('./financialEmails');
+const {
+  sendTransactionNotification,
+  sendBudgetAlert,
+  sendFinancialReport,
+} = require('./financialEmails');
 const { sendContactEmail } = require('./contactEmails');
-const { sendNewsletterConfirmation, sendNewsletterWelcome, sendNewsletterGoodbye, sendNewsletterCampaign } = require('./newsletterEmails');
+const {
+  sendNewsletterConfirmation,
+  sendNewsletterWelcome,
+  sendNewsletterGoodbye,
+  sendNewsletterCampaign,
+} = require('./newsletterEmails');
 const { notifyAdminsNewUser } = require('./adminEmails');
 const { sendLifecycleEmail } = require('./lifecycleEmails');
 

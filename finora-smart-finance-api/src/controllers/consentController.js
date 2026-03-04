@@ -51,7 +51,9 @@ async function logConsent(req, res) {
     userAgent: (req.headers['user-agent'] || '').slice(0, 500),
   });
 
-  logger.info(`Consent logged: type=${consentType} version=${consentVersion} user=${userId || 'anonymous'}`);
+  logger.info(
+    `Consent logged: type=${consentType} version=${consentVersion} user=${userId || 'anonymous'}`
+  );
 
   return sendSuccess(res, {
     message: 'Consent logged',

@@ -46,7 +46,11 @@ async function submitContact(req, res) {
       status: 400,
     });
   }
-  if (category !== undefined && category !== null && (typeof category !== 'string' || category.length > 50)) {
+  if (
+    category !== undefined &&
+    category !== null &&
+    (typeof category !== 'string' || category.length > 50)
+  ) {
     return sendError(res, req, {
       error: 'Kategorie darf max. 50 Zeichen haben',
       code: 'VALIDATION_ERROR',

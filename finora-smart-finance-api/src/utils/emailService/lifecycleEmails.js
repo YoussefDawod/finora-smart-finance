@@ -21,11 +21,16 @@ const {
  */
 function getTemplateFn(type) {
   switch (type) {
-    case 'reminder': return retentionReminder;
-    case 'finalWarning': return retentionFinalWarning;
-    case 'deletionExported': return retentionDeletionExported;
-    case 'deletionNotExported': return retentionDeletionNotExported;
-    default: return null;
+    case 'reminder':
+      return retentionReminder;
+    case 'finalWarning':
+      return retentionFinalWarning;
+    case 'deletionExported':
+      return retentionDeletionExported;
+    case 'deletionNotExported':
+      return retentionDeletionNotExported;
+    default:
+      return null;
   }
 }
 
@@ -60,7 +65,9 @@ async function sendLifecycleEmail(user, type, data) {
     if (result.sent) {
       logger.info(`[Lifecycle Email] ${type} email sent to ${user.email}`);
     } else {
-      logger.debug(`[Lifecycle Email] ${type} email not sent to ${user.email}: ${result.mode || 'unknown'}`);
+      logger.debug(
+        `[Lifecycle Email] ${type} email not sent to ${user.email}: ${result.mode || 'unknown'}`
+      );
     }
 
     return result;

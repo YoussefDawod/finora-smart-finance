@@ -3,7 +3,15 @@ const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
 // Sensible Query-Parameter, die NICHT geloggt werden dürfen
-const SENSITIVE_QUERY_KEYS = new Set(['token', 'refreshToken', 'accessToken', 'apiKey', 'key', 'secret', 'password']);
+const SENSITIVE_QUERY_KEYS = new Set([
+  'token',
+  'refreshToken',
+  'accessToken',
+  'apiKey',
+  'key',
+  'secret',
+  'password',
+]);
 
 /**
  * Maskiert sensible Werte in Query-Parametern für sicheres Logging
@@ -16,9 +24,7 @@ function sanitizeQueryForLog(query) {
   for (const [key, value] of Object.entries(query)) {
     const safeKey = String(key);
     // eslint-disable-next-line security/detect-object-injection -- key aus Object.entries(), kein User-Input als Property-Accessor
-    safe[safeKey] = SENSITIVE_QUERY_KEYS.has(safeKey.toLowerCase())
-      ? '[REDACTED]'
-      : value;
+    safe[safeKey] = SENSITIVE_QUERY_KEYS.has(safeKey.toLowerCase()) ? '[REDACTED]' : value;
   }
   return safe;
 }

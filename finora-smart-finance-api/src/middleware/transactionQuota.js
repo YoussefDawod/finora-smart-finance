@@ -112,9 +112,7 @@ async function transactionQuota(req, res, next) {
       );
 
       if (updated) {
-        logger.debug(
-          `Transaction quota reset for user ${user._id} (new month)`
-        );
+        logger.debug(`Transaction quota reset for user ${user._id} (new month)`);
       }
     }
 
@@ -137,7 +135,8 @@ async function transactionQuota(req, res, next) {
 
     // Weder Versuch 1 noch 2 matcht → Limit erreicht
     const freshUser = await User.findById(user._id).select('transactionLifecycle').lean();
-    const currentCount = freshUser?.transactionLifecycle?.monthlyTransactionCount || MONTHLY_TRANSACTION_LIMIT;
+    const currentCount =
+      freshUser?.transactionLifecycle?.monthlyTransactionCount || MONTHLY_TRANSACTION_LIMIT;
     const resetDate = getNextMonthReset();
 
     logger.info(

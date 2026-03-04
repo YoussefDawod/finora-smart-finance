@@ -31,9 +31,7 @@ async function exportUserData(userId, user) {
      * Verhindert Memory-Overflow bei Usern mit vielen Transaktionen.
      */
     getTransactionCursor() {
-      return Transaction.find({ userId })
-        .lean()
-        .cursor({ batchSize: 500 });
+      return Transaction.find({ userId }).lean().cursor({ batchSize: 500 });
     },
   };
 }

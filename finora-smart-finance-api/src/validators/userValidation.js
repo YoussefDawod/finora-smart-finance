@@ -165,7 +165,11 @@ function validateBudget(budget, errors) {
   }
 
   if (budget.categoryLimits !== undefined) {
-    if (typeof budget.categoryLimits !== 'object' || budget.categoryLimits === null || Array.isArray(budget.categoryLimits)) {
+    if (
+      typeof budget.categoryLimits !== 'object' ||
+      budget.categoryLimits === null ||
+      Array.isArray(budget.categoryLimits)
+    ) {
       errors.push('budget.categoryLimits muss ein Objekt sein');
     } else {
       const entries = Object.entries(budget.categoryLimits);
@@ -175,7 +179,9 @@ function validateBudget(budget, errors) {
         const validLimits = {};
         for (const [key, value] of entries) {
           if (typeof key !== 'string' || key.length === 0 || key.length > 50) {
-            errors.push(`budget.categoryLimits: Ungültiger Schlüssel "${String(key).slice(0, 50)}"`);
+            errors.push(
+              `budget.categoryLimits: Ungültiger Schlüssel "${String(key).slice(0, 50)}"`
+            );
             continue;
           }
           if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
@@ -237,7 +243,9 @@ function validatePreferencesInput(body = {}) {
     if (typeof timezone !== 'string') {
       errors.push('Timezone muss ein String sein');
     } else if (!VALID_TIMEZONES.has(timezone)) {
-      errors.push('Ungültige Timezone. Bitte eine gültige IANA-Timezone verwenden (z.B. Europe/Berlin)');
+      errors.push(
+        'Ungültige Timezone. Bitte eine gültige IANA-Timezone verwenden (z.B. Europe/Berlin)'
+      );
     } else {
       updates.timezone = timezone;
     }
@@ -267,7 +275,10 @@ function validatePreferencesInput(body = {}) {
     }
   }
 
-  const sanitizedNotificationCategories = validateNotificationCategories(notificationCategories, errors);
+  const sanitizedNotificationCategories = validateNotificationCategories(
+    notificationCategories,
+    errors
+  );
   if (sanitizedNotificationCategories !== undefined) {
     updates.notificationCategories = sanitizedNotificationCategories;
   }

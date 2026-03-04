@@ -63,7 +63,17 @@ function hashToken(token) {
  * @returns {Object} Sichere User-Daten mit berechneten Auth-Feldern
  */
 function sanitizeUserForAuth(user) {
-  const { _id, email, name, isVerified, role, isActive, createdAt, updatedAt, understoodNoEmailReset } = user;
+  const {
+    _id,
+    email,
+    name,
+    isVerified,
+    role,
+    isActive,
+    createdAt,
+    updatedAt,
+    understoodNoEmailReset,
+  } = user;
   return {
     id: _id.toString(),
     email: email || null,
@@ -88,13 +98,13 @@ function sanitizeUserForAuth(user) {
 async function generateAuthTokens(user, metadata = {}) {
   const accessToken = signAccessToken(user);
   const refreshToken = generateRefreshToken();
-  
+
   user.addRefreshToken(refreshToken, REFRESH_TTL_SECONDS, {
     userAgent: metadata.userAgent,
     ip: metadata.ip,
   });
   await user.save();
-  
+
   return {
     accessToken,
     refreshToken,
@@ -122,16 +132,16 @@ async function rotateRefreshToken(user, oldRefreshToken, metadata = {}) {
  */
 function validateRefreshToken(user, refreshToken) {
   const tokenHash = hashToken(refreshToken);
-  const stored = user.refreshTokens.find((t) => t.tokenHash === tokenHash);
-  
+  const stored = user.refreshTokens.find(t => t.tokenHash === tokenHash);
+
   if (!stored) {
     return { valid: false, error: 'Ungültiger Refresh-Token' };
   }
-  
+
   if (stored.expiresAt < new Date()) {
     return { valid: false, error: 'Refresh-Token abgelaufen' };
   }
-  
+
   return { valid: true, stored };
 }
 
@@ -159,11 +169,11 @@ module.exports = {
   generateAuthTokens,
   rotateRefreshToken,
   validateRefreshToken,
-  
+
   // User-Funktionen
   sanitizeUserForAuth,
   buildAuthResponse,
-  
+
   // Konstanten
   JWT_ALGORITHM,
   ACCESS_TTL_SECONDS,

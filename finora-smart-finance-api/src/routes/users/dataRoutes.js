@@ -72,14 +72,22 @@ router.delete('/me', auth, sensitiveOperationLimiter, async (req, res) => {
     if (!user) return;
 
     if (!password) {
-      return sendError(res, req, { error: 'Passwort erforderlich zur Bestätigung', code: 'CONFIRMATION_REQUIRED', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort erforderlich zur Bestätigung',
+        code: 'CONFIRMATION_REQUIRED',
+        status: 400,
+      });
     }
 
     // Passwort verifizieren
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       logger.warn(`Failed account deletion attempt for user ${user._id}`);
-      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     const userId = user._id;
@@ -98,10 +106,10 @@ router.delete('/me', auth, sensitiveOperationLimiter, async (req, res) => {
     // Refresh-Token-Cookie löschen (Session beenden)
     clearRefreshTokenCookie(res);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Account wurde dauerhaft gelöscht',
-      data: { deletedTransactions: deleteResult.deletedCount }
+      data: { deletedTransactions: deleteResult.deletedCount },
     });
   } catch (error) {
     handleServerError(res, req, 'DELETE /me', error);
@@ -171,27 +179,39 @@ router.delete('/transactions', auth, async (req, res) => {
     if (!user) return;
 
     if (!password) {
-      return sendError(res, req, { error: 'Passwort erforderlich zur Bestätigung', code: 'CONFIRMATION_REQUIRED', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort erforderlich zur Bestätigung',
+        code: 'CONFIRMATION_REQUIRED',
+        status: 400,
+      });
     }
 
     // Passwort verifizieren
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       logger.warn(`Failed transaction deletion attempt for user ${user._id}`);
-      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     const deleteResult = await dataService.deleteAllTransactions(user._id, password, user);
     if (!deleteResult.deleted) {
-      return sendError(res, req, { error: deleteResult.error, code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: deleteResult.error,
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
     logger.info(`User ${user._id} deleted all ${deleteResult.deletedCount} transactions`);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Alle Transaktionen wurden gelöscht',
-      data: { deletedCount: deleteResult.deletedCount }
+      data: { deletedCount: deleteResult.deletedCount },
     });
   } catch (error) {
     handleServerError(res, req, 'DELETE /transactions', error);

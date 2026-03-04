@@ -50,7 +50,11 @@ async function getUser(req, res) {
   try {
     const data = await adminService.getUserById(req.params.id);
     if (!data) {
-      return sendError(res, req, { error: 'User nicht gefunden', code: 'USER_NOT_FOUND', status: 404 });
+      return sendError(res, req, {
+        error: 'User nicht gefunden',
+        code: 'USER_NOT_FOUND',
+        status: 404,
+      });
     }
     res.json({ success: true, data });
   } catch (error) {
@@ -393,7 +397,8 @@ async function changeUserRole(req, res) {
 // GET /api/admin/audit-log
 async function getAuditLogs(req, res) {
   try {
-    const { page, limit, action, adminId, targetUserId, startDate, endDate, search, sort } = req.query || {};
+    const { page, limit, action, adminId, targetUserId, startDate, endDate, search, sort } =
+      req.query || {};
 
     const data = await auditLog.getLogs({
       page,
@@ -489,10 +494,19 @@ async function exportTransactions(req, res) {
 // GET /api/admin/transactions
 async function listTransactions(req, res) {
   try {
-    const { page, limit, userId, type, category, startDate, endDate, search, sort } = req.query || {};
+    const { page, limit, userId, type, category, startDate, endDate, search, sort } =
+      req.query || {};
 
     const data = await adminService.listTransactions({
-      page, limit, userId, type, category, startDate, endDate, search, sort,
+      page,
+      limit,
+      userId,
+      type,
+      category,
+      startDate,
+      endDate,
+      search,
+      sort,
     });
 
     res.json({ success: true, data });
@@ -516,7 +530,11 @@ async function getTransaction(req, res) {
   try {
     const data = await adminService.getTransactionById(req.params.id);
     if (!data) {
-      return sendError(res, req, { error: 'Transaktion nicht gefunden', code: 'TRANSACTION_NOT_FOUND', status: 404 });
+      return sendError(res, req, {
+        error: 'Transaktion nicht gefunden',
+        code: 'TRANSACTION_NOT_FOUND',
+        status: 404,
+      });
     }
     res.json({ success: true, data });
   } catch (error) {
@@ -571,7 +589,12 @@ async function listSubscribers(req, res) {
     const { page, limit, isConfirmed, search, language, sort } = req.query || {};
 
     const data = await adminService.listSubscribers({
-      page, limit, isConfirmed, search, language, sort,
+      page,
+      limit,
+      isConfirmed,
+      search,
+      language,
+      sort,
     });
 
     res.json({ success: true, data });
@@ -595,7 +618,11 @@ async function getSubscriber(req, res) {
   try {
     const data = await adminService.getSubscriberById(req.params.id);
     if (!data) {
-      return sendError(res, req, { error: 'Subscriber nicht gefunden', code: 'SUBSCRIBER_NOT_FOUND', status: 404 });
+      return sendError(res, req, {
+        error: 'Subscriber nicht gefunden',
+        code: 'SUBSCRIBER_NOT_FOUND',
+        status: 404,
+      });
     }
     res.json({ success: true, data });
   } catch (error) {
@@ -696,7 +723,10 @@ async function exportSubscribersCSV(req, res) {
     });
 
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename=subscribers_${new Date().toISOString().split('T')[0]}.csv`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=subscribers_${new Date().toISOString().split('T')[0]}.csv`
+    );
     res.send(csv);
   } catch (error) {
     handleServerError(res, req, 'Admin: Export subscribers CSV', error);
@@ -711,7 +741,14 @@ async function exportSubscribersCSV(req, res) {
 async function listCampaigns(req, res) {
   try {
     const { page, limit, status, language, search, sort } = req.query || {};
-    const data = await campaignService.listCampaigns({ page, limit, status, language, search, sort });
+    const data = await campaignService.listCampaigns({
+      page,
+      limit,
+      status,
+      language,
+      search,
+      sort,
+    });
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: List campaigns', error);
@@ -733,7 +770,11 @@ async function getCampaign(req, res) {
   try {
     const data = await campaignService.getCampaign(req.params.id);
     if (!data) {
-      return sendError(res, req, { error: 'Campaign nicht gefunden', code: 'CAMPAIGN_NOT_FOUND', status: 404 });
+      return sendError(res, req, {
+        error: 'Campaign nicht gefunden',
+        code: 'CAMPAIGN_NOT_FOUND',
+        status: 404,
+      });
     }
     res.json({ success: true, data });
   } catch (error) {
@@ -752,16 +793,24 @@ async function createCampaign(req, res) {
     else if (subject.length > 200) errors.push('Betreff darf maximal 200 Zeichen lang sein');
     if (!content || !content.trim()) errors.push('Inhalt ist erforderlich');
     else if (content.length > 50000) errors.push('Inhalt darf maximal 50.000 Zeichen lang sein');
-    if (!language || !['de', 'en', 'ar', 'ka'].includes(language)) errors.push('Gültige Sprache erforderlich (de, en, ar, ka)');
+    if (!language || !['de', 'en', 'ar', 'ka'].includes(language))
+      errors.push('Gültige Sprache erforderlich (de, en, ar, ka)');
     if (recipientFilter?.language && !['de', 'en', 'ar', 'ka'].includes(recipientFilter.language)) {
       errors.push('Ungültiger Sprachfilter');
     }
     if (errors.length > 0) {
-      return sendError(res, req, { error: errors.join('; '), code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: errors.join('; '),
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
     const { adminId, adminName } = getAdminInfo(req);
-    const result = await campaignService.createCampaign({ subject, content, language, recipientFilter }, adminId || req.body.sentBy);
+    const result = await campaignService.createCampaign(
+      { subject, content, language, recipientFilter },
+      adminId || req.body.sentBy
+    );
 
     auditLog.log({
       action: 'CAMPAIGN_CREATED',
@@ -799,10 +848,19 @@ async function updateCampaign(req, res) {
       errors.push('Ungültiger Sprachfilter');
     }
     if (errors.length > 0) {
-      return sendError(res, req, { error: errors.join('; '), code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: errors.join('; '),
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
-    const result = await campaignService.updateCampaign(req.params.id, { subject, content, language, recipientFilter });
+    const result = await campaignService.updateCampaign(req.params.id, {
+      subject,
+      content,
+      language,
+      recipientFilter,
+    });
     if (result.error) {
       const status = result.code === 'CAMPAIGN_NOT_FOUND' ? 404 : 400;
       return sendError(res, req, { error: result.error, code: result.code, status });
@@ -909,7 +967,11 @@ async function previewCampaign(req, res) {
     const { subject, content, language } = req.body || {};
 
     if (!content || !language) {
-      return sendError(res, req, { error: 'Inhalt und Sprache erforderlich', code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: 'Inhalt und Sprache erforderlich',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
     const templates = require('../utils/emailTemplates');

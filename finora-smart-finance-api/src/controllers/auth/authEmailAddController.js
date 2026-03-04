@@ -21,33 +21,50 @@ async function addEmail(req, res) {
 
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
-      return sendError(res, req, { error: emailValidation.error, code: 'INVALID_EMAIL', status: 400 });
+      return sendError(res, req, {
+        error: emailValidation.error,
+        code: 'INVALID_EMAIL',
+        status: 400,
+      });
     }
 
     const existingEmail = await User.findOne({ email: emailValidation.email });
     if (existingEmail) {
-      return sendError(res, req, { error: 'Diese Email ist bereits registriert', code: 'EMAIL_TAKEN', status: 409 });
+      return sendError(res, req, {
+        error: 'Diese Email ist bereits registriert',
+        code: 'EMAIL_TAKEN',
+        status: 409,
+      });
     }
 
     const token = user.generateEmailAddToken(emailValidation.email);
     await user.save();
 
-    const emailResult = await emailService.sendAddEmailVerification(user, token, emailValidation.email);
+    const emailResult = await emailService.sendAddEmailVerification(
+      user,
+      token,
+      emailValidation.email
+    );
 
     const responseData = {
       sent: true,
       message: 'Bestätigungs-Email gesendet. Bitte prüfen Sie Ihr Postfach.',
       pendingEmail: emailValidation.email,
-      ...(config.nodeEnv === 'development' && emailResult && {
-        verificationLink: emailResult.link,
-        previewUrl: emailResult.previewUrl,
-      }),
+      ...(config.nodeEnv === 'development' &&
+        emailResult && {
+          verificationLink: emailResult.link,
+          previewUrl: emailResult.previewUrl,
+        }),
     };
 
     return res.status(200).json({ success: true, data: responseData });
   } catch (err) {
     logger.error('addEmail error:', err);
-    return sendError(res, req, { error: 'Email hinzufügen fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Email hinzufügen fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -79,7 +96,9 @@ async function verifyAddEmailGet(req, res) {
     user.emailChangeExpires = undefined;
     await user.save();
 
-    return res.redirect(`${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(verifiedEmail)}&type=add`);
+    return res.redirect(
+      `${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(verifiedEmail)}&type=add`
+    );
   } catch (err) {
     logger.error(`Verify-add-email error: ${err.message}`);
     return res.redirect(`${frontendUrl}/verify-email?error=server_error&type=add`);
@@ -100,7 +119,11 @@ async function verifyAddEmailPost(req, res) {
     });
 
     if (!user) {
-      return sendError(res, req, { error: 'Ungültiger oder abgelaufener Token', code: 'INVALID_TOKEN', status: 400 });
+      return sendError(res, req, {
+        error: 'Ungültiger oder abgelaufener Token',
+        code: 'INVALID_TOKEN',
+        status: 400,
+      });
     }
 
     user.email = user.emailChangeNewEmail;
@@ -113,11 +136,19 @@ async function verifyAddEmailPost(req, res) {
 
     return res.status(200).json({
       success: true,
-      data: { verified: true, email: user.email, message: 'Email erfolgreich hinzugefügt und verifiziert!' },
+      data: {
+        verified: true,
+        email: user.email,
+        message: 'Email erfolgreich hinzugefügt und verifiziert!',
+      },
     });
   } catch (err) {
     logger.error('verifyAddEmailPost error:', err);
-    return sendError(res, req, { error: 'Email-Verifizierung fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Email-Verifizierung fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -127,25 +158,42 @@ async function removeEmail(req, res) {
 
     const user = await User.findById(req.user._id).select('+passwordHash');
     if (!user) {
-      return sendError(res, req, { error: 'User nicht gefunden', code: 'INVALID_USER', status: 401 });
+      return sendError(res, req, {
+        error: 'User nicht gefunden',
+        code: 'INVALID_USER',
+        status: 401,
+      });
     }
 
     if (!user.email) {
-      return sendError(res, req, { error: 'Keine Email zum Entfernen vorhanden', code: 'NO_EMAIL', status: 400 });
+      return sendError(res, req, {
+        error: 'Keine Email zum Entfernen vorhanden',
+        code: 'NO_EMAIL',
+        status: 400,
+      });
     }
 
     if (!password) {
-      return sendError(res, req, { error: 'Passwort erforderlich', code: 'MISSING_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort erforderlich',
+        code: 'MISSING_PASSWORD',
+        status: 400,
+      });
     }
 
     const isValid = await user.validatePassword(password);
     if (!isValid) {
-      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     if (!confirmRemoval) {
       return sendError(res, req, {
-        error: 'Bitte bestätigen Sie, dass Sie verstehen: Ohne Email ist kein Passwort-Reset möglich!',
+        error:
+          'Bitte bestätigen Sie, dass Sie verstehen: Ohne Email ist kein Passwort-Reset möglich!',
         code: 'CONFIRMATION_REQUIRED',
         status: 400,
       });
@@ -157,11 +205,18 @@ async function removeEmail(req, res) {
 
     return res.status(200).json({
       success: true,
-      data: { removed: true, message: 'Email wurde entfernt. Passwort-Reset ist nicht mehr möglich.' },
+      data: {
+        removed: true,
+        message: 'Email wurde entfernt. Passwort-Reset ist nicht mehr möglich.',
+      },
     });
   } catch (err) {
     logger.error(`Remove-email failed: ${err.message}`);
-    return sendError(res, req, { error: 'Email entfernen fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Email entfernen fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -180,19 +235,28 @@ async function resendAddEmailVerification(req, res) {
     const token = user.generateEmailAddToken(user.emailChangeNewEmail);
     await user.save();
 
-    const emailResult = await emailService.sendAddEmailVerification(user, token, user.emailChangeNewEmail);
+    const emailResult = await emailService.sendAddEmailVerification(
+      user,
+      token,
+      user.emailChangeNewEmail
+    );
 
     const responseData = {
       sent: true,
       email: user.emailChangeNewEmail,
-      ...(config.nodeEnv === 'development' && emailResult && { verificationLink: emailResult.link }),
+      ...(config.nodeEnv === 'development' &&
+        emailResult && { verificationLink: emailResult.link }),
     };
 
     logger.info(`📧 Resend Add-Email Verification: ${user.emailChangeNewEmail}`);
     return res.status(200).json({ success: true, data: responseData });
   } catch (err) {
     logger.error(`Resend add-email verification failed: ${err.message}`);
-    return sendError(res, req, { error: 'Email erneut senden fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Email erneut senden fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -213,7 +277,11 @@ async function getEmailStatus(req, res) {
     });
   } catch (err) {
     logger.error('getEmailStatus error:', err);
-    return sendError(res, req, { error: 'Status-Abfrage fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Status-Abfrage fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 

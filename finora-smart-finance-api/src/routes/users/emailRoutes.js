@@ -3,7 +3,10 @@ const crypto = require('crypto');
 const router = express.Router();
 const User = require('../../models/User');
 const auth = require('../../middleware/authMiddleware');
-const { emailOperationLimiter, sensitiveOperationLimiter } = require('../../middleware/rateLimiter');
+const {
+  emailOperationLimiter,
+  sensitiveOperationLimiter,
+} = require('../../middleware/rateLimiter');
 const emailService = require('../../utils/emailService');
 const auditLogService = require('../../services/auditLogService');
 const logger = require('../../utils/logger');
@@ -158,25 +161,42 @@ router.post('/change-email', auth, emailOperationLimiter, async (req, res) => {
     if (!user) return;
 
     if (errors.length > 0) {
-      return sendError(res, req, { error: 'Validierungsfehler', code: 'VALIDATION_ERROR', status: 400, details: errors });
+      return sendError(res, req, {
+        error: 'Validierungsfehler',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+        details: errors,
+      });
     }
 
     // Passwort verifizieren
     const isPasswordValid = await user.comparePassword(req.body?.password);
     if (!isPasswordValid) {
       logger.warn(`Failed email change attempt for user ${user._id}`);
-      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     // Neue Email == aktuelle Email?
     if (normalizedEmail && normalizedEmail.toLowerCase() === user.email.toLowerCase()) {
-      return sendError(res, req, { error: 'Neue Email muss sich von der aktuellen unterscheiden', code: 'SAME_EMAIL', status: 400 });
+      return sendError(res, req, {
+        error: 'Neue Email muss sich von der aktuellen unterscheiden',
+        code: 'SAME_EMAIL',
+        status: 400,
+      });
     }
 
     // Neue Email schon registriert?
     const existingUser = await User.findOne({ email: normalizedEmail.toLowerCase() });
     if (existingUser) {
-      return sendError(res, req, { error: 'Email ist bereits registriert', code: 'EMAIL_TAKEN', status: 409 });
+      return sendError(res, req, {
+        error: 'Email ist bereits registriert',
+        code: 'EMAIL_TAKEN',
+        status: 409,
+      });
     }
 
     // Token generieren
@@ -184,14 +204,18 @@ router.post('/change-email', auth, emailOperationLimiter, async (req, res) => {
     await user.save();
 
     // Verification-Email senden
-    const emailResult = await emailService.sendEmailChangeVerification(user, emailChangeToken, normalizedEmail);
+    const emailResult = await emailService.sendEmailChangeVerification(
+      user,
+      emailChangeToken,
+      normalizedEmail
+    );
 
     logger.info(`Email change token generated for user ${user._id} (new: ${normalizedEmail})`);
 
     // Dev-Mode: Token zurückgeben für Testing
     const response = {
       success: true,
-      message: 'Bestätigungs-Email gesendet'
+      message: 'Bestätigungs-Email gesendet',
     };
 
     if (process.env.NODE_ENV === 'development' && emailResult?.link) {
@@ -210,7 +234,11 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
     const { token } = req.query;
 
     if (!token) {
-      return sendError(res, req, { error: 'Token erforderlich', code: 'MISSING_TOKEN', status: 400 });
+      return sendError(res, req, {
+        error: 'Token erforderlich',
+        code: 'MISSING_TOKEN',
+        status: 400,
+      });
     }
 
     // Token hashen und suchen
@@ -227,7 +255,11 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
       user.emailChangeNewEmail = undefined;
       user.emailChangeExpires = undefined;
       await user.save();
-      return sendError(res, req, { error: 'Token ist abgelaufen', code: 'TOKEN_EXPIRED', status: 400 });
+      return sendError(res, req, {
+        error: 'Token ist abgelaufen',
+        code: 'TOKEN_EXPIRED',
+        status: 400,
+      });
     }
 
     // Email aktualisieren
@@ -250,10 +282,10 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
       req,
     });
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: 'Email erfolgreich geändert',
-      data: sanitizeUser(user)
+      data: sanitizeUser(user),
     });
   } catch (error) {
     handleServerError(res, req, 'GET /verify-email-change', error);
@@ -277,7 +309,12 @@ router.post('/verify-add-email', authEmailAddController.verifyAddEmailPost);
 router.delete('/remove-email', auth, emailOperationLimiter, authEmailAddController.removeEmail);
 
 // POST /api/users/resend-add-email-verification - Verifizierungs-Email erneut senden
-router.post('/resend-add-email-verification', auth, emailOperationLimiter, authEmailAddController.resendAddEmailVerification);
+router.post(
+  '/resend-add-email-verification',
+  auth,
+  emailOperationLimiter,
+  authEmailAddController.resendAddEmailVerification
+);
 
 // GET /api/users/email-status - Email-Status abrufen
 router.get('/email-status', auth, authEmailAddController.getEmailStatus);

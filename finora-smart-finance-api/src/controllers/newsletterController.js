@@ -36,20 +36,32 @@ async function subscribe(req, res) {
     const { email, language } = req.body;
 
     if (!email) {
-      return sendError(res, req, { error: 'E-Mail ist erforderlich', code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: 'E-Mail ist erforderlich',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
     if (typeof email !== 'string' || email.length > 254) {
-      return sendError(res, req, { error: 'E-Mail darf maximal 254 Zeichen lang sein', code: 'VALIDATION_ERROR', status: 400 });
+      return sendError(res, req, {
+        error: 'E-Mail darf maximal 254 Zeichen lang sein',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+      });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return sendError(res, req, { error: 'Ungültiges E-Mail-Format', code: 'INVALID_EMAIL', status: 400 });
+      return sendError(res, req, {
+        error: 'Ungültiges E-Mail-Format',
+        code: 'INVALID_EMAIL',
+        status: 400,
+      });
     }
 
     // Language validieren — nur erlaubte Werte, sonst Default 'de'
-    const safeLang = (language && ALLOWED_LANGUAGES.includes(language)) ? language : 'de';
+    const safeLang = language && ALLOWED_LANGUAGES.includes(language) ? language : 'de';
 
     const result = await newsletterService.subscribe(email, safeLang, req.headers.authorization);
 
@@ -60,7 +72,11 @@ async function subscribe(req, res) {
       return res.status(200).json({ success: true, message: 'Bestätigungsmail wurde gesendet' });
     }
     logger.error(`Newsletter subscribe error: ${err.message}`);
-    return sendError(res, req, { error: 'Fehler beim Abonnieren', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Fehler beim Abonnieren',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -72,18 +88,30 @@ async function confirm(req, res) {
     const { token } = req.query;
     const feUrl = getFrontendUrl(req);
     if (!token) {
-      return res.status(400).type('html').send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
+      return res
+        .status(400)
+        .type('html')
+        .send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
     }
 
     const result = await newsletterService.confirmSubscription(token);
     if (!result) {
-      return res.status(400).type('html').send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
+      return res
+        .status(400)
+        .type('html')
+        .send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
     }
 
-    return res.status(200).type('html').send(newsletterStatusPage('confirmed', result.lang, feUrl));
+    return res
+      .status(200)
+      .type('html')
+      .send(newsletterStatusPage('confirmed', result.lang, feUrl));
   } catch (err) {
     logger.error(`Newsletter confirm error: ${err.message}`);
-    return res.status(500).type('html').send(newsletterStatusPage('error', req.query.lang || 'de', getFrontendUrl(req)));
+    return res
+      .status(500)
+      .type('html')
+      .send(newsletterStatusPage('error', req.query.lang || 'de', getFrontendUrl(req)));
   }
 }
 
@@ -95,18 +123,30 @@ async function unsubscribe(req, res) {
     const { token } = req.query;
     const feUrl = getFrontendUrl(req);
     if (!token) {
-      return res.status(400).type('html').send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
+      return res
+        .status(400)
+        .type('html')
+        .send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
     }
 
     const result = await newsletterService.unsubscribeByToken(token);
     if (!result) {
-      return res.status(400).type('html').send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
+      return res
+        .status(400)
+        .type('html')
+        .send(newsletterStatusPage('invalid', req.query.lang || 'de', feUrl));
     }
 
-    return res.status(200).type('html').send(newsletterStatusPage('unsubscribed', result.lang, feUrl));
+    return res
+      .status(200)
+      .type('html')
+      .send(newsletterStatusPage('unsubscribed', result.lang, feUrl));
   } catch (err) {
     logger.error(`Newsletter unsubscribe error: ${err.message}`);
-    return res.status(500).type('html').send(newsletterStatusPage('error', req.query.lang || 'de', getFrontendUrl(req)));
+    return res
+      .status(500)
+      .type('html')
+      .send(newsletterStatusPage('error', req.query.lang || 'de', getFrontendUrl(req)));
   }
 }
 
@@ -134,7 +174,11 @@ async function toggle(req, res) {
   try {
     const userEmail = req.user.email;
     if (!userEmail) {
-      return sendError(res, req, { error: 'Keine E-Mail-Adresse vorhanden', code: 'NO_EMAIL', status: 400 });
+      return sendError(res, req, {
+        error: 'Keine E-Mail-Adresse vorhanden',
+        code: 'NO_EMAIL',
+        status: 400,
+      });
     }
 
     const result = await newsletterService.toggle(

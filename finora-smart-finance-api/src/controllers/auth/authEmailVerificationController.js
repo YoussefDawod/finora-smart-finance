@@ -10,7 +10,11 @@ async function resendVerification(req, res) {
   try {
     const { email } = req.body || {};
     if (!email) {
-      return sendError(res, req, { error: 'Email erforderlich', code: 'INVALID_INPUT', status: 400 });
+      return sendError(res, req, {
+        error: 'Email erforderlich',
+        code: 'INVALID_INPUT',
+        status: 400,
+      });
     }
 
     const user = await User.findOne({ email });
@@ -28,13 +32,18 @@ async function resendVerification(req, res) {
 
     const responseData = {
       sent: true,
-      ...(config.nodeEnv === 'development' && emailResult && { verificationLink: emailResult.link }),
+      ...(config.nodeEnv === 'development' &&
+        emailResult && { verificationLink: emailResult.link }),
     };
 
     return res.status(200).json({ success: true, data: responseData });
   } catch (err) {
     logger.error('resendVerification error:', err);
-    return sendError(res, req, { error: 'Erneutes Senden fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Erneutes Senden fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -62,7 +71,9 @@ async function verifyEmail(req, res) {
     user.verificationExpires = undefined;
     await user.save();
 
-    return res.redirect(`${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(user.email || '')}&type=initial`);
+    return res.redirect(
+      `${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(user.email || '')}&type=initial`
+    );
   } catch (err) {
     logger.error(`Verify-email error: ${err.message}`);
     return res.redirect(`${frontendUrl}/verify-email?error=server_error&type=initial`);

@@ -27,7 +27,15 @@ function buildUserQuery(search = '', isVerifiedParam, roleParam, isActiveParam) 
 }
 
 function buildUserSort(sortBy = 'createdAt', order = 'desc') {
-  const allowed = new Set(['createdAt', 'name', 'email', 'lastLogin', 'isVerified', 'role', 'isActive']);
+  const allowed = new Set([
+    'createdAt',
+    'name',
+    'email',
+    'lastLogin',
+    'isVerified',
+    'role',
+    'isActive',
+  ]);
   const field = allowed.has(sortBy) ? sortBy : 'createdAt';
   const direction = order === 'asc' ? 1 : -1;
   return { [field]: direction };

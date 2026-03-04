@@ -45,7 +45,12 @@ router.put('/preferences', auth, async (req, res) => {
     if (!user) return;
 
     if (errors.length > 0) {
-      return sendError(res, req, { error: 'Validierungsfehler', code: 'VALIDATION_ERROR', status: 400, details: errors });
+      return sendError(res, req, {
+        error: 'Validierungsfehler',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+        details: errors,
+      });
     }
 
     if (!user.preferences) {

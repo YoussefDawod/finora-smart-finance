@@ -73,17 +73,14 @@ async function getQuota(req, res) {
     });
 
     // Gespeicherten Counter mit DB synchronisieren (fire-and-forget)
-    const storedCount =
-      user.transactionLifecycle?.monthlyTransactionCount ?? 0;
+    const storedCount = user.transactionLifecycle?.monthlyTransactionCount ?? 0;
     if (storedCount !== actualCount) {
       user.transactionLifecycle = {
         ...(user.transactionLifecycle?.toObject?.() || {}),
         monthlyTransactionCount: actualCount,
         monthlyCountResetAt: new Date(),
       };
-      user.save().catch((err) =>
-        logger.error('Quota counter sync failed:', err)
-      );
+      user.save().catch(err => logger.error('Quota counter sync failed:', err));
     }
 
     // Quota-Status mit echtem Wert berechnen
@@ -132,7 +129,7 @@ async function getDashboard(req, res) {
   try {
     const userId = req.user._id;
     const { month, year } = req.query;
-    
+
     // Parse month/year wenn vorhanden
     const options = {};
     if (month) {
@@ -147,7 +144,7 @@ async function getDashboard(req, res) {
         options.year = parsedYear;
       }
     }
-    
+
     const data = await transactionService.getDashboardData(userId, options);
 
     res.json({ success: true, data });
@@ -225,7 +222,7 @@ async function createTransaction(req, res) {
     logger.error('POST /api/transactions Error:', error);
 
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err) => err.message);
+      const messages = Object.values(error.errors).map(err => err.message);
       return sendError(res, req, {
         error: 'Validierungsfehler',
         code: 'VALIDATION_ERROR',
@@ -333,7 +330,7 @@ async function updateTransaction(req, res) {
     logger.error('PUT /api/transactions/:id Error:', error);
 
     if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map((err) => err.message);
+      const messages = Object.values(error.errors).map(err => err.message);
       return sendError(res, req, {
         error: 'Validierungsfehler',
         code: 'VALIDATION_ERROR',
@@ -405,13 +402,21 @@ async function deleteAllTransactions(req, res) {
 
     const user = await User.findById(userId).select('+password');
     if (!user) {
-      return sendError(res, req, { error: 'Benutzer nicht gefunden', code: 'NOT_FOUND', status: 404 });
+      return sendError(res, req, {
+        error: 'Benutzer nicht gefunden',
+        code: 'NOT_FOUND',
+        status: 404,
+      });
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       logger.warn(`Failed bulk delete attempt for user ${userId}`);
-      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+      return sendError(res, req, {
+        error: 'Passwort ist falsch',
+        code: 'INVALID_PASSWORD',
+        status: 400,
+      });
     }
 
     const result = await Transaction.deleteMany({ userId });

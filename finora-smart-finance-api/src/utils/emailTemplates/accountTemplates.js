@@ -76,14 +76,18 @@ function securityAlert(name, eventType, details = {}) {
         ${safeDetails.userAgent ? `<strong>Gerät:</strong> ${safeDetails.userAgent}<br>` : ''}
         ${safeDetails.location ? `<strong>Standort:</strong> ${safeDetails.location}<br>` : ''}
       </div>
-      ${eventType === 'suspicious' ? `
+      ${
+        eventType === 'suspicious'
+          ? `
       <div class="warning">
         <strong>Warst das nicht du?</strong> Ändere sofort dein Passwort und überprüfe deine letzten Aktivitäten.
       </div>
       <p style="text-align: center;">
         <a href="${frontendBaseUrl}/settings" class="button">Passwort ändern</a>
       </p>
-      ` : ''}
+      `
+          : ''
+      }
       <p style="font-size: 14px; color: ${colors.textMuted};">
         Falls du diese Aktion nicht durchgeführt hast, kontaktiere uns bitte umgehend.
       </p>

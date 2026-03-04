@@ -29,7 +29,7 @@ async function notifyAdminsNewUser(newUser) {
       timeStyle: 'short',
     });
 
-    const sendPromises = admins.map(async (admin) => {
+    const sendPromises = admins.map(async admin => {
       const html = templates.newUserRegistration({
         adminName: admin.name,
         userName: newUser.name,
@@ -37,11 +37,7 @@ async function notifyAdminsNewUser(newUser) {
         registeredAt,
       });
 
-      await sendEmail(
-        admin.email,
-        `👤 Neuer Benutzer registriert: ${newUser.name} - Finora`,
-        html,
-      );
+      await sendEmail(admin.email, `👤 Neuer Benutzer registriert: ${newUser.name} - Finora`, html);
     });
 
     await Promise.allSettled(sendPromises);

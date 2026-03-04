@@ -1,7 +1,7 @@
 /**
  * Email Base Layout & Shared Styling
  * Gemeinsames Layout für alle Email-Templates
- * 
+ *
  * Verwendet zentralisierte Farben aus colors.js
  */
 

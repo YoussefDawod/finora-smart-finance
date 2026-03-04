@@ -6,7 +6,12 @@ const { passwordReset } = require('./passwordTemplates');
 const { welcome, securityAlert } = require('./accountTemplates');
 const { transactionNotification, budgetAlert, financialReport } = require('./financialTemplates');
 const { contactForm } = require('./contactTemplates');
-const { newsletterConfirmation, newsletterWelcome, newsletterGoodbye, campaignTemplate } = require('./newsletterTemplates');
+const {
+  newsletterConfirmation,
+  newsletterWelcome,
+  newsletterGoodbye,
+  campaignTemplate,
+} = require('./newsletterTemplates');
 const { newUserRegistration } = require('./adminTemplates');
 const {
   retentionReminder,

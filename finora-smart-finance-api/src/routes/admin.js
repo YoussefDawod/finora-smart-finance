@@ -25,7 +25,7 @@ router.use(async (req, res, next) => {
   // 1. Versuch: JWT-basierte Auth (Bearer Token)
   const auth = req.headers.authorization || '';
   if (auth.startsWith('Bearer ')) {
-    return authMiddleware(req, res, (err) => {
+    return authMiddleware(req, res, err => {
       if (err) return next(err);
       return requireAdmin(req, res, next);
     });
@@ -49,7 +49,10 @@ router.use(async (req, res, next) => {
   const keyBuffer = Buffer.from(ADMIN_API_KEY, 'utf8');
   const providedBuffer = Buffer.from(String(providedKey), 'utf8');
 
-  if (keyBuffer.length !== providedBuffer.length || !crypto.timingSafeEqual(keyBuffer, providedBuffer)) {
+  if (
+    keyBuffer.length !== providedBuffer.length ||
+    !crypto.timingSafeEqual(keyBuffer, providedBuffer)
+  ) {
     return sendError(res, req, {
       error: 'Nicht autorisiert: Ungültiger Admin-API-Schlüssel',
       code: 'UNAUTHORIZED',

@@ -22,7 +22,8 @@ function newsletterConfirmation(confirmUrl, unsubscribeUrl, language = 'de') {
       button: 'Abonnement bestätigen',
       fallback: 'Oder kopiere diesen Link in deinen Browser:',
       note: 'Dieser Link ist 24 Stunden gültig. Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.',
-      footer: 'Du erhältst diese E-Mail, weil sich jemand mit deiner Adresse für den Finora-Newsletter angemeldet hat.',
+      footer:
+        'Du erhältst diese E-Mail, weil sich jemand mit deiner Adresse für den Finora-Newsletter angemeldet hat.',
       unsubscribe: 'Nicht interessiert? Dann kannst du dich hier abmelden.',
     },
     en: {
@@ -32,7 +33,8 @@ function newsletterConfirmation(confirmUrl, unsubscribeUrl, language = 'de') {
       button: 'Confirm Subscription',
       fallback: 'Or copy this link into your browser:',
       note: 'This link is valid for 24 hours. If you did not request this, you can simply ignore this email.',
-      footer: 'You received this email because someone signed up for the Finora newsletter with your address.',
+      footer:
+        'You received this email because someone signed up for the Finora newsletter with your address.',
       unsubscribe: 'Not interested? You can unsubscribe here.',
     },
     ar: {
@@ -171,7 +173,8 @@ function newsletterGoodbye(language = 'de') {
     de: {
       title: 'Newsletter abgemeldet',
       text: 'Du wurdest erfolgreich vom Finora-Newsletter abgemeldet. Du wirst keine weiteren Newsletter-E-Mails mehr erhalten.',
-      resubscribe: 'Falls du dich umentscheidest, kannst du dich jederzeit erneut über unsere Webseite anmelden.',
+      resubscribe:
+        'Falls du dich umentscheidest, kannst du dich jederzeit erneut über unsere Webseite anmelden.',
       footer: 'Dies ist die letzte E-Mail, die du von uns bezüglich des Newsletters erhältst.',
     },
     en: {
@@ -189,7 +192,8 @@ function newsletterGoodbye(language = 'de') {
     ka: {
       title: 'ნიუსლეთერის გამოწერა გაუქმებულია',
       text: 'თქვენ წარმატებით გაუქმდა Finora ნიუსლეთერის გამოწერა. აღარ მიიღებთ ნიუსლეთერის ელფოსტებს.',
-      resubscribe: 'თუ გადაიფიქრებთ, ნებისმიერ დროს შეგიძლიათ ხელახლა გამოიწეროთ ჩვენი ვებგვერდიდან.',
+      resubscribe:
+        'თუ გადაიფიქრებთ, ნებისმიერ დროს შეგიძლიათ ხელახლა გამოიწეროთ ჩვენი ვებგვერდიდან.',
       footer: 'ეს არის ბოლო ელფოსტა, რომელსაც მიიღებთ ჩვენგან ნიუსლეთერთან დაკავშირებით.',
     },
   };

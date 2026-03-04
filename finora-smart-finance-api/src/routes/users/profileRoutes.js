@@ -117,7 +117,12 @@ router.put('/me', auth, async (req, res) => {
     const { errors, updates } = validateProfileUpdate(profileData);
 
     if (errors.length > 0) {
-      return sendError(res, req, { error: 'Validierungsfehler', code: 'VALIDATION_ERROR', status: 400, details: errors });
+      return sendError(res, req, {
+        error: 'Validierungsfehler',
+        code: 'VALIDATION_ERROR',
+        status: 400,
+        details: errors,
+      });
     }
 
     Object.assign(user, updates);

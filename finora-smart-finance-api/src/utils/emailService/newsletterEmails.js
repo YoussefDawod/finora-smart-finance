@@ -139,4 +139,9 @@ async function sendNewsletterCampaign(email, subject, content, unsubscribeToken,
   }
 }
 
-module.exports = { sendNewsletterConfirmation, sendNewsletterWelcome, sendNewsletterGoodbye, sendNewsletterCampaign };
+module.exports = {
+  sendNewsletterConfirmation,
+  sendNewsletterWelcome,
+  sendNewsletterGoodbye,
+  sendNewsletterCampaign,
+};

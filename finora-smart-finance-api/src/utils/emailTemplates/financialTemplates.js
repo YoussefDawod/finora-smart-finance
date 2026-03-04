@@ -67,12 +67,16 @@ function budgetAlert(name, alertData) {
           <strong>Aktueller Saldo:</strong> <span style="color: ${colors.error}; font-weight: bold;">${balance.toFixed(2)} ${currencySymbol}</span><br>
           <strong>Defizit:</strong> ${deficit.toFixed(2)} ${currencySymbol}
         </div>
-        ${latestTransaction ? `
+        ${
+          latestTransaction
+            ? `
         <div class="info">
           <strong>Letzte Transaktion:</strong><br>
           ${escapeHtml(latestTransaction.description || latestTransaction.category)}: -${latestTransaction.amount.toFixed(2)} ${currencySymbol}
         </div>
-        ` : ''}
+        `
+            : ''
+        }
         <p>Überlege, wie du deine Finanzen wieder ausgleichen kannst. Vielleicht gibt es Ausgaben, die du reduzieren könntest?</p>
         <p style="text-align: center;">
           <a href="${frontendBaseUrl}/transactions" class="button">Finanzen prüfen</a>
@@ -87,7 +91,15 @@ function budgetAlert(name, alertData) {
   }
 
   // Monthly Budget Limit Alert
-  const { totalSpent, limit, percentUsed, currency, remainingBudget, exceededBy, latestTransaction } = alertData;
+  const {
+    totalSpent,
+    limit,
+    percentUsed,
+    currency,
+    remainingBudget,
+    exceededBy,
+    latestTransaction,
+  } = alertData;
   const currencySymbol = { EUR: '€', USD: '$', GBP: '£', CHF: 'CHF', JPY: '¥' }[currency] || '€';
   const isExceeded = percentUsed > 100;
 
@@ -95,23 +107,31 @@ function budgetAlert(name, alertData) {
     <div class="content">
       <h2>${isExceeded ? 'Budget überschritten!' : 'Budget-Warnung'}</h2>
       <p>Hallo ${safeName},</p>
-      <p>${isExceeded 
-        ? 'Du hast dein monatliches Budget überschritten!' 
-        : `Du hast ${percentUsed}% deines monatlichen Budgets erreicht.`}</p>
+      <p>${
+        isExceeded
+          ? 'Du hast dein monatliches Budget überschritten!'
+          : `Du hast ${percentUsed}% deines monatlichen Budgets erreicht.`
+      }</p>
       <div class="${isExceeded ? 'warning' : 'info'}">
         <strong>Monatliches Budget:</strong> ${limit.toFixed(2)} ${currencySymbol}<br>
         <strong>Bereits ausgegeben:</strong> ${totalSpent.toFixed(2)} ${currencySymbol}<br>
         <strong>Verbraucht:</strong> ${percentUsed}%<br>
-        ${isExceeded 
-          ? `<strong>Überschritten um:</strong> <span style="color: ${colors.error};">${exceededBy.toFixed(2)} ${currencySymbol}</span>` 
-          : `<strong>Verbleibend:</strong> ${remainingBudget.toFixed(2)} ${currencySymbol}`}
+        ${
+          isExceeded
+            ? `<strong>Überschritten um:</strong> <span style="color: ${colors.error};">${exceededBy.toFixed(2)} ${currencySymbol}</span>`
+            : `<strong>Verbleibend:</strong> ${remainingBudget.toFixed(2)} ${currencySymbol}`
+        }
       </div>
-      ${latestTransaction ? `
+      ${
+        latestTransaction
+          ? `
       <div class="info">
         <strong>Letzte Transaktion:</strong><br>
         ${escapeHtml(latestTransaction.description || latestTransaction.category)}: -${latestTransaction.amount.toFixed(2)} ${currencySymbol}
       </div>
-      ` : ''}
+      `
+          : ''
+      }
       <p>Überlege, ob du in den verbleibenden Tagen des Monats noch Einsparungspotenzial hast.</p>
       <p style="text-align: center;">
         <a href="${frontendBaseUrl}/transactions" class="button">Ausgaben prüfen</a>
@@ -138,7 +158,7 @@ function financialReport(name, reportData, period = 'weekly') {
 
   const categoryList = topCategories
     .slice(0, 5)
-    .map((cat) => `<li>${escapeHtml(cat.category)}: ${cat.amount.toFixed(2)} €</li>`)
+    .map(cat => `<li>${escapeHtml(cat.category)}: ${cat.amount.toFixed(2)} €</li>`)
     .join('');
 
   return baseLayout(`
@@ -164,14 +184,18 @@ function financialReport(name, reportData, period = 'weekly') {
         </tr>
       </table>
 
-      ${topCategories.length > 0 ? `
+      ${
+        topCategories.length > 0
+          ? `
       <div class="info">
         <strong>Top Ausgaben-Kategorien:</strong>
         <ul style="margin: 10px 0 0 0; padding-left: 20px;">
           ${categoryList}
         </ul>
       </div>
-      ` : ''}
+      `
+          : ''
+      }
 
       <p style="text-align: center;">
         <a href="${frontendBaseUrl}/dashboard" class="button">Zum Dashboard</a>

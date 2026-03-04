@@ -46,10 +46,18 @@ async function register(req, res) {
   } catch (err) {
     const duplicateError = registrationService.handleDuplicateError(err);
     if (duplicateError) {
-      return sendError(res, req, { error: duplicateError.error, code: duplicateError.code, status: 409 });
+      return sendError(res, req, {
+        error: duplicateError.error,
+        code: duplicateError.code,
+        status: 409,
+      });
     }
     logger.error('Registration error:', err);
-    return sendError(res, req, { error: 'Registrierung fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Registrierung fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -58,7 +66,11 @@ async function login(req, res, next) {
     const { name, email, password } = req.body || {};
 
     if ((!name && !email) || !password) {
-      return sendError(res, req, { error: 'Name/Email und Passwort erforderlich', code: 'INVALID_INPUT', status: 400 });
+      return sendError(res, req, {
+        error: 'Name/Email und Passwort erforderlich',
+        code: 'INVALID_INPUT',
+        status: 400,
+      });
     }
 
     const identifier = name || email;
@@ -74,7 +86,11 @@ async function login(req, res, next) {
 
     const verificationResult = loginService.checkEmailVerification(authResult.user);
     if (!verificationResult.verified) {
-      return sendError(res, req, { error: verificationResult.error, code: verificationResult.code, status: 403 });
+      return sendError(res, req, {
+        error: verificationResult.error,
+        code: verificationResult.code,
+        status: 403,
+      });
     }
 
     const { tokens, user } = await loginService.generateLoginSession(authResult.user, {
@@ -113,12 +129,20 @@ async function refresh(req, res) {
   try {
     const refreshToken = getRefreshTokenFromRequest(req);
     if (!refreshToken) {
-      return sendError(res, req, { error: 'Refresh-Token fehlt', code: 'MISSING_TOKEN', status: 400 });
+      return sendError(res, req, {
+        error: 'Refresh-Token fehlt',
+        code: 'MISSING_TOKEN',
+        status: 400,
+      });
     }
 
     const user = await User.findByRefreshToken(refreshToken);
     if (!user) {
-      return sendError(res, req, { error: 'Ungültiger Refresh-Token', code: 'INVALID_TOKEN', status: 401 });
+      return sendError(res, req, {
+        error: 'Ungültiger Refresh-Token',
+        code: 'INVALID_TOKEN',
+        status: 401,
+      });
     }
 
     const validation = authService.validateRefreshToken(user, refreshToken);
@@ -142,7 +166,11 @@ async function refresh(req, res) {
     });
   } catch (err) {
     logger.error('Token refresh error:', err);
-    return sendError(res, req, { error: 'Token-Refresh fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Token-Refresh fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 
@@ -161,10 +189,16 @@ async function logout(req, res) {
     }
 
     clearRefreshTokenCookie(res);
-    return res.status(200).json({ success: true, data: { loggedOut: true }, message: 'Logout erfolgreich' });
+    return res
+      .status(200)
+      .json({ success: true, data: { loggedOut: true }, message: 'Logout erfolgreich' });
   } catch (err) {
     logger.error('Logout error:', err);
-    return sendError(res, req, { error: 'Logout fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
+    return sendError(res, req, {
+      error: 'Logout fehlgeschlagen',
+      code: 'SERVER_ERROR',
+      status: 500,
+    });
   }
 }
 

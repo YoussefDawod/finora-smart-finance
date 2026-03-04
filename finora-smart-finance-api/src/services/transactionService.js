@@ -122,7 +122,7 @@ async function getSummaryStats(userId, dateFilter = {}) {
  */
 async function getDashboardData(userId, options = {}) {
   const now = new Date();
-  
+
   // Verwende übergebenen Monat/Jahr oder aktuelles Datum
   // Hinweis: month ist 1-basiert (1=Januar), JavaScript Date verwendet 0-basiert
   const selectedMonth = options.month ? options.month - 1 : now.getMonth();
@@ -236,19 +236,19 @@ async function getDashboardData(userId, options = {}) {
       },
       totalTransactions: totalStats.totalTransactions,
     },
-    monthlyTrend: trendResult.map((item) => ({
+    monthlyTrend: trendResult.map(item => ({
       year: item._id.year,
       month: item._id.month,
       income: parseFloat(item.income.toFixed(2)),
       expense: parseFloat(item.expense.toFixed(2)),
     })),
-    categoryBreakdown: categoryResult.map((item) => ({
+    categoryBreakdown: categoryResult.map(item => ({
       category: item._id.category,
       type: item._id.type,
       total: parseFloat(item.total.toFixed(2)),
       count: item.count,
     })),
-    recentTransactions: recentResult.map((t) => ({
+    recentTransactions: recentResult.map(t => ({
       id: t._id,
       amount: t.amount,
       category: t.category,
@@ -284,7 +284,7 @@ function formatTransaction(transaction) {
  * @returns {Array}
  */
 function formatTransactions(transactions) {
-  return transactions.map((t) => t.toJSON());
+  return transactions.map(t => t.toJSON());
 }
 
 module.exports = {

@@ -8,8 +8,8 @@ const path = require('path');
 // ============================================
 
 // Standard-Werte (können über env.js überschrieben werden)
-const DEFAULT_MAX_AGE_DAYS = 14;    // Log-Dateien älter als 14 Tage löschen
-const DEFAULT_MAX_SIZE_MB = 10;     // Einzelne Datei max. 10 MB, dann rotieren
+const DEFAULT_MAX_AGE_DAYS = 14; // Log-Dateien älter als 14 Tage löschen
+const DEFAULT_MAX_SIZE_MB = 10; // Einzelne Datei max. 10 MB, dann rotieren
 const CLEANUP_INTERVAL_MS = 24 * 60 * 60 * 1000; // Alle 24h Cleanup ausführen
 
 // Logs-Verzeichnis erstellen (im Root, nicht in src/)
@@ -70,7 +70,9 @@ async function cleanupOldLogs() {
     }
 
     if (deleted > 0) {
-      console.log(`[LOG-ROTATION] ${deleted} alte Log-Datei(en) gelöscht (älter als ${maxAgeDays} Tage)`);
+      console.log(
+        `[LOG-ROTATION] ${deleted} alte Log-Datei(en) gelöscht (älter als ${maxAgeDays} Tage)`
+      );
     }
 
     return deleted;
@@ -105,7 +107,9 @@ async function rotateIfNeeded(logFile) {
     const rotatedFile = path.join(dir, `${baseName}.${rotationNum}.log`);
     await rename(logFile, rotatedFile);
 
-    console.log(`[LOG-ROTATION] ${path.basename(logFile)} → ${path.basename(rotatedFile)} (${(fileStat.size / 1024 / 1024).toFixed(1)} MB)`);
+    console.log(
+      `[LOG-ROTATION] ${path.basename(logFile)} → ${path.basename(rotatedFile)} (${(fileStat.size / 1024 / 1024).toFixed(1)} MB)`
+    );
   } catch {
     // Rotation fehlgeschlagen — nicht kritisch, weiter loggen
   }
@@ -116,7 +120,7 @@ async function rotateIfNeeded(logFile) {
 // ============================================
 
 // Log-Datei Path
-const getLogFile = (type) => {
+const getLogFile = type => {
   const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   return path.join(logsDir, `${type}-${date}.log`);
 };
@@ -188,7 +192,7 @@ const log = (level, message, data = null, requestId = null) => {
 
   // Vor dem Schreiben: Datei rotieren falls zu groß
   rotateIfNeeded(logFile).finally(() => {
-    appendFile(logFile, logString + '\n', 'utf8').catch((err) => {
+    appendFile(logFile, logString + '\n', 'utf8').catch(err => {
       console.error(`Failed to write to log file ${logFile}:`, err.message);
     });
   });

@@ -30,7 +30,7 @@ function sanitizeUser(user, options = {}) {
 function sanitizeUsers(users = [], options = {}) {
   return users
     .filter(Boolean)
-    .map((user) => sanitizeUser(user, options))
+    .map(user => sanitizeUser(user, options))
     .filter(Boolean);
 }
 

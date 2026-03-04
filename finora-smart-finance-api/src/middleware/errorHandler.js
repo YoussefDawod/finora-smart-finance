@@ -21,9 +21,7 @@ const errorHandler = (err, req, res, next) => {
   // Nur bewusst gesetzte statusCode-Fehler (z.B. 400, 404) geben ihre Message weiter.
   const isProduction = process.env.NODE_ENV === 'production';
   const isServerError = status >= 500;
-  const clientMessage = (isProduction && isServerError)
-    ? 'Interner Serverfehler'
-    : message;
+  const clientMessage = isProduction && isServerError ? 'Interner Serverfehler' : message;
 
   sendError(res, req, {
     error: clientMessage,

@@ -10,7 +10,7 @@ const transactionSchema = new mongoose.Schema(
       required: [true, 'Amount ist erforderlich'],
       min: [0.01, 'Amount muss > 0 sein'],
       max: [1000000, 'Amount darf 1.000.000 nicht überschreiten'],
-      set: (v) => parseFloat(v.toFixed(2)), // 2 Dezimalstellen
+      set: v => parseFloat(v.toFixed(2)), // 2 Dezimalstellen
     },
 
     category: {
@@ -103,16 +103,19 @@ transactionSchema.index({ type: 1, date: -1 }); // Type + Datum
 
 // VOLLTEXT-SUCHE: Text-Index für description und category
 // Ermöglicht effiziente Suche mit $text Operator
-transactionSchema.index({ 
-  description: 'text', 
-  category: 'text' 
-}, {
-  weights: {
-    description: 2,  // Beschreibung wichtiger
-    category: 1
+transactionSchema.index(
+  {
+    description: 'text',
+    category: 'text',
   },
-  name: 'transaction_text_index'
-});
+  {
+    weights: {
+      description: 2, // Beschreibung wichtiger
+      category: 1,
+    },
+    name: 'transaction_text_index',
+  }
+);
 
 // Virtual: Formatierte Ausgabe
 transactionSchema.virtual('formattedAmount').get(function () {

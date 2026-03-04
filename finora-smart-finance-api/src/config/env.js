@@ -12,8 +12,8 @@ if (!devJwtSecret && NODE_ENV === 'development') {
   devJwtSecret = crypto.randomBytes(64).toString('hex');
   console.warn(
     '\n⚠️  JWT_SECRET ist nicht gesetzt — ein zufälliges Secret wurde generiert.\n' +
-    '   Tokens werden bei jedem Server-Neustart ungültig.\n' +
-    '   Setze JWT_SECRET in .env für persistente Sessions.\n'
+      '   Tokens werden bei jedem Server-Neustart ungültig.\n' +
+      '   Setze JWT_SECRET in .env für persistente Sessions.\n'
   );
 }
 
@@ -29,11 +29,11 @@ const config = {
     },
     cors: {
       origin: [
-        'http://localhost:3000', 
-        'http://localhost:3001', 
-        'http://localhost:5173', 
-        'http://127.0.0.1:3000', 
-        'http://127.0.0.1:3001', 
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
         'http://127.0.0.1:5173',
         // Specific network IPs for testing (current network)
         'http://192.168.188.22:3000',
@@ -51,14 +51,14 @@ const config = {
     jwt: {
       secret: devJwtSecret,
       expire: process.env.JWT_EXPIRE || '7d',
-      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600,       // 1h in Sekunden
-      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800,   // 7d in Sekunden
+      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600, // 1h in Sekunden
+      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800, // 7d in Sekunden
     },
     logging: {
       level: process.env.LOG_LEVEL || 'debug',
       dir: process.env.LOG_DIR || './logs',
-      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 14,   // Log-Dateien nach 14 Tagen löschen
-      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 10,     // Einzeldatei max 10 MB
+      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 14, // Log-Dateien nach 14 Tagen löschen
+      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 10, // Einzeldatei max 10 MB
     },
     rateLimit: {
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 min
@@ -97,14 +97,14 @@ const config = {
     jwt: {
       secret: process.env.JWT_SECRET,
       expire: process.env.JWT_EXPIRE || '7d',
-      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600,       // 1h in Sekunden
-      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800,   // 7d in Sekunden
+      accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600, // 1h in Sekunden
+      refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800, // 7d in Sekunden
     },
     logging: {
       level: process.env.LOG_LEVEL || 'info',
       dir: process.env.LOG_DIR || './logs',
-      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 30,   // Produktion: 30 Tage aufbewahren
-      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 25,     // Produktion: max 25 MB pro Datei
+      maxAgeDays: parseInt(process.env.LOG_MAX_AGE_DAYS) || 30, // Produktion: 30 Tage aufbewahren
+      maxSizeMB: parseInt(process.env.LOG_MAX_SIZE_MB) || 25, // Produktion: max 25 MB pro Datei
     },
     rateLimit: {
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000,
@@ -143,13 +143,13 @@ const config = {
     jwt: {
       secret: 'test-secret-key',
       expire: '1h',
-      accessExpire: 3600,       // 1h in Sekunden
-      refreshExpire: 604800,    // 7d in Sekunden
+      accessExpire: 3600, // 1h in Sekunden
+      refreshExpire: 604800, // 7d in Sekunden
     },
     logging: {
       level: 'error',
       dir: './logs',
-      maxAgeDays: 1,     // Tests: sofort aufräumen
+      maxAgeDays: 1, // Tests: sofort aufräumen
       maxSizeMB: 5,
     },
     rateLimit: {
@@ -179,7 +179,14 @@ if (!config[NODE_ENV]) {
 
 // Produktions-Validierung
 if (NODE_ENV === 'production') {
-  const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'CORS_ORIGIN', 'SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'];
+  const requiredEnvVars = [
+    'MONGODB_URI',
+    'JWT_SECRET',
+    'CORS_ORIGIN',
+    'SMTP_HOST',
+    'SMTP_USER',
+    'SMTP_PASS',
+  ];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
       throw new Error(`Missing required environment variable: ${envVar}`);
@@ -190,7 +197,7 @@ if (NODE_ENV === 'production') {
   if (process.env.ADMIN_API_KEY && process.env.ADMIN_API_KEY.length < 32) {
     throw new Error(
       `ADMIN_API_KEY ist zu kurz (${process.env.ADMIN_API_KEY.length} Zeichen). ` +
-      'Mindestens 32 Zeichen erforderlich für ausreichende Sicherheit.'
+        'Mindestens 32 Zeichen erforderlich für ausreichende Sicherheit.'
     );
   }
 }

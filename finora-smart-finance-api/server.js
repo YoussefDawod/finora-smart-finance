@@ -29,14 +29,16 @@ const app = express();
 let schedulerInterval = null;
 
 // CORS muss ZUERST kommen - vor allen anderen Middlewares
-app.use(cors({
-  origin: config.cors.origin,
-  methods: config.cors.methods,
-  credentials: config.cors.credentials,
-  allowedHeaders: config.cors.allowedHeaders,
-  optionsSuccessStatus: 200,
-  preflightContinue: false
-}));
+app.use(
+  cors({
+    origin: config.cors.origin,
+    methods: config.cors.methods,
+    credentials: config.cors.credentials,
+    allowedHeaders: config.cors.allowedHeaders,
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
+  })
+);
 
 // Weitere Middleware
 app.use(requestLoggerMiddleware);
@@ -46,29 +48,30 @@ app.use(cookieParser());
 // Security Middleware
 // In Development: upgrade-insecure-requests und HSTS deaktivieren,
 // da Vite/Express ohne SSL laufen und der Browser sonst http→https erzwingt.
-const helmetConfig = config.nodeEnv === 'production'
-  ? {
-      // Production: Strikte Sicherheitsheader
-      contentSecurityPolicy: {
-        directives: {
-          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-          'script-src': ["'self'"],
-          'style-src': ["'self'", "'unsafe-inline'"],
-          'img-src': ["'self'", 'data:'],
+const helmetConfig =
+  config.nodeEnv === 'production'
+    ? {
+        // Production: Strikte Sicherheitsheader
+        contentSecurityPolicy: {
+          directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'script-src': ["'self'"],
+            'style-src': ["'self'", "'unsafe-inline'"],
+            'img-src': ["'self'", 'data:'],
+          },
         },
-      },
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
-    }
-  : {
-      hsts: false,
-      contentSecurityPolicy: {
-        directives: {
-          ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-          'upgrade-insecure-requests': null,
+        referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+      }
+    : {
+        hsts: false,
+        contentSecurityPolicy: {
+          directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            'upgrade-insecure-requests': null,
+          },
         },
-      },
-    };
+      };
 
 // Trust Proxy in Production (Reverse Proxy / Load Balancer)
 if (config.nodeEnv === 'production') {
@@ -166,8 +169,7 @@ app.use(errorHandler);
 // Start Server - listen on all interfaces (0.0.0.0) for network access
 const server = app.listen(config.port, '0.0.0.0', () => {
   // MongoDB-URI sicher loggen — Credentials maskieren
-  const safeMongoUrl = (config.mongodb.uri || '')
-    .replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
+  const safeMongoUrl = (config.mongodb.uri || '').replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
   logger.info(`Server started successfully`, {
     port: config.port,
     environment: config.nodeEnv,

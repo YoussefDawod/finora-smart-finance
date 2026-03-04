@@ -6,11 +6,13 @@ async function authMiddleware(req, res, next) {
   try {
     const auth = req.headers.authorization || '';
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null;
-    if (!token) return sendError(res, req, { error: 'Unauthorized', code: 'NO_TOKEN', status: 401 });
+    if (!token)
+      return sendError(res, req, { error: 'Unauthorized', code: 'NO_TOKEN', status: 401 });
 
     const payload = verifyAccessToken(token);
     const user = await User.findById(payload.sub).select('-passwordHash -refreshTokens');
-    if (!user) return sendError(res, req, { error: 'Unauthorized', code: 'INVALID_USER', status: 401 });
+    if (!user)
+      return sendError(res, req, { error: 'Unauthorized', code: 'INVALID_USER', status: 401 });
 
     // Prüfe ob der Account gesperrt ist
     if (user.isActive === false) {

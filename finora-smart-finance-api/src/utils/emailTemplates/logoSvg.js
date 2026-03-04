@@ -59,7 +59,7 @@ function _buildSvgString(size = 40) {
 /**
  * Gibt das Logo als `<img>`-Tag mit SVG Data-URI zurück.
  *
- * Email-Clients rendern kein inline `<svg>` — ein `<img src="data:image/svg+xml,...">` 
+ * Email-Clients rendern kein inline `<svg>` — ein `<img src="data:image/svg+xml,...">`
  * funktioniert dagegen in Gmail, Apple Mail, Thunderbird und allen modernen Clients.
  *
  * @param {object} [options]
@@ -69,9 +69,7 @@ function _buildSvgString(size = 40) {
 function getEmailLogoImg({ size = 40 } = {}) {
   const svg = _buildSvgString(size);
   // URL-Encode: % → %25, dann < > # { } | \ ^ ~ [ ] ` kodieren
-  const encoded = encodeURIComponent(svg)
-    .replace(/'/g, '%27')
-    .replace(/"/g, '%22');
+  const encoded = encodeURIComponent(svg).replace(/'/g, '%27').replace(/"/g, '%22');
   const dataUri = `data:image/svg+xml,${encoded}`;
   return `<img src="${dataUri}" width="${size}" height="${size}" alt="Finora Logo" style="display:block;border:0;outline:none;" />`;
 }
@@ -91,4 +89,3 @@ module.exports = {
   GROWTH_LINE_PATH,
   PEAK_DOT,
 };
-

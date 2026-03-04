@@ -3,7 +3,7 @@
 /**
  * Admin CLI Tool für User-Verwaltung
  * Usage: node admin-cli.js [command] [options]
- * 
+ *
  * Auth: API-Key (x-admin-key Header) oder JWT Bearer Token
  * Konfiguration via Environment-Variablen:
  *   API_URL       - Backend-URL (default: http://localhost:5000)
@@ -20,13 +20,13 @@ const API_URL = process.env.API_URL
  */
 function getAuthHeaders() {
   const headers = { 'Content-Type': 'application/json' };
-  
+
   if (process.env.ADMIN_TOKEN) {
     headers['Authorization'] = `Bearer ${process.env.ADMIN_TOKEN}`;
   } else if (process.env.ADMIN_API_KEY) {
     headers['x-admin-key'] = process.env.ADMIN_API_KEY;
   }
-  
+
   return headers;
 }
 
@@ -83,7 +83,7 @@ Beispiele:
   stats: async () => {
     const res = await fetch(`${API_URL}/admin/stats`, { headers: getAuthHeaders() });
     const data = await res.json();
-    
+
     if (!data.success) {
       console.error('Error:', data.message || data.error);
       return;
@@ -101,17 +101,19 @@ Beispiele:
     console.log(`Last 7 days:        ${overview.usersLast7Days}`);
     console.log(`Last 30 days:       ${overview.usersLast30Days}`);
     console.log(`Total Transactions: ${overview.totalTransactions}`);
-    
+
     console.log('\nRecent Users:');
     recentUsers.forEach((user, i) => {
       const role = user.role === 'admin' ? ' [ADMIN]' : '';
       const status = user.isActive === false ? ' [BANNED]' : '';
-      console.log(`  ${i+1}. ${user.name} (${user.email || 'no email'}) - ${user.isVerified ? 'verified' : 'pending'}${role}${status}`);
+      console.log(
+        `  ${i + 1}. ${user.name} (${user.email || 'no email'}) - ${user.isVerified ? 'verified' : 'pending'}${role}${status}`
+      );
     });
     console.log('');
   },
 
-  create: async (args) => {
+  create: async args => {
     const name = args[0];
     const password = args[1];
     const email = args.find((a, i) => i === 2 && !a.startsWith('--'));
@@ -130,7 +132,7 @@ Beispiele:
     const res = await fetch(`${API_URL}/admin/users`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     const data = await res.json();
 
@@ -148,10 +150,10 @@ Beispiele:
     console.log(`   Verifiziert: ${user.isVerified ? 'Ja' : 'Nein'}`);
   },
 
-  list: async (args) => {
+  list: async args => {
     const params = new URLSearchParams({
       limit: 50,
-      showSensitive: false
+      showSensitive: false,
     });
 
     if (args.includes('--search')) {
@@ -179,21 +181,23 @@ Beispiele:
 
     const { users, pagination } = data.data;
     console.log(`\nUsers (${pagination.total} total)\n`);
-    
+
     users.forEach((user, i) => {
       const role = user.role === 'admin' ? ' [ADMIN]' : '';
       const status = user.isActive === false ? ' [BANNED]' : '';
-      console.log(`${i+1}. [${user._id}]${role}${status}`);
+      console.log(`${i + 1}. [${user._id}]${role}${status}`);
       console.log(`   Name: ${user.name}${user.lastName ? ' ' + user.lastName : ''}`);
       console.log(`   Email: ${user.email || 'keine'}`);
       console.log(`   Rolle: ${user.role || 'user'}`);
-      console.log(`   Status: ${user.isActive === false ? 'Gesperrt' : user.isVerified ? 'Verifiziert' : 'Nicht verifiziert'}`);
+      console.log(
+        `   Status: ${user.isActive === false ? 'Gesperrt' : user.isVerified ? 'Verifiziert' : 'Nicht verifiziert'}`
+      );
       console.log(`   Erstellt: ${new Date(user.createdAt).toLocaleDateString('de-DE')}`);
       console.log('');
     });
   },
 
-  get: async (args) => {
+  get: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js get <userId>');
@@ -219,11 +223,17 @@ Beispiele:
     console.log('Aktiv:        ', user.isActive === false ? 'Nein (Gesperrt)' : 'Ja');
     if (user.isActive === false) {
       console.log('Sperrgrund:   ', user.banReason || 'Kein Grund angegeben');
-      console.log('Gesperrt am:  ', user.bannedAt ? new Date(user.bannedAt).toLocaleString('de-DE') : '-');
+      console.log(
+        'Gesperrt am:  ',
+        user.bannedAt ? new Date(user.bannedAt).toLocaleString('de-DE') : '-'
+      );
     }
     console.log('Verified:     ', user.isVerified ? 'Ja' : 'Nein');
     console.log('Created:      ', new Date(user.createdAt).toLocaleString('de-DE'));
-    console.log('Last Login:   ', user.lastLogin ? new Date(user.lastLogin).toLocaleString('de-DE') : 'nie');
+    console.log(
+      'Last Login:   ',
+      user.lastLogin ? new Date(user.lastLogin).toLocaleString('de-DE') : 'nie'
+    );
     console.log('Transactions: ', stats.transactionCount);
     console.log('\nPreferences:');
     console.log('  Theme:      ', user.preferences.theme);
@@ -232,7 +242,7 @@ Beispiele:
     console.log('');
   },
 
-  delete: async (args) => {
+  delete: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js delete <userId>');
@@ -256,12 +266,14 @@ Beispiele:
     console.log('   Transaktionen:', data.data.deletedTransactions);
   },
 
-  'reset-password': async (args) => {
+  'reset-password': async args => {
     const userId = args[0];
     let newPassword = args[1];
 
     if (!userId) {
-      console.error('User-ID fehlt! Usage: node admin-cli.js reset-password <userId> [newPassword]');
+      console.error(
+        'User-ID fehlt! Usage: node admin-cli.js reset-password <userId> [newPassword]'
+      );
       return;
     }
 
@@ -276,7 +288,7 @@ Beispiele:
     const res = await fetch(`${API_URL}/admin/users/${userId}/reset-password`, {
       method: 'POST',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ newPassword })
+      body: JSON.stringify({ newPassword }),
     });
     const data = await res.json();
 
@@ -300,7 +312,7 @@ Beispiele:
     const readline = require('readline');
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
-    const answer = await new Promise((resolve) => {
+    const answer = await new Promise(resolve => {
       rl.question('Tippen Sie "JA LÖSCHEN" ein um fortzufahren: ', resolve);
     });
     rl.close();
@@ -313,7 +325,7 @@ Beispiele:
     const res = await fetch(`${API_URL}/admin/users`, {
       method: 'DELETE',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ confirm: 'DELETE_ALL_USERS', reason: 'CLI clean-all command' })
+      body: JSON.stringify({ confirm: 'DELETE_ALL_USERS', reason: 'CLI clean-all command' }),
     });
     const data = await res.json();
 
@@ -331,7 +343,7 @@ Beispiele:
   // Account-Sperre
   // =============================================
 
-  ban: async (args) => {
+  ban: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js ban <userId> [reason]');
@@ -343,7 +355,7 @@ Beispiele:
     const res = await fetch(`${API_URL}/admin/users/${userId}/ban`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ reason })
+      body: JSON.stringify({ reason }),
     });
     const data = await res.json();
 
@@ -361,7 +373,7 @@ Beispiele:
     console.log('');
   },
 
-  unban: async (args) => {
+  unban: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js unban <userId>');
@@ -391,7 +403,7 @@ Beispiele:
   // Rollen-Verwaltung
   // =============================================
 
-  role: async (args) => {
+  role: async args => {
     const userId = args[0];
     const newRole = args[1];
 
@@ -408,7 +420,7 @@ Beispiele:
     const res = await fetch(`${API_URL}/admin/users/${userId}/role`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
-      body: JSON.stringify({ role: newRole })
+      body: JSON.stringify({ role: newRole }),
     });
     const data = await res.json();
 
@@ -425,7 +437,7 @@ Beispiele:
     console.log('');
   },
 
-  promote: async (args) => {
+  promote: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js promote <userId>');
@@ -436,7 +448,7 @@ Beispiele:
     await commands.role([userId, 'admin']);
   },
 
-  demote: async (args) => {
+  demote: async args => {
     const userId = args[0];
     if (!userId) {
       console.error('User-ID fehlt! Usage: node admin-cli.js demote <userId>');
@@ -445,12 +457,12 @@ Beispiele:
 
     // Leitet an role-Befehl weiter
     await commands.role([userId, 'user']);
-  }
+  },
 };
 
 // Main
 const main = async () => {
-  const [,, command, ...args] = process.argv;
+  const [, , command, ...args] = process.argv;
 
   if (!command || command === 'help') {
     commands.help();
