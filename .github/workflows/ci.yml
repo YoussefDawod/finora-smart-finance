@@ -163,7 +163,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: false  # Temporarily disabled - configure DEPLOY_* secrets to enable
     environment: production
     steps:
       - uses: actions/checkout@v4
