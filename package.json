@@ -23,29 +23,29 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YoussefDawod/expense-tracker.git"
+    "url": "git+https://github.com/YoussefDawod/finora-smart-finance.git"
   },
   "author": "Youssef Dawod",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/YoussefDawod/expense-tracker/issues"
+    "url": "https://github.com/YoussefDawod/finora-smart-finance/issues"
   },
-  "homepage": "https://github.com/YoussefDawod/expense-tracker#readme",
+  "homepage": "https://github.com/YoussefDawod/finora-smart-finance#readme",
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
   },
   "lint-staged": {
     "finora-smart-finance-frontend/src/**/*.{js,jsx}": [
-      "cd finora-smart-finance-frontend && eslint --fix",
-      "cd finora-smart-finance-frontend && prettier --write"
+      "npm run lint:fix --workspace=finora-smart-finance-frontend",
+      "npm run format --workspace=finora-smart-finance-frontend"
     ],
     "finora-smart-finance-frontend/src/**/*.{scss,css}": [
-      "cd finora-smart-finance-frontend && prettier --write"
+      "npm run format --workspace=finora-smart-finance-frontend"
     ],
     "finora-smart-finance-api/**/*.js": [
-      "cd finora-smart-finance-api && eslint --fix",
-      "cd finora-smart-finance-api && prettier --write"
+      "npm run lint:fix --workspace=finora-smart-finance-api",
+      "npm run format --workspace=finora-smart-finance-api"
     ]
   }
 }
