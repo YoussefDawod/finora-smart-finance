@@ -138,7 +138,7 @@
 // ============================================
 .selectGroup.small {
   .selectWrapper {
-    min-height: var(--btn-h-sm, 2rem);
+    min-height: var(--input-height-sm);
   }
 
   .select {
@@ -160,7 +160,7 @@
 
 .selectGroup.medium {
   .selectWrapper {
-    min-height: var(--input-h);
+    min-height: var(--input-height-md);
   }
 
   .select {
@@ -182,7 +182,7 @@
 
 .selectGroup.large {
   .selectWrapper {
-    min-height: var(--btn-h-lg, 3.25rem);
+    min-height: var(--input-height-lg);
   }
 
   .select {
@@ -238,7 +238,7 @@
 .hint {
   font-size: var(--fs-xs);
   margin: 0;
-  animation: slideInDown var(--d-fast) ease-out;
+  animation: slideInDown var(--duration-fast) ease-out;
 }
 
 .error {
@@ -276,7 +276,7 @@
 
   .selectGroup.large {
     .selectWrapper {
-      min-height: var(--input-h);
+      min-height: var(--input-height-md);
     }
 
     .select {

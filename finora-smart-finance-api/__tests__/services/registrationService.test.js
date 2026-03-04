@@ -12,6 +12,9 @@ const authService = require('../../src/services/authService');
 jest.mock('../../src/models/User');
 jest.mock('../../src/utils/emailService');
 jest.mock('../../src/services/authService');
+jest.mock('../../src/services/auditLogService', () => ({
+  log: jest.fn(),
+}));
 
 describe('RegistrationService', () => {
   beforeEach(() => {
@@ -130,6 +133,7 @@ describe('RegistrationService', () => {
         refreshToken: 'refresh-token',
       });
       emailService.sendVerificationEmail = jest.fn().mockResolvedValue({ link: 'verify-link' });
+      emailService.notifyAdminsNewUser = jest.fn().mockResolvedValue(true);
 
       const result = await registrationService.registerUser(userData, {
         userAgent: 'Mozilla/5.0',

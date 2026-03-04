@@ -16,15 +16,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
-import { 
-  FiLock, 
-  FiEye, 
-  FiEyeOff, 
-  FiAlertCircle, 
-  FiCheck,
-  FiX
-} from 'react-icons/fi';
+import { FiCheck } from 'react-icons/fi';
 import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import PasswordInput from '../PasswordInput/PasswordInput';
 import styles from './ResetPasswordForm.module.scss';
 
 export default function ResetPasswordForm({ token }) {
@@ -45,8 +40,6 @@ export default function ResetPasswordForm({ token }) {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
@@ -58,7 +51,9 @@ export default function ResetPasswordForm({ token }) {
   const passwordErrorMap = {
     required: t('auth.reset.validation.passwordRequired'),
     tooShort: t('auth.reset.validation.passwordMin'),
+    tooLong: t('auth.reset.validation.passwordMax'),
     noUppercase: t('auth.reset.validation.passwordWeak'),
+    noLowercase: t('auth.reset.validation.passwordWeak'),
     noNumber: t('auth.reset.validation.passwordWeak'),
     noSpecial: t('auth.reset.validation.passwordWeak'),
   };
@@ -202,56 +197,32 @@ export default function ResetPasswordForm({ token }) {
   return (
     <form onSubmit={handleSubmit} className={styles.resetForm} noValidate>
       {/* API Error */}
-      <AnimatePresence>
-        {apiError && (
-          <motion.div
-            className={styles.errorBanner}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <FiAlertCircle className={styles.errorIcon} />
-            <span>{apiError}</span>
-            <button
-              type="button"
-              className={styles.errorDismiss}
-              onClick={() => setApiError('')}
-            >
-              <FiX />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ErrorBanner
+        error={apiError}
+        onDismiss={() => setApiError('')}
+        dismissAriaLabel={t('auth.login.dismissError')}
+      />
 
       {/* Password Field */}
       <div className={styles.inputGroup}>
         <label htmlFor="password" className={styles.label}>
           {t('auth.reset.passwordLabel')}
         </label>
-        <div className={`${styles.inputWrapper} ${hasPasswordError ? styles.error : ''}`}>
-          <FiLock className={styles.inputIcon} />
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            className={styles.input}
-            placeholder={t('auth.reset.passwordPlaceholder')}
-            value={formData.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isLoading}
-            autoComplete="new-password"
-            autoFocus
-          />
-          <button
-            type="button"
-            className={styles.passwordToggle}
-            onClick={() => setShowPassword(!showPassword)}
-            tabIndex={-1}
-          >
-            {showPassword ? <FiEyeOff /> : <FiEye />}
-          </button>
-        </div>
+        <PasswordInput
+          formStyles={styles}
+          wrapperErrorClass={hasPasswordError ? styles.error : ''}
+          id="password"
+          name="password"
+          placeholder={t('auth.reset.passwordPlaceholder')}
+          value={formData.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={isLoading}
+          autoComplete="new-password"
+          autoFocus
+          showPasswordLabel={t('auth.login.showPassword')}
+          hidePasswordLabel={t('auth.login.hidePassword')}
+        />
         <AnimatePresence>
           {hasPasswordError && (
             <motion.span
@@ -286,29 +257,20 @@ export default function ResetPasswordForm({ token }) {
         <label htmlFor="confirmPassword" className={styles.label}>
           {t('auth.reset.confirmLabel')}
         </label>
-        <div className={`${styles.inputWrapper} ${hasConfirmError ? styles.error : ''}`}>
-          <FiLock className={styles.inputIcon} />
-          <input
-            id="confirmPassword"
-            name="confirmPassword"
-            type={showConfirmPassword ? 'text' : 'password'}
-            className={styles.input}
-            placeholder={t('auth.reset.confirmPlaceholder')}
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isLoading}
-            autoComplete="new-password"
-          />
-          <button
-            type="button"
-            className={styles.passwordToggle}
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            tabIndex={-1}
-          >
-            {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-          </button>
-        </div>
+        <PasswordInput
+          formStyles={styles}
+          wrapperErrorClass={hasConfirmError ? styles.error : ''}
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder={t('auth.reset.confirmPlaceholder')}
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={isLoading}
+          autoComplete="new-password"
+          showPasswordLabel={t('auth.login.showPassword')}
+          hidePasswordLabel={t('auth.login.hidePassword')}
+        />
         <AnimatePresence>
           {hasConfirmError && (
             <motion.span

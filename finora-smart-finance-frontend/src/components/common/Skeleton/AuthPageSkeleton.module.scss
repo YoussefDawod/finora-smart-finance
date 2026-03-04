@@ -71,7 +71,7 @@
 .brandingPanel {
   display: none;
   flex: 0 0 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--primary)));
+  background: linear-gradient(135deg, var(--primary), var(--pri-hover));
   align-items: center;
   justify-content: center;
   padding: var(--space-xl);

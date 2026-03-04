@@ -10,6 +10,8 @@ const {
   validateDescription,
   validateType,
   validateDate,
+  validateTags,
+  validateNotes,
   ALLOWED_CATEGORIES,
 } = require('../src/validators/transactionValidation');
 
@@ -171,6 +173,84 @@ describe('Transaction Validation', () => {
 
     it('should accept undefined when not required', () => {
       expect(validateDate(undefined, false)).toEqual({ valid: true });
+    });
+  });
+
+  // ============================================
+  // validateTags Tests (M-9)
+  // ============================================
+  describe('validateTags', () => {
+    it('should accept valid string tags', () => {
+      expect(validateTags(['food', 'rent'])).toEqual(['food', 'rent']);
+    });
+
+    it('should return empty array for non-array input', () => {
+      expect(validateTags(null)).toEqual([]);
+      expect(validateTags(undefined)).toEqual([]);
+      expect(validateTags('tag')).toEqual([]);
+      expect(validateTags(123)).toEqual([]);
+    });
+
+    it('should filter out non-string tags', () => {
+      expect(validateTags(['valid', 123, null, 'ok'])).toEqual(['valid', 'ok']);
+    });
+
+    it('should filter out empty/whitespace-only tags', () => {
+      expect(validateTags(['valid', '', '  ', 'ok'])).toEqual(['valid', 'ok']);
+    });
+
+    it('should trim tags', () => {
+      expect(validateTags(['  food  ', ' rent '])).toEqual(['food', 'rent']);
+    });
+
+    it('should truncate tags to 30 characters', () => {
+      const longTag = 'A'.repeat(50);
+      const result = validateTags([longTag]);
+      expect(result[0]).toHaveLength(30);
+    });
+
+    it('should limit to 10 tags maximum', () => {
+      const manyTags = Array.from({ length: 20 }, (_, i) => `tag${i}`);
+      const result = validateTags(manyTags);
+      expect(result).toHaveLength(10);
+    });
+  });
+
+  // ============================================
+  // validateNotes Tests (M-9)
+  // ============================================
+  describe('validateNotes', () => {
+    it('should accept valid string notes', () => {
+      const errors = [];
+      expect(validateNotes('Some note', errors)).toBe('Some note');
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should return null for empty/null/undefined', () => {
+      const errors = [];
+      expect(validateNotes(null, errors)).toBeNull();
+      expect(validateNotes(undefined, errors)).toBeNull();
+      expect(validateNotes('', errors)).toBeNull();
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should reject non-string notes', () => {
+      const errors = [];
+      validateNotes(123, errors);
+      expect(errors).toContain('Notes muss ein String sein');
+    });
+
+    it('should truncate notes to 500 characters', () => {
+      const errors = [];
+      const longNote = 'X'.repeat(600);
+      const result = validateNotes(longNote, errors);
+      expect(result).toHaveLength(500);
+      expect(errors).toHaveLength(0);
+    });
+
+    it('should trim notes', () => {
+      const errors = [];
+      expect(validateNotes('  hello  ', errors)).toBe('hello');
     });
   });
 });

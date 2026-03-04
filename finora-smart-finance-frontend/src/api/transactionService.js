@@ -37,12 +37,15 @@ export const transactionService = {
   /**
    * Get paginated transactions with filters
    * @param {TransactionFilters & PaginationParams} params - Filter und Pagination
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: any[], pagination: PaginationMeta }>>}
    */
-  getTransactions: (params = {}) => {
+  getTransactions: (params = {}, { signal } = {}) => {
     const { page = 1, limit = 20, ...filters } = params;
     return client.get(ENDPOINTS.transactions.list, { 
-      params: { page, limit, ...filters } 
+      params: { page, limit, ...filters },
+      signal,
     });
   },
 
@@ -52,72 +55,89 @@ export const transactionService = {
    * @param {Object} options - Optional filter parameters
    * @param {number} [options.month] - Month (1-12)
    * @param {number} [options.year] - Year
+   * @param {Object} [requestOpts] - Axios request options
+   * @param {AbortSignal} [requestOpts.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: DashboardData }>>}
    */
-  getDashboardData: ({ month, year } = {}) => {
+  getDashboardData: ({ month, year } = {}, { signal } = {}) => {
     const params = {};
     if (month) params.month = month;
     if (year) params.year = year;
-    return client.get(`${ENDPOINTS.transactions.list}/stats/dashboard`, { params });
+    return client.get(`${ENDPOINTS.transactions.list}/stats/dashboard`, { params, signal });
   },
 
   /**
    * Get summary stats (total income, expense, balance)
    * @param {string} [startDate]
    * @param {string} [endDate]
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: SummaryStats }>>}
    */
-  getSummary: (startDate, endDate) => {
+  getSummary: (startDate, endDate, { signal } = {}) => {
     const params = {};
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
-    return client.get(`${ENDPOINTS.transactions.list}/stats/summary`, { params });
+    return client.get(`${ENDPOINTS.transactions.list}/stats/summary`, { params, signal });
   },
 
   /**
    * Get single transaction
    * @param {string} id
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  getTransaction: (id) => {
-    return client.get(ENDPOINTS.transactions.get(id));
+  getTransaction: (id, { signal } = {}) => {
+    return client.get(ENDPOINTS.transactions.get(id), { signal });
   },
 
   /**
    * Create transaction
    * @param {Object} data
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  createTransaction: (data) => {
-    return client.post(ENDPOINTS.transactions.create, data);
+  createTransaction: (data, { signal } = {}) => {
+    return client.post(ENDPOINTS.transactions.create, data, { signal });
   },
 
   /**
    * Update transaction
    * @param {string} id
    * @param {Object} data
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  updateTransaction: (id, data) => {
-    return client.put(ENDPOINTS.transactions.update(id), data);
+  updateTransaction: (id, data, { signal } = {}) => {
+    return client.put(ENDPOINTS.transactions.update(id), data, { signal });
   },
 
   /**
    * Delete transaction
    * @param {string} id
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  deleteTransaction: (id) => {
-    return client.delete(ENDPOINTS.transactions.delete(id));
+  deleteTransaction: (id, { signal } = {}) => {
+    return client.delete(ENDPOINTS.transactions.delete(id), { signal });
   },
 
   /**
-   * Bulk delete transactions
-   * @param {string[]} ids
+   * Bulk delete transactions (delete ALL with confirmation + password)
+   * @param {string} password - Passwort zur Bestätigung
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ deleted: number, message: string }>>}
    */
-  bulkDelete: (ids) => {
-    return client.delete(ENDPOINTS.transactions.bulkDelete, { data: { ids } });
+  bulkDelete: (password, { signal } = {}) => {
+    return client.delete(`${ENDPOINTS.transactions.bulkDelete}?confirm=true`, {
+      data: { password },
+      signal,
+    });
   },
 };
 

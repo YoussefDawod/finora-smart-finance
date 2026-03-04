@@ -9,9 +9,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useMotion } from '@/hooks/useMotion';
+import { MOTION_EASING } from '@/utils/motionPresets';
 import { ThemeSelector, Logo } from '@/components/common';
 import { NAV_ITEMS } from '@/config/navigation';
-import { FiLogOut, FiLogIn } from 'react-icons/fi';
+import { FiLogOut, FiLogIn, FiShield } from 'react-icons/fi';
 import styles from './HamburgerMenu.module.scss';
 
 /**
@@ -26,6 +28,7 @@ export default function HamburgerMenu({ isOpen, onClose }) {
   const { logout, user, isAuthenticated } = useAuth();
   const menuRef = useRef(null);
   const { t, i18n } = useTranslation();
+  const { shouldAnimate } = useMotion();
   const isRtl = i18n.dir() === 'rtl';
 
   // ============================================
@@ -97,9 +100,9 @@ export default function HamburgerMenu({ isOpen, onClose }) {
           {/* Backdrop */}
           <motion.div
             className={styles.backdrop}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={shouldAnimate ? { opacity: 0 } : false}
+            animate={shouldAnimate ? { opacity: 1 } : false}
+            exit={shouldAnimate ? { opacity: 0 } : undefined}
             transition={{ duration: 0.2 }}
             onClick={onClose}
             aria-hidden="true"
@@ -109,17 +112,17 @@ export default function HamburgerMenu({ isOpen, onClose }) {
           <motion.aside
             ref={menuRef}
             className={styles.menu}
-            initial={{ x: isRtl ? '100%' : '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: isRtl ? '100%' : '-100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            initial={shouldAnimate ? { x: isRtl ? '100%' : '-100%' } : false}
+            animate={shouldAnimate ? { x: 0 } : false}
+            exit={shouldAnimate ? { x: isRtl ? '100%' : '-100%' } : undefined}
+            transition={{ type: 'spring', ...MOTION_EASING.spring }}
             role="navigation"
             aria-modal="true"
             aria-label={t('common.navigation')}
           >
             {/* Mobile Header: Logo */}
             <div className={styles.menuHeader}>
-              <Logo onClick={onClose} />
+              <Logo onClick={onClose} entrance="none" />
             </div>
 
             {/* User Section */}
@@ -132,6 +135,9 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                       .map((p) => p[0])
                       .join('')
                       .toUpperCase() || 'U'}
+                    {user.role === 'admin' && (
+                      <span className={styles.avatarBadge}>{t('admin.badge', 'Admin')}</span>
+                    )}
                   </div>
                   <div className={styles.userInfo}>
                     <div className={styles.userName}>{user.name}</div>
@@ -156,8 +162,8 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                         initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        whileHover={{ x: isRtl ? -8 : 8, backgroundColor: 'rgba(99, 102, 241, 0.1)' }}
-                        whileTap={{ scale: 0.96 }}
+                        whileHover={{ x: isRtl ? -8 : 8 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         <span className={styles.navIcon}>
                           <IconComponent size={24} />
@@ -167,9 +173,29 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                     </React.Fragment>
                   );
                 })}
+
+                {/* Admin Panel Link */}
+                {isAuthenticated && user?.role === 'admin' && (
+                  <motion.button
+                    className={`${styles.navItem} ${styles.adminLink} ${location.pathname.startsWith('/admin') ? styles.active : ''}`}
+                    onClick={() => handleNavigate('/admin')}
+                    initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35 }}
+                    whileHover={{ x: isRtl ? -8 : 8 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className={styles.navIcon}>
+                      <FiShield size={24} />
+                    </span>
+                    <span className={styles.navLabel}>{t('nav.adminPanel')}</span>
+                  </motion.button>
+                )}
+
+                {/* Theme Selector (am unteren Nav-Rand) */}
                 <motion.div
                   className={styles.themeSection}
-                  initial={{ opacity: 0, x: isRtl ? -20 : 20 }}
+                  initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                 >
@@ -185,7 +211,7 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                   className={styles.logoutBtn}
                   onClick={handleLogout}
                   whileHover={{ x: isRtl ? -8 : 8 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <FiLogOut size={20} />
                   <span>{t('nav.logout')}</span>
@@ -197,7 +223,7 @@ export default function HamburgerMenu({ isOpen, onClose }) {
                   className={styles.loginBtn}
                   onClick={() => { navigate('/login'); onClose?.(); }}
                   whileHover={{ x: isRtl ? -8 : 8 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileTap={{ scale: 0.98 }}
                 >
                   <FiLogIn size={20} />
                   <span>{t('auth.loginOrRegister')}</span>

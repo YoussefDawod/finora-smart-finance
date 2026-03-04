@@ -1,0 +1,190 @@
+// ============================================
+// ✨ GLOW UTILITIES
+// ============================================
+// Glow ist BRANDING - kein Informationsträger!
+// 
+// ERLAUBT:
+//   - Logo
+//   - Auth Hero / Landing Hero
+//   - Primary Button (Hover, Desktop)
+//   - Card Container (Outline only)
+//   - Toast Icon-Wrapper (success only)
+//   - Chart Container (Outline only)
+// 
+// VERBOTEN:
+//   - Finanzdaten (SummaryCard, BudgetWidget, etc.)
+//   - Inputs / Selects / Textareas
+//   - Text / Zahlen
+//   - Modals (Content)
+//   - Kombiniert mit Motion auf demselben Element
+// ============================================
+
+@use '../variables' as *;
+
+// ============================================
+// 🎯 GLOW MIXINS
+// ============================================
+
+/// Applies glow effect - ONLY for allowed elements
+/// @param {String} $size - sm | md | lg
+/// @param {String} $color - primary | accent | success
+@mixin glow($size: 'sm', $color: 'primary') {
+  $blur: var(--glow-blur-sm);
+  $spread: var(--glow-spread-sm);
+  $glow-color: var(--glow-primary);
+
+  @if $size == 'md' {
+    $blur: var(--glow-blur-md);
+    $spread: var(--glow-spread-md);
+  } @else if $size == 'lg' {
+    $blur: var(--glow-blur-lg);
+    $spread: var(--glow-spread-lg);
+  }
+
+  @if $color == 'accent' {
+    $glow-color: var(--glow-accent);
+  } @else if $color == 'success' {
+    $glow-color: var(--glow-success);
+  }
+
+  box-shadow: 0 0 $blur $spread $glow-color;
+}
+
+/// Glow for outline effect (Cards, Chart containers)
+/// @param {String} $color - primary | accent | success
+@mixin glow-outline($color: 'primary') {
+  $glow-color: var(--glow-primary);
+
+  @if $color == 'accent' {
+    $glow-color: var(--glow-accent);
+  } @else if $color == 'success' {
+    $glow-color: var(--glow-success);
+  }
+
+  box-shadow: 
+    0 0 0 1px var(--border),
+    0 0 var(--glow-blur-sm) 0 $glow-color;
+}
+
+/// Glow for Logo (static or slow pulse)
+/// @param {Boolean} $animated - Enable slow pulse (>=6s cycle)
+@mixin glow-logo($animated: false) {
+  filter: drop-shadow(0 0 var(--glow-blur-md) var(--glow-primary));
+
+  @if $animated {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: glow-pulse 6s ease-in-out infinite;
+    }
+  }
+}
+
+// ============================================
+// 🎭 GLOW UTILITY CLASSES
+// ============================================
+
+// Primary Glow Sizes
+.glow-sm {
+  box-shadow: var(--glow-sm);
+}
+
+.glow-md {
+  box-shadow: var(--glow-md);
+}
+
+.glow-lg {
+  box-shadow: var(--glow-lg);
+}
+
+// Outline Glow (for containers only)
+.glow-outline {
+  box-shadow: 
+    0 0 0 1px var(--border),
+    0 0 var(--glow-blur-sm) 0 var(--glow-primary);
+}
+
+.glow-outline-accent {
+  box-shadow: 
+    0 0 0 1px var(--border),
+    0 0 var(--glow-blur-sm) 0 var(--glow-accent);
+}
+
+.glow-outline-success {
+  box-shadow: 
+    0 0 0 1px var(--border),
+    0 0 var(--glow-blur-sm) 0 var(--glow-success);
+}
+
+// ============================================
+// 🎬 GLOW ANIMATION (Logo only)
+// ============================================
+
+@keyframes glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 var(--glow-blur-md) var(--glow-primary));
+  }
+  50% {
+    filter: drop-shadow(0 0 var(--glow-blur-lg) var(--glow-primary));
+  }
+}
+
+// Logo glow class
+.glow-logo {
+  filter: drop-shadow(0 0 var(--glow-blur-md) var(--glow-primary));
+}
+
+.glow-logo-animated {
+  filter: drop-shadow(0 0 var(--glow-blur-md) var(--glow-primary));
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: glow-pulse 6s ease-in-out infinite;
+  }
+}
+
+// ============================================
+// 🚫 GLOW RESET (for blocked elements)
+// ============================================
+// Use this to explicitly disable glow on 
+// financial components
+
+.no-glow {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+// ============================================
+// � FINANZ-KRITISCHE KOMPONENTEN (GESPERRT)
+// ============================================
+// Diese Komponenten dürfen NIEMALS Glow haben:
+//
+// ❌ SummaryCard
+// ❌ DashboardCharts (Daten)
+// ❌ BudgetWidget
+// ❌ QuotaIndicator
+// ❌ TransactionList
+// ❌ TransactionForm
+// ❌ RecentTransactions
+// ❌ AdminStatCard
+// ❌ AdminTransactionTable
+// ❌ AdminCharts (Datenlayer)
+//
+// Grund: Glow darf niemals Bedeutung tragen.
+// Finanzdaten müssen ruhig und vertrauenswürdig sein.
+// ============================================
+
+// ============================================
+// �🖥️ DESKTOP-ONLY GLOW (for hover states)
+// ============================================
+
+@mixin glow-hover-desktop($size: 'sm') {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @if $size == 'sm' {
+        box-shadow: var(--glow-sm);
+      } @else if $size == 'md' {
+        box-shadow: var(--glow-md);
+      } @else if $size == 'lg' {
+        box-shadow: var(--glow-lg);
+      }
+    }
+  }
+}

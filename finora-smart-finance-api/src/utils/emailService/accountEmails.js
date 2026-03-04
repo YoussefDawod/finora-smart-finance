@@ -44,6 +44,7 @@ async function sendSecurityAlert(user, eventType, details = {}) {
     login: '🔐 Neue Anmeldung in deinem Konto - Finora',
     password_change: '🔒 Passwort geändert - Finora',
     suspicious: '⚠️ Sicherheitswarnung - Finora',
+    account_locked: '🔒 Konto vorübergehend gesperrt - Finora',
   };
   const subject = subjects[eventType] || '🔐 Sicherheitshinweis - Finora';
 

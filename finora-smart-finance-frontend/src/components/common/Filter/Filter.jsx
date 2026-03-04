@@ -4,12 +4,14 @@
  * Features: Typ-abhängige Kategoriefilterung
  */
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiChevronDown } from 'react-icons/fi';
 import { getCategoriesForType } from '@/config/categoryConstants';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { useTranslation } from 'react-i18next';
+import { useMotion } from '@/hooks/useMotion';
+import DateInput from '@/components/common/DateInput/DateInput';
 import styles from './Filter.module.scss';
 
 const getPeriodRange = (period) => {
@@ -61,6 +63,32 @@ export default function Filter({
   const [isOpen, setIsOpen] = useState(false);
   const [activePeriod, setActivePeriod] = useState(null);
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
+  const filterRef = useRef(null);
+
+  // ── Click-Outside + Escape Handler ──────────
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (e) => {
+      if (filterRef.current && !filterRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const activeType = value?.type || null;
   const activeCategory = value?.category || '';
@@ -132,7 +160,7 @@ export default function Filter({
   };
 
   return (
-    <div className={styles.filterWrapper}>
+    <div className={styles.filterWrapper} ref={filterRef}>
       <button
         className={`${styles.filterBtn} ${isOpen || hasActiveFilters ? styles.active : ''}`}
         onClick={() => setIsOpen(!isOpen)}
@@ -148,10 +176,12 @@ export default function Filter({
         {isOpen && (
           <motion.div
             className={styles.filterDropdown}
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            initial={shouldAnimate ? { opacity: 0, y: -8 } : false}
+            animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
+            exit={shouldAnimate ? { opacity: 0, y: -8 } : undefined}
             transition={{ duration: 0.15 }}
+            role="dialog"
+            aria-label={t('filters.title')}
           >
             {/* Zeitraum */}
             <div className={styles.filterSection}>
@@ -164,8 +194,10 @@ export default function Filter({
                       activePeriod === option.value ? styles.selected : ''
                     }`}
                     onClick={() => handlePeriodChange(option.value)}
+                    role="checkbox"
+                    aria-checked={activePeriod === option.value}
                   >
-                    <span className={styles.checkbox} />
+                    <span className={styles.checkbox} aria-hidden="true" />
                     {option.label}
                   </button>
                 ))}
@@ -185,8 +217,10 @@ export default function Filter({
                       activeType === option.value ? styles.selected : ''
                     }`}
                     onClick={() => handleTypeChange(option.value)}
+                    role="checkbox"
+                    aria-checked={activeType === option.value}
                   >
-                    <span className={styles.checkbox} />
+                    <span className={styles.checkbox} aria-hidden="true" />
                     {option.label}
                   </button>
                 ))}
@@ -218,24 +252,18 @@ export default function Filter({
             <div className={styles.filterSection}>
               <h4 className={styles.filterTitle}>{t('filters.date')}</h4>
               <div className={styles.dateRow}>
-                <label className={styles.dateLabel}>
-                  {t('filters.from')}
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => handleDateChange('startDate', e.target.value)}
-                    className={styles.dateInput}
-                  />
-                </label>
-                <label className={styles.dateLabel}>
-                  {t('filters.to')}
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => handleDateChange('endDate', e.target.value)}
-                    className={styles.dateInput}
-                  />
-                </label>
+                <DateInput
+                  label={t('filters.from')}
+                  value={startDate}
+                  onChange={(val) => handleDateChange('startDate', val)}
+                  ariaLabel={t('filters.from')}
+                />
+                <DateInput
+                  label={t('filters.to')}
+                  value={endDate}
+                  onChange={(val) => handleDateChange('endDate', val)}
+                  ariaLabel={t('filters.to')}
+                />
               </div>
             </div>
 

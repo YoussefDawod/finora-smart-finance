@@ -154,7 +154,7 @@ a {
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
@@ -360,7 +360,7 @@ hr {
   right: 0;
   bottom: 0;
   // Above everything
-  z-index: 9999;
+  z-index: var(--z-max);
   // Don't interfere with clicks - let them pass through
   pointer-events: none;
   // Allow overflow to be visible

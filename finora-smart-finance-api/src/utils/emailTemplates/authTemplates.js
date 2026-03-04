@@ -1,4 +1,6 @@
 const { baseLayout } = require('./baseLayout');
+const { escapeHtml } = require('../escapeHtml');
+const colors = require('./colors');
 
 /**
  * Email-Verifizierung Template
@@ -8,9 +10,10 @@ const { baseLayout } = require('./baseLayout');
  * @returns {string} HTML-Template
  */
 function verification(name, link, expiresIn = '24 Stunden') {
+  const safeName = escapeHtml(name);
   return baseLayout(`
     <div class="content">
-      <h2>Hallo ${name}!</h2>
+      <h2>Hallo ${safeName}!</h2>
       <p>Willkommen bei Finora! Bitte bestätige deine Email-Adresse, um alle Funktionen nutzen zu können.</p>
       <p style="text-align: center;">
         <a href="${link}" class="button">Email bestätigen</a>
@@ -21,14 +24,14 @@ function verification(name, link, expiresIn = '24 Stunden') {
       <div class="warning">
         <strong>E-Mail nicht erhalten?</strong> Prüfe deinen Spam- oder Junk-Ordner. Markiere uns als vertrauenswürdig, damit zukünftige Emails in deinen Posteingang kommen.
       </div>
-      <p style="font-size: 14px; color: #6b7280;">
+      <p style="font-size: 14px; color: ${colors.textMuted};">
         Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
         <span class="link-fallback">${link}</span>
       </p>
     </div>
     <div class="footer">
       <p>Du hast dich nicht registriert? Ignoriere diese Email einfach.</p>
-      <p>© ${new Date().getFullYear()} Finora - Smart Finance</p>
+      <p>© ${new Date().getFullYear()} Finora — Smart Finance</p>
     </div>
   `);
 }
@@ -41,11 +44,13 @@ function verification(name, link, expiresIn = '24 Stunden') {
  * @returns {string} HTML-Template
  */
 function emailChange(name, link, newEmail) {
+  const safeName = escapeHtml(name);
+  const safeNewEmail = escapeHtml(newEmail);
   return baseLayout(`
     <div class="content">
       <h2>Email-Adresse bestätigen</h2>
-      <p>Hallo ${name},</p>
-      <p>bitte bestätige, dass <strong>${newEmail}</strong> deine neue Email-Adresse ist.</p>
+      <p>Hallo ${safeName},</p>
+      <p>bitte bestätige, dass <strong>${safeNewEmail}</strong> deine neue Email-Adresse ist.</p>
       <p style="text-align: center;">
         <a href="${link}" class="button">Email bestätigen</a>
       </p>
@@ -55,14 +60,14 @@ function emailChange(name, link, newEmail) {
       <div class="warning">
         <strong>E-Mail nicht erhalten?</strong> Prüfe deinen Spam- oder Junk-Ordner. Markiere uns als vertrauenswürdig, damit zukünftige Emails in deinen Posteingang kommen.
       </div>
-      <p style="font-size: 14px; color: #6b7280;">
+      <p style="font-size: 14px; color: ${colors.textMuted};">
         Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
         <span class="link-fallback">${link}</span>
       </p>
     </div>
     <div class="footer">
       <p>Du hast diese Änderung nicht angefordert? Ignoriere diese Email.</p>
-      <p>© ${new Date().getFullYear()} Finora - Smart Finance</p>
+      <p>© ${new Date().getFullYear()} Finora — Smart Finance</p>
     </div>
   `);
 }

@@ -10,12 +10,12 @@
  * - Recent Transactions
  */
 
-import { useEffect, useMemo } from 'react';
+import { createElement, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useAuth } from '@/hooks';
+import { useAuth, useMotion } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
-import { SummaryCard, RecentTransactions, DashboardCharts, DashboardFilter, BudgetWidget } from '@/components/dashboard';
+import { SummaryCard, RecentTransactions, DashboardCharts, DashboardFilter, BudgetWidget, QuotaIndicator, RetentionBanner } from '@/components/dashboard';
 import Button from '@/components/common/Button/Button';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
@@ -23,8 +23,22 @@ import { formatCurrency } from '@/utils/formatters';
 import { getTimeOfDay, getTimeIcon } from '@/utils/getGreeting';
 import { FiDollarSign, FiCreditCard, FiTrendingUp, FiPlus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
+import { useLifecycle } from '@/hooks/useLifecycle';
 import styles from './DashboardPage.module.scss';
 import i18n from '@/i18n';
+
+// ──────────────────────────────────────────────────────────────────────
+// ANIMATION VARIANTS (module-level constants — stable references)
+// ──────────────────────────────────────────────────────────────────────
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 export default function DashboardPage() {
   // Wrap content in ErrorBoundary to prevent white screen
@@ -37,26 +51,35 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const { user, isAuthenticated } = useAuth();
-  const { dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions } = useTransactions();
+  const { shouldAnimate } = useMotion();
   const {
-    dashboardMonth,
-    dashboardYear,
-    setDashboardMonth,
+    dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions,
+    dashboardMonth, dashboardYear, setDashboardMonth, filter,
   } = useTransactions();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const {
+    lifecycleStatus, quota, isLoading: lifecycleLoading,
+    fetchLifecycleStatus, fetchQuota, confirmExport,
+  } = useLifecycle();
 
-  // Fallback: ensure data is fetched when arriving on dashboard
+  // Lifecycle-Daten und Quota einmalig laden (nur wenn authentifiziert)
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-    
-    // Safety check: Prevent infinite loop if dashboardData is null but loading is false
-    // Only fetch if we really have nothing and no error
+    fetchLifecycleStatus();
+    fetchQuota();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  // Safety-Fallback: Dashboard-Daten laden, falls TransactionContext sie noch nicht hat
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
     if (!dashboardData && !dashboardLoading && !error) {
       fetchDashboardData();
       fetchTransactions();
     }
-  }, [isAuthenticated, user, dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
 
   // ──────────────────────────────────────────────────────────────────────
   // FORMAT SUMMARY DATA FROM SERVER
@@ -169,34 +192,14 @@ function DashboardContent() {
       console.error("Error calculating summary data", err);
       // Return safe default keys
       return {
-        income: { value: "€0,00", amount: 0, trend: null },
-        expense: { value: "€0,00", amount: 0, trend: null },
-        balance: { value: "€0,00", amount: 0, trend: null }
+        income: { value: formatCurrency(0), amount: 0, trend: null },
+        expense: { value: formatCurrency(0), amount: 0, trend: null },
+        balance: { value: formatCurrency(0), amount: 0, trend: null }
       };
     }
   }, [dashboardData, t]);
 
-  // ──────────────────────────────────────────────────────────────────────
-  // ANIMATIONS
-  // ──────────────────────────────────────────────────────────────────────
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  // Animations are defined as module-level constants (see top of file)
 
   // ──────────────────────────────────────────────────────────────────────
   // LOADING STATE - Skeleton Grid
@@ -266,7 +269,7 @@ function DashboardContent() {
         <div className={styles.greeting}>
           <h1 className={styles.greetingTitle}>
             <span className={styles.greetingIcon} aria-hidden="true">
-              {(() => { const Icon = getTimeIcon(getTimeOfDay()); return <Icon />; })()}
+              {createElement(getTimeIcon(getTimeOfDay()))}
             </span>
             <span className={styles.greetingIntro}>
               {t(`dashboard.greeting.${getTimeOfDay()}`)}
@@ -288,6 +291,8 @@ function DashboardContent() {
             selectedMonth={dashboardMonth}
             selectedYear={dashboardYear}
             onMonthChange={setDashboardMonth}
+            startDate={filter.startDate}
+            endDate={filter.endDate}
             onReset={() => {
               const now = new Date();
               setDashboardMonth(now.getMonth() + 1, now.getFullYear());
@@ -308,8 +313,8 @@ function DashboardContent() {
       <motion.section
         className={styles.summaryGrid}
         variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial={shouldAnimate ? 'hidden' : false}
+        animate={shouldAnimate ? 'visible' : false}
       >
         {/* Income Card */}
         <motion.div variants={itemVariants} key="income">
@@ -377,6 +382,25 @@ function DashboardContent() {
       <motion.section className={styles.section} variants={itemVariants}>
         <ErrorBoundary>
           <BudgetWidget />
+        </ErrorBoundary>
+      </motion.section>
+
+      {/* Quota Indicator */}
+      <motion.section className={styles.section} variants={itemVariants}>
+        <ErrorBoundary>
+          <QuotaIndicator quota={quota} isLoading={lifecycleLoading} />
+        </ErrorBoundary>
+      </motion.section>
+
+      {/* Retention Banner */}
+      <motion.section className={styles.section} variants={itemVariants}>
+        <ErrorBoundary>
+          <RetentionBanner
+            lifecycleStatus={lifecycleStatus}
+            onExport={() => navigate('/settings')}
+            onConfirmExport={confirmExport}
+            isLoading={lifecycleLoading}
+          />
         </ErrorBoundary>
       </motion.section>
 

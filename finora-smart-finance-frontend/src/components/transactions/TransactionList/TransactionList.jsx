@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -10,12 +10,14 @@ import Button from '@/components/common/Button/Button';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
 import { FiEdit2, FiTrash2, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
+import { useMotion } from '@/hooks/useMotion';
+import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
 import styles from './TransactionList.module.scss';
 
 // ============================================================================
 // KOMPONENTE - SERVER-SIDE PAGINATION
 // ============================================================================
-export const TransactionList = ({ onEdit = null }) => {
+export const TransactionList = ({ onEdit = null, onDelete = null }) => {
   const { 
     transactions, 
     deleteTransaction, 
@@ -31,11 +33,13 @@ export const TransactionList = ({ onEdit = null }) => {
     pageSize,
     nextPage,
     prevPage,
+    setLimit,
   } = useTransactions();
   
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const isMobile = useIsMobile();
   const { t, i18n } = useTranslation();
+  const { shouldAnimate } = useMotion();
   const isRtl = i18n.dir() === 'rtl';
   
   // State
@@ -49,10 +53,11 @@ export const TransactionList = ({ onEdit = null }) => {
       await deleteTransaction(id);
       setDeleteConfirm(null);
       showSuccessToast(t('transactions.deleteSuccess'));
-    } catch (err) {
+      onDelete?.();
+    } catch {
       showErrorToast(t('transactions.deleteError'));
     }
-  }, [deleteTransaction, showSuccessToast, showErrorToast, t]);
+  }, [deleteTransaction, showSuccessToast, showErrorToast, t, onDelete]);
 
   const handleToggleSort = useCallback((field) => {
     if (sortBy === field) {
@@ -65,9 +70,12 @@ export const TransactionList = ({ onEdit = null }) => {
   // Page-Size-Optionen
   const pageSizeOptions = [10, 20, 50];
 
-  const handlePageSizeChange = useCallback(() => {
-    // NOTE: setLimit not available in context, adjust page size via API
-  }, []);
+  const handlePageSizeChange = useCallback((newSize) => {
+    const parsed = Number(newSize);
+    if (parsed && parsed !== pageSize) {
+      setLimit(parsed);
+    }
+  }, [pageSize, setLimit]);
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -123,13 +131,13 @@ export const TransactionList = ({ onEdit = null }) => {
       </motion.div>
 
       <motion.div className={styles.tableBody} variants={itemVariants}>
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode="sync">
           {transactions.map((transaction) => (
             <motion.div
               key={transaction.id}
               className={`${styles.tableRow} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
               variants={itemVariants}
-              layout
+              // ❌ PERFORMANCE: Kein layout auf Zeilenebene
               aria-busy={!!transaction._pending}
             >
               {/* CATEGORY */}
@@ -177,6 +185,7 @@ export const TransactionList = ({ onEdit = null }) => {
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       title={t('transactions.editTransaction')}
+                      aria-label={t('transactions.editTransaction')}
                     >
                       <FiEdit2 />
                     </motion.button>
@@ -187,6 +196,7 @@ export const TransactionList = ({ onEdit = null }) => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     title={t('transactions.deleteTransaction')}
+                    aria-label={t('transactions.deleteTransaction')}
                   >
                     <FiTrash2 />
                   </motion.button>
@@ -231,13 +241,13 @@ export const TransactionList = ({ onEdit = null }) => {
 
   const renderCardView = () => (
     <motion.div className={styles.cardList} variants={itemVariants}>
-      <AnimatePresence mode="popLayout">
+      <AnimatePresence mode="sync">
         {transactions.map((transaction) => (
           <motion.div
             key={transaction.id}
             className={`${styles.card} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
             variants={itemVariants}
-            layout
+            // ❌ PERFORMANCE: Kein layout auf Zeilenebene
             aria-busy={!!transaction._pending}
           >
             <div className={styles.cardHeader}>
@@ -281,6 +291,7 @@ export const TransactionList = ({ onEdit = null }) => {
                   className={`${styles.editBtn} ${styles.cardActionBtn}`}
                   onClick={() => onEdit(transaction)}
                   title={t('transactions.editAction')}
+                  aria-label={t('transactions.editTransaction')}
                 >
                   <FiEdit2 />
                 </button>
@@ -289,6 +300,7 @@ export const TransactionList = ({ onEdit = null }) => {
                 className={`${styles.deleteBtn} ${styles.cardActionBtn}`}
                 onClick={() => setDeleteConfirm(transaction.id)}
                 title={t('transactions.deleteAction')}
+                aria-label={t('transactions.deleteTransaction')}
               >
                 <FiTrash2 />
               </button>
@@ -351,8 +363,8 @@ export const TransactionList = ({ onEdit = null }) => {
     return (
       <motion.div
         className={styles.errorContainer}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={shouldAnimate ? { opacity: 0 } : false}
+        animate={shouldAnimate ? { opacity: 1 } : false}
       >
         <div className={styles.errorIcon}>
           <STATE_ICONS.error />
@@ -370,8 +382,8 @@ export const TransactionList = ({ onEdit = null }) => {
     return (
       <motion.div
         className={styles.emptyContainer}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+        animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
       >
         <div className={styles.emptyIcon}>
           <STATE_ICONS.empty />
@@ -391,8 +403,8 @@ export const TransactionList = ({ onEdit = null }) => {
     <motion.div
       className={styles.container}
       variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial={shouldAnimate ? "hidden" : false}
+      animate={shouldAnimate ? "visible" : false}
     >
       {isMobile ? renderCardView() : renderTableView()}
 
@@ -400,18 +412,18 @@ export const TransactionList = ({ onEdit = null }) => {
       {totalPages > 0 && (
         <motion.div className={styles.pagination} variants={itemVariants}>
           <div className={styles.paginationLeft}>
-            <label className={styles.pageSizeLabel}>
+            <span className={styles.pageSizeLabel}>
               {t('transactions.perPage')}
-              <select 
-                value={pageSize} 
-                onChange={handlePageSizeChange}
-                className={styles.pageSizeSelect}
-              >
-                {pageSizeOptions.map(size => (
-                  <option key={size} value={size}>{size}</option>
-                ))}
-              </select>
-            </label>
+            </span>
+            <FilterDropdown
+              options={pageSizeOptions.map(size => ({
+                value: String(size),
+                label: String(size),
+              }))}
+              value={String(pageSize)}
+              onChange={handlePageSizeChange}
+              ariaLabel={t('transactions.perPage')}
+            />
           </div>
 
           <div className={styles.paginationCenter}>
@@ -450,4 +462,4 @@ export const TransactionList = ({ onEdit = null }) => {
   );
 };
 
-export default TransactionList;
+export default memo(TransactionList);

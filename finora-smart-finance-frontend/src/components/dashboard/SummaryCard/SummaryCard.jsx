@@ -11,13 +11,17 @@
  * - Skeleton Loading State
  */
 
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowUp, FiArrowDown, FiMinus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/common/Skeleton';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './SummaryCard.module.scss';
 
-export default function SummaryCard({
+export default memo(SummaryCard);
+
+function SummaryCard({
   title,
   value,
   icon: IconComponent = null,
@@ -30,6 +34,7 @@ export default function SummaryCard({
   isLoading = false,
 }) {
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
   
   // Determine trend direction and styling
   const computedVariant = isLoading ? 'neutral' : (trendVariant ?? 'neutral');
@@ -45,8 +50,8 @@ export default function SummaryCard({
     return (
       <motion.div
         className={`${styles.summaryCard} ${styles[color]} ${styles[size]} ${styles.loading}`}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+        animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
         transition={{ duration: 0.4, ease: 'easeOut' }}
         aria-busy="true"
         aria-label={t('common.loading')}
@@ -83,8 +88,8 @@ export default function SummaryCard({
   return (
     <motion.div
       className={`${styles.summaryCard} ${styles[color]} ${styles[size]}`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+      animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       whileHover={{ y: -4, boxShadow: '0 16px 32px rgba(0,0,0,0.08)' }}
       tabIndex={0}

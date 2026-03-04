@@ -18,17 +18,16 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
+import { parseApiError } from '@/api/errorHandler';
 import { 
   FiUser, 
-  FiLock, 
-  FiEye, 
-  FiEyeOff, 
-  FiAlertCircle,
   FiArrowRight,
   FiArrowLeft,
   FiCheck,
-  FiX
 } from 'react-icons/fi';
+import Checkbox from '@/components/common/Checkbox/Checkbox';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import PasswordInput from '../PasswordInput/PasswordInput';
 import styles from './LoginForm.module.scss';
 
 export default function LoginForm() {
@@ -52,7 +51,6 @@ export default function LoginForm() {
   const [touched, setTouched] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   // ============================================
   // VALIDATION
@@ -146,23 +144,10 @@ export default function LoginForm() {
       toast.success(t('auth.login.success'));
       // No manual navigation here - AuthContext updates trigger PublicRoute to redirect
     } catch (error) {
-      // Extract detailed error message for debugging
-      const errorDetail = error?.response?.data?.message 
-        || error?.response?.data?.error
-        || error?.message
-        || 'Unknown error';
-      
-      // Show more details in API error for debugging network issues
-      const networkInfo = error?.code === 'ERR_NETWORK' 
-        ? ` ${t('auth.errors.networkError')}`
-        : error?.code === 'ECONNABORTED'
-          ? ` ${t('auth.errors.timeout')}`
-          : '';
-      
-      const errorMessage = errorDetail + networkInfo;
-      
-      setApiError(errorMessage);
-      toast.error(errorMessage);
+      // L-11: Use sanitized i18n messages instead of raw server errors
+      const { message } = parseApiError(error);
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -179,28 +164,11 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className={styles.loginForm} noValidate>
       {/* API Error Banner */}
-      <AnimatePresence>
-        {apiError && (
-          <motion.div 
-            className={styles.errorBanner}
-            initial={shouldAnimate ? { opacity: 0, y: -8, height: 0 } : {}}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={shouldAnimate ? { opacity: 0, y: -8, height: 0 } : {}}
-            transition={{ duration: 0.2 }}
-          >
-            <FiAlertCircle className={styles.errorIcon} />
-            <span className={styles.errorText}>{apiError}</span>
-            <button
-              type="button"
-              className={styles.errorDismiss}
-              onClick={() => setApiError('')}
-              aria-label={t('auth.login.dismissError')}
-            >
-              <FiX />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ErrorBanner
+        error={apiError}
+        onDismiss={() => setApiError('')}
+        dismissAriaLabel={t('auth.login.dismissError')}
+      />
 
       {/* Username Field */}
       <div className={styles.inputGroup}>
@@ -247,32 +215,22 @@ export default function LoginForm() {
         <label htmlFor="password" className={styles.label}>
           {t('auth.login.password')}
         </label>
-        <div className={`${styles.inputWrapper} ${passwordStatus ? styles[passwordStatus] : ''}`}>
-          <FiLock className={styles.inputIcon} />
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? 'text' : 'password'}
-            className={styles.input}
-            placeholder={t('auth.login.passwordPlaceholder')}
-            value={formData.password}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isLoading}
-            autoComplete="current-password"
-            aria-invalid={passwordStatus === 'error'}
-            aria-describedby={errors.password ? 'password-error' : undefined}
-          />
-          <button
-            type="button"
-            className={styles.passwordToggle}
-            onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? t('auth.login.hidePassword') : t('auth.login.showPassword')}
-            tabIndex={-1}
-          >
-            {showPassword ? <FiEyeOff /> : <FiEye />}
-          </button>
-        </div>
+        <PasswordInput
+          formStyles={styles}
+          wrapperErrorClass={passwordStatus ? styles[passwordStatus] : ''}
+          id="password"
+          name="password"
+          placeholder={t('auth.login.passwordPlaceholder')}
+          value={formData.password}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          disabled={isLoading}
+          autoComplete="current-password"
+          aria-invalid={passwordStatus === 'error'}
+          aria-describedby={errors.password ? 'password-error' : undefined}
+          showPasswordLabel={t('auth.login.showPassword')}
+          hidePasswordLabel={t('auth.login.hidePassword')}
+        />
         <AnimatePresence>
           {errors.password && touched.password && (
             <motion.span 
@@ -290,19 +248,13 @@ export default function LoginForm() {
 
       {/* Remember Me & Forgot Password */}
       <div className={styles.optionsRow}>
-        <label className={styles.checkbox}>
-          <input
-            type="checkbox"
-            name="rememberMe"
-            checked={formData.rememberMe}
-            onChange={handleChange}
-            disabled={isLoading}
-          />
-          <span className={styles.checkmark}>
-            <FiCheck />
-          </span>
-          <span className={styles.checkboxLabel}>{t('auth.login.rememberMe')}</span>
-        </label>
+        <Checkbox
+          name="rememberMe"
+          checked={formData.rememberMe}
+          onChange={handleChange}
+          disabled={isLoading}
+          label={t('auth.login.rememberMe')}
+        />
 
         <Link to="/forgot-password" className={styles.forgotLink}>
           {t('auth.login.forgot')}

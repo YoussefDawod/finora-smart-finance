@@ -10,19 +10,19 @@
 // Dark Theme Palette
 $dark-palette: (
   // Core Colors
-  background: #141717,
-  text: #fcf3d7,
+  background: #070b1a,   // echtes Deep Navy (Hero-tauglich)
+  text: #e9edff,         // kühles, leicht violettes Weiß
   
   // Brand Colors
-  primary: #f13729,    // Coral Red
-  secondary: #f69a6c,  // Peach
-  accent: #fcc7a3,     // Light Peach
+  primary: #7c83ff,      // Neon Violet (Key Color)
+  secondary: #32e1ff,    // Cyan Glow
+  accent: #ff6ec7,       // Neon Pink (gezielt!)
   
   // Status Colors
-  success: #10b981,    // Emerald
-  warning: #f59e0b,    // Amber
-  error: #ef4444,      // Red
-  info: #3b82f6        // Blue
+  success: #22c55e,
+  warning: #facc15,
+  error: #fb7185,
+  info: #60a5fa
 );
 
 // Generate all CSS custom properties

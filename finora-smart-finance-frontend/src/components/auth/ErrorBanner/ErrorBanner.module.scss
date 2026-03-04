@@ -1,0 +1,54 @@
+/**
+ * @fileoverview ErrorBanner Styles
+ * @description Unified error banner styles for auth forms.
+ * Uses design tokens consistently and handles RTL via logical properties.
+ */
+
+// ============================================
+// ERROR BANNER
+// ============================================
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--error) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 25%, transparent);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  font-size: 1.125rem;
+  color: var(--error);
+}
+
+.errorText {
+  flex: 1;
+  font-size: var(--fs-sm);
+  color: var(--error);
+  line-height: 1.4;
+}
+
+.errorDismiss {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-inline-start: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--error);
+  cursor: pointer;
+  transition: background var(--tr-fast);
+
+  &:hover {
+    background: color-mix(in srgb, var(--error) 15%, transparent);
+  }
+}

@@ -1,0 +1,147 @@
+// ============================================
+// 📊 TRANSACTION QUOTA — Kompakter Zähler
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ── Container ─────────────────────────────────
+.transactionQuota {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) 0;
+  flex-shrink: 0;
+
+  @include tablet {
+    gap: var(--space-xs);
+  }
+}
+
+// ── Zähler ────────────────────────────────────
+.counter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-sm);
+  transition: color var(--duration-normal) var(--ease-out);
+
+  // Farb-Stufen — alle Werte aus CSS Variables
+  &.success {
+    color: var(--success);
+  }
+
+  &.info {
+    color: var(--info, var(--primary));
+  }
+
+  &.warning {
+    color: var(--warning);
+  }
+
+  &.danger {
+    color: var(--error);
+  }
+
+  &.neutral {
+    color: var(--tx-muted);
+  }
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-n);
+  font-weight: var(--fw-b);
+  font-size: var(--fs-md);
+}
+
+.separator {
+  color: var(--tx-muted);
+  opacity: 0.5;
+  font-weight: var(--fw-n);
+}
+
+.limit {
+  color: var(--tx-muted);
+  font-weight: var(--fw-n);
+  font-size: var(--fs-sm);
+}
+
+.label {
+  color: var(--tx-muted);
+  font-weight: var(--fw-n);
+  font-size: var(--fs-xs);
+  margin-inline-start: var(--space-2xs);
+}
+
+// ── Progress-Bar ──────────────────────────────
+.progressContainer {
+  flex: 0 1 80px;
+  min-width: 48px;
+
+  @include tablet {
+    flex: 0 1 60px;
+  }
+
+  @include mobile {
+    flex: 1 1 auto;
+    max-width: 120px;
+  }
+}
+
+.progressTrack {
+  height: 4px;
+  background: var(--surface-2);
+  border-radius: var(--r-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width var(--duration-slower, 600ms) var(--ease-out, ease-out);
+
+  &.success {
+    background: var(--success);
+  }
+
+  &.info {
+    background: var(--info, var(--primary));
+  }
+
+  &.warning {
+    background: var(--warning);
+  }
+
+  &.danger {
+    background: var(--error);
+  }
+}
+
+// ── Warnung ───────────────────────────────────
+.warning {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  white-space: nowrap;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  &.warning {
+    color: var(--warning);
+  }
+
+  &.danger {
+    color: var(--error);
+  }
+
+  @include mobile {
+    display: none; // Auf Mobilgeräten Platz sparen — Farbe reicht als Signal
+  }
+}

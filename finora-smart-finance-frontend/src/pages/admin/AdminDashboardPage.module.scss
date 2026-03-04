@@ -1,0 +1,167 @@
+// ============================================
+// 📊 ADMIN DASHBOARD PAGE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+// ── Header ──────────────────────────────────
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin: var(--space-2xs) 0 0;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+  }
+
+  @include focus-ring;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@include spin-keyframes;
+
+// ── Stats Grid ──────────────────────────────
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+// ── Sections ────────────────────────────────
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+// ── Error State ─────────────────────────────
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-3xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  text-align: center;
+}
+
+.errorText {
+  font-size: var(--fs-sm);
+  color: var(--error);
+  margin: 0;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @include focus-ring;
+}
+
+// ── Responsive ──────────────────────────────
+@include breakpoint($max: $bp-xl) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@include breakpoint($max: $bp-lg) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .page {
+    padding: var(--space-md);
+    gap: var(--space-lg);
+  }
+}
+
+@include breakpoint($max: $bp-sm) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .spinning {
+    animation: none;
+  }
+
+  .refreshButton,
+  .retryButton {
+    transition: none;
+  }
+}

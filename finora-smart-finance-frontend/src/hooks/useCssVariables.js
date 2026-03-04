@@ -64,9 +64,6 @@ export function useCssVariables() {
   }, []);
 
   useEffect(() => {
-    // Initial update
-    updateColors();
-
     // MutationObserver für Theme-Änderungen (data-theme Attribut)
     const observer = new MutationObserver((mutations) => {
       const hasThemeChange = mutations.some(
@@ -87,23 +84,6 @@ export function useCssVariables() {
   }, [updateColors]);
 
   return colors;
-}
-
-/**
- * Convenience-Export für CHART_TOKENS mit aufgelösten Werten
- * Für Komponenten, die keine Hooks verwenden können
- */
-export function getResolvedChartColors() {
-  return {
-    success: getCssVariable('--success'),
-    error: getCssVariable('--error'),
-    primary: getCssVariable('--primary'),
-    border: getCssVariable('--border'),
-    textMuted: getCssVariable('--tx-muted'),
-    surface: getCssVariable('--surface'),
-    info: getCssVariable('--info'),
-    warning: getCssVariable('--warning'),
-  };
 }
 
 export default useCssVariables;

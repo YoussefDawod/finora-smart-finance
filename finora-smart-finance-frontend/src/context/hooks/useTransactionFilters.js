@@ -12,13 +12,18 @@ import { ACTIONS } from '../reducers/transactionReducer';
  */
 export function useTransactionFilters(dispatch) {
   // ──────────────────────────────────────────────────────────────────────
-  // DASHBOARD MONTH/YEAR
+  // DASHBOARD MONTH/YEAR (syncs filter.startDate/endDate automatically)
   // ──────────────────────────────────────────────────────────────────────
   const setDashboardMonth = useCallback(
-    (month, year) => {
+    (month, year, options = {}) => {
       dispatch({
         type: ACTIONS.SET_DASHBOARD_MONTH,
-        payload: { month, year },
+        payload: {
+          month,
+          year,
+          startDate: options.startDate,
+          endDate: options.endDate,
+        },
       });
     },
     [dispatch]

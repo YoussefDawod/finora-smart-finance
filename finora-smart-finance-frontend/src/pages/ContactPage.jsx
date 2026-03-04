@@ -1,18 +1,33 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FiSend, FiUser, FiMail, FiMessageSquare } from 'react-icons/fi';
+import { useTranslation, Trans } from 'react-i18next';
+import { useNavigate, Link } from 'react-router-dom';
+import { FiSend, FiUser, FiMail, FiMessageSquare, FiArrowLeft } from 'react-icons/fi';
 import client from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
-import styles from './TermsPage.module.scss';
+import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
+import Checkbox from '@/components/common/Checkbox/Checkbox';
+import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
+import styles from './ContactPage.module.scss';
 
 const CATEGORIES = ['feedback', 'bug', 'feature', 'other'];
 
 export default function ContactPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', category: 'feedback', message: '' });
   const [honeypot, setHoneypot] = useState('');
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
   const [status, setStatus] = useState(null); // 'success' | 'error' | 'loading' | null
   const [errorMsg, setErrorMsg] = useState('');
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   const handleChange = (e) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -21,7 +36,13 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (honeypot) return; // Bot detected
-    
+
+    if (!privacyConsent) {
+      setConsentError(true);
+      return;
+    }
+
+    setConsentError(false);
     setStatus('loading');
     setErrorMsg('');
 
@@ -30,6 +51,7 @@ export default function ContactPage() {
       
       setStatus('success');
       setForm({ name: '', email: '', category: 'feedback', message: '' });
+      setPrivacyConsent(false);
     } catch (err) {
       setStatus('error');
       setErrorMsg(err.response?.data?.error || err.message || t('contact.error'));
@@ -37,28 +59,29 @@ export default function ContactPage() {
   };
 
   return (
-    <div className={styles.termsContainer}>
-      <div className={styles.termsContent}>
+    <div className={styles.contactContainer}>
+      <div className={styles.contactContent}>
+        <button
+          type="button"
+          onClick={handleBack}
+          className={styles.backButton}
+          aria-label={t('common.back')}
+        >
+          <FiArrowLeft />
+        </button>
+
         <h1 className={styles.title}>{t('contact.title')}</h1>
-        <p style={{ textAlign: 'center', color: 'var(--tx-muted)', marginBottom: 'var(--space-xl)' }}>
-          {t('contact.subtitle')}
-        </p>
+        <p className={styles.subtitle}>{t('contact.subtitle')}</p>
 
         {status === 'success' ? (
-          <div style={{
-            padding: 'var(--space-xl)',
-            textAlign: 'center',
-            background: 'var(--success-bg, rgba(34,197,94,0.1))',
-            borderRadius: 'var(--r-lg)',
-            color: 'var(--success, #22c55e)',
-          }}>
-            <FiSend size={32} style={{ marginBottom: 'var(--space-md)' }} />
-            <p style={{ fontWeight: 'var(--fw-sb)', fontSize: 'var(--fs-lg)' }}>{t('contact.success')}</p>
+          <div className={styles.successMessage}>
+            <FiSend size={32} />
+            <p>{t('contact.success')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>
             {/* Honeypot field - hidden from real users */}
-            <div style={{ position: 'absolute', left: '-9999px' }} aria-hidden="true">
+            <div className={styles.honeypot} aria-hidden="true">
               <input
                 type="text"
                 name="website"
@@ -69,110 +92,95 @@ export default function ContactPage() {
               />
             </div>
 
-            <div style={{ marginBottom: 'var(--space-lg)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-xs)', color: 'var(--tx)', fontWeight: 'var(--fw-m)', fontSize: 'var(--fs-sm)' }}>
+            <div className={styles.formGroup}>
+              <label htmlFor="contact-name" className={styles.formLabel}>
                 <FiUser size={16} /> {t('contact.form.name')}
               </label>
               <input
+                id="contact-name"
                 type="text"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-sm) var(--space-md)',
-                  borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: 'var(--tx)',
-                  fontSize: 'var(--fs-base)',
-                  minHeight: '44px',
-                }}
+                autoComplete="name"
+                className={styles.formInput}
               />
             </div>
 
-            <div style={{ marginBottom: 'var(--space-lg)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-xs)', color: 'var(--tx)', fontWeight: 'var(--fw-m)', fontSize: 'var(--fs-sm)' }}>
+            <div className={styles.formGroup}>
+              <label htmlFor="contact-email" className={styles.formLabel}>
                 <FiMail size={16} /> {t('contact.form.email')}
               </label>
               <input
+                id="contact-email"
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 required
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-sm) var(--space-md)',
-                  borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: 'var(--tx)',
-                  fontSize: 'var(--fs-base)',
-                  minHeight: '44px',
-                }}
+                autoComplete="email"
+                className={styles.formInput}
               />
             </div>
 
-            <div style={{ marginBottom: 'var(--space-lg)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-xs)', color: 'var(--tx)', fontWeight: 'var(--fw-m)', fontSize: 'var(--fs-sm)' }}>
+            <div className={styles.formGroup}>
+              <label htmlFor="contact-category" className={styles.formLabel}>
                 <FiMessageSquare size={16} /> {t('contact.form.category')}
               </label>
-              <select
-                name="category"
+              <FilterDropdown
+                id="contact-category"
+                options={CATEGORIES.map(cat => ({
+                  value: cat,
+                  label: t(`contact.categories.${cat}`),
+                }))}
                 value={form.category}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-sm) var(--space-md)',
-                  borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: 'var(--tx)',
-                  fontSize: 'var(--fs-base)',
-                  minHeight: '44px',
-                }}
-              >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{t(`contact.categories.${cat}`)}</option>
-                ))}
-              </select>
+                onChange={(val) => setForm(prev => ({ ...prev, category: val }))}
+                ariaLabel={t('contact.form.category')}
+                size="md"
+                className={styles.formDropdown}
+              />
             </div>
 
-            <div style={{ marginBottom: 'var(--space-lg)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-xs)', marginBottom: 'var(--space-xs)', color: 'var(--tx)', fontWeight: 'var(--fw-m)', fontSize: 'var(--fs-sm)' }}>
+            <div className={styles.formGroup}>
+              <label htmlFor="contact-message" className={styles.formLabel}>
                 <FiMessageSquare size={16} /> {t('contact.form.message')}
               </label>
               <textarea
+                id="contact-message"
                 name="message"
                 value={form.message}
                 onChange={handleChange}
                 required
                 rows={6}
-                style={{
-                  width: '100%',
-                  padding: 'var(--space-sm) var(--space-md)',
-                  borderRadius: 'var(--r-md)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: 'var(--tx)',
-                  fontSize: 'var(--fs-base)',
-                  resize: 'vertical',
-                  fontFamily: 'inherit',
-                }}
+                autoComplete="off"
+                className={styles.formTextarea}
               />
             </div>
 
+            {/* DSGVO Consent Checkbox */}
+            <div className={styles.consentGroup}>
+              <Checkbox
+                checked={privacyConsent}
+                onChange={(e) => {
+                  setPrivacyConsent(e.target.checked);
+                  if (e.target.checked) setConsentError(false);
+                }}
+                name="privacyConsent"
+                variant={consentError ? 'error' : 'default'}
+              >
+                <Trans
+                  i18nKey="contact.privacyConsent"
+                  components={{ link: <Link to="/privacy" /> }}
+                />
+              </Checkbox>
+              {consentError && (
+                <p className={styles.consentError}>{t('contact.privacyRequired')}</p>
+              )}
+            </div>
+
             {status === 'error' && (
-              <div style={{
-                padding: 'var(--space-sm) var(--space-md)',
-                marginBottom: 'var(--space-lg)',
-                borderRadius: 'var(--r-md)',
-                background: 'var(--error-bg, rgba(239,68,68,0.1))',
-                color: 'var(--error, #ef4444)',
-                fontSize: 'var(--fs-sm)',
-              }}>
+              <div className={styles.errorMessage}>
                 {errorMsg}
               </div>
             )}
@@ -180,30 +188,15 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={status === 'loading'}
-              style={{
-                width: '100%',
-                padding: 'var(--space-sm) var(--space-lg)',
-                borderRadius: 'var(--r-md)',
-                border: 'none',
-                background: 'var(--primary)',
-                color: 'var(--primary-fg, #fff)',
-                fontSize: 'var(--fs-base)',
-                fontWeight: 'var(--fw-sb)',
-                cursor: status === 'loading' ? 'not-allowed' : 'pointer',
-                opacity: status === 'loading' ? 0.7 : 1,
-                minHeight: '48px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 'var(--space-sm)',
-                transition: 'opacity var(--tr)',
-              }}
+              className={styles.submitButton}
             >
               <FiSend size={18} />
               {status === 'loading' ? t('contact.form.sending') : t('contact.form.submit')}
             </button>
           </form>
         )}
+
+        <MiniFooter />
       </div>
     </div>
   );

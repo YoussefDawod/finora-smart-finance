@@ -25,7 +25,7 @@
  * @module ToastContext
  */
 
-import { createContext, useReducer, useCallback, useEffect } from 'react';
+import { createContext, useReducer, useCallback, useMemo, useEffect } from 'react';
 
 // ============================================
 // 📋 TOAST TYPES & CONSTANTS
@@ -47,7 +47,7 @@ import { createContext, useReducer, useCallback, useEffect } from 'react';
  * @property {Toast[]} toasts
  */
 
-/* eslint-disable no-undef */
+ 
 const TOAST_TYPES = {
   SUCCESS: 'success',
   ERROR: 'error',
@@ -287,7 +287,7 @@ export function ToastProvider({ children }) {
   // 📤 CONTEXT VALUE
   // ============================================
 
-  const value = {
+  const value = useMemo(() => ({
     // State
     toasts: state.toasts,
     
@@ -301,7 +301,7 @@ export function ToastProvider({ children }) {
     error,
     warning,
     info,
-  };
+  }), [state.toasts, addToast, removeToast, clearAllToasts, success, error, warning, info]);
 
   return (
     <ToastContext.Provider value={value}>

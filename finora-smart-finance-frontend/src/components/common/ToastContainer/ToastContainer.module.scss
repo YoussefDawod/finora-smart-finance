@@ -10,7 +10,7 @@
 .toastContainer {
   // Fixed positioning - always in viewport
   position: fixed;
-  z-index: 9999;
+  z-index: var(--z-toast);
   
   // Centered horizontally
   left: 50%;

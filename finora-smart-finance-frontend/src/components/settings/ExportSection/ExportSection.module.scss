@@ -34,7 +34,7 @@
   p {
     font-size: var(--fs-sm);
     color: var(--tx-muted);
-    line-height: 1.5;
+    line-height: var(--lh-n);
   }
 }
 
@@ -42,7 +42,7 @@
   width: 48px;
   height: 48px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, var(--primary-bg), color-mix(in srgb, var(--primary) 15%, transparent));
+  background: linear-gradient(135deg, var(--bg-secondary), color-mix(in srgb, var(--primary) 15%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +72,7 @@
   transition: all var(--tr);
 
   &:hover {
-    border-color: var(--primary-light);
+    border-color: color-mix(in srgb, var(--primary) 15%, transparent);
     background: color-mix(in srgb, var(--primary) 2%, var(--bg));
     box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 8%, transparent);
   }
@@ -126,7 +126,7 @@
   p {
     font-size: var(--fs-sm);
     color: var(--tx-muted);
-    line-height: 1.5;
+    line-height: var(--lh-n);
 
     @include mobile {
       display: none;

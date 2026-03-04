@@ -1,0 +1,399 @@
+// ============================================
+// 💳 ADMIN TRANSACTION TABLE – Responsive Table/Card
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ── Container ───────────────────────────────
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+// ── Wrapper ─────────────────────────────────
+.tableWrapper {
+  @include desktop {
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow-x: auto;
+    @include custom-scrollbar;
+  }
+}
+
+// ── Table ───────────────────────────────────
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+
+  @include below-lg {
+    display: block;
+  }
+
+  // ── thead (Desktop sichtbar, Mobile sr-only)
+  thead {
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--border);
+
+    @include below-lg {
+      @include sr-only;
+    }
+
+    th {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      font-weight: var(--fw-sb);
+      color: var(--tx-muted);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--ls-n);
+      user-select: none;
+      white-space: nowrap;
+
+      [dir='rtl'] & {
+        text-align: right;
+      }
+    }
+  }
+
+  // ── tbody (Desktop normal, Tablet/Mobile Grid) ───
+  tbody {
+    @include below-lg {
+      display: grid;
+      gap: var(--space-md);
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+
+  // ── tr (Desktop Zeile, Mobile Card) ───────
+  tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background var(--duration-fast);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 4%, transparent);
+    }
+
+    @include below-lg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: var(--space-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--sh-sm);
+      transition:
+        box-shadow var(--duration-fast),
+        transform var(--duration-fast);
+
+      &:last-child {
+        border-bottom: 1px solid var(--border);
+      }
+
+      &:hover {
+        background: var(--surface);
+        box-shadow: var(--sh-md);
+        transform: translateY(-1px);
+      }
+    }
+
+    @include mobile {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── td (Desktop normal, Mobile Flex) ──────
+  td {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--tx);
+    vertical-align: middle;
+
+    @include below-lg {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) 0;
+      border-bottom: 1px solid var(--border-light);
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // data-label für Mobile-Labels
+  td[data-label] {
+    @include below-lg {
+      justify-content: space-between;
+
+      &::before {
+        content: attr(data-label);
+        font-size: var(--fs-2xs);
+        font-weight: var(--fw-sb);
+        color: var(--tx-muted);
+        text-transform: uppercase;
+        letter-spacing: var(--ls-n);
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ── Sortable Header ─────────────────────────
+.sortable {
+  cursor: pointer;
+  transition: color var(--duration-fast);
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
+.sortIcon {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-inline-start: var(--space-2xs);
+}
+
+// ── Description Cell (Card-Header auf Mobile)
+.descCell {
+  max-width: 220px;
+  @include truncate;
+
+  @include below-lg {
+    grid-column: 1 / -1;
+    padding-bottom: var(--space-sm);
+    max-width: none;
+    font-weight: var(--fw-sb);
+    font-size: var(--fs-md);
+    color: var(--tx);
+  }
+}
+
+// ── Date Cell ───────────────────────────────
+.dateCell {
+  font-variant-numeric: tabular-nums;
+  color: var(--tx-muted);
+  white-space: nowrap;
+}
+
+// ── User Cell ───────────────────────────────
+.userCell {
+  max-width: 180px;
+  @include truncate;
+  color: var(--tx-muted);
+
+  @include below-lg {
+    max-width: none;
+  }
+}
+
+// ── Category Badge ──────────────────────────
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--tx);
+}
+
+// ── Type Badge ──────────────────────────────
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-tight);
+
+  &.income {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  }
+
+  &.expense {
+    color: var(--error);
+    background: color-mix(in srgb, var(--error) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  }
+}
+
+// ── Amount Cell ─────────────────────────────
+.amountCell {
+  font-weight: var(--fw-sb);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  &.income {
+    color: var(--success);
+  }
+
+  &.expense {
+    color: var(--error);
+  }
+}
+
+// ── Actions ─────────────────────────────────
+.actionsCell {
+  text-align: center;
+
+  @include below-lg {
+    grid-column: 1 / -1;
+    padding-top: var(--space-sm);
+    border-bottom: none;
+  }
+}
+
+.viewButton {
+  @include flex-center;
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include below-lg {
+    width: 100%;
+    height: var(--btn-height-md);
+  }
+}
+
+// ── Empty State ─────────────────────────────
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-md);
+  color: var(--tx-muted);
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+
+  svg {
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+}
+
+// ── Pagination ──────────────────────────────
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) 0;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.paginationInfo {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+.paginationButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.pageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  padding: 0 var(--space-xs);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.activePage {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  pointer-events: none;
+}
+
+.dots {
+  padding: 0 var(--space-2xs);
+  color: var(--tx-muted);
+  user-select: none;
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .viewButton,
+  .pageButton,
+  .table tbody tr {
+    transition: none;
+  }
+}

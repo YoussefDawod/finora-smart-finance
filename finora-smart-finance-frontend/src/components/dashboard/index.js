@@ -8,3 +8,5 @@ export { default as RecentTransactions } from './RecentTransactions/RecentTransa
 export { default as DashboardCharts } from './DashboardCharts/DashboardCharts';
 export { default as DashboardFilter } from './DashboardFilter/DashboardFilter';
 export { default as BudgetWidget } from './BudgetWidget/BudgetWidget';
+export { default as QuotaIndicator } from './QuotaIndicator/QuotaIndicator';
+export { default as RetentionBanner } from './RetentionBanner/RetentionBanner';

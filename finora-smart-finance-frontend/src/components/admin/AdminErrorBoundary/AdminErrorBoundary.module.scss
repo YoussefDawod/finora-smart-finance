@@ -1,0 +1,138 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// ADMIN ERROR BOUNDARY
+// ============================================
+
+.errorBoundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: var(--space-xl);
+
+  @include below-md {
+    min-height: 300px;
+    padding: var(--space-md);
+  }
+}
+
+.errorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 480px;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+
+  @include below-md {
+    padding: var(--space-lg);
+    gap: var(--space-sm);
+  }
+}
+
+.errorIcon {
+  color: var(--error);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    opacity: 0.8;
+  }
+}
+
+.errorTitle {
+  margin: 0;
+  font-size: var(--fs-xl);
+  font-weight: 600;
+  color: var(--tx);
+
+  @include below-md {
+    font-size: var(--fs-lg);
+  }
+}
+
+.errorMessage {
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: 1.5;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  @include below-md {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+}
+
+.detailsSection {
+  width: 100%;
+  margin-top: var(--space-sm);
+}
+
+.detailsToggle {
+  background: none;
+  border: none;
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: var(--space-2xs);
+
+  &:hover {
+    color: var(--tx);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.errorDetails {
+  margin: var(--space-xs) 0 0;
+  padding: var(--space-sm);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-xs);
+  color: var(--error);
+  text-align: start;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@include reduced-motion {
+  .retryButton {
+    transition: none;
+  }
+}

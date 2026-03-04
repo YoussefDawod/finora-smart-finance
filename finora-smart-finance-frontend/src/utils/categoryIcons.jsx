@@ -5,6 +5,7 @@
 
 /* eslint-disable react-refresh/only-export-components */
 
+import { createElement } from 'react';
 import {
   FiBriefcase,
   FiGift,
@@ -81,7 +82,7 @@ export const CATEGORY_ICONS = {
 /**
  * Standard-Icon für unbekannte Kategorien
  */
-export const DEFAULT_CATEGORY_ICON = FiDollarSign;
+const DEFAULT_CATEGORY_ICON = FiDollarSign;
 
 /**
  * Utility Icons für States
@@ -101,7 +102,7 @@ export const STATE_ICONS = {
  * @param {string} category - Name der Kategorie
  * @returns {React.ComponentType} - Icon-Komponente
  */
-export const getCategoryIcon = (category) => {
+const getCategoryIcon = (category) => {
   return CATEGORY_ICONS[category] || DEFAULT_CATEGORY_ICON;
 };
 
@@ -112,8 +113,5 @@ export const getCategoryIcon = (category) => {
  * @returns {JSX.Element} - Gerendertes Icon
  */
 export const CategoryIcon = ({ category, ...props }) => {
-  const IconComponent = getCategoryIcon(category);
-  return <IconComponent {...props} />;
+  return createElement(getCategoryIcon(category), props);
 };
-
-export default CATEGORY_ICONS;

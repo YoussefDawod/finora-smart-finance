@@ -11,12 +11,14 @@ import { useNavigate } from 'react-router-dom';
 import { useBudget } from '@/hooks/useBudget';
 import { formatCurrency } from '@/utils/formatters';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './BudgetWidget.module.scss';
 
 export default function BudgetWidget() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { budgetStatus, isLoading, hasBudget } = useBudget();
+  const { shouldAnimate } = useMotion();
 
   // Determine status color and label
   const statusInfo = useMemo(() => {
@@ -96,8 +98,8 @@ export default function BudgetWidget() {
   return (
     <motion.div
       className={styles.budgetWidget}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
+      animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
       transition={{ duration: 0.3 }}
     >
       <div className={styles.header}>
@@ -117,8 +119,8 @@ export default function BudgetWidget() {
         <div className={styles.progressBar}>
           <motion.div
             className={`${styles.progressFill} ${styles[statusInfo.color]}`}
-            initial={{ width: 0 }}
-            animate={{ width: `${Math.min(percentUsed, 100)}%` }}
+            initial={shouldAnimate ? { width: 0 } : false}
+            animate={shouldAnimate ? { width: `${Math.min(percentUsed, 100)}%` } : { width: `${Math.min(percentUsed, 100)}%` }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           />
         </div>

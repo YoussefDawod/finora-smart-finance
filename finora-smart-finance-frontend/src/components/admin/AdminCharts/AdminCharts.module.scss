@@ -1,0 +1,86 @@
+// ============================================
+// 📊 ADMIN CHARTS
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg);
+}
+
+.chartCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--sh-sm);
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartTitle {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0 0 var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+}
+
+// ── Tooltip ─────────────────────────────────
+.tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--fs-sm);
+}
+
+.tooltipLabel {
+  color: var(--tx-muted);
+  font-weight: var(--fw-m);
+}
+
+.tooltipValue {
+  color: var(--tx);
+  font-weight: var(--fw-b);
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Legend ───────────────────────────────────
+.legendLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx);
+}
+
+// ── Empty State ─────────────────────────────
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+}
+
+.emptyText {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  text-align: center;
+}
+
+// ── Responsive ──────────────────────────────
+@include below-md {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartCard {
+    padding: var(--space-md);
+    min-height: 240px;
+  }
+}

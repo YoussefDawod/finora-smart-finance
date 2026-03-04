@@ -1,21 +1,29 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiDollarSign, FiPieChart, FiBarChart2, FiDownload, FiGlobe, FiShield } from 'react-icons/fi';
+import { FiArrowLeft, FiDollarSign, FiPieChart, FiBarChart2, FiDownload, FiSearch, FiGlobe, FiMonitor, FiMoon, FiShield } from 'react-icons/fi';
+import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
 import styles from './InfoPage.module.scss';
 
-const FEATURE_ICONS = [FiDollarSign, FiPieChart, FiBarChart2, FiDownload, FiGlobe, FiShield];
+const FEATURE_ICONS = [FiDollarSign, FiPieChart, FiBarChart2, FiDownload, FiSearch, FiGlobe, FiMonitor, FiMoon, FiShield];
 
 export default function FeaturesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const items = t('features.items', { returnObjects: true });
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
     <div className={styles.pageContainer}>
       <div className={`${styles.pageContent} ${styles.wideContent}`}>
-        <button type="button" onClick={() => navigate(-1)} className={styles.backLink}>
+        <button type="button" onClick={handleBack} className={styles.backButton} aria-label={t('common.back')}>
           <FiArrowLeft />
-          {t('features.backLink')}
         </button>
 
         <div className={styles.pageHeader}>
@@ -37,6 +45,8 @@ export default function FeaturesPage() {
             );
           })}
         </div>
+
+        <MiniFooter />
       </div>
     </div>
   );

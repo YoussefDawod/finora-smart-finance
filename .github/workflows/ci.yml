@@ -1,52 +1,186 @@
-name: CI
+# ============================================================================
+# CI/CD Pipeline — Finora Smart Finance
+# Stages: Lint → Test → Build → Deploy
+#
+# Triggers:
+#   - push to main           → full pipeline (CI + CD)
+#   - pull_request to main   → CI only (Lint + Test + Build)
+#
+# Caching: npm dependencies cached across runs
+# Artifacts: Frontend build uploaded for deploy stage
+# ============================================================================
+
+name: CI/CD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
+    branches: [main]
 
+# Cancel in-progress runs for the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# ============================================================================
+# STAGE 1: LINT (parallel frontend + backend)
+# ============================================================================
 jobs:
-  frontend:
+  lint-frontend:
+    name: 🔍 Lint Frontend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - name: Install root dependencies
+
+      - name: Install dependencies
         run: npm ci
         env:
-          HUSKY: 0
-      - name: Lint frontend
+          HUSKY: '0'
+
+      - name: ESLint
         run: npm run lint
         working-directory: finora-smart-finance-frontend
-      - name: Build frontend
-        run: npm run build
-        working-directory: finora-smart-finance-frontend
-      - name: Run frontend tests
-        run: npx vitest run
-        working-directory: finora-smart-finance-frontend
 
-  backend:
+  lint-backend:
+    name: 🔍 Lint Backend
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      - name: Install root dependencies
+
+      - name: Install dependencies
         run: npm ci
         env:
-          HUSKY: 0
-      - name: Lint backend
+          HUSKY: '0'
+
+      - name: ESLint
         run: npm run lint
         working-directory: finora-smart-finance-api
-      - name: Run backend tests
-        run: npx jest --forceExit
+
+  # ============================================================================
+  # STAGE 2: TEST (parallel, runs after lint passes)
+  # ============================================================================
+  test-frontend:
+    name: 🧪 Test Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: '0'
+
+      - name: Run tests
+        run: npx vitest run --reporter=default
+        working-directory: finora-smart-finance-frontend
+
+  test-backend:
+    name: 🧪 Test Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint-backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: '0'
+
+      - name: Run tests
+        run: npx jest --forceExit --no-coverage
         working-directory: finora-smart-finance-api
         env:
           NODE_ENV: test
-          JWT_SECRET: test-secret-key-ci
-          JWT_REFRESH_SECRET: test-refresh-secret-ci
+          JWT_SECRET: ci-test-secret-${{ github.run_id }}
+          JWT_REFRESH_SECRET: ci-test-refresh-secret-${{ github.run_id }}
+
+  # ============================================================================
+  # STAGE 3: BUILD (runs after ALL tests pass)
+  # ============================================================================
+  build:
+    name: 🏗️ Build Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [test-frontend, test-backend]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          HUSKY: '0'
+
+      - name: Build
+        run: npm run build
+        working-directory: finora-smart-finance-frontend
+        env:
+          NODE_ENV: production
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: finora-smart-finance-frontend/dist
+          retention-days: 7
+          if-no-files-found: error
+
+  # ============================================================================
+  # STAGE 4: DEPLOY (only on push to main, after build succeeds)
+  # ============================================================================
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: finora-smart-finance-frontend/dist
+
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            cd /var/www/finora-smart-finance-api
+            bash deploy.sh

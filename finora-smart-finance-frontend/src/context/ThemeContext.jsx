@@ -19,13 +19,13 @@
  * @module ThemeContext
  */
 
-import { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import { createContext, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 // ============================================
 // 🎨 THEME CONSTANTS
 // ============================================
 
-/* eslint-disable no-undef */
+ 
 
 const THEMES = {
   LIGHT: 'light',
@@ -35,6 +35,32 @@ const THEMES = {
 const STORAGE_KEYS = {
   THEME: 'et-theme-preference',
 };
+
+/**
+ * Determines the initial theme from localStorage → system preference → light
+ * @returns {'light' | 'dark'}
+ */
+function getInitialTheme() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.THEME);
+    if (saved && Object.values(THEMES).includes(saved)) return saved;
+  } catch { /* ignore */ }
+  if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return THEMES.DARK;
+  }
+  return THEMES.LIGHT;
+}
+
+/**
+ * Reads the current system color scheme preference
+ * @returns {'light' | 'dark'}
+ */
+function getInitialSystemPreference() {
+  if (typeof window === 'undefined') return THEMES.LIGHT;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? THEMES.DARK
+    : THEMES.LIGHT;
+}
 
 // ============================================
 // 🎯 CONTEXT
@@ -59,9 +85,9 @@ export function ThemeProvider({ children }) {
   // 📊 STATE
   // ============================================
 
-  const [theme, setThemeState] = useState(THEMES.LIGHT);
-  const [systemPreference, setSystemPreference] = useState(THEMES.LIGHT);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [theme, setThemeState] = useState(getInitialTheme);
+  const [systemPreference, setSystemPreference] = useState(getInitialSystemPreference);
+  const isInitialized = true;
   
   // for cleanup
   const mediaQueryRef = useRef(null);
@@ -92,58 +118,18 @@ export function ThemeProvider({ children }) {
     }
   }, []);
 
-  /**
-   * Load saved preferences from localStorage
-   * @returns {Object} { theme }
-   */
-  const loadPreferences = useCallback(() => {
-    try {
-      const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
-      return {
-        theme: savedTheme && Object.values(THEMES).includes(savedTheme) ? savedTheme : null,
-      };
-    } catch (error) {
-      console.error('Failed to load theme preferences:', error);
-      return { theme: null };
-    }
-  }, []);
-
-  /**
-   * Get system color scheme preference
-   * @returns {'light' | 'dark'}
-   */
-  const getSystemPreference = useCallback(() => {
-    if (typeof window === 'undefined') return THEMES.LIGHT;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches 
-      ? THEMES.DARK 
-      : THEMES.LIGHT;
-  }, []);
-
   // ============================================
   // 🎬 INITIALIZATION & LISTENERS
   // ============================================
 
   /**
-   * Initialize theme on mount
-   * Priority: localStorage > system preference > light
+   * Apply theme to DOM on mount
+   * State is already initialized via lazy initializers (getInitialTheme / getInitialSystemPreference)
    */
   useEffect(() => {
-    const preferences = loadPreferences();
-    const systemPref = getSystemPreference();
-    
-    setSystemPreference(systemPref);
-
-    let initialTheme = THEMES.LIGHT;
-    if (preferences.theme) {
-      initialTheme = preferences.theme;
-    } else if (systemPref === THEMES.DARK) {
-      initialTheme = THEMES.DARK;
-    }
-
-    setThemeState(initialTheme);
-    applyThemeToDom(initialTheme);
-    setIsInitialized(true);
-  }, [getSystemPreference, loadPreferences, applyThemeToDom]);
+    applyThemeToDom(theme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /**
    * System preference listener
@@ -225,7 +211,7 @@ export function ThemeProvider({ children }) {
   // 🔌 CONTEXT VALUE
   // ============================================
 
-  const value = {
+  const value = useMemo(() => ({
     // State
     theme,
     systemPreference,
@@ -236,7 +222,7 @@ export function ThemeProvider({ children }) {
     setTheme,
     toggleTheme,
     resetToSystemPreference,
-  };
+  }), [theme, systemPreference, isInitialized, setTheme, toggleTheme, resetToSystemPreference]);
 
   return (
     <ThemeContext.Provider value={value}>

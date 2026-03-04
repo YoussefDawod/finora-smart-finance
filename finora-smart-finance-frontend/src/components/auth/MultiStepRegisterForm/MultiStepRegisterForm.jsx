@@ -15,20 +15,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
+import { parseApiError } from '@/api/errorHandler';
 import { 
   FiUser, 
   FiMail, 
-  FiLock, 
-  FiEye, 
-  FiEyeOff, 
+  FiLock,
   FiCheck,
   FiChevronRight,
   FiChevronLeft,
   FiShield,
-  FiAlertCircle,
   FiAlertTriangle
 } from 'react-icons/fi';
 import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
+import Checkbox from '@/components/common/Checkbox/Checkbox';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
+import PasswordInput from '../PasswordInput/PasswordInput';
 import styles from './MultiStepRegisterForm.module.scss';
 
 export default function MultiStepRegisterForm() {
@@ -55,8 +56,6 @@ export default function MultiStepRegisterForm() {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
@@ -78,8 +77,8 @@ export default function MultiStepRegisterForm() {
     if (!name) return t('auth.register.validation.nameRequired');
     if (name.length < 3) return t('auth.register.validation.nameMin');
     if (name.length > 50) return t('auth.register.validation.nameMax');
-    // Erlaubte Zeichen: Buchstaben (inkl. Umlaute), Zahlen, Leerzeichen, Bindestriche
-    if (!/^[a-zA-ZäöüÄÖÜß0-9\s-]+$/.test(name)) {
+    // Erlaubte Zeichen: Unicode-Buchstaben (inkl. AR/KA/Umlaute), Zahlen, Leerzeichen, Bindestriche (L-10)
+    if (!/^[\p{L}\p{N}\s-]+$/u.test(name)) {
       return t('auth.register.validation.nameChars');
     }
     return '';
@@ -95,7 +94,9 @@ export default function MultiStepRegisterForm() {
   const passwordErrorMap = {
     required: t('auth.register.validation.passwordRequired'),
     tooShort: t('auth.register.validation.passwordMin'),
+    tooLong: t('auth.register.validation.passwordMax'),
     noUppercase: t('auth.register.validation.passwordUpper'),
+    noLowercase: t('auth.register.validation.passwordLower'),
     noNumber: t('auth.register.validation.passwordNumber'),
     noSpecial: t('auth.register.validation.passwordSpecial'),
   };
@@ -225,13 +226,10 @@ export default function MultiStepRegisterForm() {
         navigate('/dashboard');
       }
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        t('auth.register.error');
-
-      setApiError(errorMessage);
-      toast.error(errorMessage);
+      // L-11: Use sanitized i18n messages instead of raw server errors
+      const { message } = parseApiError(error);
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -315,6 +313,7 @@ export default function MultiStepRegisterForm() {
                   className={`${styles.stepCircle} ${isCompleted ? styles.completed : ''} ${isCurrent ? styles.current : ''}`}
                   onClick={() => goToStep(index)}
                   disabled={index > currentStep + 1}
+                  aria-label={`${step.label} – ${isCompleted ? t('common.stepCompleted') : t('common.stepLabel', { step: index + 1 })}`}
                 >
                   {isCompleted ? <FiCheck /> : <Icon />}
                 </button>
@@ -331,19 +330,7 @@ export default function MultiStepRegisterForm() {
       </div>
 
       {/* API Error */}
-      <AnimatePresence>
-        {apiError && (
-          <motion.div
-            className={styles.errorBanner}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <FiAlertCircle className={styles.errorIcon} />
-            <span>{apiError}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ErrorBanner error={apiError} />
 
       {/* Step Content */}
       <div className={styles.stepContent}>
@@ -437,29 +424,20 @@ export default function MultiStepRegisterForm() {
               {/* Password Field */}
               <div className={styles.inputGroup}>
                 <label htmlFor="register-password" className={styles.label}>{t('auth.register.step2.passwordLabel')}</label>
-                <div className={`${styles.inputWrapper} ${errors.password && touched.password ? styles.error : ''}`}>
-                  <FiLock className={styles.inputIcon} />
-                  <input
-                    id="register-password"
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    placeholder={t('auth.register.step2.passwordPlaceholder')}
-                    value={formData.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    disabled={isLoading}
-                    autoComplete="new-password"
-                    className={styles.input}
-                  />
-                  <button
-                    type="button"
-                    className={styles.passwordToggle}
-                    onClick={() => setShowPassword(!showPassword)}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
+                <PasswordInput
+                  formStyles={styles}
+                  wrapperErrorClass={errors.password && touched.password ? styles.error : ''}
+                  id="register-password"
+                  name="password"
+                  placeholder={t('auth.register.step2.passwordPlaceholder')}
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isLoading}
+                  autoComplete="new-password"
+                  showPasswordLabel={t('auth.login.showPassword')}
+                  hidePasswordLabel={t('auth.login.hidePassword')}
+                />
                 {errors.password && touched.password && (
                   <span className={styles.errorMessage}>{errors.password}</span>
                 )}
@@ -483,29 +461,20 @@ export default function MultiStepRegisterForm() {
               {/* Confirm Password Field */}
               <div className={styles.inputGroup}>
                 <label htmlFor="register-confirm-password" className={styles.label}>{t('auth.register.step2.confirmLabel')}</label>
-                <div className={`${styles.inputWrapper} ${errors.confirmPassword && touched.confirmPassword ? styles.error : ''}`}>
-                  <FiLock className={styles.inputIcon} />
-                  <input
-                    id="register-confirm-password"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    name="confirmPassword"
-                    placeholder={t('auth.register.step2.confirmPlaceholder')}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    disabled={isLoading}
-                    autoComplete="new-password"
-                    className={styles.input}
-                  />
-                  <button
-                    type="button"
-                    className={styles.passwordToggle}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    tabIndex={-1}
-                  >
-                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
+                <PasswordInput
+                  formStyles={styles}
+                  wrapperErrorClass={errors.confirmPassword && touched.confirmPassword ? styles.error : ''}
+                  id="register-confirm-password"
+                  name="confirmPassword"
+                  placeholder={t('auth.register.step2.confirmPlaceholder')}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isLoading}
+                  autoComplete="new-password"
+                  showPasswordLabel={t('auth.login.showPassword')}
+                  hidePasswordLabel={t('auth.login.hidePassword')}
+                />
                 {errors.confirmPassword && touched.confirmPassword && (
                   <span className={styles.errorMessage}>{errors.confirmPassword}</span>
                 )}
@@ -546,42 +515,33 @@ export default function MultiStepRegisterForm() {
                 <p>{t('auth.register.step3.termsText')}</p>
               </div>
 
-              <label className={`${styles.checkbox} ${errors.agreeToTerms ? styles.error : ''}`}>
-                <input
-                  type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                />
-                <span className={styles.checkmark}>
-                  <FiCheck />
-                </span>
-                <span className={styles.checkboxText}>
-                  {t('auth.register.step3.termsAccept')}{' '}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer">
-                    {t('auth.register.step3.termsLink')}
-                  </a>
-                </span>
-              </label>
+              <Checkbox
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+                disabled={isLoading}
+                variant={errors.agreeToTerms ? 'error' : 'default'}
+              >
+                {t('auth.register.step3.termsAccept')}{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer">
+                  {t('auth.register.step3.termsLink')}
+                </a>
+                {' '}{t('auth.register.step3.and')}{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  {t('auth.register.step3.privacyLink')}
+                </a>
+              </Checkbox>
 
               {/* Checkbox für "Verstanden" wenn keine Email */}
               {!hasEmail && (
-                <label className={`${styles.checkbox} ${styles.warningCheckbox} ${errors.understoodNoEmailReset ? styles.error : ''}`}>
-                  <input
-                    type="checkbox"
-                    name="understoodNoEmailReset"
-                    checked={formData.understoodNoEmailReset}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                  />
-                  <span className={styles.checkmark}>
-                    <FiCheck />
-                  </span>
-                  <span className={styles.checkboxText}>
-                    {t('auth.register.step3.noEmailConfirm')}
-                  </span>
-                </label>
+                <Checkbox
+                  name="understoodNoEmailReset"
+                  checked={formData.understoodNoEmailReset}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  variant={errors.understoodNoEmailReset ? 'error' : 'warning'}
+                  label={t('auth.register.step3.noEmailConfirm')}
+                />
               )}
             </motion.div>
           )}

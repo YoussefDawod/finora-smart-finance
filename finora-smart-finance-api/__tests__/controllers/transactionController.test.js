@@ -5,15 +5,25 @@
 
 const transactionController = require('../../src/controllers/transactionController');
 const Transaction = require('../../src/models/Transaction');
+const User = require('../../src/models/User');
 const transactionService = require('../../src/services/transactionService');
 const emailService = require('../../src/utils/emailService');
 const budgetAlertService = require('../../src/services/budgetAlertService');
 
 // Mock dependencies
 jest.mock('../../src/models/Transaction');
+jest.mock('../../src/models/User');
 jest.mock('../../src/services/transactionService');
 jest.mock('../../src/utils/emailService');
 jest.mock('../../src/services/budgetAlertService');
+jest.mock('../../src/middleware/transactionQuota', () => ({
+  rollbackQuotaReservation: jest.fn().mockResolvedValue(undefined),
+  decrementTransactionCount: jest.fn().mockResolvedValue(0),
+  getQuotaStatus: jest.fn().mockReturnValue({
+    used: 1, limit: 150, remaining: 149, resetDate: '2026-04-01T00:00:00.000Z', isLimitReached: false,
+  }),
+  MONTHLY_TRANSACTION_LIMIT: 150,
+}));
 jest.mock('../../src/utils/logger', () => ({
   info: jest.fn(),
   warn: jest.fn(),
@@ -23,6 +33,8 @@ jest.mock('../../src/utils/logger', () => ({
 jest.mock('../../src/config/env', () => ({
   nodeEnv: 'test',
 }));
+
+const { rollbackQuotaReservation, decrementTransactionCount, getQuotaStatus } = require('../../src/middleware/transactionQuota');
 
 describe('TransactionController', () => {
   let req, res;
@@ -34,6 +46,10 @@ describe('TransactionController', () => {
       body: {},
       params: {},
       query: {},
+      quotaReserved: true,
+      quotaSnapshot: {
+        used: 1, limit: 150, remaining: 149, resetDate: '2026-04-01T00:00:00.000Z', isLimitReached: false,
+      },
       user: {
         _id: 'user-123',
         email: 'max@example.com',
@@ -106,6 +122,57 @@ describe('TransactionController', () => {
   });
 
   // ============================================
+  // getQuota Tests
+  // ============================================
+  describe('GET /quota', () => {
+    it('should return quota status based on actual DB count', async () => {
+      Transaction.countDocuments.mockResolvedValue(5);
+
+      await transactionController.getQuota(req, res);
+
+      expect(Transaction.countDocuments).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: 'user-123',
+          createdAt: expect.objectContaining({ $gte: expect.any(Date) }),
+        })
+      );
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: expect.objectContaining({
+          used: 5,
+          limit: 150,
+          remaining: 145,
+          isLimitReached: false,
+        }),
+      });
+    });
+
+    it('should sync stored counter when it differs from DB count', async () => {
+      Transaction.countDocuments.mockResolvedValue(10);
+      req.user.transactionLifecycle = { monthlyTransactionCount: 3 };
+
+      await transactionController.getQuota(req, res);
+
+      expect(req.user.save).toHaveBeenCalled();
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: expect.objectContaining({ used: 10 }),
+      });
+    });
+
+    it('should handle server error', async () => {
+      Transaction.countDocuments.mockRejectedValue(new Error('DB error'));
+
+      await transactionController.getQuota(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'SERVER_ERROR' })
+      );
+    });
+  });
+
+  // ============================================
   // getDashboard Tests
   // ============================================
   describe('GET /stats/dashboard', () => {
@@ -166,7 +233,7 @@ describe('TransactionController', () => {
       date: '2026-02-18',
     };
 
-    it('should create a new transaction', async () => {
+    it('should create a new transaction and include quota', async () => {
       req.body = validTransaction;
 
       const mockCreated = {
@@ -186,6 +253,11 @@ describe('TransactionController', () => {
         expect.objectContaining({
           success: true,
           message: 'Transaktion erstellt',
+          quota: expect.objectContaining({
+            used: expect.any(Number),
+            limit: 150,
+            remaining: expect.any(Number),
+          }),
         })
       );
       expect(Transaction.create).toHaveBeenCalledWith(
@@ -476,11 +548,12 @@ describe('TransactionController', () => {
   // deleteTransaction Tests
   // ============================================
   describe('DELETE /transactions/:id', () => {
-    it('should delete a transaction', async () => {
+    it('should delete a transaction and decrement quota', async () => {
       req.params.id = '507f1f77bcf86cd799439011';
       const mockTxn = {
         _id: '507f1f77bcf86cd799439011',
         userId: 'user-123',
+        createdAt: new Date(),
       };
       Transaction.findById = jest.fn().mockResolvedValue(mockTxn);
       Transaction.findByIdAndDelete = jest.fn().mockResolvedValue(true);
@@ -495,6 +568,7 @@ describe('TransactionController', () => {
         })
       );
       expect(Transaction.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
+      expect(decrementTransactionCount).toHaveBeenCalledWith(req.user, mockTxn.createdAt);
     });
 
     it('should return 404 if transaction not found', async () => {
@@ -521,8 +595,18 @@ describe('TransactionController', () => {
   // deleteAllTransactions Tests
   // ============================================
   describe('DELETE /transactions (Bulk)', () => {
-    it('should delete all user transactions with confirmation', async () => {
+    it('should delete all user transactions and reset quota', async () => {
       req.query = { confirm: 'true' };
+      req.body = { password: 'Password123!' };
+      req.user.transactionLifecycle = { monthlyTransactionCount: 42 };
+
+      const mockDbUser = {
+        _id: 'user-123',
+        comparePassword: jest.fn().mockResolvedValue(true),
+      };
+      User.findById = jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockDbUser),
+      });
       Transaction.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 15 });
 
       await transactionController.deleteAllTransactions(req, res);
@@ -534,6 +618,8 @@ describe('TransactionController', () => {
         })
       );
       expect(Transaction.deleteMany).toHaveBeenCalledWith({ userId: 'user-123' });
+      expect(req.user.transactionLifecycle.monthlyTransactionCount).toBe(0);
+      expect(req.user.save).toHaveBeenCalled();
     });
 
     it('should return 400 without confirmation flag', async () => {
@@ -547,6 +633,38 @@ describe('TransactionController', () => {
       );
     });
 
+    it('should return 400 without password (L-8)', async () => {
+      req.query = { confirm: 'true' };
+      req.body = {};
+
+      await transactionController.deleteAllTransactions(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'CONFIRMATION_REQUIRED' })
+      );
+    });
+
+    it('should return 400 for wrong password (L-8)', async () => {
+      req.query = { confirm: 'true' };
+      req.body = { password: 'WrongPassword!' };
+
+      const mockDbUser = {
+        _id: 'user-123',
+        comparePassword: jest.fn().mockResolvedValue(false),
+      };
+      User.findById = jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockDbUser),
+      });
+
+      await transactionController.deleteAllTransactions(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'INVALID_PASSWORD' })
+      );
+    });
+
     it('should reject confirm=false', async () => {
       req.query = { confirm: 'false' };
 
@@ -557,6 +675,15 @@ describe('TransactionController', () => {
 
     it('should handle server error', async () => {
       req.query = { confirm: 'true' };
+      req.body = { password: 'Password123!' };
+
+      const mockDbUser = {
+        _id: 'user-123',
+        comparePassword: jest.fn().mockResolvedValue(true),
+      };
+      User.findById = jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockDbUser),
+      });
       Transaction.deleteMany = jest.fn().mockRejectedValue(new Error('DB error'));
 
       await transactionController.deleteAllTransactions(req, res);

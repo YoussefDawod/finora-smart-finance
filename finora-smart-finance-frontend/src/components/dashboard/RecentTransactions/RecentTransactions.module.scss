@@ -58,10 +58,7 @@
     transform: translateX(4px);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
@@ -102,10 +99,7 @@
     box-shadow: var(--sh-sm);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   // Type variants
   &.income {

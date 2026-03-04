@@ -7,6 +7,7 @@ import Input from '@/components/common/Input/Input';
 import Textarea from '@/components/common/Textarea/Textarea';
 import Button from '@/components/common/Button/Button';
 import { FiAlertCircle, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './TransactionForm.module.scss';
 
 // ============================================================================
@@ -14,6 +15,7 @@ import styles from './TransactionForm.module.scss';
 // ============================================================================
 export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => {
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
 
   // ──────────────────────────────────────────────────────────────────────
   // FORM HOOK - Extrahierte Logik
@@ -40,8 +42,8 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
       className={styles.form}
       onSubmit={onFormSubmit}
       variants={formContainerVariants}
-      initial="hidden"
-      animate="visible"
+      initial={shouldAnimate ? "hidden" : false}
+      animate={shouldAnimate ? "visible" : false}
     >
       {/* ERROR BANNER */}
       {error && (
@@ -88,6 +90,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
         <Input
           label={t('transactions.amount')}
           id="amount"
+          name="amount"
           type="number"
           placeholder={t('transactions.amountPlaceholder')}
           value={formData.amount}
@@ -101,6 +104,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           disabled={isLoading}
           size="medium"
           hint={t('transactions.amountHint')}
+          autoComplete="off"
         />
       </motion.div>
 
@@ -131,6 +135,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
         <Input
           label={t('transactions.date')}
           id="date"
+          name="date"
           type="date"
           value={formData.date}
           onChange={(e) =>
@@ -143,6 +148,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           disabled={isLoading}
           size="medium"
           hint={t('transactions.dateHint')}
+          autoComplete="off"
         />
       </motion.div>
 
@@ -151,6 +157,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
         <Textarea
           label={t('transactions.description')}
           id="description"
+          name="description"
           placeholder={t('transactions.descriptionPlaceholder')}
           value={formData.description}
           onChange={(e) =>
@@ -166,6 +173,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           showCharCount
           maxLength={100}
           hint={t('transactions.descriptionHint')}
+          autoComplete="off"
         />
       </motion.div>
 

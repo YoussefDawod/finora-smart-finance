@@ -4,7 +4,7 @@
  * Nutzt aggregierte Daten vom Server (monthlyTrend, categoryBreakdown)
  */
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import {
   ResponsiveContainer,
   PieChart,
@@ -30,7 +30,9 @@ import { ChartTooltip, ChartLegend } from './ChartComponents';
 import { SkeletonChart } from '@/components/common/Skeleton';
 import styles from './DashboardCharts.module.scss';
 
-export default function DashboardCharts() {
+export default memo(DashboardCharts);
+
+function DashboardCharts() {
   const isMobile = useIsMobile();
   const [categoryType, setCategoryType] = useState('expense');
   const { t } = useTranslation();

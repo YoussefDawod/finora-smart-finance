@@ -1,18 +1,27 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck } from 'react-icons/fi';
+import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
 import styles from './InfoPage.module.scss';
 
 export default function AboutPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const values = t('about.values.items', { returnObjects: true });
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.pageContent}>
-        <button type="button" onClick={() => navigate(-1)} className={styles.backLink}>
+        <button type="button" onClick={handleBack} className={styles.backButton} aria-label={t('common.back')}>
           <FiArrowLeft />
-          {t('about.backLink')}
         </button>
 
         <div className={styles.pageHeader}>
@@ -23,6 +32,30 @@ export default function AboutPage() {
         <div className={styles.aboutSection}>
           <h2 className={styles.aboutSectionTitle}>{t('about.mission.title')}</h2>
           <p className={styles.aboutSectionText}>{t('about.mission.description')}</p>
+        </div>
+
+        <div className={styles.aboutSection}>
+          <h2 className={styles.aboutSectionTitle}>{t('about.whatIs.title')}</h2>
+          <p className={styles.aboutSectionText}>{t('about.whatIs.description')}</p>
+        </div>
+
+        <div className={styles.aboutSection}>
+          <h2 className={styles.aboutSectionTitle}>{t('about.audience.title')}</h2>
+          <p className={styles.aboutSectionText}>{t('about.audience.description')}</p>
+        </div>
+
+        <div className={styles.aboutSection}>
+          <h2 className={styles.aboutSectionTitle}>{t('about.values.title')}</h2>
+          {Array.isArray(values) && (
+            <ul className={styles.aboutValuesList}>
+              {values.map((value, index) => (
+                <li key={index} className={styles.aboutValueItem}>
+                  <FiCheck />
+                  <span>{value}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className={styles.aboutSection}>
@@ -41,6 +74,8 @@ export default function AboutPage() {
           <h2 className={styles.aboutSectionTitle}>{t('about.tech.title')}</h2>
           <p className={styles.aboutSectionText}>{t('about.tech.description')}</p>
         </div>
+
+        <MiniFooter />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'react';
 
-/* eslint-disable no-undef */
+ 
 
 /**
  * Debounce a value

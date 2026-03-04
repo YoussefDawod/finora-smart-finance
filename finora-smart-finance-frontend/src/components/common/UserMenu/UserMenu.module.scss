@@ -33,10 +33,7 @@
     background: var(--surface);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
@@ -49,7 +46,7 @@
   width: var(--space-xl);
   height: var(--space-xl);
   border-radius: var(--r-full);
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--pri-hover)));
+  background: linear-gradient(135deg, var(--primary), var(--pri-hover));
   color: var(--on-primary);
   font-weight: var(--fw-b);
   font-size: var(--fs-sm);
@@ -69,7 +66,6 @@
   border-radius: var(--r-lg);
   overflow: hidden;
   z-index: var(--z-dropdown);
-  animation: fadeIn var(--tr) ease-out;
 }
 
 :global([dir='rtl']) .dropdownMenu {
@@ -126,10 +122,7 @@
     color: var(--primary);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: -2px;
-  }
+  @include focus-ring-inset;
 }
 
 :global([dir='rtl']) .dropdownItem {
@@ -138,19 +131,6 @@
 }
 
 // ============================================
-// ANIMATIONS
-// ============================================
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(calc(var(--space-xs) * -1));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 // ============================================
 // REDUCED MOTION
 // ============================================

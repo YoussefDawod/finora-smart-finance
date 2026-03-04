@@ -26,10 +26,7 @@
   font-size: var(--fs-sm);
 
   // Focus State (Accessibility)
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   // Disabled State
   &.disabled {
@@ -81,6 +78,13 @@
     background: var(--pri-hover);
     box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 35%, transparent);
     transform: translateY(-1px);
+
+    // Glow: nur Primary, nur Hover, nur Desktop
+    @media (hover: hover) and (pointer: fine) {
+      box-shadow: 
+        0 4px 12px color-mix(in srgb, var(--primary) 35%, transparent),
+        var(--glow-sm);
+    }
   }
 
   &:active:not(.disabled) {
@@ -176,7 +180,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.25em;
-  line-height: 1;
+  line-height: var(--lh-none);
 }
 
 // ============================================
@@ -189,7 +193,7 @@
   border: 2px solid color-mix(in srgb, currentColor 30%, transparent);
   border-top-color: currentColor;
   border-radius: var(--r-full);
-  animation: spin var(--d-slow) linear infinite;
+  animation: spin var(--duration-slow) linear infinite;
 }
 
 .button.primary .spinner {

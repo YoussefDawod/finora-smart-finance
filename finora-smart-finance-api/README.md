@@ -6,7 +6,7 @@
 
 ![Node](https://img.shields.io/badge/node-18+-green?style=for-the-badge)
 ![Express](https://img.shields.io/badge/express-5-blue?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-50_passing-00d084?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-462_passing-00d084?style=for-the-badge)
 
 [⬅️ Zurück zum Hauptprojekt](../README.md)
 
@@ -42,11 +42,14 @@ npm run dev              # Server starten (Port 5000)
 ```
 src/
 ├── controllers/      # Request Handler
+│   └── auth/         # Auth Sub-Controllers
 ├── services/         # Business Logic
 ├── validators/       # Zod Validation
 ├── models/           # Mongoose Schemas
 ├── routes/           # Express Routes
+│   └── users/        # User Sub-Routes
 ├── middleware/       # Auth, Error, Rate Limiter
+├── config/           # DB, Env, Swagger
 └── utils/            # Logger, Email Service
 ```
 
@@ -86,6 +89,26 @@ src/
 
 📖 **Detailliert:** [docs/ADMIN_API.md](./docs/ADMIN_API.md)
 
+### Admin API
+
+| Method | Endpoint | Beschreibung |
+|--------|----------|-------------|
+| GET | `/api/v1/admin/stats` | Dashboard-Statistiken |
+| GET | `/api/v1/admin/users` | Alle User (mit Suche/Filter) |
+| GET | `/api/v1/admin/users/:id` | User-Details |
+| PATCH | `/api/v1/admin/users/:id` | User bearbeiten |
+| DELETE | `/api/v1/admin/users/:id` | User löschen |
+| POST | `/api/v1/admin/users/:id/ban` | User sperren |
+| POST | `/api/v1/admin/users/:id/unban` | User entsperren |
+| PATCH | `/api/v1/admin/users/:id/role` | Rolle ändern |
+| POST | `/api/v1/admin/users/:id/reset-password` | Passwort zurücksetzen |
+| DELETE | `/api/v1/admin/users` | Alle User löschen (Admin, mit Bestätigung + reason) |
+| GET | `/api/v1/admin/transactions` | Alle Transaktionen |
+| DELETE | `/api/v1/admin/transactions/:id` | Transaktion löschen |
+| GET | `/api/v1/admin/subscribers` | Newsletter-Abonnenten |
+| DELETE | `/api/v1/admin/subscribers/:id` | Abonnent löschen |
+| GET | `/api/v1/admin/audit-log` | Audit-Log abrufen |
+
 ---
 
 ## 🛠️ Admin CLI
@@ -94,14 +117,34 @@ src/
 # User-Statistiken
 npm run admin:stats
 
-# Alle Users auflisten
+# Alle Users auflisten (mit Filtern)
 npm run admin:list
+npm run admin:list -- --role=admin --verified
+npm run admin:list -- --search="youssef"
+
+# User-Details abrufen
+node admin-cli.js get <userId>
+
+# User erstellen
+node admin-cli.js create
 
 # Passwort zurücksetzen
 node admin-cli.js reset-password <userId> newPassword
 
+# User sperren / entsperren
+node admin-cli.js ban <userId> "Regelverstoß"
+node admin-cli.js unban <userId>
+
+# Rolle ändern
+node admin-cli.js role <userId> admin
+node admin-cli.js promote <userId>    # → admin
+node admin-cli.js demote <userId>     # → user
+
 # User löschen
-node admin-cli.js delete-user <userId>
+node admin-cli.js delete <userId>
+
+# Alle User löschen (Vorsicht!)
+node admin-cli.js clean-all
 ```
 
 ---
@@ -118,7 +161,11 @@ npm run test:coverage     # Coverage Report
 |---------|-------|
 | Auth Validation | 20 |
 | Transaction Validation | 30 |
-| **Total** | **50 ✅** |
+| Services | 280+ |
+| Controllers | 60+ |
+| Middleware | 30+ |
+| Routes | 40+ |
+| **Total** | **462 ✅** |
 
 ---
 
@@ -157,6 +204,7 @@ CORS_ORIGIN=http://localhost:3000
 | `npm run lint` | ESLint |
 | `npm run admin:stats` | User Stats |
 | `npm run admin:list` | User List |
+| `npm run admin:list -- --role=admin` | Admins anzeigen |
 
 ---
 

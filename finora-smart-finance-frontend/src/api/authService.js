@@ -16,59 +16,72 @@ export const authService = {
    * Login user with name and password
    * @param {string} name - The username
    * @param {string} password
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object, token: string }>>}
    */
-  login: (name, password) => {
-    return client.post(ENDPOINTS.auth.login, { name, password });
+  login: (name, password, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.login, { name, password }, { signal });
   },
 
   /**
    * Register new user
    * @param {Object} data - Registration data
-   * @param {string} data.name - Username (required)
-   * @param {string} data.password - Password (required)
-   * @param {string} [data.email] - Email (optional)
-   * @param {boolean} [data.understoodNoEmailReset] - Acknowledged no email (required if no email)
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object, verificationLink?: string }>>}
    */
-  register: (data) => {
-    return client.post(ENDPOINTS.auth.register, data);
+  register: (data, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.register, data, { signal });
   },
 
   /**
    * Logout user
+   * Refresh-Token wird als httpOnly Cookie automatisch mitgesendet.
+   * Fallback: Falls ein Legacy-Token übergeben wird, wird er im Body gesendet.
+   * @param {string} [refreshToken] - Optional: Legacy-Refresh-Token aus Storage
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
   logout: (refreshToken) => {
-    return client.post(ENDPOINTS.auth.logout, { refreshToken });
+    return client.post(
+      ENDPOINTS.auth.logout,
+      refreshToken ? { refreshToken } : {},
+      { withCredentials: true }
+    );
   },
 
   /**
    * Verify email with token
    * @param {string} token
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object, message: string }>>}
    */
-  verifyEmail: (token) => {
-    return client.post(ENDPOINTS.auth.verify, { token });
+  verifyEmail: (token, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.verify, { token }, { signal });
   },
 
   /**
    * Request password reset email
    * @param {string} email
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  forgotPassword: (email) => {
-    return client.post(ENDPOINTS.auth.forgotPassword, { email });
+  forgotPassword: (email, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.forgotPassword, { email }, { signal });
   },
 
   /**
    * Reset password using reset token
    * @param {string} token
    * @param {string} newPassword
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object, message: string }>>}
    */
-  resetPassword: (token, newPassword) => {
-    return client.post(ENDPOINTS.auth.resetPassword, { token, password: newPassword });
+  resetPassword: (token, newPassword, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.resetPassword, { token, password: newPassword }, { signal });
   },
 
   /**
@@ -82,20 +95,23 @@ export const authService = {
 
   /**
    * Get current authenticated user
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object }>>}
    */
-  getCurrentUser: () => {
-    return client.get(ENDPOINTS.auth.me);
+  getCurrentUser: ({ signal } = {}) => {
+    return client.get(ENDPOINTS.auth.me, { signal });
   },
 
   /**
    * Update user profile (name)
    * @param {Object} data - Profile data
-   * @param {string} data.name - New username
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ success: boolean, data: object }>>}
    */
-  updateProfile: (data) => {
-    return client.put(ENDPOINTS.auth.me, data);
+  updateProfile: (data, { signal } = {}) => {
+    return client.put(ENDPOINTS.auth.me, data, { signal });
   },
 
   // ============================================
@@ -105,27 +121,34 @@ export const authService = {
   /**
    * Add email to account (for users who registered without email)
    * @param {string} email
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  addEmail: (email) => {
-    return client.post(ENDPOINTS.auth.addEmail, { email });
+  addEmail: (email, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.addEmail, { email }, { signal });
   },
 
   /**
    * Change existing email (verified users)
    * @param {string} newEmail
+   * @param {string} password - Aktuelles Passwort zur Bestätigung
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    */
-  changeEmail: (newEmail) => {
-    return client.post(ENDPOINTS.auth.changeEmail, { newEmail });
+  changeEmail: (newEmail, password, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.changeEmail, { newEmail, password }, { signal });
   },
 
   /**
    * Verify newly added email with token
    * @param {string} token
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ user: object, message: string }>>}
    */
-  verifyAddEmail: (token) => {
-    return client.post(ENDPOINTS.auth.verifyAddEmail, { token });
+  verifyAddEmail: (token, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.verifyAddEmail, { token }, { signal });
   },
 
   /**
@@ -138,26 +161,33 @@ export const authService = {
 
   /**
    * Get email status
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ hasEmail: boolean, isVerified: boolean, canResetPassword: boolean }>>}
    */
-  getEmailStatus: () => {
-    return client.get(ENDPOINTS.auth.emailStatus);
+  getEmailStatus: ({ signal } = {}) => {
+    return client.get(ENDPOINTS.auth.emailStatus, { signal });
   },
 
   /**
    * Resend verification email
+   * @param {string} [email] - Email-Adresse des Nutzers
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  resendVerification: () => {
-    return client.post(ENDPOINTS.auth.resendVerification);
+  resendVerification: (email, { signal } = {}) => {
+    return client.post(ENDPOINTS.auth.resendVerification, { email }, { signal });
   },
 
   /**
    * Resend verification email for pending email (for already added but unverified emails)
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ message: string, email: string }>>}
    */
-  resendAddEmailVerification: () => {
-    return client.post(ENDPOINTS.auth.resendAddEmailVerification);
+  resendAddEmailVerification: ({ signal } = {}) => {
+    return client.post(ENDPOINTS.auth.resendAddEmailVerification, null, { signal });
   },
 
 };

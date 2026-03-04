@@ -28,6 +28,7 @@ export const AUTH_ACTIONS = {
   AUTO_LOGIN_SUCCESS: 'AUTO_LOGIN_SUCCESS',
   AUTO_LOGIN_FAIL: 'AUTO_LOGIN_FAIL',
   UPDATE_USER: 'UPDATE_USER',
+  TOKEN_REFRESHED: 'TOKEN_REFRESHED',
 };
 
 // ============================================================================
@@ -85,6 +86,12 @@ export function authReducer(state, action) {
       return {
         ...state,
         user: action.payload.user,
+      };
+
+    case AUTH_ACTIONS.TOKEN_REFRESHED:
+      return {
+        ...state,
+        token: action.payload.token,
       };
 
     default:

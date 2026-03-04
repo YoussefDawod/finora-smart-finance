@@ -6,6 +6,7 @@
 const User = require('../models/User');
 const emailService = require('../utils/emailService');
 const authService = require('./authService');
+const auditLogService = require('./auditLogService');
 const config = require('../config/env');
 const { validateName, validatePassword, validateOptionalEmail } = require('../validators/authValidation');
 
@@ -102,6 +103,17 @@ async function registerUser(validatedData, requestContext = {}) {
   const tokens = await authService.generateAuthTokens(user, {
     userAgent: requestContext.userAgent,
     ip: requestContext.ip,
+  });
+
+  // Notify admins about new registration (fire & forget)
+  emailService.notifyAdminsNewUser(user).catch(() => {});
+
+  // Audit-Log: Neue Registrierung
+  auditLogService.log({
+    action: 'USER_REGISTERED',
+    targetUserId: user._id,
+    targetUserName: user.name,
+    details: { hasEmail: !!email },
   });
 
   return {

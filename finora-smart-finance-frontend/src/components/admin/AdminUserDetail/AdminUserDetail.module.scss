@@ -1,0 +1,392 @@
+// ============================================
+// 👤 ADMIN USER DETAIL
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.content {
+  padding: var(--space-xs) 0;
+}
+
+// ── User Header ─────────────────────────────
+.userHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-lg);
+}
+
+.headerAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--icon-size-xl);
+  height: var(--icon-size-xl);
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  flex-shrink: 0;
+
+  &.adminAvatar {
+    background: color-mix(in srgb, var(--warning) 14%, transparent);
+    color: var(--warning);
+  }
+}
+
+.headerInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+}
+
+.headerBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+// ── Badges ──────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-tight);
+}
+
+.role_admin {
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  color: var(--warning);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+}
+
+.role_user {
+  background: color-mix(in srgb, var(--info) 18%, transparent);
+  color: var(--info);
+  border: 1px solid color-mix(in srgb, var(--info) 30%, transparent);
+}
+
+.active {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.banned {
+  background: color-mix(in srgb, var(--error) 18%, transparent);
+  color: var(--error);
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+}
+
+.verified {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+  border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+}
+
+.unverified {
+  background: color-mix(in srgb, var(--tx-muted) 18%, transparent);
+  color: var(--tx-muted);
+  border: 1px solid color-mix(in srgb, var(--tx-muted) 30%, transparent);
+}
+
+// ── Info Grid ───────────────────────────────
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+}
+
+.infoIcon {
+  color: var(--tx-muted);
+  flex-shrink: 0;
+}
+
+.infoLabel {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  min-width: 100px;
+}
+
+.infoValue {
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  word-break: break-all;
+}
+
+// ── Action Grid ─────────────────────────────
+.actionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+}
+
+// ── Shared Button Base ──────────────────────
+%button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  border: 1px solid transparent;
+
+  @include focus-ring;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.successButton {
+  @extend %button-base;
+  background: var(--success);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.warningButton {
+  @extend %button-base;
+  background: var(--warning);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.outlineButton {
+  @extend %button-base;
+  background: transparent;
+  border-color: var(--border);
+  color: var(--tx);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+}
+
+.dangerOutlineButton {
+  @extend %button-base;
+  background: transparent;
+  border-color: color-mix(in srgb, var(--error) 30%, transparent);
+  color: var(--error);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--error) 8%, transparent);
+  }
+}
+
+.primaryButton {
+  @extend %button-base;
+  background: var(--primary);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.dangerButton {
+  @extend %button-base;
+  background: var(--error);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+.cancelButton {
+  @extend %button-base;
+  background: var(--surface-2);
+  color: var(--tx-muted);
+  border-color: var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+}
+
+// ── Confirm View ────────────────────────────
+.confirmView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+
+  h3 {
+    margin: 0;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+  }
+}
+
+.confirmIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--r-full);
+  margin-bottom: var(--space-2xs);
+
+  &.warning {
+    background: color-mix(in srgb, var(--warning) 12%, transparent);
+    color: var(--warning);
+  }
+
+  &.danger {
+    background: color-mix(in srgb, var(--error) 12%, transparent);
+    color: var(--error);
+  }
+
+  &.info {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    color: var(--primary);
+  }
+}
+
+.confirmText {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin: 0;
+  max-width: 22.5rem;
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  width: 100%;
+  justify-content: center;
+}
+
+// ── Inputs ──────────────────────────────────
+.inputLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  width: 100%;
+  max-width: 320px;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  text-align: left;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--duration-fast);
+
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+
+  &::placeholder {
+    color: var(--tx-muted);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+.inputHint {
+  font-size: var(--fs-xs);
+  color: var(--error);
+  margin: 0;
+}
+
+// ── Edit View ───────────────────────────────
+.editView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+
+  h3 {
+    margin: 0;
+    font-size: var(--fs-md);
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+  }
+}
+
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 320px;
+}
+
+// ── Spinning ────────────────────────────────
+@include spin-keyframes;
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+// ── Responsive ──────────────────────────────
+@include breakpoint($max: $bp-xs) {
+  .actionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .confirmActions {
+    flex-direction: column;
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .spinning {
+    animation: none;
+  }
+}

@@ -12,7 +12,21 @@ import { CategoryIcon, STATE_ICONS } from '@/utils/categoryIcons';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
 import { useTranslation } from 'react-i18next';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './RecentTransactions.module.scss';
+
+// ──────────────────────────────────────────────────────────────────────
+// ANIMATION VARIANTS (module-level constants — stable references)
+// ──────────────────────────────────────────────────────────────────────
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.2 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+};
 
 // ============================================================================
 // KOMPONENTE
@@ -20,6 +34,7 @@ import styles from './RecentTransactions.module.scss';
 export const RecentTransactions = () => {
   const { dashboardData, dashboardLoading } = useTransactions();
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
 
   // ──────────────────────────────────────────────────────────────────────
   // GET RECENT TRANSACTIONS FROM SERVER DATA
@@ -29,37 +44,14 @@ export const RecentTransactions = () => {
     : [];
 
   // ──────────────────────────────────────────────────────────────────────
-  // ANIMATIONS
-  // ──────────────────────────────────────────────────────────────────────
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.06,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.3 },
-    },
-  };
-
-  // ──────────────────────────────────────────────────────────────────────
   // LOADING STATE
   // ──────────────────────────────────────────────────────────────────────
   if (dashboardLoading && !dashboardData) {
     return (
       <motion.div
         className={styles.container}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={shouldAnimate ? { opacity: 0 } : false}
+        animate={shouldAnimate ? { opacity: 1 } : false}
       >
         <div className={styles.header}>
           <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
@@ -81,8 +73,8 @@ export const RecentTransactions = () => {
     return (
       <motion.div
         className={styles.container}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
+        animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
       >
         <div className={styles.header}>
           <h3 className={styles.title}>{t('dashboard.recentTransactions')}</h3>
@@ -107,8 +99,8 @@ export const RecentTransactions = () => {
     <motion.div
       className={styles.container}
       variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial={shouldAnimate ? "hidden" : false}
+      animate={shouldAnimate ? "visible" : false}
     >
       {/* HEADER */}
       <div className={styles.header}>

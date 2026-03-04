@@ -477,6 +477,6 @@
 
 @include mobile {
   :global(.recharts-legend-item-text) {
-    font-size: 12px !important;
+    font-size: var(--fs-xs) !important;
   }
 }

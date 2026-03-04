@@ -14,7 +14,7 @@ import { AUTH_ACTIONS } from '../reducers/authReducer';
  * @param {Object} storage - Token storage methods from useAuthStorage
  */
 export function useAuthActions(dispatch, storage) {
-  const { saveToken, saveRefreshToken, getRefreshToken, clearAllTokens, setRememberMe } = storage;
+  const { saveToken, getRefreshToken, clearAllTokens, setRememberMe } = storage;
 
   // ============================================
   // LOGIN
@@ -32,14 +32,33 @@ export function useAuthActions(dispatch, storage) {
         // Set storage preference before saving tokens
         setRememberMe(rememberMe);
         saveToken(accessToken, rememberMe);
-        if (refreshToken) {
-          saveRefreshToken(refreshToken);
-        }
+        // Refresh-Token wird als httpOnly Cookie vom Backend gesetzt —
+        // kein manuelles Speichern im Frontend mehr nötig.
 
         dispatch({
           type: AUTH_ACTIONS.LOGIN_SUCCESS,
           payload: { user, token: accessToken },
         });
+
+        // Lifecycle-Notification als Toast anzeigen (fire-and-forget)
+        const notification = response.data.notification;
+        if (notification) {
+          const toastType = notification.severity === 'error' ? 'warning' : 'info';
+          const messageKey =
+            notification.type === 'retention_final_warning'
+              ? 'lifecycle.toast.retentionFinalWarning'
+              : 'lifecycle.toast.retentionReminder';
+
+          window.dispatchEvent(
+            new CustomEvent('toast:add', {
+              detail: {
+                type: toastType,
+                message: i18n.t(messageKey, { count: notification.transactionCount }),
+                duration: 8000,
+              },
+            })
+          );
+        }
       } catch (error) {
         const errorMessage =
           error.response?.data?.message || error.message || i18n.t('auth.errors.loginFailed');
@@ -48,7 +67,7 @@ export function useAuthActions(dispatch, storage) {
         throw error;
       }
     },
-    [dispatch, saveToken, saveRefreshToken, setRememberMe]
+    [dispatch, saveToken, setRememberMe]
   );
 
   // ============================================
@@ -65,9 +84,8 @@ export function useAuthActions(dispatch, storage) {
         const { accessToken, refreshToken, user } = response.data.data;
 
         saveToken(accessToken);
-        if (refreshToken) {
-          saveRefreshToken(refreshToken);
-        }
+        // Refresh-Token wird als httpOnly Cookie vom Backend gesetzt —
+        // kein manuelles Speichern im Frontend mehr nötig.
 
         dispatch({
           type: AUTH_ACTIONS.REGISTER_SUCCESS,
@@ -83,7 +101,7 @@ export function useAuthActions(dispatch, storage) {
         throw error;
       }
     },
-    [dispatch, saveToken, saveRefreshToken]
+    [dispatch, saveToken]
   );
 
   // ============================================
@@ -92,10 +110,10 @@ export function useAuthActions(dispatch, storage) {
 
   const logout = useCallback(async () => {
     try {
+      // Logout-Request mit withCredentials — Cookie wird automatisch mitgesendet
+      // Refresh-Token wird vom Backend aus dem Cookie gelesen
       const refreshToken = getRefreshToken();
-      if (refreshToken) {
-        await authService.logout(refreshToken);
-      }
+      await authService.logout(refreshToken);
     } catch (error) {
       globalThis.console?.warn('Logout API call failed:', error);
     } finally {
@@ -165,14 +183,14 @@ export function useAuthActions(dispatch, storage) {
   // RESEND VERIFICATION
   // ============================================
 
-  const resendVerification = useCallback(async () => {
+  const resendVerification = useCallback(async (email) => {
     try {
-      const response = await authService.resendVerification();
+      const response = await authService.resendVerification(email);
       return response.data;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || error.message || 'Verifizierungs-Email konnte nicht gesendet werden.';
-      throw new Error(errorMessage);
+      throw new Error(errorMessage, { cause: error });
     }
   }, []);
 

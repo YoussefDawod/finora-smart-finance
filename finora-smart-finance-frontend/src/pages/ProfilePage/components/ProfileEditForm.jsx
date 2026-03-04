@@ -3,29 +3,39 @@
  * Handles user profile (name) editing
  */
 
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
+import { useMotion } from '@/hooks/useMotion';
 import { Card } from '@/components/common';
-import { FiUser, FiEdit2, FiCheck, FiX } from 'react-icons/fi';
+import { FiUser, FiEdit2, FiCheck, FiX, FiLock } from 'react-icons/fi';
 import styles from '../ProfilePage.module.scss';
 
 export function ProfileEditForm({ user, isEditing, setIsEditing, formData, handleInputChange, handleSave, handleCancel, isSaving }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { shouldAnimate } = useMotion();
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const itemVariants = {
+  const itemVariants = shouldAnimate ? {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  };
+  } : {};
 
   const handleSaveClick = async () => {
-    const result = await handleSave();
+    const result = await handleSave(confirmPassword);
     if (result.success) {
+      setConfirmPassword('');
       toast.success(t('profile.toasts.saved'));
     } else {
       toast.error(t(`profile.toasts.${result.error}`));
     }
+  };
+
+  const handleCancelClick = () => {
+    setConfirmPassword('');
+    handleCancel();
   };
 
   return (
@@ -68,6 +78,24 @@ export function ProfileEditForm({ user, isEditing, setIsEditing, formData, handl
                     onChange={handleInputChange}
                     placeholder={t('profile.personal.usernamePlaceholder')}
                     className={styles.input}
+                    autoComplete="name"
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="confirmPassword">{t('profile.personal.passwordLabel')}</label>
+                <div className={styles.inputWrapper}>
+                  <FiLock size={20} className={styles.inputIcon} />
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={t('profile.personal.passwordPlaceholder')}
+                    className={styles.input}
+                    autoComplete="current-password"
                   />
                 </div>
               </div>
@@ -87,7 +115,7 @@ export function ProfileEditForm({ user, isEditing, setIsEditing, formData, handl
                 <motion.button
                   type="button"
                   className={styles.btnCancel}
-                  onClick={handleCancel}
+                  onClick={handleCancelClick}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >

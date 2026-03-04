@@ -8,15 +8,18 @@
  */
 
 const config = require('../../config/env');
+const colors = require('./colors');
+const { getEmailLogoImg } = require('./logoSvg');
 
 /**
  * Rendert eine eigenständige HTML-Statusseite für Newsletter-Aktionen
  * @param {'confirmed'|'unsubscribed'|'invalid'|'error'} status - Ergebnis
  * @param {string} language - Sprache (de, en, ar, ka)
+ * @param {string} [overrideFrontendUrl] - Optionale Frontend-URL (aus Request abgeleitet)
  * @returns {string} Vollständiges HTML-Dokument
  */
-function newsletterStatusPage(status, language = 'de') {
-  const frontendUrl = config.frontendUrl || 'http://localhost:3000';
+function newsletterStatusPage(status, language = 'de', overrideFrontendUrl) {
+  const frontendUrl = overrideFrontendUrl || config.frontendUrl || 'http://localhost:3000';
 
   const content = {
     de: {
@@ -144,10 +147,10 @@ function newsletterStatusPage(status, language = 'de') {
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
       line-height: 1.6;
-      color: #1f2937;
-      background: linear-gradient(135deg, #f0f0ff 0%, #f5f3ff 50%, #faf5ff 100%);
+      color: ${colors.textSecondary};
+      background: ${colors.GRADIENTS.pageBackground};
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -159,13 +162,13 @@ function newsletterStatusPage(status, language = 'de') {
     .card {
       max-width: 520px;
       width: 100%;
-      background: #ffffff;
+      background: ${colors.surface};
       border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+      box-shadow: ${colors.GRADIENTS.cardShadow};
     }
     .header {
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: ${colors.GRADIENTS.headerBrand};
       color: white;
       padding: 28px 30px;
       text-align: center;
@@ -174,6 +177,10 @@ function newsletterStatusPage(status, language = 'de') {
       font-size: 26px;
       font-weight: 700;
       letter-spacing: -0.5px;
+    }
+    .header img {
+      display: block;
+      margin: 0 auto 8px;
     }
     .body {
       padding: 40px 30px 30px;
@@ -188,27 +195,27 @@ function newsletterStatusPage(status, language = 'de') {
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 12px;
-      color: ${isSuccess ? '#059669' : status === 'invalid' ? '#d97706' : '#dc2626'};
+      color: ${isSuccess ? colors.success : status === 'invalid' ? colors.warning : colors.error};
     }
     .body p {
       font-size: 15px;
-      color: #4b5563;
+      color: ${colors.textLight};
       margin-bottom: 16px;
       line-height: 1.7;
     }
     .note {
-      background: ${isSuccess ? '#ecfdf5' : '#fef3c7'};
-      border: 1px solid ${isSuccess ? '#10b981' : '#f59e0b'};
+      background: ${isSuccess ? colors.successBg : colors.warningBg};
+      border: 1px solid ${isSuccess ? colors.success : colors.warning};
       border-radius: 10px;
       padding: 14px 18px;
       margin: 20px 0;
       font-size: 14px;
-      color: ${isSuccess ? '#065f46' : '#92400e'};
+      color: ${isSuccess ? colors.successText : colors.warningText};
       text-align: ${align};
     }
     .btn {
       display: inline-block;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: ${colors.GRADIENTS.brand};
       color: white;
       text-decoration: none;
       padding: 13px 32px;
@@ -220,18 +227,19 @@ function newsletterStatusPage(status, language = 'de') {
     }
     .btn:hover { opacity: 0.9; transform: translateY(-1px); }
     .footer {
-      background: #f9fafb;
+      background: ${colors.surfaceLight};
       padding: 16px 30px;
       text-align: center;
-      color: #9ca3af;
+      color: ${colors.textSubtle};
       font-size: 13px;
-      border-top: 1px solid #f3f4f6;
+      border-top: 1px solid ${colors.borderLight};
     }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="header">
+      ${getEmailLogoImg({ size: 40 })}
       <h1>Finora</h1>
     </div>
     <div class="body">

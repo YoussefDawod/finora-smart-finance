@@ -4,7 +4,8 @@
     "transactions": "Transactions",
     "settings": "Settings",
     "profile": "Profile",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "adminPanel": "Admin Panel"
   },
   "common": {
     "saveChanges": "Save changes",
@@ -35,6 +36,7 @@
     "loadingComplete": "Submitting...",
     "stepErrorsTitle": "Errors in this step:",
     "retry": "Try again",
+    "offline": "You are offline – some features are limited",
     "appName": "Finora - Smart Finance",
     "errors": {
       "generic": "An error occurred",
@@ -105,7 +107,7 @@
       },
       "newsletter": {
         "title": "Newsletter",
-        "description": "Receive news, tips and updates from Finora by email.",
+        "description": "Receive newsletter with Finora updates, financial tips, and new features. Sent by admin, no spam.",
         "aria": "Toggle newsletter",
         "subscribed": "Successfully subscribed to the newsletter!",
         "unsubscribed": "Successfully unsubscribed from the newsletter.",
@@ -180,6 +182,8 @@
       "previousMonth": "Previous month",
       "nextMonth": "Next month",
       "goToToday": "Go to current month",
+      "thisYear": "This year",
+      "customRange": "Date range",
       "apply": "Apply",
       "reset": "Reset"
     },
@@ -265,6 +269,12 @@
       "descriptionMax": "Description must be at most 100 characters",
       "dateRequired": "Date is required",
       "invalidDate": "Invalid date"
+    },
+    "quota": {
+      "label": "Transactions",
+      "aria": "{{count}} of {{limit}} transactions this month",
+      "ariaGuest": "{{count}} transactions",
+      "nearLimit": "Near limit"
     }
   },
   "auth": {
@@ -416,6 +426,7 @@
         "passwordRequired": "Password is required",
         "passwordMin": "At least 8 characters",
         "passwordWeak": "Too weak",
+        "passwordMax": "At most 128 characters",
         "confirmRequired": "Confirmation required",
         "passwordMismatch": "Passwords do not match",
         "formInvalid": "Please fill all fields correctly"
@@ -486,6 +497,8 @@
         "termsText": "By registering you accept our terms and privacy policy. You are responsible for all activity under your account.",
         "termsAccept": "I accept the",
         "termsLink": "terms of service",
+        "and": "and the",
+        "privacyLink": "privacy policy",
         "noEmailConfirm": "I understand that I cannot reset my password without an email address"
       },
       "navigation": {
@@ -509,8 +522,10 @@
         "passwordRequired": "Password is required",
         "passwordMin": "At least 8 characters",
         "passwordUpper": "At least one uppercase letter required",
+        "passwordLower": "At least one lowercase letter required",
         "passwordNumber": "At least one number required",
         "passwordSpecial": "At least one special character required",
+        "passwordMax": "At most 128 characters",
         "confirmRequired": "Confirmation required",
         "passwordMismatch": "Passwords do not match",
         "termsRequired": "Consent required",
@@ -557,6 +572,8 @@
       "edit": "Edit",
       "usernameLabel": "Username",
       "usernamePlaceholder": "Your username",
+      "passwordLabel": "Password for confirmation",
+      "passwordPlaceholder": "Enter current password",
       "save": "Save",
       "saving": "Saving...",
       "cancel": "Cancel"
@@ -579,6 +596,9 @@
         "label": "New email address",
         "placeholder": "name@example.com",
         "hint": "You will receive a verification email at this address.",
+        "passwordLabel": "Password for confirmation",
+        "passwordPlaceholder": "Enter current password",
+        "passwordRequired": "Please enter your password to change your email.",
         "spamHint": "Check your spam folder if the email doesn’t arrive.",
         "cancel": "Cancel",
         "submit": "Send verification",
@@ -606,6 +626,9 @@
         "title": "Delete account",
         "warningPrimary": "This action cannot be undone.",
         "warningSecondary": "All your data, transactions, and settings will be permanently deleted.",
+        "passwordLabel": "Password for confirmation",
+        "passwordPlaceholder": "Your current password",
+        "passwordRequired": "Please enter your password",
         "confirmLabel": "Type \"{{value}}\" to confirm:",
         "placeholder": "{{value}}",
         "cancel": "Cancel",
@@ -635,6 +658,7 @@
       "passwordWeak": "At least 8 characters, uppercase, number & special character required",
       "passwordChanged": "Password changed successfully!",
       "passwordChangeError": "Password could not be changed",
+      "invalidPassword": "Password is incorrect",
       "accountDeleted": "Account deleted",
       "accountDeleteError": "Account could not be deleted"
     },
@@ -674,7 +698,8 @@
           "Provide accurate and complete information",
           "Keep your credentials confidential",
           "Notify us promptly about unauthorized use",
-          "Create only one account per person"
+          "Create only one account per person",
+          "The Service is intended for persons who have legal capacity under applicable law. Use by minors is the responsibility of their legal guardians."
         ]
       },
       {
@@ -729,6 +754,38 @@
         "title": "9. Final provisions",
         "paragraphs": [
           "The laws of the Federal Republic of Germany apply. If any provision is invalid, the remaining provisions remain effective."
+        ]
+      },
+      {
+        "title": "10. Service description",
+        "paragraphs": [
+          "Finora is a free application for managing personal finances. Current features include: transaction management, budget planning, data export (CSV/PDF), newsletter and contact form.",
+          "We reserve the right to extend, restrict or introduce paid features at any time. Registered users will be notified of material changes in advance."
+        ]
+      },
+      {
+        "title": "11. Prices and costs",
+        "paragraphs": [
+          "The use of Finora is currently free of charge. No fees or subscription costs apply.",
+          "Should paid features be introduced in the future, they will be clearly labelled and require separate consent."
+        ]
+      },
+      {
+        "title": "12. Account suspension for misuse",
+        "paragraphs": [
+          "We reserve the right to temporarily suspend or permanently delete accounts if:"
+        ],
+        "list": [
+          "These terms of service are violated",
+          "The platform is used for unlawful purposes",
+          "Repeated or serious violations of usage rules occur",
+          "Automated access or manipulation attempts are detected"
+        ]
+      },
+      {
+        "title": "13. Jurisdiction",
+        "paragraphs": [
+          "German law applies to disputes arising from or in connection with these terms. If the user is a consumer, mandatory consumer protection provisions of the country of residence apply."
         ]
       }
     ]
@@ -836,24 +893,49 @@
     "networkError": "No connection to the server",
     "timeout": "Request took too long",
     "unexpectedError": "Unexpected error",
-    "validationError": "Validation error"
+    "validationError": "Validation error",
+    "api": {
+      "invalidInput": "Invalid input. Please check your data.",
+      "invalidCredentials": "Invalid credentials. Please check your username and password.",
+      "accountBanned": "Your account has been suspended. Please contact support.",
+      "accountLocked": "Account temporarily locked. Please try again later.",
+      "emailNotVerified": "Please verify your email address first.",
+      "nameExists": "This name is already taken.",
+      "emailExists": "This email address is already registered.",
+      "checkboxRequired": "Please confirm the required checkbox.",
+      "invalidEmail": "Invalid email address.",
+      "invalidPassword": "Invalid password.",
+      "weakPassword": "The password is too weak.",
+      "passwordMismatch": "Passwords do not match.",
+      "invalidToken": "Invalid or expired token.",
+      "tokenExpired": "Your token has expired. Please request a new one.",
+      "confirmationRequired": "Confirmation required.",
+      "userNotFound": "User not found."
+    }
   },
   "footer": {
     "allRightsReserved": "All rights reserved",
     "terms": "Terms & Conditions",
     "privacy": "Privacy Policy",
     "contact": "Contact",
+    "impressum": "Legal Notice",
+    "privacyNotice": "Privacy Notice",
     "navigation": "Footer Navigation",
     "brand": {
       "description": "Smart financial management for your smart life. Keep track of your finances with Finora."
     },
     "newsletter": {
       "title": "Subscribe to Newsletter",
+      "subtitle": "Finora updates, financial tips & new features straight to your inbox.",
       "placeholder": "Your email address",
       "button": "Subscribe",
       "success": "Confirmation email sent! Please check your inbox.",
+      "emailRequired": "Please enter an email address.",
       "error": "Invalid email address",
-      "serverError": "Failed to subscribe. Please try again later."
+      "serverError": "Failed to subscribe. Please try again later.",
+      "privacyHint": "By subscribing you agree to our <link>Privacy Policy</link>.",
+      "consent": "I have read the <link>Privacy Policy</link> and consent to the processing of my email address for newsletter delivery.",
+      "consentRequired": "Please confirm the privacy policy."
     },
     "sections": {
       "product": "Product",
@@ -866,6 +948,7 @@
       "pricing": "Pricing",
       "about": "About Us",
       "blog": "Blog",
+      "contact": "Contact",
       "help": "Help",
       "faq": "FAQ"
     },
@@ -876,43 +959,165 @@
       "ariaGithub": "Visit us on GitHub (opens in new tab)",
       "ariaLinkedin": "Visit us on LinkedIn (opens in new tab)"
     },
-    "contactInfo": {
-      "title": "Contact",
-      "email": "Email"
-    },
-    "madeWith": "Made with",
-    "byAuthor": "by Youssef Dawod",
-    "backToTop": "Back to Top"
+    "copyright": "© {{year}} Finora. <link>Youssef Dawod</link>",
+    "backToTop": "Back to Top",
+    "languageSwitcher": {
+      "label": "Language",
+      "de": "DE",
+      "en": "EN",
+      "ar": "AR",
+      "ka": "KA"
+    }
+  },
+  "miniFooter": {
+    "home": "Home",
+    "ariaLabel": "Page navigation"
   },
   "privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: February 2026",
     "sections": [
       {
-        "title": "Data Collection & Processing",
-        "paragraphs": ["We collect personal data necessary to provide our services. Data processing is carried out in accordance with the GDPR and only with your consent or on a legal basis."],
-        "list": ["Name and email address", "Transaction data", "Usage statistics"]
+        "title": "§ 1 Data Controller (Art. 13(1)(a) GDPR)",
+        "paragraphs": [
+          "The data controller responsible for data processing on this website is:",
+          "Youssef Dawod",
+          "Bahnhofstraße 1, 29614 Soltau, Germany",
+          "Email: Contact form at /contact",
+          "The controller determines the purposes and means of processing personal data."
+        ]
       },
       {
-        "title": "Cookies & Tracking",
-        "paragraphs": ["We use essential cookies only to ensure the functionality of our application. No tracking cookies or third-party cookies are used."]
+        "title": "§ 2 Data Protection Officer (Art. 13(1)(b) GDPR)",
+        "paragraphs": [
+          "There is currently no legal obligation to appoint a data protection officer. For questions regarding data protection, you can reach us using the contact details above."
+        ]
       },
       {
-        "title": "Data Sharing",
-        "paragraphs": ["Your data is not shared with third parties unless required by law or strictly necessary for providing our services."]
+        "title": "§ 3 Data Collected",
+        "paragraphs": ["In the course of using our application, we collect and process the following personal data:"],
+        "list": [
+          "Username (required) and email address (optional) during registration",
+          "Password (stored as a cryptographic hash, bcrypt with 12 rounds)",
+          "Financial transaction data (amount, category, description, date)",
+          "Language settings, theme preferences, and sidebar state",
+          "Privacy notice status (whether the notice has been acknowledged)",
+          "IP address and user agent on login (security audit log)",
+          "Contact form data (name, email, category, message)",
+          "Newsletter subscription (email, double opt-in status)"
+        ]
       },
       {
-        "title": "Your Rights (GDPR)",
-        "paragraphs": ["Under the GDPR, you have the following rights regarding your personal data:"],
-        "list": ["Access your data", "Correct your data", "Delete your data", "Export your data", "Object to processing"]
+        "title": "§ 4 Legal Bases for Processing (Art. 13(1)(c) GDPR)",
+        "paragraphs": ["We process personal data based on the following legal grounds:"],
+        "list": [
+          "Art. 6(1)(a) GDPR (Consent): Newsletter subscription, contact form consent",
+          "Art. 6(1)(b) GDPR (Contract performance): Registration, login, transaction management, budget management — to fulfill the usage agreement",
+          "Art. 6(1)(c) GDPR (Legal obligation): Retention of consent records pursuant to Art. 7 GDPR",
+          "Art. 6(1)(f) GDPR (Legitimate interests): Security logging (login attempts, account lockouts), abuse prevention, technical troubleshooting"
+        ]
       },
       {
-        "title": "Data Security",
-        "paragraphs": ["We implement industry-standard security measures to protect your data from unauthorized access, loss, or misuse."]
+        "title": "§ 5 Legitimate Interests (Art. 13(1)(d) GDPR)",
+        "paragraphs": [
+          "Where we base processing on legitimate interests (Art. 6(1)(f) GDPR), we pursue the following interests:",
+          "Protecting our application from unauthorized access and misuse by logging login attempts and suspicious activities. Ensuring system stability and security through technical error logs. Your interests, fundamental rights and freedoms do not override these interests, as processing is limited to what is technically necessary and automatic deletion periods apply."
+        ]
       },
       {
-        "title": "Contact for Privacy Concerns",
-        "paragraphs": ["For privacy-related questions, please contact us via our contact form."]
+        "title": "§ 6 Retention Periods and Deletion (Art. 13(2)(a) GDPR)",
+        "paragraphs": ["We store personal data only as long as necessary for the respective purpose:"],
+        "list": [
+          "Account data (username, email, password hash): Until account deletion by the user",
+          "Transaction data: According to the configured retention period (lifecycle policy); automatically deleted after expiry with prior email notification",
+          "Security audit logs: 365 days, then automatically deleted via TTL index",
+          "Consent records (ConsentLog): 3 years (legal proof obligation under Art. 7(1) GDPR)",
+          "Unconfirmed newsletter subscriptions: 48 hours, then automatically deleted",
+          "Contact inquiries: Deleted after processing"
+        ]
+      },
+      {
+        "title": "§ 7 Cookies and Local Storage",
+        "paragraphs": [
+          "We only use technically necessary cookies and local storage entries. No tracking cookies or third-party cookies are used."
+        ],
+        "list": [
+          "auth_token (localStorage): JWT access token for authentication — validity 1 hour",
+          "refreshToken (httpOnly cookie): Refresh token for token renewal — validity 7 days",
+          "privacyNoticeSeen (localStorage): Privacy notice acknowledgment status (read/not read)",
+          "theme (localStorage): Selected color scheme (light/dark)",
+          "i18nextLng (localStorage): Selected language",
+          "sidebar-collapsed (localStorage): Sidebar state"
+        ]
+      },
+      {
+        "title": "§ 8 Data Sharing with Third Parties",
+        "paragraphs": [
+          "Your data is generally not shared with third parties. Sharing occurs only in the following cases:",
+          "When you have expressly consented (Art. 6(1)(a) GDPR), when sharing is necessary for contract performance (Art. 6(1)(b) GDPR), or when there is a legal obligation (Art. 6(1)(c) GDPR).",
+          "We use the following service providers as data processors (Art. 28 GDPR) to operate the application:"
+        ],
+        "list": [
+          "Hosting (Frontend): ALL-INKL.COM – Neue Medien Münnich, Hauptstraße 68, 02742 Friedersdorf, Germany. Server location: Germany/EU.",
+          "Hosting (Backend/API): Render Services, Inc., San Francisco, USA. Data processing on servers in the EU/EEA region. Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
+          "Database: MongoDB, Inc. (MongoDB Atlas), New York, USA. Cluster location: EU (Frankfurt). Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
+          "Newsletter delivery: Handled via our own SMTP server. No external newsletter service provider is used."
+        ]
+      },
+      {
+        "title": "§ 9 Your Rights as a Data Subject",
+        "paragraphs": ["Under the GDPR, you have the following rights:"],
+        "list": [
+          "Right of access (Art. 15 GDPR): You can request information about your stored data",
+          "Right to rectification (Art. 16 GDPR): You can request correction of inaccurate data",
+          "Right to erasure (Art. 17 GDPR): You can request deletion of your data (account deletion in settings)",
+          "Right to restriction (Art. 18 GDPR): You can request restriction of processing",
+          "Right to data portability (Art. 20 GDPR): You can export your data in a machine-readable format (CSV export in the application)",
+          "Right to object (Art. 21 GDPR): You can object to processing based on legitimate interests"
+        ]
+      },
+      {
+        "title": "§ 10 Right to Withdraw Consent (Art. 13(2)(c) GDPR)",
+        "paragraphs": [
+          "If the processing of your data is based on consent (Art. 6(1)(a) GDPR), you have the right to withdraw this consent at any time. The lawfulness of the processing carried out on the basis of consent until its withdrawal is not affected.",
+          "You can unsubscribe from the newsletter at any time via the unsubscribe link in every email or via the newsletter toggle in account settings."
+        ]
+      },
+      {
+        "title": "§ 11 Right to Lodge a Complaint (Art. 13(2)(d) GDPR)",
+        "paragraphs": [
+          "Without prejudice to any other administrative or judicial remedy, you have the right to lodge a complaint with a data protection supervisory authority if you believe that the processing of your data violates the GDPR.",
+          "The supervisory authority responsible for us is: The State Commissioner for Data Protection of Lower Saxony (Die Landesbeauftragte für den Datenschutz Niedersachsen), Prinzenstraße 5, 30159 Hannover, Germany, https://www.lfd.niedersachsen.de",
+          "An overview of all data protection commissioners and their contact details can be found at: https://www.bfdi.bund.de"
+        ]
+      },
+      {
+        "title": "§ 12 Automated Decision-Making (Art. 13(2)(f) GDPR)",
+        "paragraphs": [
+          "No automated decision-making, including profiling, pursuant to Art. 22(1) and (4) GDPR takes place. We do not use processes that are based exclusively on automated processing and have legal effect on you or similarly significantly affect you.",
+          "Budget notifications and transaction lifecycle management are based on simple threshold checks and do not constitute automated decision-making within the meaning of the GDPR."
+        ]
+      },
+      {
+        "title": "§ 13 Data Security",
+        "paragraphs": [
+          "We implement comprehensive technical and organizational measures to protect your data:"
+        ],
+        "list": [
+          "HTTPS encryption for all data transmissions",
+          "Password hashing with bcrypt (12 rounds of salting)",
+          "JWT-based authentication with short-lived access tokens (1h) and httpOnly refresh cookies (7d)",
+          "Rate limiting and account lockout after failed login attempts",
+          "Content Security Policy (CSP), HSTS and other HTTP security headers via Helmet",
+          "MongoDB query injection prevention through input sanitization",
+          "Regular security audits (npm audit)"
+        ]
+      },
+      {
+        "title": "§ 14 Contact for Privacy Concerns",
+        "paragraphs": [
+          "For questions about data protection, the processing of your personal data, or to exercise your rights as a data subject, you can contact us at any time via our contact form at /contact. We will respond to your inquiry without delay, but at the latest within one month (Art. 12(3) GDPR)."
+        ]
       }
     ]
   },
@@ -934,7 +1139,9 @@
       "other": "Other"
     },
     "success": "Your message has been sent successfully! We'll get back to you soon.",
-    "error": "Failed to send message. Please try again later."
+    "error": "Failed to send message. Please try again later.",
+    "privacyConsent": "I have read the <link>Privacy Policy</link> and consent to the processing of my data to handle my inquiry.",
+    "privacyRequired": "Please confirm the privacy policy."
   },
   "features": {
     "title": "Features",
@@ -943,27 +1150,39 @@
     "items": [
       {
         "title": "Expense Tracking",
-        "description": "Track every transaction, categorize your spending, and gain deep insights into where your money goes."
+        "description": "Track every transaction, categorize your income and expenses across 22 categories, and gain deep insights into where your money goes."
       },
       {
         "title": "Budget Management",
-        "description": "Set budgets for different categories and receive real-time alerts when you're close to your limits."
+        "description": "Set a monthly budget limit and configure a threshold at which you'll be notified by email — helping you stay on top of your spending."
       },
       {
-        "title": "Financial Reports",
-        "description": "Generate comprehensive financial reports with beautiful charts and graphs to visualize your spending patterns."
+        "title": "Dashboard & Reports",
+        "description": "Interactive charts for income vs. expenses, monthly trends, and category breakdowns — plus summary cards for a quick overview."
       },
       {
         "title": "Data Export",
-        "description": "Export your financial data as PDF or CSV for personal records, tax preparation, or accounting purposes."
+        "description": "Export all your transactions as PDF or CSV from the Settings page — ideal for personal records, tax preparation, or accounting."
+      },
+      {
+        "title": "Search & Filter",
+        "description": "Search your transactions by keyword, filter by category, type, or date range, and sort by date or amount."
       },
       {
         "title": "Multi-Language Support",
-        "description": "Use Finora in your preferred language \u2014 currently supporting English, German, Arabic, and Georgian."
+        "description": "Use Finora in your preferred language — English, German, Arabic (with full RTL support), and Georgian. Switch anytime."
+      },
+      {
+        "title": "Guest Mode & Full Access",
+        "description": "Start instantly without an account in Guest Mode, or sign up for free to get cloud storage, budget alerts, export, and multi-device access."
+      },
+      {
+        "title": "Light, Dark & System Theme",
+        "description": "Choose between light, dark, or system theme — Finora automatically adapts to your system preferences."
       },
       {
         "title": "Secure & Private",
-        "description": "Your financial data is encrypted and secure. We take your privacy seriously and never share your data."
+        "description": "Your financial data is encrypted and secure. No data sharing with third parties, GDPR-compliant, and security alerts for account changes."
       }
     ]
   },
@@ -972,17 +1191,27 @@
     "subtitle": "Finora is completely free. Choose how you want to use it.",
     "backLink": "Back to Home",
     "popular": "Recommended",
+    "showMore": "More Benefits",
+    "showLess": "Show Less",
     "plans": [
       {
         "name": "Guest Mode",
         "price": "Free",
         "description": "No registration required",
         "features": [
-          "Basic expense tracking",
-          "Local storage only (browser)",
-          "Limited transaction history",
-          "Light & Dark themes",
-          "No account needed"
+          "Expense tracking & categories",
+          "Dashboard with charts",
+          "Search, filter & sorting",
+          "Light, dark & system theme",
+          "Multi-language (DE, EN, AR, KA)",
+          "No registration required",
+          "Data in current tab only (session)"
+        ],
+        "extraFeatures": [
+          "Monthly trend comparisons (vs. previous month)",
+          "Category distribution analysis with charts",
+          "22+ income & expense categories",
+          "Currency & date format settings"
         ],
         "cta": "Start Now"
       },
@@ -991,13 +1220,19 @@
         "price": "Free",
         "description": "Create a free account",
         "features": [
-          "Unlimited expense tracking",
-          "Cloud storage & sync",
+          "Everything in Guest Mode",
+          "Cloud storage & multi-device access",
           "Budget alerts & notifications",
-          "Financial reports & export",
-          "Multi-language support",
-          "Data backup & security",
-          "Access from any device"
+          "Email notifications",
+          "Financial reports & export (PDF/CSV)",
+          "Data retention & backup",
+          "Profile & account management"
+        ],
+        "extraFeatures": [
+          "Automatic weekly & monthly reports via email",
+          "Security alerts on login & password changes",
+          "Budget widget with configurable threshold",
+          "Granular notification control (4 categories)"
         ],
         "cta": "Create Free Account"
       }
@@ -1009,17 +1244,34 @@
     "backLink": "Back to Home",
     "mission": {
       "title": "Our Mission",
-      "description": "Finora was created to make personal financial management simple, accessible, and free for everyone. We believe that understanding your finances shouldn't require expensive software or complex tools."
+      "description": "Finora was created to make personal financial management simple, accessible, and free for everyone. Many people lose track of their finances because existing tools are too complex or too expensive. Finora solves this problem with an intuitive interface that works without registration — and with a free account unlocks the full range of features."
+    },
+    "whatIs": {
+      "title": "What is Finora?",
+      "description": "Finora is a free web app for personal financial management. You can track income and expenses, categorize them across 22 categories, and analyze them through an interactive dashboard with charts. Set a monthly budget limit and receive alerts when you exceed it. Export your data as PDF or CSV. Finora supports four languages (German, English, Arabic, Georgian) and offers a guest mode for instant use without an account."
+    },
+    "audience": {
+      "title": "Who is Finora for?",
+      "description": "Finora is designed for anyone who wants to manage their finances simply and clearly — whether students, young professionals, families, or anyone seeking a better overview of their income and expenses. Thanks to guest mode, you can try Finora instantly without creating an account. For long-term use with cloud storage, budget alerts, and data export, free registration is available."
+    },
+    "values": {
+      "title": "Our Values",
+      "items": [
+        "Privacy: Your financial data is encrypted and never shared with third parties.",
+        "Transparency: Finora is completely free — no hidden fees, no premium plans.",
+        "Accessibility: The app supports four languages including RTL layout for Arabic and is optimized for screen readers.",
+        "Ease of Use: Clean design, intuitive navigation, and instant start without registration."
+      ]
     },
     "developer": {
       "title": "Developer",
       "name": "Youssef Dawod",
       "role": "Full-Stack Developer",
-      "description": "Finora is developed and maintained by Youssef Dawod \u2014 a passionate full-stack developer dedicated to building useful, beautiful, and accessible web applications."
+      "description": "Finora is developed and maintained by Youssef Dawod — a passionate full-stack developer dedicated to building useful, beautiful, and accessible web applications."
     },
     "tech": {
-      "title": "Technology",
-      "description": "Built with modern technologies for the best possible user experience."
+      "title": "What Makes Finora Special",
+      "description": "Finora is built with modern technologies to give you the best possible experience. The app loads lightning-fast, works on any device — whether smartphone, tablet, or desktop — and can be installed directly on your home screen. Choose between light, dark, or automatic design. Finora is continuously developed and improved so you can focus entirely on your finances."
     }
   },
   "blog": {
@@ -1036,23 +1288,68 @@
     "sections": [
       {
         "title": "Getting Started",
-        "paragraphs": ["Create an account or use Guest Mode to start tracking your expenses immediately. Simply click 'Add Transaction' to record your first income or expense."]
+        "paragraphs": [
+          "Welcome to Finora! You can get started right away — either in Guest Mode without registration or with a free account for full functionality.",
+          "In Guest Mode, your data is stored in the current browser tab (sessionStorage). Once you close the tab, the data is lost. With an account, your data is securely stored in the cloud and available across all your devices.",
+          "To create your first transaction, click 'Add Transaction', choose a type (income or expense), enter the amount, select a category, and save."
+        ]
+      },
+      {
+        "title": "Understanding the Dashboard",
+        "paragraphs": [
+          "The dashboard gives you a quick overview of your finances. At the top, you'll see three summary cards: total income, total expenses, and your current balance.",
+          "Below that, you'll find interactive charts: a pie chart showing the ratio of income to expenses, a monthly trend view, and a category analysis for both income and expenses. Your five most recent transactions are also displayed for a quick overview."
+        ]
       },
       {
         "title": "Managing Transactions",
-        "paragraphs": ["You can add, edit, and delete transactions at any time. Use categories, dates, and descriptions to organize your financial data effectively."]
+        "paragraphs": [
+          "You can add, edit, and delete transactions at any time. Each transaction has a type (income/expense), an amount, a date, a category, and an optional description.",
+          "22 categories are available — depending on the transaction type, relevant categories are shown (e.g., Salary, Freelance for income; Groceries, Rent, Transport for expenses)."
+        ]
+      },
+      {
+        "title": "Search & Filter",
+        "paragraphs": [
+          "Use the search bar to find transactions by description. With filters, you can narrow down by category, transaction type (income/expense), and date range.",
+          "Sorting allows you to order transactions by date or amount — ascending or descending."
+        ]
       },
       {
         "title": "Budget Alerts",
-        "paragraphs": ["Set budget limits for different categories in your Settings. Finora will alert you when your spending approaches your defined limits."]
+        "paragraphs": [
+          "With an account, you can set a monthly budget limit in Settings and choose an alert threshold (e.g., 80%).",
+          "Finora will automatically warn you when your spending reaches the chosen threshold or exceeds your limit. This helps you stay on top of your expenses and meet your financial goals."
+        ]
+      },
+      {
+        "title": "Settings",
+        "paragraphs": [
+          "In Settings, you can customize your language (German, English, Arabic, Georgian), currency, date format, and theme (Light, Dark, or System).",
+          "With an account, additional options are available: email notifications, newsletter management, data retention, and profile management."
+        ]
       },
       {
         "title": "Exporting Data",
-        "paragraphs": ["Export your financial data as PDF or CSV from the Settings page. Reports can be filtered by date range and category."]
+        "paragraphs": [
+          "As a registered user, you can export all your financial data as PDF or CSV. Go to Settings and select your preferred export type.",
+          "The export includes all your saved transactions — ideal as a backup, for bookkeeping, or personal financial reviews."
+        ]
+      },
+      {
+        "title": "Guest Mode vs. Account",
+        "paragraphs": [
+          "In Guest Mode, you can use all basic features: transactions, dashboard, search & filter, categories, language selection, and themes. However, your data is only stored in the current browser tab.",
+          "With a free account, you additionally get: cloud storage, multi-device access, budget alerts, email notifications, data export (PDF/CSV), data retention, and profile management.",
+          "Registration is free and takes only a few seconds."
+        ]
       },
       {
         "title": "Need More Help?",
-        "paragraphs": ["If you can't find the answer you're looking for, please don't hesitate to contact us at info@finora.dawoddev.com."]
+        "paragraphs": [
+          "If you can't find the answer you're looking for, feel free to contact us via email at <email>info@finora.dawoddev.com</email> or use our <contactLink>contact form</contactLink>.",
+          "Also check out our <faqLink>FAQ</faqLink> — you'll find answers to the most common questions there."
+        ]
       }
     ]
   },
@@ -1063,34 +1360,613 @@
     "questions": [
       {
         "question": "Is Finora really free?",
-        "answer": "Yes! Finora is 100% free \u2014 both Guest Mode and Full Access with a registered account."
+        "answer": "Yes! Finora is 100% free — both Guest Mode and Full Access with a registered account. There are no hidden fees, no premium tiers, and no ads."
       },
       {
         "question": "Do I need to create an account?",
-        "answer": "No. You can use Finora in Guest Mode without registration. However, creating a free account gives you cloud storage, data backup, and access from any device."
+        "answer": "No. You can use Finora right away in Guest Mode without registration. However, creating a free account gives you cloud storage, budget alerts, data export (PDF/CSV), email reports, and access from multiple devices."
+      },
+      {
+        "question": "What is the difference between Guest Mode and Full Access?",
+        "answer": "In Guest Mode, you can track transactions, use the dashboard, search, filter and sort, and switch languages and themes. However, your data is only stored in the current browser tab (sessionStorage) and is lost when you close it. With a free account, you additionally get cloud storage, budget alerts, data export, email reports, and multi-device access."
       },
       {
         "question": "Is my financial data secure?",
-        "answer": "Yes. All data is encrypted and stored securely. We use industry-standard security practices and never share your data with third parties."
+        "answer": "Yes. All data is encrypted in transit and stored securely. We use industry-standard security practices, never share your data with third parties, and send you security alerts for login and password changes."
       },
       {
         "question": "Which languages are supported?",
-        "answer": "Finora currently supports English, German, Arabic (RTL), and Georgian."
+        "answer": "Finora currently supports English, German, Arabic (with full RTL support), and Georgian. You can switch the language at any time in the settings or via the language switcher."
       },
       {
         "question": "Can I export my data?",
-        "answer": "Yes. You can export your financial data as PDF or CSV from the Settings page."
+        "answer": "Yes. With a registered account, you can export all your transactions as PDF or CSV from the Settings page. The export includes all stored transactions."
+      },
+      {
+        "question": "What happens to my data in Guest Mode?",
+        "answer": "In Guest Mode, your data is stored in the browser's sessionStorage — meaning only in the current tab. Once you close the tab or browser window, all data is permanently lost. For persistent storage, we recommend creating a free account."
+      },
+      {
+        "question": "How do I set up budget alerts?",
+        "answer": "Sign in with your free account and go to Settings. There you can set a monthly budget limit and configure a threshold at which you will be notified by email. Budget alerts are only available with a registered account."
+      },
+      {
+        "question": "Can I use Finora on multiple devices?",
+        "answer": "Yes — with a free account, your data is securely stored in the cloud and accessible from any device. Simply sign in with your account and your transactions, settings, and budgets are instantly available."
       },
       {
         "question": "How do I contact support?",
-        "answer": "You can reach us at info@finora.dawoddev.com or use the contact form on our Contact page."
+        "answer": "You can reach us by email at info@finora.dawoddev.com or through the contact form on our Contact page. We aim to respond to all inquiries promptly."
       }
     ]
+  },
+  "impressum": {
+    "title": "Legal Notice (Impressum)",
+    "lastUpdated": "Last updated: February 2026",
+    "sections": [
+      {
+        "title": "Information according to \u00a7 5 DDG",
+        "paragraphs": ["Youssef Dawod", "Bahnhofstraße 1", "29614 Soltau", "Germany", "No commercial register entry."]
+      },
+      {
+        "title": "Contact",
+        "paragraphs": ["Email: info@finora.dawoddev.com", "Contact form: /contact"]
+      },
+      {
+        "title": "Responsible for content according to \u00a7 18 Abs. 2 MStV",
+        "paragraphs": ["Youssef Dawod", "Bahnhofstraße 1, 29614 Soltau"]
+      },
+      {
+        "title": "Dispute Resolution",
+        "paragraphs": ["The European Commission provides a platform for online dispute resolution (ODR): https://ec.europa.eu/consumers/odr/", "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board."]
+      },
+      {
+        "title": "Liability for Content",
+        "paragraphs": ["As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to \u00a7 7 Abs.1 DDG. According to \u00a7\u00a7 8 to 10 DDG, we are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity."]
+      },
+      {
+        "title": "Liability for Links",
+        "paragraphs": ["Our website contains links to external third-party websites over whose content we have no influence. We therefore cannot assume any liability for such external content. The respective provider or operator of the pages is always responsible for the content of the linked pages."]
+      }
+    ]
+  },
+  "privacyNotice": {
+    "title": "We respect your privacy",
+    "description": "We use only technically necessary storage and processing technologies to provide the application. In guest mode, data is stored locally in your browser. For registered users, personal data is processed and stored on our servers. No tracking or marketing cookies are used.",
+    "understood": "Understood",
+    "close": "Close"
   },
   "newsletter": {
     "confirmed": "Newsletter successfully confirmed! You will now receive our updates.",
     "unsubscribed": "Successfully unsubscribed from the newsletter.",
     "invalid": "Invalid or expired link.",
     "error": "An error occurred. Please try again later."
+  },
+  "admin": {
+    "badge": "Admin",
+    "loadingPanel": "Loading admin panel...",
+    "placeholder": "This page will be implemented soon.",
+    "nav": {
+      "label": "Admin Navigation",
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "transactions": "Transactions",
+      "subscribers": "Subscribers",
+      "campaigns": "Campaigns",
+      "auditLog": "Audit Log",
+      "lifecycle": "Lifecycle",
+      "backToApp": "Back to App"
+    },
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "subtitle": "Overview of your platform at a glance.",
+      "totalUsers": "Total Users",
+      "verifiedUsers": "Verified",
+      "bannedUsers": "Banned",
+      "adminUsers": "Admins",
+      "totalTransactions": "Transactions",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "subscribers": "Subscribers",
+      "confirmed": "confirmed",
+      "thisWeek": "this week",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "statsLabel": "Key Metrics",
+      "chartsLabel": "Charts",
+      "income": "Income",
+      "expenses": "Expenses",
+      "incomeVsExpense": "Income vs. Expenses",
+      "topCategories": "Top Categories",
+      "subscriberLanguages": "Subscriber Languages",
+      "userLanguages": "User Languages",
+      "noChartData": "Not enough data for charts yet.",
+      "recentUsers": "Recent Users",
+      "noRecentUsers": "No users registered yet.",
+      "verified": "Verified",
+      "unverified": "Not verified"
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "{{count}} users total",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "verified": "Verified",
+      "joined": "Joined",
+      "actions": "Actions",
+      "viewDetails": "View Details",
+      "noResults": "No users found.",
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Page {{page}} of {{pages}}",
+      "roleAdmin": "Admin",
+      "roleUser": "User",
+      "active": "Active",
+      "banned": "Banned",
+      "unverifiedLabel": "Unverified",
+      "lastLogin": "Last Login",
+      "searchPlaceholder": "Search users…",
+      "filterRole": "Filter by role",
+      "filterStatus": "Filter by status",
+      "filterVerified": "Filter by verification",
+      "allRoles": "All Roles",
+      "allStatuses": "All Statuses",
+      "allVerified": "All",
+      "totalUsers": "{{count}} users",
+      "refresh": "Refresh",
+      "userDetails": "User Details",
+      "ban": "Ban User",
+      "unban": "Unban",
+      "banSuccess": "User banned successfully.",
+      "unbanSuccess": "User unbanned successfully.",
+      "confirmBan": "Ban User",
+      "confirmBanText": "Are you sure you want to ban {{name}}? They will no longer be able to sign in.",
+      "banReason": "Reason (optional)",
+      "banReasonPlaceholder": "e.g. Violation of terms of service",
+      "confirmDelete": "Delete User",
+      "confirmDeleteText": "Are you sure you want to permanently delete {{name}}? All their data including transactions will be removed. This action cannot be undone.",
+      "delete": "Delete",
+      "deleteSuccess": "User deleted successfully.",
+      "changeRole": "Change Role",
+      "confirmRoleChange": "Change Role",
+      "confirmRoleChangeText": "Change the role of {{name}} to {{role}}?",
+      "roleChangeSuccess": "Role changed successfully.",
+      "resetPassword": "Reset Password",
+      "resetPasswordTitle": "Reset Password",
+      "resetPasswordText": "Set a new password for {{name}}.",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Minimum 8 characters",
+      "passwordMinLength": "Password must be at least 8 characters.",
+      "passwordResetSuccess": "Password reset successfully.",
+      "create": {
+        "button": "Create User",
+        "title": "Create New User",
+        "labelName": "Name",
+        "labelEmail": "Email",
+        "labelPassword": "Password",
+        "labelRole": "Role",
+        "labelVerified": "Verified",
+        "placeholderName": "Full name",
+        "placeholderEmail": "example@email.com",
+        "placeholderPassword": "Secure password",
+        "errorNameRequired": "Name is required.",
+        "errorNameTooShort": "Name must be at least 2 characters.",
+        "errorEmailRequired": "Email is required.",
+        "errorEmailInvalid": "Invalid email address.",
+        "errorPassword_required": "Password is required.",
+        "errorPassword_tooShort": "Password must be at least 8 characters.",
+        "errorPassword_tooLong": "Password is too long.",
+        "errorPassword_noUppercase": "At least one uppercase letter required.",
+        "errorPassword_noLowercase": "At least one lowercase letter required.",
+        "errorPassword_noNumber": "At least one number required.",
+        "errorPassword_noSpecial": "At least one special character required.",
+        "submit": "Create",
+        "success": "User created successfully.",
+        "error": "Failed to create user."
+      },
+      "edit": {
+        "button": "Edit",
+        "title": "Edit User",
+        "save": "Save",
+        "success": "User updated successfully."
+      },
+      "export": {
+        "button": "Export",
+        "success": "User list exported successfully.",
+        "error": "Failed to export user list."
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "subtitle": "{{count}} transactions total",
+      "description": "Description",
+      "amount": "Amount",
+      "category": "Category",
+      "type": "Type",
+      "date": "Date",
+      "user": "User",
+      "userEmail": "Email",
+      "actions": "Actions",
+      "viewDetails": "View Details",
+      "transactionDetails": "Transaction Details",
+      "noResults": "No transactions found.",
+      "showing": "{{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Pagination",
+      "income": "Income",
+      "expense": "Expense",
+      "allTypes": "All types",
+      "allCategories": "All categories",
+      "searchPlaceholder": "Search transactions…",
+      "filterType": "Filter by type",
+      "filterCategory": "Filter by category",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "totalTransactions": "{{count}} transactions",
+      "refresh": "Refresh",
+      "notes": "Notes",
+      "tags": "Tags",
+      "confirmDelete": "Delete Transaction",
+      "confirmDeleteText": "Are you sure you want to delete \"{{description}}\" ({{amount}})? This action cannot be undone.",
+      "delete": "Delete",
+      "deleteSuccess": "Transaction deleted successfully.",
+      "deleteError": "Failed to delete transaction.",
+      "usersSubtitle": "{{count}} users with transactions",
+      "searchUserPlaceholder": "Search users…",
+      "noUsers": "No users with transactions found.",
+      "viewUserTransactions": "View transactions",
+      "txCount": "Transactions",
+      "lastTransaction": "Last transaction",
+      "backToUsers": "Back to user overview",
+      "export": {
+        "button": "Export",
+        "success": "Transactions exported successfully.",
+        "error": "Failed to export transactions."
+      }
+    },
+    "subscribers": {
+      "title": "Newsletter Subscribers",
+      "subtitle": "{{count}} subscribers total",
+      "email": "Email",
+      "status": "Status",
+      "language": "Language",
+      "subscribedAt": "Subscribed",
+      "actions": "Actions",
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "allStatuses": "All Statuses",
+      "allLanguages": "All Languages",
+      "searchPlaceholder": "Search by email…",
+      "filterStatus": "Filter by status",
+      "filterLanguage": "Filter by language",
+      "noResults": "No subscribers found.",
+      "showing": "{{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Subscriber pagination",
+      "totalSubscribers": "{{count}} subscribers",
+      "refresh": "Refresh",
+      "confirmDeleteText": "Delete subscriber \"{{email}}\"? This action cannot be undone.",
+      "delete": "Delete",
+      "deleteSuccess": "Subscriber deleted successfully.",
+      "deleteError": "Failed to delete subscriber.",
+      "lang_de": "German",
+      "lang_en": "English",
+      "lang_ar": "Arabic",
+      "lang_ka": "Georgian",
+      "type": "Type",
+      "registered": "Registered",
+      "guest": "Guest",
+      "confirmDelete": "Delete Subscriber",
+      "detail": {
+        "title": "Subscriber Details",
+        "view": "View Details",
+        "subscribedAt": "Subscribed on",
+        "confirmedAt": "Confirmed on"
+      },
+      "edit": {
+        "button": "Edit",
+        "title": "Edit Subscriber",
+        "save": "Save",
+        "success": "Subscriber updated successfully.",
+        "error": "Failed to update subscriber.",
+        "confirmManual": "Manually mark subscriber as confirmed? This normally happens via email confirmation."
+      },
+      "resend": {
+        "button": "Resend Confirmation",
+        "success": "Confirmation email resent.",
+        "error": "Failed to resend confirmation email.",
+        "cooldown": "Please wait…"
+      },
+      "export": {
+        "button": "Export",
+        "success": "Subscriber list exported successfully.",
+        "error": "Failed to export subscriber list."
+      }
+    },
+    "campaigns": {
+      "title": "Newsletter Campaigns",
+      "subtitle": "{{count}} campaigns total",
+      "subject": "Subject",
+      "content": "Content",
+      "language": "Language",
+      "status": "Status",
+      "sentAt": "Sent on",
+      "createdAt": "Created on",
+      "recipients": "Recipients",
+      "actions": "Actions",
+      "draft": "Draft",
+      "sending": "Sending",
+      "sent": "Sent",
+      "failed": "Failed",
+      "allStatuses": "All Statuses",
+      "allLanguages": "All Languages",
+      "searchPlaceholder": "Search campaigns…",
+      "filterStatus": "Filter by status",
+      "filterLanguage": "Filter by language",
+      "noResults": "No campaigns found.",
+      "showing": "{{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Campaign pagination",
+      "totalCampaigns": "{{count}} campaigns",
+      "refresh": "Refresh",
+      "create": "Create Newsletter",
+      "editCampaign": "Edit Campaign",
+      "confirmDelete": "Delete Campaign",
+      "confirmDeleteText": "Delete campaign \"{{subject}}\"? This action cannot be undone.",
+      "delete": "Delete",
+      "deleteSuccess": "Campaign deleted successfully.",
+      "deleteError": "Failed to delete campaign.",
+      "send": "Send Newsletter",
+      "confirmSend": "Send Newsletter",
+      "confirmSendText": "Send newsletter to {{count}} subscribers?",
+      "sendSuccess": "Newsletter sent successfully to {{success}}/{{total}} recipients.",
+      "sendError": "Failed to send newsletter.",
+      "noConfirmedRecipients": "No confirmed subscribers found. Please confirm subscribers via Subscribers → Edit first.",
+      "sendSkippedLangs": "No subscribers for: {{langs}} – skipped.",
+      "broadcastMode": "Broadcast: all subscribers",
+      "broadcastModeHint": "All confirmed subscribers receive this email regardless of their language preference.",
+      "broadcastConfirmText": "Send newsletter to all ~{{count}} confirmed subscribers?",
+      "preview": "Preview",
+      "previewTitle": "Newsletter Preview",
+      "save": "Save",
+      "saveDraft": "Save as Draft",
+      "saveSuccess": "Campaign saved successfully.",
+      "saveError": "Failed to save campaign.",
+      "subjectPlaceholder": "Enter newsletter subject…",
+      "contentPlaceholder": "Enter newsletter content…",
+      "recipientFilter": "Recipient Filter",
+      "allConfirmed": "Multilingual (4 languages)",
+      "languageOnly": "Language only: {{lang}}",
+      "recipientCount": "Will be sent to approx. {{count}} subscribers",
+      "recipientCountLoading": "Calculating recipients…",
+      "noRecipients": "No recipients for this filter",
+      "subjectRequired": "Subject is required.",
+      "subjectTooLong": "Subject must not exceed 200 characters.",
+      "contentRequired": "Content is required.",
+      "contentTooLong": "Content must not exceed 50,000 characters.",
+      "languageRequired": "Language is required.",
+      "statTotal": "Total",
+      "statSent": "Sent",
+      "statDrafts": "Drafts",
+      "statFailed": "Failed",
+      "detail": {
+        "title": "Campaign Details",
+        "view": "View Details",
+        "sentBy": "Sent by",
+        "successCount": "Successful",
+        "failCount": "Failed",
+        "recipientCount": "Recipients",
+        "createdAt": "Created on",
+        "sentAt": "Sent on",
+        "contentPreview": "Content Preview",
+        "recipientStats": "Send Statistics"
+      },
+      "backToList": "Back to List",
+      "templates": {
+        "label": "Template",
+        "custom": "Custom",
+        "productUpdate": "Product Update",
+        "newsletterDigest": "Newsletter Digest",
+        "securityNotice": "Security Notice",
+        "maintenance": "Maintenance",
+        "tipsTricks": "Tips & Tricks"
+      },
+      "confirmSendAllLangs": "Send newsletter in 4 languages to approx. {{count}} subscribers?",
+      "resetAll": "Reset All",
+      "resetConfirmText": "Permanently delete all campaigns? This action cannot be undone.",
+      "resetSuccess": "All campaigns deleted successfully.",
+      "resetError": "Failed to reset campaigns."
+    },
+    "auditLog": {
+      "title": "Audit Log",
+      "subtitle": "{{count}} entries total",
+      "date": "Date",
+      "admin": "Admin",
+      "action": "Action",
+      "target": "Target",
+      "details": "Details",
+      "ipAddress": "IP Address",
+      "requestId": "Request ID",
+      "filterAction": "Filter by action",
+      "allActions": "All Actions",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "noResults": "No audit log entries found.",
+      "showing": "{{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pagination": "Audit log pagination",
+      "totalEntries": "{{count}} entries",
+      "refresh": "Refresh",
+      "statsLabel": "Statistics",
+      "statTotal": "Total Entries",
+      "statMostCommon": "Most Common Action",
+      "statActiveAdmins": "Active Admins",
+      "searchPlaceholder": "Search audit logs…",
+      "actions_enum": {
+        "USER_CREATED": "User Created",
+        "USER_UPDATED": "User Updated",
+        "USER_DELETED": "User Deleted",
+        "USER_BANNED": "User Banned",
+        "USER_UNBANNED": "User Unbanned",
+        "USER_ROLE_CHANGED": "Role Changed",
+        "USER_PASSWORD_RESET": "Password Reset",
+        "ALL_USERS_DELETED": "All Users Deleted",
+        "ADMIN_LOGIN": "Admin Login",
+        "SETTINGS_CHANGED": "Settings Changed",
+        "TRANSACTION_DELETED": "Transaction Deleted",
+        "SUBSCRIBER_DELETED": "Subscriber Deleted",
+        "DATA_EXPORT": "Data Export",
+        "TRANSACTION_QUOTA_REACHED": "Quota Reached",
+        "RETENTION_REMINDER_SENT": "Retention Reminder Sent",
+        "RETENTION_FINAL_WARNING_SENT": "Final Warning Sent",
+        "TRANSACTIONS_AUTO_DELETED": "Transactions Auto-Deleted",
+        "USER_EXPORT_CONFIRMED": "User Export Confirmed",
+        "RETENTION_RESET_BY_ADMIN": "Retention Reset by Admin",
+        "RETENTION_MANUAL_TRIGGER": "Retention Manual Trigger",
+        "RETENTION_SCHEDULED_RUN": "Retention Scheduled Run",
+        "USER_LOGIN": "User Login",
+        "USER_LOGIN_FAILED": "Login Failed",
+        "USER_REGISTERED": "User Registered",
+        "USER_ACCOUNT_LOCKED": "Account Locked",
+        "PASSWORD_CHANGED": "Password Changed",
+        "PASSWORD_RESET_REQUESTED": "Password Reset Requested",
+        "PASSWORD_RESET_COMPLETED": "Password Reset Completed",
+        "EMAIL_CHANGED": "Email Changed"
+      },
+      "details_format": {
+        "newRole": "New role: {{role}}",
+        "deletedTransactions": "{{count}} transactions deleted",
+        "email": "Email: {{email}}",
+        "role": "Role: {{role}}",
+        "reason": "Reason: {{reason}}",
+        "type": "Type: {{type}}",
+        "format": "Format: {{format}}"
+      },
+      "roles": {
+        "admin": "Admin",
+        "user": "User"
+      }
+    },
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "message": "An error occurred while loading this page. Please try again.",
+      "retry": "Try again",
+      "details": "Technical details"
+    }
+  },
+  "lifecycle": {
+    "quota": {
+      "title": "Transaction Quota",
+      "used": "{{used}} of {{limit}} this month",
+      "remaining": "{{remaining}} remaining",
+      "exceeded": "Monthly limit reached",
+      "resetInfo": "Resets on {{date}}"
+    },
+    "retention": {
+      "title": "Data Retention",
+      "status": "Lifecycle Status",
+      "phase": {
+        "active": "Active",
+        "reminding": "Reminder Phase",
+        "finalWarning": "Final Warning",
+        "gracePeriod": "Export Period",
+        "deleted": "Deleted"
+      },
+      "oldTransactions": "{{count}} transactions older than 12 months",
+      "daysRemaining": "{{days}} days until deletion",
+      "exportConfirmed": "Export confirmed on {{date}}",
+      "noOldTransactions": "No old transactions found",
+      "exportReminder": "Please export your old data to save it permanently.",
+      "exportButton": "Export Data",
+      "confirmExport": "Confirm Export",
+      "exportConfirmedSuccess": "Export successfully confirmed"
+    },
+    "toast": {
+      "retentionReminder": "You have {{count}} old transactions. Please export your data before they are deleted.",
+      "retentionFinalWarning": "Warning: {{count}} transactions will be permanently deleted in a few days! Export now.",
+      "exportAction": "Export now"
+    },
+    "admin": {
+      "title": "Lifecycle Overview",
+      "subtitle": "Retention status and transaction lifecycle of all users",
+      "usersInReminding": "Users in reminder phase",
+      "usersInFinalWarning": "Users with final warning",
+      "usersExported": "Users with export",
+      "deletionsThisMonth": "Deletions this month",
+      "totalOldTransactions": "Users with old transactions",
+      "usersApproachingLimit": "Users approaching limit",
+      "usersAtLimit": "Users at limit",
+      "refresh": "Refresh",
+      "triggerProcessing": "Trigger Processing",
+      "triggerConfirm": "Manually trigger retention processing now?",
+      "triggerSuccess": "Retention processing triggered successfully",
+      "triggerError": "Failed to trigger processing",
+      "criticalUsers": "Critical Users",
+      "criticalUsersSubtitle": "Users in final warning phase",
+      "noCriticalUsers": "No users in critical phase",
+      "quotaUsers": "Users Near Quota Limit",
+      "quotaUsersSubtitle": "Monthly transaction limit almost reached",
+      "noQuotaUsers": "No users near limit",
+      "userDetail": "Lifecycle Details",
+      "retentionPhase": "Retention Phase",
+      "transactionBreakdown": "Transaction Breakdown",
+      "totalTransactions": "Total",
+      "oldTransactions": "Older than 12 months",
+      "recentTransactions": "Within 12 months",
+      "quotaStatus": "Quota Status",
+      "resetRetention": "Reset Retention",
+      "resetConfirm": "Really reset retention status for this user?",
+      "resetSuccess": "Retention status successfully reset",
+      "resetError": "Failed to reset",
+      "finalWarningSentAt": "Final warning sent",
+      "monthlyCount": "{{count}} / 150 transactions",
+      "statsLabel": "Lifecycle Statistics",
+      "criticalLabel": "Critical Users",
+      "close": "Close",
+      "viewDetail": "View Details",
+      "configTitle": "System Configuration",
+      "configRetention": "Months Retention",
+      "configGracePeriod": "Months Grace Period",
+      "configFinalWarning": "Days Final Warning",
+      "configCooldown": "Days Cooldown",
+      "configQuota": "Tx / Month",
+      "timelineTitle": "Lifecycle Phases",
+      "phaseActive": "Active",
+      "phaseReminding": "Reminding",
+      "phaseFinalWarning": "Final Warning",
+      "phaseDeletion": "Deletion",
+      "months": "months",
+      "days": "days",
+      "tabCritical": "Critical",
+      "tabReminding": "Reminding",
+      "tabExported": "Exported",
+      "tabQuota": "Quota",
+      "noRemindingUsers": "No users in reminder phase",
+      "noExportedUsers": "No users with export",
+      "searchPlaceholder": "Search users…",
+      "noSearchResults": "No results found",
+      "triggerResult": "Processing Result",
+      "resultProcessed": "Processed",
+      "resultReminders": "Reminders",
+      "resultFinalWarnings": "Final Warnings",
+      "resultDeletions": "Deletions",
+      "resultErrors": "Errors",
+      "resultSkipped": "Skipped",
+      "reminderStartedAt": "Reminder started",
+      "reminderCount": "{{count}} reminders",
+      "exportConfirmedAt": "Export confirmed",
+      "retentionTimestamps": "Retention Timestamps",
+      "noTimestamps": "No retention data available",
+      "remindersLabel": "Reminder count",
+      "daysUntilDeletion": "Days until deletion",
+      "quotaResetDate": "Quota resets on {{date}}"
+    }
   }
 }

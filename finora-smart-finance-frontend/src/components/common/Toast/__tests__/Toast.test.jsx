@@ -1,126 +1,168 @@
 /**
  * @fileoverview Toast Component Tests
- * @description Tests for Toast rendering, types, auto-dismiss, close
+ * @description Full coverage: types, auto-dismiss, close, action, swipe, duration=0, progress
  */
 
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from '../Toast';
 
-// Mock react-i18next
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key) => key,
-    i18n: { language: 'de' },
-  }),
+  useTranslation: () => ({ t: (key) => key, i18n: { language: 'de' } }),
 }));
 
+const renderToast = (props = {}) =>
+  render(<Toast id="t1" message="Hello" onClose={vi.fn()} {...props} />);
+
 describe('Toast', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  // ─── Rendering ────────────────────────────────────────────────────
+  it('renders message text', () => {
+    renderToast({ message: 'Saved!' });
+    expect(screen.getByText('Saved!')).toBeInTheDocument();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
+  it('has role="alert" + aria-live="polite"', () => {
+    renderToast();
+    const el = screen.getByRole('alert');
+    expect(el).toHaveAttribute('aria-live', 'polite');
   });
 
-  // ==========================================
-  // Rendering
-  // ==========================================
-  it('renders toast message', () => {
-    render(<Toast id="1" message="Success!" type="success" onClose={vi.fn()} />);
-    expect(screen.getByText('Success!')).toBeInTheDocument();
+  // ─── All types ────────────────────────────────────────────────────
+  it.each(['success', 'error', 'warning', 'info'])(
+    'applies "%s" type class',
+    (type) => {
+      const { container } = renderToast({ type });
+      expect(container.querySelector('[role="alert"]').className).toContain(type);
+    },
+  );
+
+  it('defaults to info type', () => {
+    const { container } = renderToast();
+    expect(container.querySelector('[role="alert"]').className).toContain('info');
   });
 
-  it('renders with default info type', () => {
-    render(
-      <Toast id="2" message="Info toast" onClose={vi.fn()} />
-    );
-    expect(screen.getByText('Info toast')).toBeInTheDocument();
+  // ─── Close button ─────────────────────────────────────────────────
+  it('has close button with correct aria-label', () => {
+    renderToast();
+    expect(screen.getByLabelText('common.closeNotification')).toBeInTheDocument();
   });
 
-  it('has role="alert" for accessibility', () => {
-    render(<Toast id="3" message="Alert" type="error" onClose={vi.fn()} />);
-    expect(screen.getByRole('alert')).toBeInTheDocument();
-  });
-
-  // ==========================================
-  // Types
-  // ==========================================
-  it('renders success toast', () => {
-    const { container } = render(
-      <Toast id="4" message="Saved" type="success" onClose={vi.fn()} />
-    );
-    const toast = container.querySelector('[class*="toast"]');
-    expect(toast.className).toContain('success');
-  });
-
-  it('renders error toast', () => {
-    const { container } = render(
-      <Toast id="5" message="Failed" type="error" onClose={vi.fn()} />
-    );
-    const toast = container.querySelector('[class*="toast"]');
-    expect(toast.className).toContain('error');
-  });
-
-  it('renders warning toast', () => {
-    const { container } = render(
-      <Toast id="6" message="Warn" type="warning" onClose={vi.fn()} />
-    );
-    const toast = container.querySelector('[class*="toast"]');
-    expect(toast.className).toContain('warning');
-  });
-
-  // ==========================================
-  // Close Button
-  // ==========================================
-  it('renders close button', () => {
-    render(<Toast id="7" message="Close me" onClose={vi.fn()} />);
-    const closeBtn = screen.getByLabelText('common.closeNotification');
-    expect(closeBtn).toBeInTheDocument();
-  });
-
-  it('calls onClose when close button is clicked', () => {
+  it('triggers exit-up phase on close click, then calls onClose after delay', () => {
     const onClose = vi.fn();
-    render(<Toast id="8" message="Closable" onClose={onClose} />);
-    const closeBtn = screen.getByLabelText('common.closeNotification');
-    fireEvent.click(closeBtn);
-
-    // onClose gets called after exit animation delay
-    act(() => {
-      vi.advanceTimersByTime(400);
-    });
-    expect(onClose).toHaveBeenCalled();
+    renderToast({ onClose });
+    fireEvent.click(screen.getByLabelText('common.closeNotification'));
+    expect(onClose).not.toHaveBeenCalled(); // not yet
+    act(() => vi.advanceTimersByTime(300)); // EXIT_DURATION
+    expect(onClose).toHaveBeenCalledWith('t1');
   });
 
-  // ==========================================
-  // Auto-dismiss
-  // ==========================================
+  // ─── Auto-dismiss ─────────────────────────────────────────────────
   it('auto-dismisses after duration', () => {
     const onClose = vi.fn();
-    render(<Toast id="9" message="Auto" duration={3000} onClose={onClose} />);
-
-    act(() => {
-      vi.advanceTimersByTime(3500);
-    });
-
-    expect(onClose).toHaveBeenCalled();
+    renderToast({ onClose, duration: 2000 });
+    act(() => vi.advanceTimersByTime(2500));
+    expect(onClose).toHaveBeenCalledWith('t1');
   });
 
-  // ==========================================
-  // Action Button
-  // ==========================================
-  it('renders action button when provided', () => {
-    const action = { label: 'Undo', onClick: vi.fn() };
-    render(<Toast id="10" message="Deleted" action={action} onClose={vi.fn()} />);
+  it('does NOT auto-dismiss when duration=0', () => {
+    const onClose = vi.fn();
+    renderToast({ onClose, duration: 0 });
+    act(() => vi.advanceTimersByTime(10000));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  // ─── Progress bar ─────────────────────────────────────────────────
+  it('renders progress bar when duration > 0', () => {
+    const { container } = renderToast({ duration: 5000 });
+    expect(container.querySelector('[class*="progressBar"]')).toBeInTheDocument();
+  });
+
+  it('does NOT render progress bar when duration=0', () => {
+    const { container } = renderToast({ duration: 0 });
+    expect(container.querySelector('[class*="progressBar"]')).not.toBeInTheDocument();
+  });
+
+  // ─── Action button ────────────────────────────────────────────────
+  it('renders action button with label', () => {
+    renderToast({ action: { label: 'Undo', onClick: vi.fn() } });
     expect(screen.getByText('Undo')).toBeInTheDocument();
   });
 
-  it('calls action onClick when action button is clicked', () => {
-    const actionClick = vi.fn();
-    const action = { label: 'Retry', onClick: actionClick };
-    render(<Toast id="11" message="Failed" action={action} onClose={vi.fn()} />);
+  it('calls action onClick, then triggers exit', () => {
+    const onClick = vi.fn();
+    const onClose = vi.fn();
+    renderToast({ action: { label: 'Retry', onClick }, onClose });
     fireEvent.click(screen.getByText('Retry'));
-    expect(actionClick).toHaveBeenCalledTimes(1);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    act(() => vi.advanceTimersByTime(300));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('does not render action button when no action prop', () => {
+    renderToast();
+    expect(screen.queryByRole('button', { name: /undo|retry/i })).not.toBeInTheDocument();
+  });
+
+  // ─── Swipe-to-dismiss (touch events) ──────────────────────────────
+  it('dismisses on swipe left exceeding threshold (80px)', () => {
+    const onClose = vi.fn();
+    const { container } = renderToast({ onClose, duration: 0 });
+    const toast = container.querySelector('[role="alert"]');
+
+    fireEvent.touchStart(toast, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(toast, { touches: [{ clientX: 100 }] }); // -100px
+    fireEvent.touchEnd(toast);
+
+    act(() => vi.advanceTimersByTime(300));
+    expect(onClose).toHaveBeenCalledWith('t1');
+  });
+
+  it('dismisses on swipe right exceeding threshold', () => {
+    const onClose = vi.fn();
+    const { container } = renderToast({ onClose, duration: 0 });
+    const toast = container.querySelector('[role="alert"]');
+
+    fireEvent.touchStart(toast, { touches: [{ clientX: 100 }] });
+    fireEvent.touchMove(toast, { touches: [{ clientX: 200 }] }); // +100px
+    fireEvent.touchEnd(toast);
+
+    act(() => vi.advanceTimersByTime(300));
+    expect(onClose).toHaveBeenCalledWith('t1');
+  });
+
+  it('snaps back on short swipe (< 80px)', () => {
+    const onClose = vi.fn();
+    const { container } = renderToast({ onClose, duration: 0 });
+    const toast = container.querySelector('[role="alert"]');
+
+    fireEvent.touchStart(toast, { touches: [{ clientX: 200 }] });
+    fireEvent.touchMove(toast, { touches: [{ clientX: 160 }] }); // -40px
+    fireEvent.touchEnd(toast);
+
+    act(() => vi.advanceTimersByTime(500));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  // ─── Icon rendering ──────────────────────────────────────────────
+  it('renders icon with aria-hidden', () => {
+    const { container } = renderToast();
+    const icon = container.querySelector('[class*="icon"]');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  // ─── Double-exit guard ────────────────────────────────────────────
+  it('only calls onClose once even with multiple close triggers', () => {
+    const onClose = vi.fn();
+    renderToast({ onClose, duration: 0 });
+    const closeBtn = screen.getByLabelText('common.closeNotification');
+
+    fireEvent.click(closeBtn);
+    fireEvent.click(closeBtn); // second click should be ignored
+
+    act(() => vi.advanceTimersByTime(300));
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

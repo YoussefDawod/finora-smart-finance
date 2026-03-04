@@ -26,7 +26,7 @@ export function formatCurrency(amount, currency) {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  } catch (error) {
+  } catch {
     const fallbackCurrency = currency || 'EUR';
     return `${amount.toFixed(2)} ${fallbackCurrency}`;
   }

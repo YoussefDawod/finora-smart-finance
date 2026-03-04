@@ -76,7 +76,7 @@
   p {
     font-size: var(--fs-base);
     color: var(--tx-muted);
-    line-height: 1.6;
+    line-height: var(--lh-relaxed);
     margin-bottom: var(--space-md);
 
     @include mobile {
@@ -92,7 +92,7 @@
     li {
       font-size: var(--fs-base);
       color: var(--tx-muted);
-      line-height: 1.6;
+      line-height: var(--lh-relaxed);
       margin-bottom: var(--space-xs);
 
       @include mobile {
@@ -118,30 +118,6 @@
   font-style: italic;
 }
 
-.backLink {
-  display: block;
-  text-align: center;
-  margin-top: var(--space-lg);
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: var(--fw-m);
-  transition: color var(--tr);
-
-  &:hover {
-    color: var(--pri-hover);
-  }
-
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
-}
-
-// ============================================
-// REDUCED MOTION
-// ============================================
-@include reduced-motion {
-  .backLink {
-    transition: none;
-  }
+.backButton {
+  @include back-button;
 }

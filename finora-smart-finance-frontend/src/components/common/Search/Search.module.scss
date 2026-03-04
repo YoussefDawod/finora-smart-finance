@@ -86,7 +86,7 @@
 .searchInput {
   width: 100%;
   padding: var(--space-sm) var(--space-md) var(--space-sm) var(--space-2xl);
-  min-height: var(--input-h);
+  min-height: var(--input-height-md);
   background: var(--surface);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
   border-radius: var(--r-md);
@@ -113,7 +113,7 @@
   @include mobile {
     font-size: var(--fs-sm);
     padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
-    min-height: calc(var(--input-h) - var(--space-3xs));
+    min-height: calc(var(--input-height-md) - var(--space-3xs));
   }
 }
 

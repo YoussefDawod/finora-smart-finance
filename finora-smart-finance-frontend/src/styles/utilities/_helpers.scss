@@ -255,7 +255,7 @@ $spacing-map: (
 .font-bold { font-weight: var(--fw-b); }
 
 // Line Height
-.leading-none { line-height: 1; }
+.leading-none { line-height: var(--lh-none); }
 .leading-tight { line-height: var(--lh-tight); }
 .leading-normal { line-height: var(--lh-n); }
 .leading-relaxed { line-height: var(--lh-relaxed); }

@@ -8,7 +8,7 @@ const config = require('../../config/env');
 const logger = require('../logger');
 
 const backendBaseUrl = (config.apiUrl && config.apiUrl.replace(/\/api$/, '')) || 'http://localhost:5000';
-const frontendBaseUrl = config.frontendUrl || 'http://localhost:3001';
+const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
 let transporter = null;
 
@@ -60,9 +60,8 @@ async function initTransporter() {
             pass: testAccount.pass,
           },
         });
-        logger.info('Ethereal Test-Account erstellt:');
+        logger.info('Ethereal Test-Account erstellt (Credentials werden nicht geloggt)');
         logger.info(`   User: ${testAccount.user}`);
-        logger.info(`   Pass: ${testAccount.pass}`);
         logger.info('   Emails werden an Ethereal gesendet - Preview-Links im Log!');
       } catch (error) {
         logger.warn(`Ethereal account creation failed: ${error.message}`);

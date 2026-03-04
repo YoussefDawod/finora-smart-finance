@@ -2,6 +2,27 @@
 const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
+// Sensible Query-Parameter, die NICHT geloggt werden dürfen
+const SENSITIVE_QUERY_KEYS = new Set(['token', 'refreshToken', 'accessToken', 'apiKey', 'key', 'secret', 'password']);
+
+/**
+ * Maskiert sensible Werte in Query-Parametern für sicheres Logging
+ * @param {Object} query - Express req.query
+ * @returns {Object} Kopie mit maskierten Werten
+ */
+function sanitizeQueryForLog(query) {
+  if (!query || typeof query !== 'object') return {};
+  const safe = {};
+  for (const [key, value] of Object.entries(query)) {
+    const safeKey = String(key);
+    // eslint-disable-next-line security/detect-object-injection -- key aus Object.entries(), kein User-Input als Property-Accessor
+    safe[safeKey] = SENSITIVE_QUERY_KEYS.has(safeKey.toLowerCase())
+      ? '[REDACTED]'
+      : value;
+  }
+  return safe;
+}
+
 // Request-Logger Middleware
 const requestLoggerMiddleware = (req, res, next) => {
   // Unique Request ID
@@ -11,12 +32,12 @@ const requestLoggerMiddleware = (req, res, next) => {
   // Start time
   const startTime = Date.now();
 
-  // Log incoming request
+  // Log incoming request — sensible Query-Parameter maskiert
   logger.info(`${req.method} ${req.path}`, {
     requestId,
     method: req.method,
     path: req.path,
-    query: req.query,
+    query: sanitizeQueryForLog(req.query),
     ip: req.ip,
   });
 

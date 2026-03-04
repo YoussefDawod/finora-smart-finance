@@ -1,0 +1,224 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================================================
+// RetentionBanner — Phasenabhängiges Alert-Banner
+// ============================================================================
+
+.retentionBanner {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--r-lg);
+  border: 1px solid transparent;
+
+  @include mobile {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+  }
+
+  // ── Varianten ──
+
+  &.info {
+    background: color-mix(in srgb, var(--info, var(--primary)) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--info, var(--primary)) 25%, transparent);
+
+    .iconWrapper {
+      color: var(--info, var(--primary));
+    }
+  }
+
+  &.warning {
+    background: color-mix(in srgb, var(--warning) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--warning) 25%, transparent);
+
+    .iconWrapper {
+      color: var(--warning);
+    }
+  }
+
+  &.danger {
+    background: color-mix(in srgb, var(--error) 8%, var(--surface));
+    border-color: color-mix(in srgb, var(--error) 25%, transparent);
+
+    .iconWrapper {
+      color: var(--error);
+    }
+  }
+
+  &.neutral {
+    background: var(--surface);
+    border-color: var(--border);
+
+    .iconWrapper {
+      color: var(--tx-muted);
+    }
+  }
+}
+
+// Icon
+.iconWrapper {
+  display: flex;
+  align-items: flex-start;
+  padding-top: var(--space-2xs);
+  flex-shrink: 0;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Content
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+}
+
+// Phase Badge
+.phaseBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3xs, 2px) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-2xs, 0.6875rem);
+  font-weight: var(--fw-sb);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+
+  &.info {
+    background: color-mix(in srgb, var(--info, var(--primary)) 18%, transparent);
+    color: var(--info, var(--primary));
+    border: 1px solid color-mix(in srgb, var(--info, var(--primary)) 30%, transparent);
+  }
+
+  &.warning {
+    background: color-mix(in srgb, var(--warning) 18%, transparent);
+    color: var(--warning);
+    border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  }
+
+  &.danger {
+    background: color-mix(in srgb, var(--error) 18%, transparent);
+    color: var(--error);
+    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  }
+
+  &.neutral {
+    background: color-mix(in srgb, var(--tx-muted) 18%, transparent);
+    color: var(--tx-muted);
+    border: 1px solid color-mix(in srgb, var(--tx-muted) 30%, transparent);
+  }
+}
+
+// Message Text
+.message {
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  line-height: 1.5;
+}
+
+.countdown {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+}
+
+.exported {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: 0;
+  font-size: var(--fs-xs);
+  color: var(--success);
+  font-weight: var(--fw-m);
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Actions
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.exportBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.confirmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}

@@ -5,14 +5,12 @@
 
 import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
-import { useToast } from './useToast';
 import authService from '@/api/authService';
 import userService from '@/api/userService';
 import { validatePassword } from '@/validators';
 
 export function useProfile() {
   const { user, refreshUser } = useAuth();
-  useToast();
 
   // ============================================
   // PROFILE FORM STATE
@@ -56,7 +54,11 @@ export function useProfile() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (password) => {
+    if (!password) {
+      return { success: false, error: 'passwordRequired' };
+    }
+
     const trimmedName = formData.name?.trim();
     if (!trimmedName || trimmedName.length < 3) {
       return { success: false, error: 'nameMin' };
@@ -67,12 +69,14 @@ export function useProfile() {
 
     setIsSaving(true);
     try {
-      await authService.updateProfile({ name: trimmedName });
+      await authService.updateProfile({ name: trimmedName, password });
       await refreshUser();
       setIsEditing(false);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.error || 'saveError' };
+      const code = error.response?.data?.code;
+      if (code === 'INVALID_PASSWORD') return { success: false, error: 'invalidPassword' };
+      return { success: false, error: 'saveError' };
     } finally {
       setIsSaving(false);
     }
@@ -104,7 +108,7 @@ export function useProfile() {
     }
   }, []);
 
-  const handleAddEmail = async (newEmail) => {
+  const handleAddEmail = async (newEmail, password) => {
     if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
       return { success: false, error: 'invalidEmail', link: null };
     }
@@ -116,7 +120,7 @@ export function useProfile() {
     try {
       const isChange = emailStatus.hasEmail;
       const response = isChange
-        ? await authService.changeEmail(newEmail)
+        ? await authService.changeEmail(newEmail, password)
         : await authService.addEmail(newEmail);
 
       await fetchEmailStatus();
@@ -159,7 +163,7 @@ export function useProfile() {
   const handleResendVerification = async () => {
     setIsResendingVerification(true);
     try {
-      await authService.resendVerification();
+      await authService.resendVerification(emailStatus?.email);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.response?.data?.message || 'emailSendError' };
@@ -196,7 +200,7 @@ export function useProfile() {
 
     setIsChangingPassword(true);
     try {
-      await userService.changePassword(currentPassword, newPassword);
+      await userService.changePassword(currentPassword, newPassword, confirmPassword);
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       return { success: true };
     } catch (error) {

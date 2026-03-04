@@ -5,17 +5,19 @@
 
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { useMotion } from '@/hooks/useMotion';
 import { Card } from '@/components/common';
 import { FiCheck, FiAlertCircle, FiAlertTriangle } from 'react-icons/fi';
 import styles from '../ProfilePage.module.scss';
 
 export function ProfileHeader({ user, emailStatus }) {
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
 
-  const itemVariants = {
+  const itemVariants = shouldAnimate ? {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  };
+  } : {};
 
   return (
     <motion.div variants={itemVariants}>

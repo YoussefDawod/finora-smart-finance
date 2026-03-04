@@ -97,17 +97,14 @@
   font-family: inherit;
   cursor: pointer;
   transition: all var(--tr);
-  text-align: left;
+  text-align: start;
 
   &:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--primary) 30%, transparent);
     box-shadow: var(--sh-sm);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   &.active {
     border-color: var(--primary);
@@ -226,21 +223,24 @@
   font-family: inherit;
   cursor: pointer;
   transition: all var(--tr-fast);
-  text-align: left;
+  text-align: start;
 
   &:hover {
     background: var(--surface-2);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   &.selected {
     background: color-mix(in srgb, var(--primary) 12%, transparent);
     color: var(--primary);
     font-weight: var(--fw-m);
+  }
+
+  // Keyboard-focused item (arrow-key navigation)
+  &.focused {
+    outline: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    outline-offset: -2px;
   }
 
   @include tablet {
@@ -281,26 +281,26 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-b);
   color: var(--primary);
-  margin-left: var(--space-xs);
+  margin-inline-start: var(--space-xs);
 }
 
 // ============================================
 // SIZE VARIANTS
 // ============================================
 .pickerGroup.small .pickerButton {
-  min-height: var(--input-h-sm, auto);
+  min-height: var(--input-height-sm);
   padding: var(--space-3xs) var(--space-sm);
   font-size: var(--fs-xs);
 }
 
 .pickerGroup.medium .pickerButton {
-  min-height: var(--input-h);
+  min-height: var(--input-height-md);
   padding: var(--space-sm) var(--space-md);
   font-size: var(--fs-sm);
 }
 
 .pickerGroup.large .pickerButton {
-  min-height: var(--input-h-lg, auto);
+  min-height: var(--input-height-lg);
   padding: var(--space-md) var(--space-lg);
   font-size: var(--fs-md);
 }
@@ -370,6 +370,17 @@
   }
 
   .chevron {
-    margin-left: var(--space-sm);
+    margin-inline-start: var(--space-sm);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .pickerButton,
+  .menuItem,
+  .chevron {
+    transition: none;
   }
 }

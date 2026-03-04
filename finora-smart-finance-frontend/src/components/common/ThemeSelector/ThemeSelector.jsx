@@ -13,14 +13,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/hooks/useTheme';
-import { FiSun, FiMoon, FiMonitor, FiCheck } from 'react-icons/fi';
+import { useMotion } from '@/hooks/useMotion';
+import { FiSun, FiMoon, FiMonitor, FiCheck, FiChevronDown } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ThemeSelector.module.scss';
 
 function ThemeSelector({ isCollapsed = false, onClose }) {
   const { theme, systemPreference, isInitialized, setTheme, resetToSystemPreference } = useTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { shouldAnimate } = useMotion();
+  const isRtl = i18n.dir() === 'rtl';
   const [isOpen, setIsOpen] = useState(false);
+  const [isSystemMode, setIsSystemMode] = useState(() => {
+    try { return localStorage.getItem('et-theme-system-mode') === 'true'; }
+    catch { return false; }
+  });
   const containerRef = useRef(null);
 
   // ============================================
@@ -77,18 +84,12 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   ];
 
   // ============================================
-  // GET CURRENT THEME ICON
+  // HELPERS
   // ============================================
-  const getCurrentIcon = () => {
-    if (theme === 'dark') return FiMoon;
-    if (theme === 'light') return FiSun;
-    return FiMonitor;
-  };
-
   const getCurrentLabel = () => {
+    if (isSystemMode) return themeLabels.system;
     if (theme === 'dark') return themeLabels.dark;
-    if (theme === 'light') return themeLabels.light;
-    return themeLabels.system;
+    return themeLabels.light;
   };
 
   // ============================================
@@ -97,16 +98,18 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   const handleThemeSelect = (selectedTheme) => {
     if (selectedTheme === 'system') {
       resetToSystemPreference();
+      setIsSystemMode(true);
+      try { localStorage.setItem('et-theme-system-mode', 'true'); } catch { /* ignore */ }
     } else {
       setTheme(selectedTheme);
+      setIsSystemMode(false);
+      try { localStorage.setItem('et-theme-system-mode', 'false'); } catch { /* ignore */ }
     }
     setIsOpen(false);
     onClose?.();
   };
 
 
-
-  const CurrentIcon = getCurrentIcon();
 
   // ============================================
   // RENDER
@@ -124,7 +127,7 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
         title={isCollapsed ? getCurrentLabel() : undefined}
       >
         <span className={styles.triggerIcon}>
-          <CurrentIcon size={20} />
+          {theme === 'dark' ? <FiMoon size={20} /> : theme === 'light' ? <FiSun size={20} /> : <FiMonitor size={20} />}
         </span>
         {!isCollapsed && (
           <>
@@ -134,7 +137,7 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
               animate={{ rotate: isOpen ? 180 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              ▼
+              <FiChevronDown size={12} />
             </motion.span>
           </>
         )}
@@ -145,9 +148,9 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
         {isOpen && (
           <motion.div
             className={styles.panel}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={shouldAnimate ? { opacity: 0, height: 0 } : false}
+            animate={shouldAnimate ? { opacity: 1, height: 'auto' } : false}
+            exit={shouldAnimate ? { opacity: 0, height: 0 } : undefined}
             transition={{ duration: 0.18 }}
           >
             {/* Theme Options Section */}
@@ -156,14 +159,16 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
               <div className={styles.options}>
                 {themes.map((themeOption) => {
                   const Icon = themeOption.icon;
-                  const isActive = (themeOption.value === 'system' && theme === systemPreference) || theme === themeOption.value;
+                  const isActive = themeOption.value === 'system'
+                    ? isSystemMode
+                    : (!isSystemMode && theme === themeOption.value);
                   return (
                     <motion.button
                       key={themeOption.value}
                       className={`${styles.option} ${isActive ? styles.optionActive : ''}`}
                       onClick={() => handleThemeSelect(themeOption.value)}
-                      whileHover={{ x: 2 }}
-                      whileTap={{ scale: 0.96 }}
+                      whileHover={{ x: isRtl ? -2 : 2 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <Icon size={18} />
                       <span>{themeOption.label}</span>

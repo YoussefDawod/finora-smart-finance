@@ -17,11 +17,10 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiMail, 
-  FiAlertCircle, 
   FiArrowRight,
-  FiArrowLeft,
-  FiX
+  FiArrowLeft
 } from 'react-icons/fi';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import styles from './ForgotPasswordRequestForm.module.scss';
 
 export default function ForgotPasswordRequestForm() {
@@ -142,26 +141,11 @@ export default function ForgotPasswordRequestForm() {
   return (
     <form onSubmit={handleSubmit} className={styles.requestForm} noValidate>
       {/* API Error */}
-      <AnimatePresence>
-        {apiError && (
-          <motion.div
-            className={styles.errorBanner}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <FiAlertCircle className={styles.errorIcon} />
-            <span>{apiError}</span>
-            <button
-              type="button"
-              className={styles.errorDismiss}
-              onClick={() => setApiError('')}
-            >
-              <FiX />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ErrorBanner
+        error={apiError}
+        onDismiss={() => setApiError('')}
+        dismissAriaLabel={t('auth.login.dismissError')}
+      />
 
       {/* Email Field */}
       <div className={styles.inputGroup}>

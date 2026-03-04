@@ -13,7 +13,7 @@ const templates = require('../emailTemplates');
  * @returns {string} Vollständige Unsubscribe-URL
  */
 function buildUnsubscribeUrl(unsubscribeToken) {
-  return buildLink(backendBaseUrl, '/api/newsletter/unsubscribe', unsubscribeToken);
+  return buildLink(backendBaseUrl, '/api/v1/newsletter/unsubscribe', unsubscribeToken);
 }
 
 /**
@@ -25,7 +25,7 @@ function buildUnsubscribeUrl(unsubscribeToken) {
  * @returns {Promise<Object>} Ergebnis mit sent-Status
  */
 async function sendNewsletterConfirmation(email, confirmToken, unsubscribeToken, language = 'de') {
-  const confirmUrl = buildLink(backendBaseUrl, '/api/newsletter/confirm', confirmToken);
+  const confirmUrl = buildLink(backendBaseUrl, '/api/v1/newsletter/confirm', confirmToken);
   const unsubscribeUrl = buildUnsubscribeUrl(unsubscribeToken);
 
   const subjects = {
@@ -113,4 +113,30 @@ async function sendNewsletterGoodbye(email, language = 'de') {
   }
 }
 
-module.exports = { sendNewsletterConfirmation, sendNewsletterWelcome, sendNewsletterGoodbye };
+/**
+ * Sendet einen Newsletter-Kampagnen-Inhalt an einen Subscriber
+ * @param {string} email - Email des Empfängers
+ * @param {string} subject - Betreff der Kampagne
+ * @param {string} content - HTML-Inhalt der Kampagne
+ * @param {string} unsubscribeToken - Hashed Abmelde-Token des Subscribers
+ * @param {string} language - Sprache (de, en, ar, ka)
+ * @returns {Promise<Object>} Ergebnis mit sent-Status
+ */
+async function sendNewsletterCampaign(email, subject, content, unsubscribeToken, language = 'de') {
+  const unsubscribeUrl = buildUnsubscribeUrl(unsubscribeToken);
+
+  try {
+    const result = await sendEmail(
+      email,
+      subject,
+      templates.campaignTemplate(subject, content, unsubscribeUrl, language),
+      `${subject}\n\nNewsletter abbestellen: ${unsubscribeUrl}`
+    );
+    return result;
+  } catch (error) {
+    logger.error(`Newsletter campaign email failed for ${email}: ${error.message}`);
+    throw error;
+  }
+}
+
+module.exports = { sendNewsletterConfirmation, sendNewsletterWelcome, sendNewsletterGoodbye, sendNewsletterCampaign };

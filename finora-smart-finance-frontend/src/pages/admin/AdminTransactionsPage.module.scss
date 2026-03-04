@@ -1,0 +1,377 @@
+// ============================================
+// 💰 ADMIN TRANSACTIONS PAGE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+// ── Header ──────────────────────────────────
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.backButton {
+  @include flex-center;
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--tx);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+.title {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  margin: var(--space-2xs) 0 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.exportDropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.exportMenu {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  right: 0;
+  min-width: 7rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  overflow: hidden;
+}
+
+.exportMenuItem {
+  display: block;
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--primary);
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@include spin-keyframes;
+
+// ── Toolbar (Search + Filters) ──────────────
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.searchWrapper {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--tx-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--duration-fast);
+
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+
+  &::placeholder {
+    color: var(--tx-muted);
+  }
+}
+
+.filterGroup {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+
+
+// ── Date Range ──────────────────────────────
+.dateRange {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.dateLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+}
+
+.dateInput {
+  padding: 0 var(--space-sm);
+  height: var(--btn-height-sm, 2rem);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  background: var(--surface);
+  outline: none;
+  cursor: pointer;
+  transition: all var(--tr);
+  color-scheme: light dark;
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: var(--sh-xs);
+  }
+
+  &:focus {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    background: var(--surface-2);
+    box-shadow: var(--sh-sm);
+  }
+}
+
+// ── Count Badge ─────────────────────────────
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  font-weight: var(--fw-m);
+}
+
+// ── Error State ─────────────────────────────
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-3xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  text-align: center;
+}
+
+.errorText {
+  font-size: var(--fs-sm);
+  color: var(--error);
+  margin: 0;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Responsive ──────────────────────────────
+@include below-md {
+  .page {
+    padding: var(--space-md);
+    gap: var(--space-md);
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchWrapper {
+    max-width: none;
+  }
+
+  .filterGroup {
+    flex-direction: column;
+  }
+
+  .dateRange {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .spinning {
+    animation: none;
+  }
+
+  .refreshButton,
+  .exportButton,
+  .backButton,
+  .searchInput,
+  .dateInput,
+  .retryButton {
+    transition: none;
+  }
+}

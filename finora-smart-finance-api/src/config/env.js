@@ -1,7 +1,21 @@
 // config/env.js
 require('dotenv').config();
+const crypto = require('crypto');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// In Development: Falls JWT_SECRET nicht gesetzt ist, wird ein zufälliges Secret
+// generiert. Das verhindert, dass ein erratbares Hardcoded-Secret verwendet wird.
+// ACHTUNG: Bei jedem Neustart werden bestehende Tokens ungültig!
+let devJwtSecret = process.env.JWT_SECRET;
+if (!devJwtSecret && NODE_ENV === 'development') {
+  devJwtSecret = crypto.randomBytes(64).toString('hex');
+  console.warn(
+    '\n⚠️  JWT_SECRET ist nicht gesetzt — ein zufälliges Secret wurde generiert.\n' +
+    '   Tokens werden bei jedem Server-Neustart ungültig.\n' +
+    '   Setze JWT_SECRET in .env für persistente Sessions.\n'
+  );
+}
 
 const config = {
   development: {
@@ -25,17 +39,17 @@ const config = {
         'http://192.168.188.22:3000',
         'http://192.168.188.22:3001',
         'http://192.168.188.22:5173',
-        // Network IPs for mobile testing (regex patterns for any IP in private ranges)
-        /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d+$/,
-        /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/,
-        /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}:\d+$/,
+        // Network IPs for mobile testing (regex patterns for any IP in private ranges, restricted to dev ports)
+        /^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:(3000|3001|5173)$/,
+        /^http:\/\/10\.\d{1,3}\.\d{1,3}\.\d{1,3}:(3000|3001|5173)$/,
+        /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}:(3000|3001|5173)$/,
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
     },
     jwt: {
-      secret: process.env.JWT_SECRET || 'dev-secret-key-change-in-production',
+      secret: devJwtSecret,
       expire: process.env.JWT_EXPIRE || '7d',
       accessExpire: parseInt(process.env.JWT_ACCESS_EXPIRE) || 3600,       // 1h in Sekunden
       refreshExpire: parseInt(process.env.JWT_REFRESH_EXPIRE) || 604800,   // 7d in Sekunden
@@ -121,7 +135,7 @@ const config = {
       db: 'finora-test',
     },
     cors: {
-      origin: '*',
+      origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
@@ -165,11 +179,19 @@ if (!config[NODE_ENV]) {
 
 // Produktions-Validierung
 if (NODE_ENV === 'production') {
-  const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'CORS_ORIGIN'];
+  const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET', 'CORS_ORIGIN', 'SMTP_HOST', 'SMTP_USER', 'SMTP_PASS'];
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
       throw new Error(`Missing required environment variable: ${envVar}`);
     }
+  }
+
+  // Admin-API-Key Mindestlänge erzwingen (falls gesetzt)
+  if (process.env.ADMIN_API_KEY && process.env.ADMIN_API_KEY.length < 32) {
+    throw new Error(
+      `ADMIN_API_KEY ist zu kurz (${process.env.ADMIN_API_KEY.length} Zeichen). ` +
+      'Mindestens 32 Zeichen erforderlich für ausreichende Sicherheit.'
+    );
   }
 }
 

@@ -1,5 +1,6 @@
 // middleware/errorHandler.js
 const logger = require('../utils/logger');
+const { sendError } = require('../utils/responseHelper');
 
 // Error Handler Middleware (MUSS ZULETZT sein!)
 const errorHandler = (err, req, res, next) => {
@@ -7,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
   const status = err.statusCode || 500;
   const message = err.message || 'Interner Serverfehler';
 
-  // Log Error
+  // Log Error (immer die echte Fehlermeldung loggen)
   logger.error(`Unhandled Error: ${message}`, {
     requestId,
     status,
@@ -16,12 +17,18 @@ const errorHandler = (err, req, res, next) => {
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 
-  // Response
-  res.status(status).json({
-    error: message,
+  // Response: In Production keine internen Fehlermeldungen an den Client leaken.
+  // Nur bewusst gesetzte statusCode-Fehler (z.B. 400, 404) geben ihre Message weiter.
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isServerError = status >= 500;
+  const clientMessage = (isProduction && isServerError)
+    ? 'Interner Serverfehler'
+    : message;
+
+  sendError(res, req, {
+    error: clientMessage,
     code: err.code || 'INTERNAL_ERROR',
-    requestId,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    status,
   });
 };
 

@@ -7,6 +7,9 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const config = require('../config/env');
 
+// JWT-Algorithmus — zentral definiert, in sign() und verify() erzwungen
+const JWT_ALGORITHM = 'HS256';
+
 // Token TTL aus Config (konfigurierbar via JWT_ACCESS_EXPIRE / JWT_REFRESH_EXPIRE)
 const ACCESS_TTL_SECONDS = config.jwt.accessExpire;
 const REFRESH_TTL_SECONDS = config.jwt.refreshExpire;
@@ -18,10 +21,21 @@ const REFRESH_TTL_SECONDS = config.jwt.refreshExpire;
  */
 function signAccessToken(user) {
   return jwt.sign(
-    { sub: user._id.toString(), name: user.name, email: user.email || null },
+    { sub: user._id.toString(), name: user.name, role: user.role || 'user' },
     config.jwt.secret,
-    { expiresIn: ACCESS_TTL_SECONDS }
+    { algorithm: JWT_ALGORITHM, expiresIn: ACCESS_TTL_SECONDS }
   );
+}
+
+/**
+ * Verifiziert einen Access Token mit erzwungenem HS256-Algorithmus
+ * Verhindert Algorithm-Confusion-Angriffe (z.B. "none"-Algorithmus)
+ * @param {string} token - Der zu verifizierende JWT
+ * @returns {Object} Decodiertes Payload
+ * @throws {jwt.JsonWebTokenError|jwt.TokenExpiredError} Bei ungültigem/abgelaufenem Token
+ */
+function verifyAccessToken(token) {
+  return jwt.verify(token, config.jwt.secret, { algorithms: [JWT_ALGORITHM] });
 }
 
 /**
@@ -49,12 +63,14 @@ function hashToken(token) {
  * @returns {Object} Sichere User-Daten mit berechneten Auth-Feldern
  */
 function sanitizeUserForAuth(user) {
-  const { _id, email, name, isVerified, createdAt, updatedAt, understoodNoEmailReset } = user;
+  const { _id, email, name, isVerified, role, isActive, createdAt, updatedAt, understoodNoEmailReset } = user;
   return {
     id: _id.toString(),
     email: email || null,
     name,
     isVerified,
+    role: role || 'user',
+    isActive: isActive !== false,
     hasEmail: !!email,
     canResetPassword: !!email && isVerified,
     understoodNoEmailReset,
@@ -137,6 +153,7 @@ function buildAuthResponse(tokens, user) {
 module.exports = {
   // Token-Funktionen
   signAccessToken,
+  verifyAccessToken,
   generateRefreshToken,
   hashToken,
   generateAuthTokens,
@@ -148,6 +165,7 @@ module.exports = {
   buildAuthResponse,
   
   // Konstanten
+  JWT_ALGORITHM,
   ACCESS_TTL_SECONDS,
   REFRESH_TTL_SECONDS,
 };

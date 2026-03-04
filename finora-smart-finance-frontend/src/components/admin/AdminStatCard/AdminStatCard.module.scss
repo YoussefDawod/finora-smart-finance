@@ -1,0 +1,129 @@
+// ============================================
+// 📊 ADMIN STAT CARD
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.statCard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-sm);
+  transition: box-shadow var(--duration-normal), transform var(--duration-normal);
+  min-width: 0;
+
+  &:hover {
+    box-shadow: var(--sh-md);
+    transform: translateY(-2px);
+  }
+}
+
+// ── Icon Box ────────────────────────────────
+.iconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-lg);
+  flex-shrink: 0;
+  font-size: var(--fs-lg);
+}
+
+// ── Content ─────────────────────────────────
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.value {
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  line-height: var(--lh-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Trend Badge ─────────────────────────────
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  line-height: var(--lh-none);
+  margin-top: var(--space-2xs);
+
+  &.up { color: var(--success); }
+  &.down { color: var(--error); }
+  &.neutral { color: var(--tx-muted); }
+
+  svg { flex-shrink: 0; }
+}
+
+// ── Color Variants ──────────────────────────
+.primary {
+  .iconBox {
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+}
+
+.success {
+  .iconBox {
+    color: var(--success);
+    background: color-mix(in srgb, var(--success) 12%, transparent);
+  }
+}
+
+.warning {
+  .iconBox {
+    color: var(--warning);
+    background: color-mix(in srgb, var(--warning) 12%, transparent);
+  }
+}
+
+.error {
+  .iconBox {
+    color: var(--error);
+    background: color-mix(in srgb, var(--error) 12%, transparent);
+  }
+}
+
+.info {
+  .iconBox {
+    color: var(--info);
+    background: color-mix(in srgb, var(--info) 12%, transparent);
+  }
+}
+
+// ── Loading State ───────────────────────────
+.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .statCard {
+    transition: none;
+    &:hover { transform: none; }
+  }
+}

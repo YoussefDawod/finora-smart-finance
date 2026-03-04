@@ -1,4 +1,6 @@
 const { baseLayout } = require('./baseLayout');
+const { escapeHtml } = require('../escapeHtml');
+const colors = require('./colors');
 
 /**
  * Password Reset Template
@@ -7,10 +9,11 @@ const { baseLayout } = require('./baseLayout');
  * @returns {string} HTML-Template
  */
 function passwordReset(name, link) {
+  const safeName = escapeHtml(name);
   return baseLayout(`
     <div class="content">
       <h2>Passwort zurücksetzen</h2>
-      <p>Hallo ${name},</p>
+      <p>Hallo ${safeName},</p>
       <p>du hast einen Antrag zum Zurücksetzen deines Passworts gestellt.</p>
       <p style="text-align: center;">
         <a href="${link}" class="button">Neues Passwort setzen</a>
@@ -18,14 +21,14 @@ function passwordReset(name, link) {
       <div class="warning">
         <strong>Wichtig:</strong> Dieser Link ist nur <strong>1 Stunde</strong> gültig. Wenn du keinen Reset angefordert hast, ignoriere diese Email.
       </div>
-      <p style="font-size: 14px; color: #6b7280;">
+      <p style="font-size: 14px; color: ${colors.textMuted};">
         Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
         <span class="link-fallback">${link}</span>
       </p>
     </div>
     <div class="footer">
       <p>Dein Passwort bleibt sicher, solange du diesen Link nicht verwendest.</p>
-      <p>© ${new Date().getFullYear()} Finora - Smart Finance</p>
+      <p>© ${new Date().getFullYear()} Finora — Smart Finance</p>
     </div>
   `);
 }

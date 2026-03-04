@@ -23,7 +23,7 @@
   align-items: center;
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-md);
-  min-height: var(--input-h);
+  min-height: var(--input-height-md);
   background: var(--surface);
   border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
   border-radius: var(--r-md);
@@ -46,10 +46,7 @@
     box-shadow: var(--sh-md);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   &.active {
     background: color-mix(in srgb, var(--primary) 12%, var(--surface));
@@ -189,17 +186,41 @@
 // ============================================
 .filterSelect {
   width: 100%;
-  padding: var(--space-xs) var(--space-sm);
-  min-height: calc(var(--input-h) - var(--space-3xs));
-  border-radius: var(--r-sm);
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--space-xs) var(--space-xl) var(--space-xs) var(--space-sm);
+  min-height: var(--btn-height-sm, 2rem);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
   background: var(--surface);
   color: var(--tx);
-  font-size: var(--fs-sm);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: all var(--tr);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-sm) center;
+
+  &:hover {
+    background-color: var(--surface-2);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: var(--sh-xs);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    background-color: var(--surface-2);
+    box-shadow: var(--sh-sm);
+  }
 }
 
 :global([dir='rtl']) .filterSelect {
   text-align: right;
+  background-position: left var(--space-sm) center;
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xl);
 }
 
 .dateRow {
@@ -227,12 +248,30 @@
 .dateInput {
   width: 100%;
   padding: var(--space-2xs) var(--space-sm);
-  min-height: calc(var(--input-h) - var(--space-2xs));
-  border-radius: var(--r-sm);
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  min-height: var(--btn-height-sm, 2rem);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
   background: var(--surface);
   color: var(--tx);
-  font-size: var(--fs-sm);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: all var(--tr);
+  color-scheme: light dark;
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: var(--sh-xs);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    background: var(--surface-2);
+    box-shadow: var(--sh-sm);
+  }
 }
 
 :global([dir='rtl']) .dateInput {
@@ -264,5 +303,17 @@
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .filterButton,
+  .chipInner,
+  .clearButton,
+  .dateInput {
+    transition: none;
   }
 }

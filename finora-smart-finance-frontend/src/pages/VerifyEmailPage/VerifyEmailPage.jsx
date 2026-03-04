@@ -18,7 +18,7 @@ import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { VerifyEmailForm } from '@/components/auth';
-import Logo from '@/components/common/Logo/Logo';
+import { Logo } from '@/components/common';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './VerifyEmailPage.module.scss';
@@ -50,13 +50,13 @@ export default function VerifyEmailPage() {
   if (isLoading) {
     return (
       <div className={styles.verifyEmailPage} aria-busy="true" aria-label={t('common.loadingContent')}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-lg)', padding: 'var(--space-xl)' }}>
+        <div className={styles.skeletonWrapper}>
           <Skeleton width="120px" height="40px" borderRadius="var(--r-lg)" />
-          <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-sm)' }}>
+          <div className={styles.skeletonTextGroup}>
             <Skeleton width="200px" height="28px" borderRadius="var(--r-md)" />
             <Skeleton width="280px" height="18px" borderRadius="var(--r-sm)" />
           </div>
-          <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center' }}>
+          <div className={styles.skeletonCodeGroup}>
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} width="48px" height="56px" borderRadius="var(--r-md)" />
             ))}
@@ -108,7 +108,7 @@ export default function VerifyEmailPage() {
           className={styles.mobileLogo}
           variants={shouldAnimate ? itemVariants : {}}
         >
-          <Logo to="/" size="default" showText={true} />
+          <Logo to="/" size="default" showText disableNavigation entrance="fade" />
         </motion.div>
 
         {/* Header */}

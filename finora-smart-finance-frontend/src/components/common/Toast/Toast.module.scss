@@ -103,10 +103,7 @@
     color: var(--on-primary);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
@@ -132,10 +129,7 @@
     background: var(--surface-2);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
@@ -154,7 +148,7 @@
 .progressFill {
   height: 100%;
   background: currentColor;
-  transition: width 50ms linear;
+  transition: width var(--duration-instant) var(--ease-linear);
 }
 
 // ============================================
@@ -166,6 +160,11 @@
   .icon {
     color: var(--success);
     background: color-mix(in srgb, var(--success) 10%, transparent);
+
+    // ✅ Glow nur auf Icon-Wrapper für success
+    @media (prefers-reduced-motion: no-preference) {
+      box-shadow: 0 0 var(--glow-blur-sm) 0 var(--glow-success);
+    }
   }
 
   .progressFill {
@@ -183,6 +182,7 @@
   .icon {
     color: var(--error);
     background: color-mix(in srgb, var(--error) 10%, transparent);
+    // ❌ Kein Glow für error
   }
 
   .progressFill {
@@ -200,6 +200,7 @@
   .icon {
     color: var(--warning);
     background: color-mix(in srgb, var(--warning) 10%, transparent);
+    // ❌ Kein Glow für warning
   }
 
   .progressFill {
@@ -217,6 +218,7 @@
   .icon {
     color: var(--info);
     background: color-mix(in srgb, var(--info) 10%, transparent);
+    // ❌ Kein Glow für info
   }
 
   .progressFill {
@@ -249,7 +251,7 @@
 // ============================================
 @include reduced-motion {
   .toast {
-    animation: fadeIn var(--d-fast) ease-out;
+    animation: fadeIn var(--duration-fast) ease-out;
   }
 
   @keyframes fadeIn {

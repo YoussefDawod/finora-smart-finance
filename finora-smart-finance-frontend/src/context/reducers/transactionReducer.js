@@ -4,15 +4,37 @@
  */
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Berechnet den ersten und letzten Tag eines Monats als ISO-String (YYYY-MM-DD)
+ * Vermeidet toISOString() um Timezone-Probleme zu verhindern
+ */
+function monthBounds(month, year) {
+  const mm = String(month).padStart(2, '0');
+  const lastDay = new Date(year, month, 0).getDate();
+  return {
+    startDate: `${year}-${mm}-01`,
+    endDate: `${year}-${mm}-${String(lastDay).padStart(2, '0')}`,
+  };
+}
+
+// ============================================================================
 // INITIAL STATE
 // ============================================================================
+const _now = new Date();
+const _currentMonth = _now.getMonth() + 1;
+const _currentYear = _now.getFullYear();
+const _currentBounds = monthBounds(_currentMonth, _currentYear);
+
 export const initialState = {
   // DASHBOARD-DATEN (aggregiert vom Server, keine vollständigen Transaktionen)
   dashboardData: null,
 
   // DASHBOARD MONTH/YEAR FILTER
-  dashboardMonth: new Date().getMonth() + 1,
-  dashboardYear: new Date().getFullYear(),
+  dashboardMonth: _currentMonth,
+  dashboardYear: _currentYear,
 
   // TRANSAKTIONSLISTE (paginiert vom Server)
   transactions: [],
@@ -29,12 +51,12 @@ export const initialState = {
 
   error: null,
 
-  // Filter für Transaktionsliste
+  // Filter für Transaktionsliste — synchron mit dashboardMonth/Year
   filter: {
     type: null, // 'income' | 'expense' | null
     category: null,
-    startDate: null,
-    endDate: null,
+    startDate: _currentBounds.startDate,
+    endDate: _currentBounds.endDate,
     searchQuery: '',
   },
   sortBy: 'date', // 'date' | 'amount'
@@ -107,12 +129,25 @@ export function transactionReducer(state, action) {
     case ACTIONS.FETCH_DASHBOARD_ERROR:
       return { ...state, dashboardLoading: false, error: action.payload };
 
-    case ACTIONS.SET_DASHBOARD_MONTH:
+    case ACTIONS.SET_DASHBOARD_MONTH: {
+      const { month, year, startDate, endDate } = action.payload;
+      // Wenn explizite Daten übergeben (z.B. "Dieses Jahr" oder Custom), diese nutzen.
+      // Sonst automatisch Monatsgrenzen berechnen.
+      const dates = (startDate && endDate)
+        ? { startDate, endDate }
+        : monthBounds(month, year);
       return {
         ...state,
-        dashboardMonth: action.payload.month,
-        dashboardYear: action.payload.year,
+        dashboardMonth: month,
+        dashboardYear: year,
+        filter: {
+          ...state.filter,
+          startDate: dates.startDate,
+          endDate: dates.endDate,
+        },
+        pagination: { ...state.pagination, page: 1 },
       };
+    }
 
     // ────────────────────────────────────────────────────────────────────
     // TRANSAKTIONSLISTE (paginiert)
@@ -288,12 +323,27 @@ export function transactionReducer(state, action) {
     // ────────────────────────────────────────────────────────────────────
     // FILTER & SORT
     // ────────────────────────────────────────────────────────────────────
-    case ACTIONS.SET_FILTER:
+    case ACTIONS.SET_FILTER: {
+      const newFilter = { ...state.filter, ...action.payload };
+      let { dashboardMonth, dashboardYear } = state;
+
+      // Reverse-Sync: Wenn sich startDate ändert, dashboardMonth/Year ableiten
+      if (action.payload.startDate) {
+        const d = new Date(action.payload.startDate + 'T00:00:00');
+        if (!Number.isNaN(d.getTime())) {
+          dashboardMonth = d.getMonth() + 1;
+          dashboardYear = d.getFullYear();
+        }
+      }
+
       return {
         ...state,
-        filter: { ...state.filter, ...action.payload },
+        filter: newFilter,
+        dashboardMonth,
+        dashboardYear,
         pagination: { ...state.pagination, page: 1 },
       };
+    }
 
     case ACTIONS.SET_SORT:
       return {
@@ -303,14 +353,25 @@ export function transactionReducer(state, action) {
         pagination: { ...state.pagination, page: 1 },
       };
 
-    case ACTIONS.CLEAR_FILTER:
+    case ACTIONS.CLEAR_FILTER: {
+      const now = new Date();
+      const m = now.getMonth() + 1;
+      const y = now.getFullYear();
+      const bounds = monthBounds(m, y);
       return {
         ...state,
-        filter: initialState.filter,
+        filter: {
+          ...initialState.filter,
+          startDate: bounds.startDate,
+          endDate: bounds.endDate,
+        },
+        dashboardMonth: m,
+        dashboardYear: y,
         sortBy: initialState.sortBy,
         sortOrder: initialState.sortOrder,
         pagination: { ...state.pagination, page: 1 },
       };
+    }
 
     // ────────────────────────────────────────────────────────────────────
     // ERROR

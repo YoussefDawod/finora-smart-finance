@@ -1,0 +1,157 @@
+// ============================================
+// ➕ ADMIN CREATE USER MODAL
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+}
+
+// ── Field ───────────────────────────────────
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--tx);
+  background: var(--surface);
+  outline: none;
+  transition: border-color var(--duration-fast);
+
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+
+  &::placeholder {
+    color: var(--tx-muted);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.inputError {
+  border-color: var(--error);
+
+  &:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--error) 12%, transparent);
+  }
+}
+
+.errorText {
+  font-size: var(--fs-xs);
+  color: var(--error);
+  margin: 0;
+}
+
+// ── Row fields (Role + Verified) ────────────
+.rowFields {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-end;
+}
+
+// ── Actions ─────────────────────────────────
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+  margin-top: var(--space-xs);
+}
+
+%button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  border: 1px solid transparent;
+
+  @include focus-ring;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.cancelButton {
+  @extend %button-base;
+  background: var(--surface-2);
+  color: var(--tx-muted);
+  border-color: var(--border);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-3);
+  }
+}
+
+.submitButton {
+  @extend %button-base;
+  background: var(--primary);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+}
+
+// ── Spinning ────────────────────────────────
+@include spin-keyframes;
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}
+
+// ── Responsive ──────────────────────────────
+@include breakpoint($max: $bp-xs) {
+  .rowFields {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .spinning {
+    animation: none;
+  }
+}

@@ -7,12 +7,15 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
+import { useMotion } from '@/hooks/useMotion';
 import { FiTrash2, FiX } from 'react-icons/fi';
+import Checkbox from '@/components/common/Checkbox/Checkbox';
 import styles from '../../ProfilePage.module.scss';
 
 export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { shouldAnimate } = useMotion();
   const [password, setPassword] = useState('');
   const [confirmRemoval, setConfirmRemoval] = useState(false);
 
@@ -35,16 +38,16 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
       {isOpen && (
         <motion.div
           className={styles.modalOverlay}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={shouldAnimate ? { opacity: 0 } : false}
+          animate={shouldAnimate ? { opacity: 1 } : false}
+          exit={shouldAnimate ? { opacity: 0 } : undefined}
           onClick={onClose}
         >
           <motion.div
             className={styles.modal}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
+            animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
+            exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
@@ -68,10 +71,11 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
                   required
                 />
               </div>
-              <label className={styles.modalHint} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <input type="checkbox" checked={confirmRemoval} onChange={(e) => setConfirmRemoval(e.target.checked)} />
-                <span>{t('profile.modals.removeEmail.confirmLabel')}</span>
-              </label>
+              <Checkbox
+                checked={confirmRemoval}
+                onChange={(e) => setConfirmRemoval(e.target.checked)}
+                label={t('profile.modals.removeEmail.confirmLabel')}
+              />
               <div className={styles.modalActions}>
                 <button type="button" className={styles.btnCancel} onClick={onClose}>
                   {t('profile.modals.removeEmail.cancel')}

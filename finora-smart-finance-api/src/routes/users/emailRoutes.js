@@ -3,44 +3,180 @@ const crypto = require('crypto');
 const router = express.Router();
 const User = require('../../models/User');
 const auth = require('../../middleware/authMiddleware');
-const { emailOperationLimiter } = require('../../middleware/rateLimiter');
+const { emailOperationLimiter, sensitiveOperationLimiter } = require('../../middleware/rateLimiter');
 const emailService = require('../../utils/emailService');
+const auditLogService = require('../../services/auditLogService');
 const logger = require('../../utils/logger');
 const { sanitizeUser } = require('../../utils/userSanitizer');
+const { sendError } = require('../../utils/responseHelper');
 const { validateEmailChangeInput } = require('../../validators/userValidation');
-const { loadUserOr404, handleServerError } = require('./userHelpers');
+const { loadUserOr404 } = require('./userHelpers');
+const { handleServerError } = require('../../utils/responseHelper');
 const authEmailAddController = require('../../controllers/auth/authEmailAddController');
 
+/**
+ * @openapi
+ * /users/change-email:
+ *   post:
+ *     tags: [Users]
+ *     summary: Email-Adresse ändern
+ *     description: Initiiert Email-Änderung mit Verifizierung. Passwort erforderlich.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Bestätigungs-Email gesendet
+ *       400:
+ *         description: Validierungsfehler oder falsches Passwort
+ *       409:
+ *         description: Email bereits registriert
+ *
+ * /users/verify-email-change:
+ *   get:
+ *     tags: [Users]
+ *     summary: Email-Änderung bestätigen
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Email erfolgreich geändert
+ *       400:
+ *         description: Token ungültig oder abgelaufen
+ *
+ * /users/add-email:
+ *   post:
+ *     tags: [Users]
+ *     summary: Email-Adresse hinzufügen
+ *     description: Fügt einem Account ohne Email eine Email-Adresse hinzu.
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Verifizierungs-Email gesendet
+ *       429:
+ *         description: Rate Limit (10/24h)
+ *
+ * /users/verify-add-email:
+ *   get:
+ *     tags: [Users]
+ *     summary: Email-Hinzufügung verifizieren (Link)
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200:
+ *         description: Email verifiziert
+ *   post:
+ *     tags: [Users]
+ *     summary: Email-Hinzufügung verifizieren (Token)
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [token]
+ *             properties:
+ *               token: { type: string }
+ *     responses:
+ *       200:
+ *         description: Email verifiziert
+ *
+ * /users/remove-email:
+ *   delete:
+ *     tags: [Users]
+ *     summary: Email-Adresse entfernen
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [password]
+ *             properties:
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Email entfernt
+ *       429:
+ *         description: Rate Limit (10/24h)
+ *
+ * /users/resend-add-email-verification:
+ *   post:
+ *     tags: [Users]
+ *     summary: Verifizierungs-Email erneut senden
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Email gesendet
+ *       429:
+ *         description: Rate Limit (10/24h)
+ *
+ * /users/email-status:
+ *   get:
+ *     tags: [Users]
+ *     summary: Email-Status abrufen
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Aktueller Email-Status
+ */
 // POST /api/users/change-email - Email ändern (mit Verifizierung)
-router.post('/change-email', auth, async (req, res) => {
+router.post('/change-email', auth, emailOperationLimiter, async (req, res) => {
   try {
     const { errors, email: normalizedEmail } = validateEmailChangeInput(req.body || {});
-    const user = await loadUserOr404(req.user._id, res);
+    const user = await loadUserOr404(req.user._id, res, req);
     if (!user) return;
 
     if (errors.length > 0) {
-      return res.status(400).json({ success: false, message: 'Validierungsfehler', errors });
+      return sendError(res, req, { error: 'Validierungsfehler', code: 'VALIDATION_ERROR', status: 400, details: errors });
     }
 
     // Passwort verifizieren
     const isPasswordValid = await user.comparePassword(req.body?.password);
     if (!isPasswordValid) {
       logger.warn(`Failed email change attempt for user ${user._id}`);
-      return res.status(400).json({ success: false, message: 'Passwort ist falsch' });
+      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
     }
 
     // Neue Email == aktuelle Email?
     if (normalizedEmail && normalizedEmail.toLowerCase() === user.email.toLowerCase()) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Neue Email muss sich von der aktuellen unterscheiden' 
-      });
+      return sendError(res, req, { error: 'Neue Email muss sich von der aktuellen unterscheiden', code: 'SAME_EMAIL', status: 400 });
     }
 
     // Neue Email schon registriert?
     const existingUser = await User.findOne({ email: normalizedEmail.toLowerCase() });
     if (existingUser) {
-      return res.status(409).json({ success: false, message: 'Email ist bereits registriert' });
+      return sendError(res, req, { error: 'Email ist bereits registriert', code: 'EMAIL_TAKEN', status: 409 });
     }
 
     // Token generieren
@@ -64,17 +200,17 @@ router.post('/change-email', auth, async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    handleServerError(res, 'POST /change-email', error);
+    handleServerError(res, req, 'POST /change-email', error);
   }
 });
 
 // GET /api/users/verify-email-change - Email-Change verifizieren
-router.get('/verify-email-change', async (req, res) => {
+router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) => {
   try {
     const { token } = req.query;
 
     if (!token) {
-      return res.status(400).json({ success: false, message: 'Token erforderlich' });
+      return sendError(res, req, { error: 'Token erforderlich', code: 'MISSING_TOKEN', status: 400 });
     }
 
     // Token hashen und suchen
@@ -82,7 +218,7 @@ router.get('/verify-email-change', async (req, res) => {
     const user = await User.findOne({ emailChangeToken: tokenHash });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: 'Token ungültig' });
+      return sendError(res, req, { error: 'Token ungültig', code: 'INVALID_TOKEN', status: 400 });
     }
 
     // Token abgelaufen?
@@ -91,7 +227,7 @@ router.get('/verify-email-change', async (req, res) => {
       user.emailChangeNewEmail = undefined;
       user.emailChangeExpires = undefined;
       await user.save();
-      return res.status(400).json({ success: false, message: 'Token ist abgelaufen' });
+      return sendError(res, req, { error: 'Token ist abgelaufen', code: 'TOKEN_EXPIRED', status: 400 });
     }
 
     // Email aktualisieren
@@ -105,13 +241,22 @@ router.get('/verify-email-change', async (req, res) => {
 
     logger.info(`User ${user._id} verified email change (${oldEmail} -> ${user.email})`);
 
+    // Audit-Log: Email geändert
+    auditLogService.log({
+      action: 'EMAIL_CHANGED',
+      targetUserId: user._id,
+      targetUserName: user.name,
+      details: { oldEmail, newEmail: user.email },
+      req,
+    });
+
     res.json({ 
       success: true, 
       message: 'Email erfolgreich geändert',
       data: sanitizeUser(user)
     });
   } catch (error) {
-    handleServerError(res, 'GET /verify-email-change', error);
+    handleServerError(res, req, 'GET /verify-email-change', error);
   }
 });
 

@@ -1,6 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
+
+// ============================================
+// Fonts — self-hosted via @fontsource
+// ============================================
+import '@fontsource-variable/plus-jakarta-sans';   // Logo-Wortmarke (Brand-Font)
+import '@fontsource-variable/inter';                // UI-Body-Text (Variable Font)
+import '@fontsource/fira-code/400.css';             // Code-Mono (Regular)
+import '@fontsource/fira-code/500.css';             // Code-Mono (Medium)
+
 import App from './App';
 import '@styles/index.scss';
 import { initAccessibility } from '@/utils/keyboardNavigation';

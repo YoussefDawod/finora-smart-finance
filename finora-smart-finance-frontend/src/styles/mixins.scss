@@ -16,7 +16,7 @@
 // Breakpoint Values (müssen als SCSS-Variablen existieren für @media)
 $bp-xs: 480px;
 $bp-sm: 640px;
-$bp-md: 750px;   // Größere Tablets (10+ Zoll)
+$bp-md: 768px;   // Tablets / Mobile-Breakpoint (konsistent mit --bp-md in variables.scss)
 $bp-lg: 1024px;
 $bp-xl: 1280px;
 $bp-2xl: 1536px;
@@ -265,7 +265,7 @@ $bp-2xl: 1536px;
   &:focus { outline: none; }
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
@@ -273,11 +273,11 @@ $bp-2xl: 1536px;
   &:focus { 
     outline: none; 
     border-color: var(--primary);
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
   &:focus-visible { 
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
@@ -285,7 +285,7 @@ $bp-2xl: 1536px;
   &:focus { outline: none; }
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, $color 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, $color 40%, transparent);
   }
 }
 
@@ -352,6 +352,10 @@ $bp-2xl: 1536px;
   }
 
   @include focus-ring;
+
+  @include reduced-motion {
+    transition: none;
+  }
 }
 
 @mixin button-variant($bg, $color: var(--on-primary), $hover-darken: 10%) {
@@ -461,6 +465,23 @@ $bp-2xl: 1536px;
   }
 
   @include focus-ring;
+}
+
+/// Card with optional glow outline on hover
+/// ⚠️ NUR für Container, NICHT für Finanz-Komponenten
+/// @param {Boolean} $glow - Aktiviert Glow-Outline auf Hover
+@mixin card-interactive-glow($glow: false) {
+  @include card-interactive;
+
+  @if $glow {
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        box-shadow: 
+          var(--sh-lg),
+          0 0 var(--glow-blur-sm) 0 var(--glow-primary);
+      }
+    }
+  }
 }
 
 // ============================================
@@ -679,6 +700,7 @@ $bp-2xl: 1536px;
     --on-info: #{contrast-color($info, $tx, $bg)};
     
     // ========== SHADOWS ==========
+    --sh-xs: 0 1px 1px 0 #{alpha($tx, 0.03)};
     --sh-sm: 0 1px 2px 0 #{alpha($tx, 0.05)};
     --sh-md: 0 4px 6px -1px #{alpha($tx, 0.08)}, 0 2px 4px -1px #{alpha($tx, 0.06)};
     --sh-lg: 0 10px 15px -3px #{alpha($tx, 0.12)}, 0 4px 6px -2px #{alpha($tx, 0.08)};
@@ -735,4 +757,71 @@ $bp-2xl: 1536px;
 @mixin touch-target {
   min-height: var(--touch-target-min);
   min-width: var(--touch-target-min);
+}
+
+// ============================================
+// ⬅ BACK BUTTON (Icon-only, rund)
+// ============================================
+@mixin back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-full);
+  background: var(--surface);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  margin-bottom: var(--space-lg);
+  box-shadow: var(--sh-sm);
+
+  svg {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+
+  &:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 6%, transparent);
+    transform: translateX(-2px);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  :global([dir='rtl']) & {
+    &:hover {
+      transform: translateX(2px);
+    }
+  }
+
+  @include reduced-motion {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+
+    :global([dir='rtl']) & {
+      &:hover {
+        transform: none;
+      }
+    }
+  }
+}
+
+// ============================================
+// SPIN KEYFRAMES
+// ============================================
+/// Outputs a locally-scoped `@keyframes spin` block.
+/// Use inside CSS-module files so the animation name is scoped correctly.
+@mixin spin-keyframes {
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 }

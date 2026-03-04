@@ -1,15 +1,22 @@
-const { validateEmail } = require('./authValidation');
+const { validateEmail, validatePassword } = require('./authValidation');
 
+// IANA-Zeitzonen-Set für Timezone-Validierung (L-2)
+const VALID_TIMEZONES = new Set(Intl.supportedValuesOf('timeZone'));
+VALID_TIMEZONES.add('UTC'); // UTC wird von Intl nicht gelistet, ist aber gültig
+
+/**
+ * Wrapper um die zentrale validatePassword aus authValidation.
+ * Gibt ein Array von Fehlern zurück (leer = valide) für Kompatibilität
+ * mit der Error-Aggregation in validatePasswordChangeInput.
+ * @param {string} password
+ * @returns {string[]} Array von Fehlerstrings
+ */
 function validatePasswordStrength(password) {
-  const errors = [];
   if (password === undefined || password === null) {
-    return errors;
+    return [];
   }
-  if (password.length < 8) errors.push('Passwort muss mind. 8 Zeichen lang sein');
-  if (!/[A-Z]/.test(password)) errors.push('Passwort muss Großbuchstaben enthalten');
-  if (!/[a-z]/.test(password)) errors.push('Passwort muss Kleinbuchstaben enthalten');
-  if (!/\d/.test(password)) errors.push('Passwort muss Ziffern enthalten');
-  return errors;
+  const result = validatePassword(password);
+  return result.valid ? [] : [result.error];
 }
 
 function validatePasswordChangeInput({ currentPassword, newPassword, confirmPassword }) {
@@ -61,13 +68,18 @@ function validateProfileUpdate(body = {}) {
     if (typeof name !== 'string') {
       errors.push('Name muss ein String sein');
     } else {
-      updates.name = name.trim();
+      const trimmed = name.trim();
+      if (trimmed.length < 3) errors.push('Name muss mind. 3 Zeichen haben');
+      else if (trimmed.length > 50) errors.push('Name darf max. 50 Zeichen haben');
+      else updates.name = trimmed;
     }
   }
 
   if (lastName !== undefined) {
     if (typeof lastName !== 'string') {
       errors.push('LastName muss ein String sein');
+    } else if (lastName.trim().length > 50) {
+      errors.push('LastName darf max. 50 Zeichen haben');
     } else {
       updates.lastName = lastName.trim();
     }
@@ -76,6 +88,8 @@ function validateProfileUpdate(body = {}) {
   if (phone !== undefined) {
     if (typeof phone !== 'string') {
       errors.push('Phone muss ein String sein');
+    } else if (phone.trim().length > 20) {
+      errors.push('Phone darf max. 20 Zeichen haben');
     } else {
       updates.phone = phone.trim() || null;
     }
@@ -84,6 +98,8 @@ function validateProfileUpdate(body = {}) {
   if (avatar !== undefined) {
     if (typeof avatar !== 'string' && avatar !== null) {
       errors.push('Avatar muss ein String sein');
+    } else if (avatar && avatar.length > 2048) {
+      errors.push('Avatar-URL darf max. 2048 Zeichen haben');
     } else {
       updates.avatar = avatar || null;
     }
@@ -149,10 +165,32 @@ function validateBudget(budget, errors) {
   }
 
   if (budget.categoryLimits !== undefined) {
-    if (typeof budget.categoryLimits !== 'object') {
+    if (typeof budget.categoryLimits !== 'object' || budget.categoryLimits === null || Array.isArray(budget.categoryLimits)) {
       errors.push('budget.categoryLimits muss ein Objekt sein');
     } else {
-      sanitized.categoryLimits = budget.categoryLimits;
+      const entries = Object.entries(budget.categoryLimits);
+      if (entries.length > 30) {
+        errors.push('budget.categoryLimits darf maximal 30 Einträge haben');
+      } else {
+        const validLimits = {};
+        for (const [key, value] of entries) {
+          if (typeof key !== 'string' || key.length === 0 || key.length > 50) {
+            errors.push(`budget.categoryLimits: Ungültiger Schlüssel "${String(key).slice(0, 50)}"`);
+            continue;
+          }
+          if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+            errors.push(`budget.categoryLimits.${key} muss eine positive Zahl sein`);
+            continue;
+          }
+          if (value > 1000000) {
+            errors.push(`budget.categoryLimits.${key} darf maximal 1.000.000 betragen`);
+            continue;
+          }
+          // eslint-disable-next-line security/detect-object-injection -- key aus Object.entries(), validiert
+          validLimits[key] = value;
+        }
+        sanitized.categoryLimits = validLimits;
+      }
     }
   }
 
@@ -198,6 +236,8 @@ function validatePreferencesInput(body = {}) {
   if (timezone !== undefined) {
     if (typeof timezone !== 'string') {
       errors.push('Timezone muss ein String sein');
+    } else if (!VALID_TIMEZONES.has(timezone)) {
+      errors.push('Ungültige Timezone. Bitte eine gültige IANA-Timezone verwenden (z.B. Europe/Berlin)');
     } else {
       updates.timezone = timezone;
     }

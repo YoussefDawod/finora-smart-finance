@@ -45,6 +45,19 @@
   }
 }
 
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3xs) var(--space-sm);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border-radius: var(--r-full);
+}
+
 // ============================================
 // HAMBURGER MENU (Mobile)
 // ============================================
@@ -69,10 +82,10 @@
     opacity: 0.7;
   }
 
+  @include focus-ring;
+
   &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
     border-radius: var(--r-sm);
-    outline-offset: var(--focus-o);
   }
 
   &.open {
@@ -150,10 +163,7 @@
     color: var(--primary);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: -2px;
-  }
+  @include focus-ring-inset;
 }
 
 .dropdownIcon {

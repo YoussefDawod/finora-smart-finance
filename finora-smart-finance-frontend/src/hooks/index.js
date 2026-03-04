@@ -7,21 +7,25 @@ export { useTheme } from './useTheme';
 export { useToast } from './useToast';
 export { useMotion } from './useMotion';
 export { useTransactions } from './useTransactions';
+export { useCookieConsent } from './useCookieConsent';
 
 // ============================================
 // 🪝 UTILITY HOOKS
 // ============================================
 
 export { useDebounce } from './useDebounce';
+export { useAbortSignal, isAborted } from './useAbortSignal';
+export { useOnlineStatus } from './useOnlineStatus';
 export { useProfile } from './useProfile';
 export { useBudget } from './useBudget';
+export { useLifecycle } from './useLifecycle';
 
 // ============================================
 // 📦 EXISTING HOOKS
 // ============================================
 
 export { useForm } from './useForm';
-export { useMediaQuery, useIsMobile, useIsTablet, useIsDesktop } from './useMediaQuery';
+export { useMediaQuery, useIsMobile, useIsDesktop } from './useMediaQuery';
 export { useClickOutside } from './useClickOutside';
 
 // ============================================
@@ -35,9 +39,17 @@ export { useTransactionForm } from './useTransactionForm';
 // ============================================
 
 export { useDashboardChartData, formatMonthLabel } from './useDashboardChartData';
+export { useAdminDashboard } from './useAdminDashboard';
+export { useAdminUsers } from './useAdminUsers';
+export { useAdminTransactions } from './useAdminTransactions';
+export { useAdminTransactionUsers } from './useAdminTransactionUsers';
+export { useAdminSubscribers } from './useAdminSubscribers';
+export { useAdminCampaigns } from './useAdminCampaigns';
+export { useAdminAuditLog } from './useAdminAuditLog';
+export { useAdminLifecycle } from './useAdminLifecycle';
 
 // ============================================
 // 🎨 CSS/THEME HOOKS
 // ============================================
 
-export { useCssVariables, getResolvedChartColors } from './useCssVariables';
+export { useCssVariables } from './useCssVariables';

@@ -16,17 +16,19 @@ import i18next from 'i18next';
 import { API_CONFIG } from './config';
 import { logRequest, logResponse, logError } from './logger';
 import { isUnauthorized, isForbidden, isNetworkError } from './errorHandler';
+import { refreshAccessToken, isExcludedFromRefresh } from './tokenRefresh';
 
-/* eslint-disable no-undef */
+ 
 
 /**
  * Create axios instance with config
- * Note: withCredentials is NOT needed since we use localStorage for tokens, not cookies
+ * withCredentials: true — httpOnly Refresh-Token-Cookie wird automatisch mitgesendet
  */
 const client = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: 10000, // 10 seconds per spec
   headers: API_CONFIG.HEADERS,
+  withCredentials: true,
 });
 
 /**
@@ -105,6 +107,19 @@ client.interceptors.response.use(
     return response;
   },
   (error) => {
+    // ── ABORT / CANCEL ────────────────────────────────────────────────
+    // Requests aborted by AbortController (e.g. unmount, single-flight)
+    // are expected — skip logging AND toasts entirely.
+    const isCanceled =
+      error?.name === 'CanceledError' ||
+      error?.name === 'AbortError' ||
+      error?.code === 'ERR_CANCELED' ||
+      error?.__CANCEL__;
+
+    if (isCanceled) {
+      return Promise.reject(error);
+    }
+
     const isMeEndpoint = error?.config?.url?.includes('/auth/me');
     
     // Don't log 401 errors for /auth/me - they're expected during initial auth check
@@ -114,6 +129,29 @@ client.interceptors.response.use(
       logError(error.config?.method?.toUpperCase?.(), error.config?.url, error);
     }
 
+    // ── TOKEN REFRESH ON 401 ──────────────────────────────────────────
+    // If 401 and not an excluded endpoint (login/register/refresh itself)
+    // → attempt silent token refresh and retry the original request
+    if (isUnauthorized(error) && !isExcludedFromRefresh(error.config) && !error.config?._isRetryAfterRefresh) {
+      return refreshAccessToken()
+        .then((newAccessToken) => {
+          // Retry original request with new token
+          const retryConfig = { ...error.config };
+          retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccessToken}` };
+          retryConfig._isRetryAfterRefresh = true;
+          return client(retryConfig);
+        })
+        .catch(() => {
+          // Refresh failed → final logout (already handled in tokenRefresh.js)
+          // Don't show toast for /auth/me during initial check
+          if (!isMeEndpoint) {
+            dispatchToast('error', i18next.t('errors.authRequired'));
+          }
+          return Promise.reject(error);
+        });
+    }
+
+    // ── REGULAR ERROR HANDLING ────────────────────────────────────────
     // Don't show toast for 401 on /auth/me endpoint (initial auth check)
     const shouldShowAuthToast = !isMeEndpoint;
 

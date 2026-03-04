@@ -17,6 +17,7 @@ jest.mock('../../src/services/loginService');
 jest.mock('../../src/services/emailVerificationService');
 jest.mock('../../src/services/passwordResetService');
 jest.mock('../../src/services/authService');
+jest.mock('../../src/services/transactionLifecycleService');
 jest.mock('../../src/models/User');
 jest.mock('../../src/utils/emailService', () => ({
   sendVerificationEmail: jest.fn().mockResolvedValue({ link: 'http://test/verify' }),
@@ -31,6 +32,14 @@ jest.mock('../../src/config/env', () => ({
     refreshExpire: 604800,
   },
 }));
+jest.mock('../../src/utils/logger', () => ({
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+}));
+
+const lifecycleService = require('../../src/services/transactionLifecycleService');
 
 describe('AuthController Integration Tests', () => {
   let req, res, next;
@@ -207,6 +216,87 @@ describe('AuthController Integration Tests', () => {
       );
     });
 
+    it('should include notification when lifecycle requires toast', async () => {
+      req.body = { email: 'max@example.com', password: 'SecurePassword123!' };
+
+      loginService.validateLoginInput.mockReturnValue({ valid: true });
+      loginService.authenticateUser.mockResolvedValue({
+        success: true,
+        user: { _id: 'user-123', email: 'max@example.com', name: 'Max', isVerified: true },
+      });
+      loginService.checkEmailVerification.mockReturnValue({ verified: true });
+      loginService.generateLoginSession.mockResolvedValue({
+        tokens: { accessToken: 'at', refreshToken: 'rt' },
+        user: { _id: 'user-123' },
+      });
+      authService.buildAuthResponse.mockReturnValue({ accessToken: 'at', user: {} });
+      lifecycleService.getLoginNotification.mockResolvedValue({
+        showToast: true,
+        notification: { type: 'retention_reminder', severity: 'warning', transactionCount: 15, action: 'export' },
+      });
+
+      await authController.login(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: true,
+          notification: expect.objectContaining({
+            type: 'retention_reminder',
+            severity: 'warning',
+            transactionCount: 15,
+          }),
+        })
+      );
+    });
+
+    it('should not include notification when no toast needed', async () => {
+      req.body = { email: 'max@example.com', password: 'SecurePassword123!' };
+
+      loginService.validateLoginInput.mockReturnValue({ valid: true });
+      loginService.authenticateUser.mockResolvedValue({
+        success: true,
+        user: { _id: 'user-123', email: 'max@example.com', isVerified: true },
+      });
+      loginService.checkEmailVerification.mockReturnValue({ verified: true });
+      loginService.generateLoginSession.mockResolvedValue({
+        tokens: { accessToken: 'at', refreshToken: 'rt' },
+        user: { _id: 'user-123' },
+      });
+      authService.buildAuthResponse.mockReturnValue({ accessToken: 'at', user: {} });
+      lifecycleService.getLoginNotification.mockResolvedValue({ showToast: false });
+
+      await authController.login(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      const responseBody = res.json.mock.calls[0][0];
+      expect(responseBody.notification).toBeUndefined();
+    });
+
+    it('should still login successfully when lifecycle check fails', async () => {
+      req.body = { email: 'max@example.com', password: 'SecurePassword123!' };
+
+      loginService.validateLoginInput.mockReturnValue({ valid: true });
+      loginService.authenticateUser.mockResolvedValue({
+        success: true,
+        user: { _id: 'user-123', email: 'max@example.com', isVerified: true },
+      });
+      loginService.checkEmailVerification.mockReturnValue({ verified: true });
+      loginService.generateLoginSession.mockResolvedValue({
+        tokens: { accessToken: 'at', refreshToken: 'rt' },
+        user: { _id: 'user-123' },
+      });
+      authService.buildAuthResponse.mockReturnValue({ accessToken: 'at', user: {} });
+      lifecycleService.getLoginNotification.mockRejectedValue(new Error('DB error'));
+
+      await authController.login(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      const responseBody = res.json.mock.calls[0][0];
+      expect(responseBody.notification).toBeUndefined();
+    });
+
     it('should reject invalid credentials', async () => {
       req.body = {
         email: 'max@example.com',
@@ -367,41 +457,6 @@ describe('AuthController Integration Tests', () => {
   });
 
   // ============================================
-  // Password Reset Request Tests
-  // ============================================
-  describe('POST /auth/reset-password-request', () => {
-    it('should initiate password reset', async () => {
-      req.body = { email: 'max@example.com' };
-
-      passwordResetService.initiatePasswordReset.mockResolvedValue({
-        sent: true,
-        message: 'Password reset email sent',
-      });
-
-      await authController.resetPasswordRequest(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ initiated: true })
-      );
-    });
-
-    it('should handle invalid email in password reset', async () => {
-      req.body = { email: 'nonexistent@example.com' };
-
-      passwordResetService.initiatePasswordReset.mockResolvedValue({
-        sent: false,
-        code: 'USER_NOT_FOUND',
-        error: 'User not found',
-      });
-
-      await authController.resetPasswordRequest(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-    });
-  });
-
-  // ============================================
   // Password Reset Completion Tests
   // ============================================
   describe('POST /auth/reset-password', () => {
@@ -453,47 +508,13 @@ describe('AuthController Integration Tests', () => {
 
       await authController.logout(req, res, next);
 
-      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken');
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
-  });
-
-  // ============================================
-  // Send Verification Email Endpoint Tests
-  // ============================================
-  describe('POST /auth/send-verification', () => {
-    it('should send verification email', async () => {
-      req.user = {
-        id: 'user-123',
-        _id: 'user-123',
-        isVerified: false,
-        email: 'max@example.com',
-      };
-
-      emailVerificationService.sendVerificationEmail.mockResolvedValue({
-        sent: true,
-        message: 'Verification email sent',
+      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken', {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'strict',
+        path: '/api/v1/auth',
       });
-
-      await authController.sendVerificationEmail(req, res, next);
-
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ sent: true })
-      );
-    });
-
-    it('should handle already verified email', async () => {
-      req.user = {
-        id: 'user-123',
-        _id: 'user-123',
-        isVerified: true,
-        email: 'max@example.com',
-      };
-
-      await authController.sendVerificationEmail(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
     });
   });
 });

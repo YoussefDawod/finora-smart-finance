@@ -7,25 +7,32 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
+import { useMotion } from '@/hooks/useMotion';
 import { FiX } from 'react-icons/fi';
 import styles from '../../ProfilePage.module.scss';
 
 export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { shouldAnimate } = useMotion();
   const [newEmail, setNewEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await onSubmit(newEmail);
+
+    if (hasEmail && !password) {
+      toast.error(t('profile.modals.addEmail.passwordRequired'));
+      return;
+    }
+
+    const result = await onSubmit(newEmail, password);
 
     if (result.success) {
       toast.success(t(`profile.toasts.${result.message}`));
       toast.info(t('profile.toasts.spamHint'));
-      if (result.link) {
-        console.log('DEV MODE - Verifizierungs-Link:', result.link);
-      }
       setNewEmail('');
+      setPassword('');
       onClose();
     } else {
       toast.error(result.error);
@@ -37,16 +44,16 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
       {isOpen && (
         <motion.div
           className={styles.modalOverlay}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={shouldAnimate ? { opacity: 0 } : false}
+          animate={shouldAnimate ? { opacity: 1 } : false}
+          exit={shouldAnimate ? { opacity: 0 } : undefined}
           onClick={onClose}
         >
           <motion.div
             className={styles.modal}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
+            animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
+            exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
@@ -61,14 +68,31 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
                 <input
                   type="email"
                   id="newEmail"
+                  name="newEmail"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
                   placeholder={t('profile.modals.addEmail.placeholder')}
                   className={styles.input}
+                  autoComplete="email"
                   required
                 />
               </div>
               <p className={styles.modalHint}>{t('profile.modals.addEmail.hint')}</p>
+              {hasEmail && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="emailPassword">{t('profile.modals.addEmail.passwordLabel')}</label>
+                  <input
+                    type="password"
+                    id="emailPassword"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('profile.modals.addEmail.passwordPlaceholder')}
+                    className={styles.input}
+                    autoComplete="current-password"
+                    required
+                  />
+                </div>
+              )}
               <p className={styles.modalHintWarning}>{t('profile.modals.addEmail.spamHint')}</p>
               <div className={styles.modalActions}>
                 <button type="button" className={styles.btnCancel} onClick={onClose}>

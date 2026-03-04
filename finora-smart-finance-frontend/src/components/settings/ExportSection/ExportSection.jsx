@@ -8,7 +8,7 @@
  * - Zeitraum-Filter für Export
  */
 
-/* eslint-disable no-undef */
+ 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiDownload, FiFileText, FiDatabase } from 'react-icons/fi';
@@ -20,6 +20,7 @@ import { formatCurrency, formatDate } from '@/utils/formatters';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { getLocaleForLanguage, getUserPreferences } from '@/utils/userPreferences';
 import Button from '@/components/common/Button/Button';
+import { getLogoIconSVG, getLogoFaviconSVG, svgToDataURI, LOGO_COLORS } from '@/utils/logoSvgStrings';
 import styles from './ExportSection.module.scss';
 
 // ============================================================================
@@ -73,29 +74,13 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
     return acc;
   }, {});
 
-  // Original Finora SVG Logo
-  const logoSVG = `<svg viewBox="0 0 48 48" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#6366f1"/>
-        <stop offset="100%" stop-color="#8b5cf6"/>
-      </linearGradient>
-      <linearGradient id="accent" x1="0%" y1="100%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#22d3ee"/>
-        <stop offset="100%" stop-color="#34d399"/>
-      </linearGradient>
-    </defs>
-    <rect width="48" height="48" rx="12" fill="url(#bg)"/>
-    <path d="M14 10h20c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v6h12c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v8c0 1.1-.9 2-2 2h-2c-1.1 0-2-.9-2-2V12c0-1.1.9-2 2-2z" fill="white"/>
-    <path d="M24 38L30 30L36 33L42 22" stroke="url(#accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="42" cy="22" r="3.5" fill="#34d399"/>
-  </svg>`;
+  // Logo SVGs from Single Source of Truth
+  const logoSVG = getLogoIconSVG({ size: 40, theme: 'light' });
+  const logoSmall = getLogoIconSVG({ size: 20, theme: 'light' });
 
-  const logoSmall = logoSVG.replace('width="40" height="40"', 'width="20" height="20"');
-
-  // Favicon für Browser-Tab - vollständiges SVG mit URL-encoding
-  const faviconSVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient><linearGradient id="accent" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#22d3ee"/><stop offset="100%" stop-color="#34d399"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#bg)"/><path d="M14 10h20c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v6h12c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v8c0 1.1-.9 2-2 2h-2c-1.1 0-2-.9-2-2V12c0-1.1.9-2 2-2z" fill="white"/><path d="M24 38L30 30L36 33L42 22" stroke="url(#accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="22" r="3.5" fill="#34d399"/></svg>`;
-  const faviconDataURI = `data:image/svg+xml,${encodeURIComponent(faviconSVG)}`;
+  // Favicon für Browser-Tab
+  const faviconSVG = getLogoFaviconSVG({ theme: 'light' });
+  const faviconDataURI = svgToDataURI(faviconSVG);
 
   const exportDate = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
@@ -117,19 +102,19 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
   <link rel="icon" type="image/svg+xml" href="${faviconDataURI}">
   <style>
     :root {
-      --primary: #6366f1;
-      --success: #10b981;
-      --error: #ef4444;
+      --primary: ${LOGO_COLORS.light.primary};
+      --success: ${LOGO_COLORS.light.success};
+      --error: ${LOGO_COLORS.light.error};
       --surface: #ffffff;
-      --text: #1a1a2e;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
+      --text: ${LOGO_COLORS.light.text};
+      --text-muted: ${LOGO_COLORS.light.textMuted};
+      --border: ${LOGO_COLORS.light.border};
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
     
     body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       color: var(--text);
       background: var(--surface);
       line-height: 1.4;
@@ -248,7 +233,7 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
       align-items: center;
       justify-content: space-between;
       padding: 8px 16px;
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      background: linear-gradient(135deg, #5b6cff 0%, #2dd4ff 100%);
       border-radius: 4px 4px 0 0;
       color: white;
     }
@@ -478,14 +463,12 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
   </footer>
   
   <script>
-    // Favicon dynamisch setzen - Exakt das gleiche SVG wie im Hauptprojekt
+    // Favicon dynamisch setzen — aus logoSvgStrings Single Source of Truth
     (function() {
-      var svgContent = '<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%236366f1"/><stop offset="100%" stop-color="%238b5cf6"/></linearGradient><linearGradient id="accent" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="%2322d3ee"/><stop offset="100%" stop-color="%2334d399"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(%23bg)"/><path d="M14 10h20c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v6h12c1.1 0 2 .9 2 2v2c0 1.1-.9 2-2 2H18v8c0 1.1-.9 2-2 2h-2c-1.1 0-2-.9-2-2V12c0-1.1.9-2 2-2z" fill="white"/><path d="M24 38L30 30L36 33L42 22" stroke="url(%23accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="22" r="3.5" fill="%2334d399"/></svg>';
-      
       var link = document.createElement('link');
       link.rel = 'icon';
       link.type = 'image/svg+xml';
-      link.href = 'data:image/svg+xml,' + svgContent;
+      link.href = '${faviconDataURI}';
       
       // Alte Favicons entfernen
       var existing = document.querySelectorAll('link[rel*="icon"]');
@@ -576,7 +559,7 @@ export default function ExportSection() {
       URL.revokeObjectURL(url);
 
       showSuccess(t('export.toasts.csvSuccess', { count: transactions.length }));
-    } catch (err) {
+    } catch {
       showError(t('export.toasts.csvError'));
     } finally {
       setLoading(false);
@@ -605,18 +588,31 @@ export default function ExportSection() {
       } : null;
 
       const htmlContent = generatePDFContent(transactions, userInfo, t);
-      const printWindow = window.open('', '_blank');
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.focus();
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const blobUrl = URL.createObjectURL(blob);
+      const printWindow = window.open(blobUrl, '_blank');
+
+      // Blob-URL freigeben, sobald das Fenster geladen hat
+      const cleanup = () => URL.revokeObjectURL(blobUrl);
+
+      if (!printWindow) {
+        cleanup();
+        showError(t('export.toasts.pdfError'));
+        return;
+      }
+
+      printWindow.addEventListener('afterprint', cleanup);
 
       // Warte kurz, dann öffne Print-Dialog
-      setTimeout(() => {
-        printWindow.print();
-      }, 500);
+      printWindow.addEventListener('load', () => {
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print();
+        }, 300);
+      });
 
       showSuccess(t('export.toasts.pdfSuccess', { count: transactions.length }));
-    } catch (err) {
+    } catch {
       showError(t('export.toasts.pdfError'));
     } finally {
       setLoading(false);

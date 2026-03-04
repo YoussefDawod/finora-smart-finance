@@ -10,7 +10,7 @@
  * @module api/logger
  */
 
-/* eslint-disable no-undef */
+ 
 
 // ============================================
 // COLOR PALETTE

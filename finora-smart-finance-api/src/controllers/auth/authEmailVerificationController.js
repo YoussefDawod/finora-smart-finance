@@ -2,15 +2,15 @@ const User = require('../../models/User');
 const config = require('../../config/env');
 const logger = require('../../utils/logger');
 const authService = require('../../services/authService');
-const emailVerificationService = require('../../services/emailVerificationService');
 const emailService = require('../../utils/emailService');
+const { sendError } = require('../../utils/responseHelper');
 
 // Email Verification
 async function resendVerification(req, res) {
   try {
     const { email } = req.body || {};
     if (!email) {
-      return res.status(400).json({ error: 'Email erforderlich', code: 'INVALID_INPUT' });
+      return sendError(res, req, { error: 'Email erforderlich', code: 'INVALID_INPUT', status: 400 });
     }
 
     const user = await User.findOne({ email });
@@ -33,7 +33,8 @@ async function resendVerification(req, res) {
 
     return res.status(200).json({ success: true, data: responseData });
   } catch (err) {
-    return res.status(500).json({ error: 'Erneutes Senden fehlgeschlagen', code: 'SERVER_ERROR', message: err.message });
+    logger.error('resendVerification error:', err);
+    return sendError(res, req, { error: 'Erneutes Senden fehlgeschlagen', code: 'SERVER_ERROR', status: 500 });
   }
 }
 
@@ -68,23 +69,7 @@ async function verifyEmail(req, res) {
   }
 }
 
-async function sendVerificationEmail(req, res) {
-  const user = req.user;
-
-  if (!user) {
-    return res.status(401).json({ error: 'Nicht authentifiziert', code: 'UNAUTHORIZED' });
-  }
-
-  if (user.isVerified) {
-    return res.status(400).json({ sent: false, code: 'EMAIL_VERIFIED', error: 'Email bereits verifiziert' });
-  }
-
-  const result = await emailVerificationService.sendVerificationEmail(user);
-  return res.status(200).json(result);
-}
-
 module.exports = {
   resendVerification,
   verifyEmail,
-  sendVerificationEmail,
 };

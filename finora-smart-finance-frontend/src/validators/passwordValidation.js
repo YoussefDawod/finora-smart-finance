@@ -9,6 +9,12 @@
 
 export const PASSWORD_MIN_LENGTH = 8;
 
+/** Maximale Passwortlänge (bcrypt trunciert bei 72 Bytes) */
+export const PASSWORD_MAX_LENGTH = 128;
+
+/** Erlaubte Sonderzeichen — identisch mit Backend (authValidation.js) */
+export const SPECIAL_CHAR_REGEX = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/;
+
 /**
  * Calculate password strength based on character class checks.
  * @param {string} password
@@ -21,7 +27,7 @@ export function calculatePasswordStrength(password) {
     hasLower: /[a-z]/.test(password),
     hasUpper: /[A-Z]/.test(password),
     hasNumber: /\d/.test(password),
-    hasSpecial: /[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password),
+    hasSpecial: SPECIAL_CHAR_REGEX.test(password),
     isLongEnough: password.length >= PASSWORD_MIN_LENGTH,
   };
 
@@ -39,7 +45,7 @@ export function calculatePasswordStrength(password) {
  * Validate password strength.
  * Returns an error key string (for caller to translate) or '' if valid.
  *
- * Error keys: 'required' | 'tooShort' | 'noUppercase' | 'noNumber' | 'noSpecial' | ''
+ * Error keys: 'required' | 'tooShort' | 'tooLong' | 'noUppercase' | 'noLowercase' | 'noNumber' | 'noSpecial' | ''
  *
  * @param {string} password
  * @returns {string} Error key or empty string
@@ -47,9 +53,11 @@ export function calculatePasswordStrength(password) {
 export function validatePassword(password) {
   if (!password) return 'required';
   if (password.length < PASSWORD_MIN_LENGTH) return 'tooShort';
+  if (password.length > PASSWORD_MAX_LENGTH) return 'tooLong';
   if (!/[A-Z]/.test(password)) return 'noUppercase';
+  if (!/[a-z]/.test(password)) return 'noLowercase';
   if (!/\d/.test(password)) return 'noNumber';
-  if (!/[!@#$%^&*()_+=[\]{};':"\\|,.<>/?-]/.test(password)) return 'noSpecial';
+  if (!SPECIAL_CHAR_REGEX.test(password)) return 'noSpecial';
   return '';
 }
 

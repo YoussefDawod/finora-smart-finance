@@ -166,7 +166,7 @@ function TransactionProvider({ children }) {
   // ──────────────────────────────────────────────────────────────────────
   const isLocal = !isAuthenticated;
 
-  const value = {
+  const value = useMemo(() => ({
     // State
     state,
     isLocal,
@@ -225,7 +225,13 @@ function TransactionProvider({ children }) {
     allTransactions: isLocal
       ? (localData?.dashboard?.recentTransactions || [])
       : (state.dashboardData?.recentTransactions || []),
-  };
+  }), [
+    state, isLocal, localData,
+    fetchDashboardData, fetchTransactions, triggerLocalRefresh,
+    apiCreate, apiUpdate, apiDelete, localCreate, localUpdate, localDelete,
+    setPage, setLimit, nextPage, prevPage, setDashboardMonth,
+    setFilter, setSort, clearFilter, clearError,
+  ]);
 
   return <TransactionContext.Provider value={value}>{children}</TransactionContext.Provider>;
 }

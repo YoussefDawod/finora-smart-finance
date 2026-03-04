@@ -1,0 +1,125 @@
+// ============================================
+// 👥 ADMIN RECENT USERS
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: var(--space-lg);
+  box-shadow: var(--sh-sm);
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0 0 var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+}
+
+// ── List ─────────────────────────────────────
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--r-md);
+  transition: background var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+  }
+}
+
+// ── Avatar ───────────────────────────────────
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  flex-shrink: 0;
+
+  &.adminAvatar {
+    background: color-mix(in srgb, var(--warning) 12%, transparent);
+    color: var(--warning);
+  }
+}
+
+// ── Content ──────────────────────────────────
+.rowContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+  flex: 1;
+}
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.userName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.verified {
+  color: var(--success);
+  flex-shrink: 0;
+}
+
+.unverified {
+  color: var(--tx-muted);
+  flex-shrink: 0;
+}
+
+.roleBadge {
+  font-size: var(--fs-2xs, 10px);
+  font-weight: var(--fw-sb);
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 18%, transparent);
+  padding: 1px 6px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+}
+
+.meta {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+// ── Empty State ──────────────────────────────
+.empty {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+// ── Responsive ───────────────────────────────
+@include below-md {
+  .card {
+    padding: var(--space-md);
+  }
+}

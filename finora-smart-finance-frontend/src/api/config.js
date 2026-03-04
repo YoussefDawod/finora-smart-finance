@@ -5,7 +5,7 @@
  * @module api/config
  */
 
-/* eslint-disable no-undef */
+ 
 
 // Empty baseURL - endpoints contain full path for proxy to work
 const RAW_API_URL = import.meta.env?.VITE_API_URL || '';
@@ -20,7 +20,7 @@ export const API_CONFIG = {
     'Content-Type': 'application/json',
   },
   TOKEN_STORAGE_KEY: 'auth_token',
-  DEBUG: true,
+  DEBUG: import.meta.env.DEV,
 };
 
 export default API_CONFIG;

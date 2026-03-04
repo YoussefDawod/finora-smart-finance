@@ -5,6 +5,7 @@
  * Wiederverwendbare Chart-Hilfskomponenten
  * ============================================================================
  */
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 import { formatCurrency } from '@/utils/formatters';
@@ -20,19 +21,20 @@ export { tooltipContentStyle } from './chartConstants';
 // ──────────────────────────────────────────────────────────────────────
 // SERIES ICON
 // ──────────────────────────────────────────────────────────────────────
-export const SeriesIcon = ({ series }) => {
+export const SeriesIcon = memo(({ series }) => {
   if (series === 'income') return <FiTrendingUp />;
   if (series === 'expense') return <FiTrendingDown />;
   if (series === 'balance') {
     return <span style={{ fontSize: '1.2em', fontWeight: 'bold' }}>=</span>;
   }
   return null;
-};
+});
+SeriesIcon.displayName = 'SeriesIcon';
 
 // ──────────────────────────────────────────────────────────────────────
 // CHART TOOLTIP
 // ──────────────────────────────────────────────────────────────────────
-export const ChartTooltip = ({ active, payload, label, variant }) => {
+export const ChartTooltip = memo(({ active, payload, label, variant }) => {
   const { t } = useTranslation();
   const cssColors = useCssVariables();
   
@@ -91,12 +93,13 @@ export const ChartTooltip = ({ active, payload, label, variant }) => {
       ) : null}
     </div>
   );
-};
+});
+ChartTooltip.displayName = 'ChartTooltip';
 
 // ──────────────────────────────────────────────────────────────────────
 // CHART LEGEND
 // ──────────────────────────────────────────────────────────────────────
-export const ChartLegend = ({ payload }) => {
+export const ChartLegend = memo(({ payload }) => {
   const { t } = useTranslation();
   const cssColors = useCssVariables();
   
@@ -162,4 +165,5 @@ export const ChartLegend = ({ payload }) => {
       })}
     </div>
   );
-};
+});
+ChartLegend.displayName = 'ChartLegend';

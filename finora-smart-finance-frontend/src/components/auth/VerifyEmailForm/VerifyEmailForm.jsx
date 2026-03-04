@@ -15,16 +15,15 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { 
   FiMail, 
-  FiAlertCircle, 
   FiCheck,
-  FiRefreshCw,
-  FiX
+  FiRefreshCw
 } from 'react-icons/fi';
+import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import styles from './VerifyEmailForm.module.scss';
 
 export default function VerifyEmailForm({ email }) {
@@ -229,26 +228,11 @@ export default function VerifyEmailForm({ email }) {
   return (
     <div className={styles.verifyForm}>
       {/* API Error */}
-      <AnimatePresence>
-        {apiError && (
-          <motion.div
-            className={styles.errorBanner}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            <FiAlertCircle className={styles.errorIcon} />
-            <span>{apiError}</span>
-            <button
-              type="button"
-              className={styles.errorDismiss}
-              onClick={() => setApiError('')}
-            >
-              <FiX />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ErrorBanner
+        error={apiError}
+        onDismiss={() => setApiError('')}
+        dismissAriaLabel={t('auth.login.dismissError')}
+      />
 
       {/* Code Input */}
       <div className={styles.codeInputContainer}>

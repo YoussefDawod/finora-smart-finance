@@ -3,7 +3,7 @@
  * @description Budget-Management UI for SettingsPage
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FiSave, FiAlertTriangle, FiTrendingUp, FiTrash2 } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ import styles from './BudgetSettings.module.scss';
 const THRESHOLD_OPTIONS = [50, 60, 70, 80, 90, 100];
 
 export default function BudgetSettings() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { success, error: showError } = useToast();
   const { budgetStatus, isLoading, updateBudget, clearBudget, hasBudget } = useBudget();
 
@@ -39,13 +39,15 @@ export default function BudgetSettings() {
     }
   }, []);
 
-  // Initialize form with existing budget
-  useEffect(() => {
+  // Initialize form with existing budget (render-time state adjustment)
+  const [prevBudgetStatus, setPrevBudgetStatus] = useState(budgetStatus);
+  if (budgetStatus !== prevBudgetStatus) {
+    setPrevBudgetStatus(budgetStatus);
     if (budgetStatus?.hasBudget) {
       setMonthlyLimit(budgetStatus.monthlyLimit?.toString() || '');
       setAlertThreshold(budgetStatus.alertThreshold || 80);
     }
-  }, [budgetStatus]);
+  }
 
   // Check if form has changed
   const isDirty = useMemo(() => {
@@ -171,7 +173,7 @@ export default function BudgetSettings() {
               id="monthlyLimit"
               value={monthlyLimit}
               onChange={handleLimitChange}
-              placeholder="0.00"
+              placeholder={new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 2 }).format(0)}
               className={styles.input}
             />
             <span className={styles.inputSuffix}>{currencySymbol}</span>

@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { MEDIA_QUERIES } from '@/constants';
 import Header from '../Header/Header';
 import Sidebar from '../Sidebar/Sidebar';
 import Footer from '../Footer/Footer';
@@ -17,21 +19,17 @@ import styles from './MainLayout.module.scss';
  * - Navigation schließt Sidebar NICHT erneut
  */
 export default function MainLayout({ children }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar-collapsed');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+  const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
+  const { t } = useTranslation();
   
   // Only apply sidebar state class on desktop
   const layoutStateClass = isMobile 
     ? '' 
     : (isSidebarCollapsed ? styles.sidebarCollapsed : styles.sidebarExpanded);
-
-  // Initialize collapsed state from localStorage
-  useEffect(() => {
-    const savedCollapsedState = localStorage.getItem('sidebar-collapsed');
-    if (savedCollapsedState !== null) {
-      setIsSidebarCollapsed(JSON.parse(savedCollapsedState));
-    }
-  }, []);
 
   /**
    * Toggle sidebar collapse (Desktop only)
@@ -47,6 +45,11 @@ export default function MainLayout({ children }) {
 
   return (
     <div className={styles.mainLayout}>
+      {/* ── SKIP LINK ──────────────────────────────── */}
+      <a href="#main-content" className={styles.skipLink}>
+        {t('common.skipToContent', 'Skip to content')}
+      </a>
+
       {/* Header - Sticky Top */}
       <Header />
 
@@ -57,8 +60,6 @@ export default function MainLayout({ children }) {
           <Sidebar
             isCollapsed={isSidebarCollapsed}
             onToggleCollapse={handleToggleCollapse}
-            isOpen={false}
-            onClose={undefined}
           />
         )}
 

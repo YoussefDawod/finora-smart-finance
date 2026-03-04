@@ -1,4 +1,6 @@
 const js = require('@eslint/js');
+const globals = require('globals');
+const security = require('eslint-plugin-security');
 
 module.exports = [
   {
@@ -10,26 +12,22 @@ module.exports = [
       ecmaVersion: 2020,
       sourceType: 'commonjs',
       globals: {
-        console: 'readonly',
-        process: 'readonly',
-        Buffer: 'readonly',
-        __dirname: 'readonly',
-        __filename: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        require: 'readonly',
-        module: 'readonly',
-        exports: 'readonly',
-        fetch: 'readonly',
-        URLSearchParams: 'readonly',
+        ...globals.node,
+        ...globals.commonjs,
       },
+    },
+    plugins: {
+      security,
     },
     rules: {
       ...js.configs.recommended.rules,
+      ...security.configs.recommended.rules,
       'no-unused-vars': ['warn', { args: 'none', ignoreRestSiblings: true }],
       'no-console': 'off',
+      // Security: Erlaube non-literal RegExp da wir sie kontrolliert einsetzen
+      'security/detect-non-literal-regexp': 'warn',
+      // Security: Erlaube child_process in deploy/admin scripts
+      'security/detect-child-process': 'warn',
     },
   },
   // Jest Test-Dateien - zusätzliche Globals
@@ -37,15 +35,7 @@ module.exports = [
     files: ['__tests__/**/*.js', '**/*.test.js', '**/*.spec.js'],
     languageOptions: {
       globals: {
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        test: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        jest: 'readonly',
+        ...globals.jest,
       },
     },
   },

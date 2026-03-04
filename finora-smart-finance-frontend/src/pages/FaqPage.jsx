@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { FiArrowLeft, FiChevronDown } from 'react-icons/fi';
+import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
 import styles from './InfoPage.module.scss';
 
 export default function FaqPage() {
@@ -10,6 +11,14 @@ export default function FaqPage() {
   const questions = t('faq.questions', { returnObjects: true });
   const [openIndex, setOpenIndex] = useState(null);
 
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   const toggleQuestion = useCallback((index) => {
     setOpenIndex((prev) => (prev === index ? null : index));
   }, []);
@@ -17,9 +26,8 @@ export default function FaqPage() {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.pageContent}>
-        <button type="button" onClick={() => navigate(-1)} className={styles.backLink}>
+        <button type="button" onClick={handleBack} className={styles.backButton} aria-label={t('common.back')}>
           <FiArrowLeft />
-          {t('faq.backLink')}
         </button>
 
         <div className={styles.pageHeader}>
@@ -50,6 +58,8 @@ export default function FaqPage() {
             );
           })}
         </div>
+
+        <MiniFooter />
       </div>
     </div>
   );

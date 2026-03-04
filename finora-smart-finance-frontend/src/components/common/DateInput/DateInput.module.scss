@@ -1,0 +1,413 @@
+// ============================================
+// 📅  DATE INPUT  — Custom Kalender-Picker (Portal-basiert)
+//
+// ARCHITEKTUR:
+//   Panel wird via React Portal in <body> gerendert.
+//   → Kein overflow-clip durch Ancestor-Container
+//   → Kein CSS-Spezifitäts-Krieg zwischen Viewports/RTL
+//   → Position komplett via JS (getBoundingClientRect)
+//   → Funktioniert auf ALLEN Viewports + Sprachen identisch
+//
+// KEIN natives <input type="date">.
+// Button-Trigger (im DOM-Baum) + AnimatePresence Panel (Portal).
+//
+// MOTION_GLOW_RULES: nur border/shadow Transition, kein Glow.
+// COLOR_USAGE_RULES: ausschließlich CSS Custom Properties.
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ─────────────────────────────────────────────
+// WRAPPER  (im normalen DOM-Baum)
+// ─────────────────────────────────────────────
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  &.rtl { direction: rtl; }
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  &.withLabel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2xs);
+  }
+}
+
+// ─────────────────────────────────────────────
+// LABEL
+// ─────────────────────────────────────────────
+.label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// ─────────────────────────────────────────────
+// TRIGGER WRAP
+// ─────────────────────────────────────────────
+.triggerWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+// ─────────────────────────────────────────────
+// TRIGGER BUTTON
+// ─────────────────────────────────────────────
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 0 var(--space-sm);
+  height: var(--btn-height-sm, 2rem);
+  min-width: max-content;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--tx);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+  white-space: nowrap;
+  user-select: none;
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: var(--sh-xs);
+  }
+
+  @include focus-ring;
+
+  &.triggerOpen {
+    border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+    background: var(--surface-2);
+    box-shadow: var(--sh-sm);
+  }
+
+  &.hasValue {
+    color: var(--tx);
+    border-color: color-mix(in srgb, var(--primary) 14%, var(--border));
+  }
+}
+
+// size-md → taller trigger
+.size-md .trigger {
+  height: var(--input-height-md, 2.5rem);
+  padding: 0 var(--space-md);
+  font-size: var(--fs-sm);
+  gap: var(--space-sm);
+}
+
+// ─────────────────────────────────────────────
+// CALENDAR ICON
+// ─────────────────────────────────────────────
+.icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--primary);
+}
+
+.size-md .icon {
+  width: 16px;
+  height: 16px;
+}
+
+// ─────────────────────────────────────────────
+// TRIGGER LABEL
+// ─────────────────────────────────────────────
+.triggerLabel {
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ─────────────────────────────────────────────
+// CALENDAR PANEL  (Portal — direkt in <body>)
+// ─────────────────────────────────────────────
+// position: fixed + inline top/left von JS.
+// KEINE CSS-Position-Overrides für Viewport oder RTL.
+// JS berechnet die korrekte Position für JEDEN Fall.
+.panel {
+  position: fixed;
+  z-index: var(--z-dropdown, 1000);
+  width: 280px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-lg);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+// ─────────────────────────────────────────────
+// CALENDAR HEADER  (Month Nav)
+// ─────────────────────────────────────────────
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.monthLabel {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  text-transform: capitalize;
+  user-select: none;
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--tx);
+  }
+
+  @include focus-ring;
+}
+
+// ─────────────────────────────────────────────
+// WEEKDAY HEADERS
+// ─────────────────────────────────────────────
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.weekday {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  padding: var(--space-3xs) 0;
+  user-select: none;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+// ─────────────────────────────────────────────
+// DAY GRID
+// ─────────────────────────────────────────────
+.dayGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  max-width: 100%;
+}
+
+.dayCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-width: 0;
+  aspect-ratio: 1;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  padding: 0;
+  font-family: inherit;
+
+  &:hover:not(.daySelected):not(.dayDisabled) {
+    background: var(--surface-2);
+    border-color: var(--border);
+  }
+
+  @include focus-ring;
+}
+
+.daySelected {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  font-weight: var(--fw-sb);
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.dayToday {
+  border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
+}
+
+// Keyboard-focused day cell (arrow-key navigation)
+.dayFocused {
+  outline: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  outline-offset: -2px;
+}
+
+.dayOutside {
+  color: var(--tx-muted);
+  opacity: 0.35;
+}
+
+.dayDisabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+// ─────────────────────────────────────────────
+// TODAY BUTTON
+// ─────────────────────────────────────────────
+.todayBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-xs) 0;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  font-family: inherit;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 16%, transparent);
+  }
+
+  @include focus-ring;
+}
+
+// ─────────────────────────────────────────────
+// RESPONSIVE  (NUR Trigger-Sizing — Panel hat KEINE Breakpoint-Overrides)
+// ─────────────────────────────────────────────
+
+@include below-md {
+  .wrapper {
+    width: 100%;
+  }
+
+  .triggerWrap {
+    width: 100%;
+  }
+
+  .trigger {
+    width: 100%;
+    justify-content: flex-start;
+    height: var(--input-height-md, 2.5rem);
+    font-size: var(--fs-sm);
+    padding: 0 var(--space-md);
+  }
+}
+
+@include mobile {
+  .trigger {
+    height: var(--input-height-lg, 3rem);
+    font-size: var(--fs-md);
+    border-radius: var(--r-lg);
+    padding: 0 var(--space-md);
+  }
+
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ─────────────────────────────────────────────
+// RTL  (Trigger + Label im Wrapper-Baum)
+// ─────────────────────────────────────────────
+// NUR Trigger/Label hier — sie leben im normalen DOM unter .wrapper.rtl.
+// Panel-RTL wird via .panelRtl gesteuert (Panel lebt im Portal).
+
+.rtl .trigger {
+  flex-direction: row-reverse;
+}
+
+.rtl .label {
+  text-align: right;
+}
+
+// ─────────────────────────────────────────────
+// RTL  (Panel-Inhalt im Portal)
+// ─────────────────────────────────────────────
+// .panelRtl wird direkt auf das Portal-Panel gesetzt.
+// Keine Abhängigkeit von .wrapper.rtl Ancestry.
+
+.panelRtl {
+  direction: rtl;
+
+  // calendarHeader braucht kein flex-direction: row-reverse —
+  // direction: rtl auf dem Panel kehrt die Flex-Reihenfolge
+  // automatisch um (konsistent mit DashboardFilter.navHeader).
+
+  .weekdays,
+  .dayGrid {
+    direction: rtl;
+  }
+
+  .todayBtn {
+    direction: rtl;
+  }
+}
+
+// ─────────────────────────────────────────────
+// REDUCED MOTION
+// ─────────────────────────────────────────────
+@include reduced-motion {
+  .trigger,
+  .dayCell,
+  .navBtn,
+  .todayBtn {
+    transition: none;
+  }
+}
+
+// ─────────────────────────────────────────────
+// PRINT
+// ─────────────────────────────────────────────
+@media print {
+  .trigger {
+    border-color: var(--tx-muted);
+    box-shadow: none;
+  }
+  .icon { display: none; }
+  .panel { display: none; }
+}

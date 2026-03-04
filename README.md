@@ -38,6 +38,7 @@
 | 📊 **Smart Dashboard** | Echtzeit-Statistiken, Charts (Pie, Bar, Line), Trend-Analyse |
 | 💰 **Transaktions-Management** | Schnelles Hinzufügen, automatische Kategorisierung, Tags |
 | 🎯 **Sparziele & Budgets** | Budget-Limits, Progress Tracking, Notifikationen |
+| 🔐 **Admin Panel** | Dashboard, User-Management, Transaktions-Übersicht, Newsletter, Audit-Log |
 | 🌍 **4 Sprachen** | Deutsch, English, العربية, ქართული (RTL Support) |
 | 🔐 **Bank-Level Sicherheit** | JWT Auth, Bcrypt Hashing, Rate Limiting |
 | 🌙 **Dark Mode** | Framer Motion Animationen |
@@ -49,7 +50,7 @@
 | ✨ | Vorteil | Details |
 |---|---------|---------|
 | 💎 | **Premium UX** | WCAG 2.1 AA, flüssige Animationen, durchdachte Patterns |
-| 🚀 | **Developer-Friendly** | 119 Unit Tests, 75% Coverage, MVC-Pattern |
+| 🚀 | **Developer-Friendly** | 1638+ Unit Tests, MVC-Pattern |
 | 🌍 | **Global Ready** | 4 Sprachen, HTTP i18n Backend, Multi-Currency |
 | 🔧 | **Production-Ready** | GitHub Actions CI/CD, ESLint, Prettier |
 
@@ -86,7 +87,7 @@ npm run dev:api &         # Express ⚙️ Port 5000
 |-------|-------------|
 | **Frontend** | React 19, Vite 7, SCSS Modules, Recharts, Framer Motion |
 | **Backend** | Express 5, MongoDB, Mongoose, JWT, Bcrypt |
-| **Testing** | Vitest (69 Tests), Jest (50 Tests) |
+| **Testing** | Vitest (1176 Tests), Jest (462 Tests) |
 | **Quality** | ESLint 9, Prettier 3, Husky, GitHub Actions |
 
 ---
@@ -102,8 +103,8 @@ npm run lint              # Code-Qualität
 
 | Metric | Wert |
 |--------|------|
-| **Unit Tests** | 119 (69 Frontend + 50 Backend) |
-| **Coverage** | ~75% |
+| **Unit Tests** | 1638+ (1176 Frontend + 462 Backend) |
+| **Test Suites** | 79 (57 Frontend + 22 Backend) |
 | **ESLint Errors** | 0 |
 | **Build Size** | ~500KB |
 
@@ -148,7 +149,8 @@ git push origin feature/amazing-feature
 |----------|-------------|
 | [Frontend README](./finora-smart-finance-frontend/README.md) | React, Hooks, Design System |
 | [Backend README](./finora-smart-finance-api/README.md) | Express, API Endpoints, Admin CLI |
-| [API Reference](./finora-smart-finance-api/docs/ADMIN_API.md) | Alle Endpoints |
+| [Admin API Reference](./finora-smart-finance-api/docs/ADMIN_API.md) | Admin Endpoints |
+| [Changelog](./CHANGELOG.md) | Alle Änderungen |
 
 ---
 

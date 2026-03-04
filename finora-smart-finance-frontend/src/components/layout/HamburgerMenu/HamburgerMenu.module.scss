@@ -11,7 +11,7 @@
   position: fixed;
   inset: 0;
   background: color-mix(in srgb, black 60%, transparent);
-  z-index: 1150;
+  z-index: var(--z-header);
 }
 
 // ============================================
@@ -28,7 +28,7 @@
   }
   display: flex;
   flex-direction: column;
-  z-index: 1200;
+  z-index: var(--z-overlay);
   background: var(--surface);
   box-shadow: var(--sh-xl);
   overflow: hidden;
@@ -36,7 +36,7 @@
   padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
   border-right: 1px solid var(--border);
 
-  @media (max-width: 400px) {
+  @include breakpoint($max: 400px) {
     width: 288px;
   }
 }
@@ -55,7 +55,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
+  height: var(--header-height, 48px);
+  padding: 0 var(--space-lg);
   border-bottom: 1px solid var(--border);
   background: var(--surface-2);
   flex-shrink: 0;
@@ -88,12 +89,35 @@
   width: 48px;
   height: 48px;
   min-width: 48px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--pri-hover)));
+  background: linear-gradient(135deg, var(--primary), var(--pri-hover));
   border-radius: var(--r-md);
   color: var(--on-primary);
   font-size: var(--fs-lg);
   font-weight: var(--fw-b);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+  position: relative;
+}
+
+.avatarBadge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  padding: 1px var(--space-2xs);
+  font-size: 9px;
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border: 1px solid var(--primary);
+  border-radius: var(--r-full);
+  line-height: 1.3;
+  white-space: nowrap;
+
+  :global([dir='rtl']) & {
+    right: auto;
+    left: -6px;
+  }
 }
 
 .userInfo {
@@ -160,7 +184,8 @@
 // ============================================
 .themeSection {
   padding: 0;
-  margin-top: 0;
+  margin-top: auto;
+  width: 100%;
 }
 
 .navItem {
@@ -176,7 +201,7 @@
   font-weight: var(--fw-m);
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--tr-fast);
   position: relative;
   width: 100%;
   min-height: 44px;
@@ -193,7 +218,7 @@
     height: 0;
     background: var(--primary);
     border-radius: 0 var(--r-sm) var(--r-sm) 0;
-    transition: height 0.15s ease;
+    transition: height var(--tr-fast);
   }
 
   // Hover State
@@ -212,7 +237,7 @@
 
   // Active State
   &.active {
-    background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+    background: transparent;
     color: var(--primary);
     font-weight: var(--fw-sb);
 
@@ -238,6 +263,13 @@
   }
 }
 
+// ============================================
+// ADMIN LINK
+// ============================================
+.adminLink {
+  margin-top: var(--space-xs);
+}
+
 .navIcon {
   display: flex;
   align-items: center;
@@ -246,7 +278,7 @@
   height: 28px;
   min-width: 28px;
   color: var(--tx-muted);
-  transition: color 0.15s ease;
+  transition: color var(--tr-fast);
   flex-shrink: 0;
 
   svg {
@@ -265,7 +297,6 @@
 }
 
 :global([dir='rtl']) .navItem {
-  flex-direction: row-reverse;
   text-align: right;
 
   &::before {
@@ -276,8 +307,11 @@
 }
 
 :global([dir='rtl']) .logoutBtn {
-  flex-direction: row-reverse;
   text-align: right;
+
+  &:hover svg {
+    transform: translateX(-4px);
+  }
 }
 
 // ============================================
@@ -297,7 +331,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
   position: relative;
   width: 100%;
   min-height: 44px;
@@ -322,15 +356,12 @@
   }
 
   // Focus State
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   svg {
     width: 20px;
     height: 20px;
-    transition: transform 0.2s ease;
+    transition: transform var(--tr-fast);
   }
 }
 
@@ -351,7 +382,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
   width: 100%;
   min-height: 44px;
   flex-shrink: 0;
@@ -365,15 +396,12 @@
     transform: scale(0.97);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   svg {
     width: 20px;
     height: 20px;
-    transition: transform 0.2s ease;
+    transition: transform var(--tr-fast);
   }
 }
 
@@ -397,8 +425,8 @@
 
   &::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 4px;
-    transition: background 0.2s ease;
+    border-radius: var(--r-sm);
+    transition: background var(--tr-fast);
 
     &:hover {
       background: var(--tx-muted);

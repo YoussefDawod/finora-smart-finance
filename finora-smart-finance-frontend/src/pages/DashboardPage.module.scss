@@ -141,7 +141,7 @@
     font-size: var(--fs-sm);
     color: var(--tx-muted);
     margin: 0;
-    line-height: 1.5;
+    line-height: var(--lh-n);
 
     @include mobile {
       font-size: var(--fs-xs);
@@ -160,7 +160,9 @@
 .greetingIcon {
   display: inline-flex;
   align-items: center;
-  color: var(--accent);
+  // ⚠️ --accent nur für Glow/Hero/Decor, nicht für UI-Icons
+  // Verwende --primary für konsistente Brand-Präsenz
+  color: var(--primary);
   font-size: 1.1em;
 }
 
@@ -232,10 +234,7 @@
     text-decoration: underline;
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================

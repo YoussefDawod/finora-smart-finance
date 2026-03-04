@@ -4,9 +4,15 @@
  */
 
 const Transaction = require('../models/Transaction');
+const User = require('../models/User');
 const transactionService = require('../services/transactionService');
 const emailService = require('../utils/emailService');
 const budgetAlertService = require('../services/budgetAlertService');
+const {
+  rollbackQuotaReservation,
+  decrementTransactionCount,
+  getQuotaStatus,
+} = require('../middleware/transactionQuota');
 const logger = require('../utils/logger');
 const {
   validateObjectId,
@@ -15,34 +21,26 @@ const {
   validateUpdateTransaction,
 } = require('../validators/transactionValidation');
 
-const config = require('../config/env');
+const { sendError, handleServerError } = require('../utils/responseHelper');
 
-function handleServerError(res, context, error) {
-  logger.error(`${context} error:`, error);
-  return res.status(500).json({
-    error: 'Serverfehler',
-    code: 'SERVER_ERROR',
-    ...(config.nodeEnv !== 'production' && { message: error.message }),
-  });
-}
-
-async function getOwnedTransactionOrFail(id, userId, res) {
+async function getOwnedTransactionOrFail(id, userId, res, req) {
   const idValidation = validateObjectId(id);
   if (!idValidation.valid) {
-    res.status(400).json({ error: idValidation.error, code: 'INVALID_ID' });
+    sendError(res, req, { error: idValidation.error, code: 'INVALID_ID', status: 400 });
     return null;
   }
 
   const transaction = await Transaction.findById(id);
   if (!transaction) {
-    res.status(404).json({ error: 'Transaktion nicht gefunden', code: 'NOT_FOUND' });
+    sendError(res, req, { error: 'Transaktion nicht gefunden', code: 'NOT_FOUND', status: 404 });
     return null;
   }
 
   if (!transactionService.isOwner(transaction, userId)) {
-    res.status(403).json({
+    sendError(res, req, {
       error: 'Sie haben keine Berechtigung, diese Transaktion zu sehen',
       code: 'FORBIDDEN',
+      status: 403,
     });
     return null;
   }
@@ -53,6 +51,56 @@ async function getOwnedTransactionOrFail(id, userId, res) {
 // ============================================
 // STATS ENDPOINTS
 // ============================================
+
+/**
+ * GET /api/transactions/quota
+ * Monatliches Transaktions-Quota-Status
+ *
+ * Verwendet die tatsächliche Anzahl aus der DB als Source-of-Truth,
+ * damit auch Transaktionen gezählt werden, die vor dem Quota-System
+ * erstellt wurden.  Der gespeicherte Counter wird bei Bedarf synchronisiert.
+ */
+async function getQuota(req, res) {
+  try {
+    const user = req.user;
+
+    // ── Source-of-Truth: echte Anzahl dieses Monats aus der DB ──
+    const now = new Date();
+    const startOfMonth = new Date(Date.UTC(now.getFullYear(), now.getMonth(), 1));
+    const actualCount = await Transaction.countDocuments({
+      userId: user._id,
+      createdAt: { $gte: startOfMonth },
+    });
+
+    // Gespeicherten Counter mit DB synchronisieren (fire-and-forget)
+    const storedCount =
+      user.transactionLifecycle?.monthlyTransactionCount ?? 0;
+    if (storedCount !== actualCount) {
+      user.transactionLifecycle = {
+        ...(user.transactionLifecycle?.toObject?.() || {}),
+        monthlyTransactionCount: actualCount,
+        monthlyCountResetAt: new Date(),
+      };
+      user.save().catch((err) =>
+        logger.error('Quota counter sync failed:', err)
+      );
+    }
+
+    // Quota-Status mit echtem Wert berechnen
+    const quota = getQuotaStatus(user);
+    // Überschreibe `used` mit DB-Wert (falls getQuotaStatus cached war)
+    quota.used = actualCount;
+    quota.remaining = Math.max(0, quota.limit - actualCount);
+    quota.isLimitReached = actualCount >= quota.limit;
+
+    res.json({
+      success: true,
+      data: quota,
+    });
+  } catch (error) {
+    handleServerError(res, req, 'GET /api/transactions/quota', error);
+  }
+}
 
 /**
  * GET /api/transactions/stats/summary
@@ -69,7 +117,7 @@ async function getSummary(req, res) {
 
     res.json({ success: true, data: stats });
   } catch (error) {
-    handleServerError(res, 'GET /api/transactions/stats/summary', error);
+    handleServerError(res, req, 'GET /api/transactions/stats/summary', error);
   }
 }
 
@@ -104,7 +152,7 @@ async function getDashboard(req, res) {
 
     res.json({ success: true, data });
   } catch (error) {
-    handleServerError(res, 'GET /api/transactions/stats/dashboard', error);
+    handleServerError(res, req, 'GET /api/transactions/stats/dashboard', error);
   }
 }
 
@@ -123,10 +171,11 @@ async function createTransaction(req, res) {
     const validation = validateCreateTransaction(req.body);
 
     if (!validation.valid) {
-      return res.status(400).json({
+      return sendError(res, req, {
         error: 'Validierungsfehler',
-        details: validation.errors,
         code: 'VALIDATION_ERROR',
+        status: 400,
+        details: validation.errors,
       });
     }
 
@@ -134,6 +183,9 @@ async function createTransaction(req, res) {
       userId,
       ...validation.data,
     });
+
+    // Quota wurde bereits atomar in der Middleware reserviert (req.quotaReserved)
+    const quota = req.quotaSnapshot || getQuotaStatus(user);
 
     // Transaktions-Benachrichtigung (prüft automatisch Benutzereinstellungen)
     if (user.email && user.isVerified) {
@@ -162,24 +214,27 @@ async function createTransaction(req, res) {
       success: true,
       data: transactionService.formatTransaction(transaction),
       message: 'Transaktion erstellt',
+      quota,
     });
   } catch (error) {
+    // Quota-Rollback: Middleware hat Slot reserviert, aber Transaktion schlug fehl
+    if (req.quotaReserved) {
+      await rollbackQuotaReservation(req.user._id);
+    }
+
     logger.error('POST /api/transactions Error:', error);
 
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
+      return sendError(res, req, {
         error: 'Validierungsfehler',
-        details: messages,
         code: 'VALIDATION_ERROR',
+        status: 400,
+        details: messages,
       });
     }
 
-    res.status(500).json({
-      error: 'Fehler beim Erstellen der Transaktion',
-      code: 'SERVER_ERROR',
-      ...(config.nodeEnv !== 'production' && { message: error.message }),
-    });
+    handleServerError(res, req, 'POST /api/transactions', error);
   }
 }
 
@@ -218,7 +273,7 @@ async function getTransactions(req, res) {
       ...(req.query.search && { searchQuery: req.query.search }),
     });
   } catch (error) {
-    handleServerError(res, 'GET /api/transactions', error);
+    handleServerError(res, req, 'GET /api/transactions', error);
   }
 }
 
@@ -231,7 +286,7 @@ async function getTransactionById(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    const transaction = await getOwnedTransactionOrFail(id, userId, res, req);
     if (!transaction) return;
 
     res.json({
@@ -239,7 +294,7 @@ async function getTransactionById(req, res) {
       data: transactionService.formatTransaction(transaction),
     });
   } catch (error) {
-    handleServerError(res, 'GET /api/transactions/:id', error);
+    handleServerError(res, req, 'GET /api/transactions/:id', error);
   }
 }
 
@@ -252,15 +307,16 @@ async function updateTransaction(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    const transaction = await getOwnedTransactionOrFail(id, userId, res, req);
     if (!transaction) return;
 
     const validation = validateUpdateTransaction(req.body);
     if (!validation.valid) {
-      return res.status(400).json({
+      return sendError(res, req, {
         error: 'Validierungsfehler',
-        details: validation.errors,
         code: 'VALIDATION_ERROR',
+        status: 400,
+        details: validation.errors,
       });
     }
 
@@ -278,18 +334,15 @@ async function updateTransaction(req, res) {
 
     if (error.name === 'ValidationError') {
       const messages = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({
+      return sendError(res, req, {
         error: 'Validierungsfehler',
-        details: messages,
         code: 'VALIDATION_ERROR',
+        status: 400,
+        details: messages,
       });
     }
 
-    res.status(500).json({
-      error: 'Fehler beim Aktualisieren der Transaktion',
-      code: 'SERVER_ERROR',
-      ...(config.nodeEnv !== 'production' && { message: error.message }),
-    });
+    handleServerError(res, req, 'PUT /api/transactions/:id', error);
   }
 }
 
@@ -302,10 +355,13 @@ async function deleteTransaction(req, res) {
     const userId = req.user._id;
     const { id } = req.params;
 
-    const transaction = await getOwnedTransactionOrFail(id, userId, res);
+    const transaction = await getOwnedTransactionOrFail(id, userId, res, req);
     if (!transaction) return;
 
     await Transaction.findByIdAndDelete(id);
+
+    // Transaktionszähler dekrementieren (nur wenn im aktuellen Monat erstellt)
+    await decrementTransactionCount(req.user, transaction.createdAt);
 
     res.json({
       success: true,
@@ -316,27 +372,55 @@ async function deleteTransaction(req, res) {
       },
     });
   } catch (error) {
-    handleServerError(res, 'DELETE /api/transactions/:id', error);
+    handleServerError(res, req, 'DELETE /api/transactions/:id', error);
   }
 }
 
 /**
  * DELETE /api/transactions
- * Alle Transaktionen löschen (Bulk)
+ * Alle Transaktionen löschen (Bulk) — erfordert Passwort-Bestätigung (L-8)
  */
 async function deleteAllTransactions(req, res) {
   try {
     const userId = req.user._id;
     const { confirm } = req.query;
+    const { password } = req.body || {};
 
     if (confirm !== 'true') {
-      return res.status(400).json({
+      return sendError(res, req, {
         error: 'Sicherheitsbestätigung erforderlich: ?confirm=true',
         code: 'MISSING_CONFIRMATION',
+        status: 400,
       });
     }
 
+    // Passwort-Bestätigung für destruktive Operation (L-8)
+    if (!password) {
+      return sendError(res, req, {
+        error: 'Passwort erforderlich zur Bestätigung',
+        code: 'CONFIRMATION_REQUIRED',
+        status: 400,
+      });
+    }
+
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return sendError(res, req, { error: 'Benutzer nicht gefunden', code: 'NOT_FOUND', status: 404 });
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
+      logger.warn(`Failed bulk delete attempt for user ${userId}`);
+      return sendError(res, req, { error: 'Passwort ist falsch', code: 'INVALID_PASSWORD', status: 400 });
+    }
+
     const result = await Transaction.deleteMany({ userId });
+
+    // Transaktionszähler zurücksetzen
+    if (req.user.transactionLifecycle) {
+      req.user.transactionLifecycle.monthlyTransactionCount = 0;
+      await req.user.save();
+    }
 
     res.json({
       success: true,
@@ -347,7 +431,7 @@ async function deleteAllTransactions(req, res) {
       },
     });
   } catch (error) {
-    handleServerError(res, 'DELETE /api/transactions', error);
+    handleServerError(res, req, 'DELETE /api/transactions', error);
   }
 }
 
@@ -355,6 +439,7 @@ module.exports = {
   // Stats
   getSummary,
   getDashboard,
+  getQuota,
 
   // CRUD
   createTransaction,

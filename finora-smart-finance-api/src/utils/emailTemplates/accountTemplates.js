@@ -1,4 +1,6 @@
 const { baseLayout, frontendBaseUrl } = require('./baseLayout');
+const { escapeHtml } = require('../escapeHtml');
+const colors = require('./colors');
 
 /**
  * Willkommens-Email Template
@@ -6,10 +8,11 @@ const { baseLayout, frontendBaseUrl } = require('./baseLayout');
  * @returns {string} HTML-Template
  */
 function welcome(name) {
+  const safeName = escapeHtml(name);
   return baseLayout(`
     <div class="content">
       <h2>Willkommen bei Finora!</h2>
-      <p>Hallo ${name},</p>
+      <p>Hallo ${safeName},</p>
       <p>deine Email-Adresse wurde erfolgreich bestätigt. Du kannst jetzt alle Funktionen von Finora nutzen:</p>
       <ul>
         <li>Einnahmen und Ausgaben tracken</li>
@@ -23,7 +26,7 @@ function welcome(name) {
     </div>
     <div class="footer">
       <p>Viel Erfolg beim Sparen!</p>
-      <p>© ${new Date().getFullYear()} Finora - Smart Finance</p>
+      <p>© ${new Date().getFullYear()} Finora — Smart Finance</p>
     </div>
   `);
 }
@@ -36,6 +39,12 @@ function welcome(name) {
  * @returns {string} HTML-Template
  */
 function securityAlert(name, eventType, details = {}) {
+  const safeName = escapeHtml(name);
+  const safeDetails = {
+    ip: escapeHtml(details.ip),
+    userAgent: escapeHtml(details.userAgent),
+    location: escapeHtml(details.location),
+  };
   const titles = {
     login: 'Neue Anmeldung erkannt',
     password_change: 'Passwort wurde geändert',
@@ -59,13 +68,13 @@ function securityAlert(name, eventType, details = {}) {
   return baseLayout(`
     <div class="content">
       <h2>${titles[eventType] || 'Sicherheitshinweis'}</h2>
-      <p>Hallo ${name},</p>
+      <p>Hallo ${safeName},</p>
       <p>${messages[eventType] || 'Es gab eine sicherheitsrelevante Aktion in deinem Konto.'}</p>
       <div class="${eventType === 'suspicious' ? 'warning' : 'info'}">
         <strong>Zeitpunkt:</strong> ${timestamp}<br>
-        ${details.ip ? `<strong>IP-Adresse:</strong> ${details.ip}<br>` : ''}
-        ${details.userAgent ? `<strong>Gerät:</strong> ${details.userAgent}<br>` : ''}
-        ${details.location ? `<strong>Standort:</strong> ${details.location}<br>` : ''}
+        ${safeDetails.ip ? `<strong>IP-Adresse:</strong> ${safeDetails.ip}<br>` : ''}
+        ${safeDetails.userAgent ? `<strong>Gerät:</strong> ${safeDetails.userAgent}<br>` : ''}
+        ${safeDetails.location ? `<strong>Standort:</strong> ${safeDetails.location}<br>` : ''}
       </div>
       ${eventType === 'suspicious' ? `
       <div class="warning">
@@ -75,13 +84,13 @@ function securityAlert(name, eventType, details = {}) {
         <a href="${frontendBaseUrl}/settings" class="button">Passwort ändern</a>
       </p>
       ` : ''}
-      <p style="font-size: 14px; color: #6b7280;">
+      <p style="font-size: 14px; color: ${colors.textMuted};">
         Falls du diese Aktion nicht durchgeführt hast, kontaktiere uns bitte umgehend.
       </p>
     </div>
     <div class="footer">
       <p>Diese Benachrichtigung dient deiner Sicherheit.</p>
-      <p>© ${new Date().getFullYear()} Finora - Smart Finance</p>
+      <p>© ${new Date().getFullYear()} Finora — Smart Finance</p>
     </div>
   `);
 }

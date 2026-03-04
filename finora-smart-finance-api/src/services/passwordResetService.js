@@ -6,6 +6,7 @@
 const User = require('../models/User');
 const emailService = require('../utils/emailService');
 const authService = require('./authService');
+const auditLogService = require('./auditLogService');
 const logger = require('../utils/logger');
 const { validatePassword } = require('../validators/authValidation');
 
@@ -45,6 +46,13 @@ async function changePassword(userId, currentPassword, newPassword) {
   user.refreshTokens = []; // Invalidate all sessions
   await user.save();
 
+  // Audit-Log: Passwort geändert
+  auditLogService.log({
+    action: 'PASSWORD_CHANGED',
+    targetUserId: user._id,
+    targetUserName: user.name,
+  });
+
   // Send security alert
   if (user.email && user.isVerified) {
     try {
@@ -74,27 +82,30 @@ async function initiatePasswordReset(email) {
     return { sent: true };
   }
 
-  // Check if password reset is allowed
+  // Sicherheit: Kein Unterschied in der Antwort, egal ob E-Mail
+  // verifiziert ist oder Reset nicht erlaubt — verhindert E-Mail-Enumeration.
+  // Probleme werden nur intern geloggt.
   if (!user.isVerified) {
-    return {
-      sent: false,
-      error: 'Email ist nicht verifiziert. Bitte zuerst verifizieren.',
-      code: 'EMAIL_NOT_VERIFIED',
-    };
+    logger.info(`Password reset requested for unverified email: ${email}`);
+    return { sent: true };
   }
 
   if (!user.canResetPassword()) {
-    return {
-      sent: false,
-      error: 'Passwort-Reset ist nicht möglich. Bitte verifiziere zuerst deine Email.',
-      code: 'RESET_NOT_ALLOWED',
-    };
+    logger.info(`Password reset requested but not allowed for: ${email}`);
+    return { sent: true };
   }
 
   // Generate reset token and send email
   const resetToken = user.generatePasswordReset();
   await user.save();
   await emailService.sendPasswordResetEmail(user, resetToken);
+
+  // Audit-Log: Passwort-Reset angefordert
+  auditLogService.log({
+    action: 'PASSWORD_RESET_REQUESTED',
+    targetUserId: user._id,
+    targetUserName: user.name,
+  });
 
   return { sent: true };
 }
@@ -109,6 +120,16 @@ async function completePasswordReset(token, newPassword) {
       reset: false,
       error: 'Token und Passwort erforderlich',
       code: 'INVALID_INPUT',
+    };
+  }
+
+  // Validate new password strength
+  const passwordValidation = validatePassword(newPassword);
+  if (!passwordValidation.valid) {
+    return {
+      reset: false,
+      error: passwordValidation.error,
+      code: 'WEAK_PASSWORD',
     };
   }
 
@@ -133,6 +154,13 @@ async function completePasswordReset(token, newPassword) {
   user.passwordResetExpires = undefined;
   user.refreshTokens = []; // Invalidate all existing sessions
   await user.save();
+
+  // Audit-Log: Passwort-Reset abgeschlossen
+  auditLogService.log({
+    action: 'PASSWORD_RESET_COMPLETED',
+    targetUserId: user._id,
+    targetUserName: user.name,
+  });
 
   // Send security alert
   if (user.email && user.isVerified) {

@@ -14,6 +14,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { MEDIA_QUERIES } from '@/constants';
 import { FiMenu } from 'react-icons/fi';
 import { Logo, UserMenu } from '@/components/common';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
@@ -23,7 +24,7 @@ import styles from './Header.module.scss';
 export default function Header() {
   const { user, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const { t } = useTranslation();
   
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
@@ -64,8 +65,8 @@ export default function Header() {
             <motion.button
               className={styles.hamburger}
               onClick={() => setIsHamburgerOpen(!isHamburgerOpen)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               aria-label={t('common.menu')}
               aria-expanded={isHamburgerOpen}
             >
@@ -83,7 +84,12 @@ export default function Header() {
             // Loading: Skeleton für Avatar
             <Skeleton variant="circle" width="40px" height="40px" />
           ) : isAuthenticated ? (
-            <UserMenu user={user} onLogout={handleLogout} />
+            <>
+              {user?.role === 'admin' && (
+                <span className={styles.adminBadge}>{t('admin.badge', 'Admin')}</span>
+              )}
+              <UserMenu user={user} onLogout={handleLogout} />
+            </>
           ) : (
             <Link to="/login" className={styles.authBtn}>
               {t('auth.loginOrRegister')}

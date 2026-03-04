@@ -1,0 +1,155 @@
+// ============================================
+// PRIVACY NOTICE BANNER — Einfacher Datenschutz-Hinweis
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// BACKDROP
+// ============================================
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: var(--z-modal);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+// ============================================
+// BANNER CONTAINER
+// ============================================
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: calc(var(--z-modal) + 1);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: var(--sh-xl);
+  max-height: 90vh;
+  overflow-y: auto;
+
+  @include custom-scrollbar;
+}
+
+// ============================================
+// CLOSE BUTTON (for re-opening from footer)
+// ============================================
+.closeButton {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--tr-fast);
+
+  &:hover {
+    color: var(--tx);
+    border-color: var(--tx-muted);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  :global([dir='rtl']) & {
+    right: auto;
+    left: var(--space-md);
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: var(--mw-xl, 1280px);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-2xl);
+
+  @include mobile {
+    padding: var(--space-lg) var(--space-md);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--fs-md);
+  }
+}
+
+.description {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--tx-muted);
+  margin: 0;
+}
+
+// ============================================
+// ACTIONS (button row)
+// ============================================
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.btnAccept {
+  @include button-base;
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+  background: var(--primary);
+  color: var(--text-on-primary, #fff);
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .closeButton,
+  .btnAccept {
+    transition: none;
+  }
+
+  .backdrop {
+    backdrop-filter: none;
+  }
+}

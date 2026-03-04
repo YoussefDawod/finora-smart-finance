@@ -10,73 +10,29 @@
  * - Smooth 600-800ms transition animation
  * - Mobile: Vertical stack with branding on top/bottom
  * 
+ * BRANDING:
+ * - Delegates all visual branding to <BrandingPanel> component
+ * - No duplicate branding logic here
+ * 
  * @module components/layout/AuthLayout
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 import { useMotion } from '@/hooks/useMotion';
-import { Logo } from '@/components/common';
-import { FiBarChart2, FiShield, FiZap } from 'react-icons/fi';
+import BrandingPanel from '@/components/auth/BrandingPanel/BrandingPanel';
 import styles from './AuthLayout.module.scss';
 
 /**
  * AuthLayout Component
  * @param {Object} props
  * @param {React.ReactNode} props.children - Auth form content
- * @param {string} props.variant - 'login' | 'register' | 'forgot' | 'verify'
+ * @param {'login'|'register'|'forgot'|'verify'} props.variant - Auth page variant
  */
 export default function AuthLayout({ children, variant = 'login' }) {
   const { shouldAnimate } = useMotion();
-  const { t } = useTranslation();
 
-  // Determine panel position based on variant
   const isRegister = variant === 'register';
   const panelPosition = isRegister ? 'left' : 'right';
-
-  // ============================================
-  // FLOATING SHAPES ANIMATION
-  // ============================================
-  const floatingShapes = [
-    { size: 120, x: '15%', y: '20%', delay: 0, duration: 8 },
-    { size: 80, x: '75%', y: '15%', delay: 1, duration: 10 },
-    { size: 60, x: '25%', y: '70%', delay: 2, duration: 7 },
-    { size: 100, x: '80%', y: '65%', delay: 0.5, duration: 9 },
-    { size: 40, x: '60%', y: '40%', delay: 1.5, duration: 6 },
-  ];
-
-  // ============================================
-  // BRAND CONTENT BY VARIANT
-  // ============================================
-  const brandContent = {
-    login: {
-      headline: t('auth.layout.login.headline'),
-      subline: t('auth.layout.login.subline'),
-      ctaText: t('auth.layout.login.cta'),
-      ctaLink: '/register',
-    },
-    register: {
-      headline: t('auth.layout.register.headline'),
-      subline: t('auth.layout.register.subline'),
-      ctaText: t('auth.layout.register.cta'),
-      ctaLink: '/login',
-    },
-    forgot: {
-      headline: t('auth.layout.forgot.headline'),
-      subline: t('auth.layout.forgot.subline'),
-      ctaText: t('auth.layout.forgot.cta'),
-      ctaLink: '/login',
-    },
-    verify: {
-      headline: t('auth.layout.verify.headline'),
-      subline: t('auth.layout.verify.subline'),
-      ctaText: t('auth.layout.verify.cta'),
-      ctaLink: '/login',
-    },
-  };
-
-  const content = brandContent[variant] || brandContent.login;
 
   // ============================================
   // ANIMATION VARIANTS
@@ -102,15 +58,6 @@ export default function AuthLayout({ children, variant = 'login' }) {
     },
   };
 
-  const contentVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.4, delay: 0.2 },
-    },
-  };
-
   // ============================================
   // RENDER
   // ============================================
@@ -118,7 +65,7 @@ export default function AuthLayout({ children, variant = 'login' }) {
     <div className={styles.authLayout}>
       {/* Form Container - Always centered in the visible half */}
       <div className={`${styles.formPanel} ${isRegister ? styles.formRight : styles.formLeft}`}>
-        <motion.div 
+        <motion.div
           className={styles.formContainer}
           initial={shouldAnimate ? { opacity: 0, y: 20 } : {}}
           animate={{ opacity: 1, y: 0 }}
@@ -128,97 +75,22 @@ export default function AuthLayout({ children, variant = 'login' }) {
         </motion.div>
       </div>
 
-      {/* Sliding Branding Panel */}
-      <motion.div 
+      {/* Sliding Branding Panel (desktop) */}
+      <motion.div
         className={styles.brandingPanel}
         variants={shouldAnimate ? panelVariants : {}}
         initial={panelPosition}
         animate={panelPosition}
         key={panelPosition}
       >
-        {/* Animated Background Shapes */}
-        <div className={styles.shapesContainer}>
-          {floatingShapes.map((shape, index) => (
-            <motion.div
-              key={index}
-              className={styles.floatingShape}
-              style={{
-                width: shape.size,
-                height: shape.size,
-                left: shape.x,
-                top: shape.y,
-              }}
-              animate={shouldAnimate ? {
-                y: [0, -20, 0],
-                rotate: [0, 5, -5, 0],
-                scale: [1, 1.05, 1],
-              } : {}}
-              transition={{
-                duration: shape.duration,
-                delay: shape.delay,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Branding Content */}
-        <AnimatePresence mode="wait">
-          <motion.div 
-            className={styles.brandingContent}
-            key={variant}
-            variants={shouldAnimate ? contentVariants : {}}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-          >
-            <Logo to="/" showText={true} />
-
-            <div className={styles.headline}>
-              <h2>{content.headline}</h2>
-              <p>{content.subline}</p>
-            </div>
-
-            {/* CTA Button */}
-            <Link to={content.ctaLink} className={styles.ctaButton}>
-              {content.ctaText}
-            </Link>
-
-            {/* Feature Pills */}
-            <div className={styles.features}>
-              <div className={styles.featurePill}>
-                <span className={styles.featureIcon}><FiBarChart2 /></span>
-                <span>{t('auth.layout.features.realtime')}</span>
-              </div>
-              <div className={styles.featurePill}>
-                <span className={styles.featureIcon}><FiShield /></span>
-                <span>{t('auth.layout.features.secure')}</span>
-              </div>
-              <div className={styles.featurePill}>
-                <span className={styles.featureIcon}><FiZap /></span>
-                <span>{t('auth.layout.features.fast')}</span>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Footer */}
-        <div className={styles.brandingFooter}>
-          <p>{t('auth.branding.footer')}</p>
-        </div>
+        <BrandingPanel mode={variant} isDesktop />
       </motion.div>
 
-      {/* Mobile Branding (shown only on mobile) */}
+      {/* Mobile Branding */}
       <div className={`${styles.mobileBranding} ${isRegister ? styles.mobileTop : styles.mobileBottom}`}>
-        <div className={styles.mobileContent}>
-          <h3>{content.headline}</h3>
-          <p>{content.subline}</p>
-          <Link to={content.ctaLink} className={styles.mobileCta}>
-            {content.ctaText}
-          </Link>
-        </div>
+        <BrandingPanel mode={variant} isDesktop={false} />
       </div>
     </div>
   );
 }
+

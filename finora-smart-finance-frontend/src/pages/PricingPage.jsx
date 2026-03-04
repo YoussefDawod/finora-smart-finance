@@ -1,19 +1,33 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiCheck } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
 import styles from './InfoPage.module.scss';
 
 export default function PricingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const plans = t('pricing.plans', { returnObjects: true });
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleExpand = (index) => {
+    setExpandedCards((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
 
   return (
     <div className={styles.pageContainer}>
       <div className={`${styles.pageContent} ${styles.wideContent}`}>
-        <button type="button" onClick={() => navigate(-1)} className={styles.backLink}>
+        <button type="button" onClick={handleBack} className={styles.backButton} aria-label={t('common.back')}>
           <FiArrowLeft />
-          {t('pricing.backLink')}
         </button>
 
         <div className={styles.pageHeader}>
@@ -24,6 +38,8 @@ export default function PricingPage() {
         <div className={styles.pricingGrid}>
           {Array.isArray(plans) && plans.map((plan, index) => {
             const isPopular = index === 1;
+            const isExpanded = !!expandedCards[index];
+            const hasExtras = plan.extraFeatures?.length > 0;
             return (
               <div
                 key={`plan-${index}`}
@@ -43,6 +59,29 @@ export default function PricingPage() {
                     </li>
                   ))}
                 </ul>
+                {hasExtras && (
+                  <>
+                    <button
+                      type="button"
+                      className={styles.showMoreBtn}
+                      onClick={() => toggleExpand(index)}
+                      aria-expanded={isExpanded}
+                    >
+                      <span>{isExpanded ? t('pricing.showLess') : t('pricing.showMore')}</span>
+                      {isExpanded ? <FiChevronUp /> : <FiChevronDown />}
+                    </button>
+                    {isExpanded && (
+                      <ul className={`${styles.planFeatures} ${styles.extraFeatures}`}>
+                        {plan.extraFeatures.map((extra, eIndex) => (
+                          <li key={`extra-${eIndex}`} className={styles.planFeatureItem}>
+                            <FiCheck />
+                            <span>{extra}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                )}
                 <Link
                   to={isPopular ? '/register' : '/dashboard'}
                   className={`${styles.planCta} ${!isPopular ? styles.planCtaOutline : ''}`}
@@ -53,6 +92,8 @@ export default function PricingPage() {
             );
           })}
         </div>
+
+        <MiniFooter />
       </div>
     </div>
   );

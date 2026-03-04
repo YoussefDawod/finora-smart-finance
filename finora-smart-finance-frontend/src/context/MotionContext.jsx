@@ -21,7 +21,7 @@
  * @module MotionContext
  */
 
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useMemo, useSyncExternalStore } from 'react';
 
 // ============================================
 // 🎬 CONSTANTS
@@ -29,7 +29,27 @@ import { createContext, useState, useEffect } from 'react';
 
 const MEDIA_QUERY = '(prefers-reduced-motion: reduce)';
 
-/* eslint-disable no-undef */
+/**
+ * Subscribe to matchMedia changes for reduced motion
+ * @param {Function} callback - Subscriber callback
+ * @returns {Function} Unsubscribe function
+ */
+function subscribeReducedMotion(callback) {
+  const mq = globalThis.window?.matchMedia(MEDIA_QUERY);
+  if (!mq) return () => {};
+  mq.addEventListener('change', callback);
+  return () => mq.removeEventListener('change', callback);
+}
+
+/** @returns {boolean} Current reduced motion preference */
+function getReducedMotionSnapshot() {
+  return globalThis.window?.matchMedia(MEDIA_QUERY).matches ?? false;
+}
+
+/** @returns {boolean} Server-side fallback */
+function getReducedMotionServerSnapshot() {
+  return false;
+}
 
 // ============================================
 // 📦 CONTEXT
@@ -50,45 +70,19 @@ export const MotionContext = createContext(undefined);
  * @param {React.ReactNode} props.children
  */
 export function MotionProvider({ children }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  // ============================================
-  // 🔍 DETECT & LISTEN TO REDUCED MOTION
-  // ============================================
-
-  useEffect(() => {
-    if (typeof globalThis.window === 'undefined') {
-      return;
-    }
-
-    // Check initial preference
-    const mediaQuery = globalThis.window.matchMedia(MEDIA_QUERY);
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    /**
-     * Handler for media query changes
-     * @param {MediaQueryListEvent} event
-     */
-    const handleChange = (event) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
-    // Modern browsers use addEventListener
-    mediaQuery.addEventListener('change', handleChange);
-
-    // Cleanup
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    getReducedMotionServerSnapshot,
+  );
 
   // ============================================
   // 📤 CONTEXT VALUE
   // ============================================
 
-  const value = {
+  const value = useMemo(() => ({
     prefersReducedMotion,
-  };
+  }), [prefersReducedMotion]);
 
   return (
     <MotionContext.Provider value={value}>{children}</MotionContext.Provider>

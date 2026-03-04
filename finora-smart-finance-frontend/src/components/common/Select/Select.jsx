@@ -1,7 +1,8 @@
-import { forwardRef, useState, useCallback } from 'react';
+import { forwardRef, useState, useCallback, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FiAlertCircle, FiChevronDown } from 'react-icons/fi';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './Select.module.scss';
 
 /**
@@ -50,28 +51,32 @@ export const Select = forwardRef((
   ref
 ) => {
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
   const [isFocused, setIsFocused] = useState(false);
+  const autoId = useId();
   const hasError = !!error;
   const hasValue = value && value !== '';
   const resolvedPlaceholder = placeholder || t('common.selectPlaceholder');
+
+  // Generate stable IDs for aria-describedby
+  const errorId = `${autoId}-error`;
+  const hintId = `${autoId}-hint`;
+  const describedBy = hasError ? errorId : hint ? hintId : undefined;
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLERS
   // ──────────────────────────────────────────────────────────────────────
   const handleFocus = useCallback((e) => {
     setIsFocused(true);
-    props.onFocus?.(e);
-  }, [props]);
+  }, []);
 
   const handleBlur = useCallback((e) => {
     setIsFocused(false);
-    props.onBlur?.(e);
-  }, [props]);
+  }, []);
 
   const handleChange = useCallback((e) => {
     onChange?.(e);
-    props.onChange?.(e);
-  }, [onChange, props]);
+  }, [onChange]);
 
   // ──────────────────────────────────────────────────────────────────────
   // RENDER
@@ -86,17 +91,17 @@ export const Select = forwardRef((
         ${disabled ? styles.disabled : ''}
         ${className}
       `.trim()}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
+      animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
+      transition={{ duration: 0.25 }}
     >
       {/* LABEL */}
       {label && (
         <motion.label
           className={styles.label}
           htmlFor={props.id}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={shouldAnimate ? { opacity: 0 } : false}
+          animate={shouldAnimate ? { opacity: 1 } : false}
         >
           {label}
           {required && <span className={styles.required}>*</span>}
@@ -113,6 +118,8 @@ export const Select = forwardRef((
           onFocus={handleFocus}
           onBlur={handleBlur}
           onChange={handleChange}
+          aria-invalid={hasError || undefined}
+          aria-describedby={describedBy}
           {...props}
         >
           {/* PLACEHOLDER OPTION */}
@@ -150,6 +157,7 @@ export const Select = forwardRef((
       >
         {hasError && (
           <motion.p
+            id={errorId}
             className={styles.error}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -162,6 +170,7 @@ export const Select = forwardRef((
 
         {hint && !hasError && (
           <motion.p
+            id={hintId}
             className={styles.hint}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

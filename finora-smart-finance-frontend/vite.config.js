@@ -1,9 +1,61 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    // CSP-Meta-Tag im Development entfernen — Vite's HMR injiziert eigene
+    // Inline-Scripts + Blob-Worker + WebSocket, die mit festen SHA-Hashes kollidieren.
+    // Im Production-Build bleibt die CSP-Policy unverändert in index.html.
+    {
+      name: 'csp-dev-strip',
+      transformIndexHtml: {
+        order: 'pre',
+        handler(html, ctx) {
+          if (ctx.server) {
+            return html.replace(
+              /[ \t]*<!-- Content Security Policy -->[\s\S]*?form-action 'self'"\s*\/>/,
+              '    <!-- CSP: nur im Production-Build aktiv (Vite HMR braucht inline scripts) -->'
+            );
+          }
+          return html;
+        },
+      },
+    },
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      workbox: {
+        // Single-Page-App: alle Navigationen auf index.html leiten
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
+        // Statische Assets cachen (JS, CSS, HTML, Bilder, Fonts)
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        // Runtime-Caching für statische Ressourcen
+        runtimeCaching: [
+          {
+            // Lokalisierungsdateien: StaleWhileRevalidate
+            urlPattern: /\/locales\/.*\.json$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'finora-i18n-cache',
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24, // 24 Stunden
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+      },
+      manifest: false, // Existierendes manifest.json nutzen
+      devOptions: {
+        enabled: false, // SW nur im Build aktiv
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -63,7 +115,7 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV !== 'production',
     chunkSizeWarningLimit: 700,
     rollupOptions: {
       output: {
@@ -72,7 +124,6 @@ export default defineConfig({
           axios: ['axios'],
           motion: ['framer-motion'],
           charts: ['recharts'],
-          query: ['@tanstack/react-query'],
           icons: ['react-icons/fi'],
         },
       },

@@ -1,5 +1,5 @@
 const logger = require('../logger');
-const { sendEmail, buildLink, frontendBaseUrl } = require('./emailTransport');
+const { sendEmail, buildLink, frontendBaseUrl, backendBaseUrl } = require('./emailTransport');
 const templates = require('../emailTemplates');
 
 /**
@@ -31,7 +31,7 @@ async function sendPasswordResetEmail(user, token) {
  * @returns {Promise<Object>}
  */
 async function sendEmailChangeVerification(user, token, newEmail) {
-  const link = buildLink(frontendBaseUrl, '/verify-email-change', token);
+  const link = buildLink(backendBaseUrl, '/api/v1/users/verify-email-change', token);
   const name = user.name || 'Nutzer';
 
   logger.info(`Email Change: ${newEmail} -> ${link}`);

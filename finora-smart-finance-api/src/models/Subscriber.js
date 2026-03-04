@@ -29,6 +29,7 @@ const subscriberSchema = new mongoose.Schema(
     confirmationExpires: Date,
     unsubscribeToken: String,
     subscribedAt: Date,
+    confirmedAt: Date,
     language: {
       type: String,
       default: 'de',

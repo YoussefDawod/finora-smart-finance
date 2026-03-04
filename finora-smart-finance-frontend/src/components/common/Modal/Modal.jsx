@@ -24,53 +24,15 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
+import { useMotion } from '@/hooks/useMotion';
+import { modalVariants, modalBackdropVariants } from '@/utils/motionPresets';
 import styles from './Modal.module.scss';
 
 // ============================================================================
-// ANIMATION VARIANTS
+// ANIMATION VARIANTS (imported from motionPresets)
 // ============================================================================
-const overlayVariants = {
-  hidden: {
-    opacity: 0,
-  },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.2,
-    },
-  },
-  exit: {
-    opacity: 0,
-    transition: {
-      duration: 0.2,
-    },
-  },
-};
-
-const modalVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.95,
-    y: 20,
-  },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      duration: 0.3,
-      ease: [0.4, 0, 0.2, 1],
-    },
-  },
-  exit: {
-    opacity: 0,
-    scale: 0.95,
-    y: 20,
-    transition: {
-      duration: 0.2,
-    },
-  },
-};
+// Using modalVariants and modalBackdropVariants from @/utils/motionPresets
+// ❌ Kein Glow erlaubt für Modal
 
 // ============================================================================
 // COMPONENT
@@ -88,6 +50,7 @@ const Modal = ({
   className = '',
 }) => {
   const { t } = useTranslation();
+  const { shouldAnimate } = useMotion();
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
 
@@ -195,16 +158,19 @@ const Modal = ({
       {isOpen && (
         <motion.div
           className={styles.overlay}
-          variants={overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
+          variants={modalBackdropVariants}
+          initial={shouldAnimate ? 'hidden' : false}
+          animate={shouldAnimate ? 'visible' : false}
+          exit={shouldAnimate ? 'exit' : undefined}
           onClick={handleOverlayClick}
         >
           <motion.div
             ref={modalRef}
             className={`${styles.modal} ${styles[size]} ${className}`}
             variants={modalVariants}
+            initial={shouldAnimate ? 'hidden' : false}
+            animate={shouldAnimate ? 'visible' : false}
+            exit={shouldAnimate ? 'exit' : undefined}
             onClick={(e) => e.stopPropagation()} // Prevent overlay click
             role="dialog"
             aria-modal="true"

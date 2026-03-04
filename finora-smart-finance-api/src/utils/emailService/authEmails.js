@@ -9,7 +9,7 @@ const templates = require('../emailTemplates');
  * @returns {Promise<Object>}
  */
 async function sendVerificationEmail(user, token) {
-  const link = buildLink(backendBaseUrl, '/api/auth/verify-email', token);
+  const link = buildLink(backendBaseUrl, '/api/v1/auth/verify-email', token);
   const emailAddress = user.email;
   const name = user.name || 'Nutzer';
 
@@ -32,7 +32,7 @@ async function sendVerificationEmail(user, token) {
  * @returns {Promise<Object>}
  */
 async function sendAddEmailVerification(user, token, newEmail) {
-  const link = buildLink(backendBaseUrl, '/api/auth/verify-add-email', token);
+  const link = buildLink(backendBaseUrl, '/api/v1/users/verify-add-email', token);
   const name = user.name || 'Nutzer';
 
   logger.info(`📧 Add-Email Verification: ${newEmail} -> ${link}`);

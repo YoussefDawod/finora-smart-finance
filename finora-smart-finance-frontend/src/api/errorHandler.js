@@ -7,7 +7,7 @@
 
 import i18next from 'i18next';
 
-/* eslint-disable no-undef */
+ 
 
 const ERROR_CODES = {
   NETWORK_ERROR: 'NETWORK_ERROR',
@@ -18,6 +18,37 @@ const ERROR_CODES = {
   NOT_FOUND: 'NOT_FOUND',
   SERVER_ERROR: 'SERVER_ERROR',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
+
+/**
+ * Map of backend error codes (data.code) to i18n keys (L-11)
+ * Prevents raw server messages from leaking to the UI
+ */
+const API_ERROR_CODE_MAP = {
+  INVALID_INPUT: 'errors.api.invalidInput',
+  INVALID_CREDENTIALS: 'errors.api.invalidCredentials',
+  ACCOUNT_BANNED: 'errors.api.accountBanned',
+  ACCOUNT_LOCKED: 'errors.api.accountLocked',
+  EMAIL_NOT_VERIFIED: 'errors.api.emailNotVerified',
+  NAME_EXISTS: 'errors.api.nameExists',
+  EMAIL_EXISTS: 'errors.api.emailExists',
+  EMAIL_TAKEN: 'errors.api.emailExists',
+  CHECKBOX_REQUIRED: 'errors.api.checkboxRequired',
+  INVALID_NAME: 'errors.api.invalidInput',
+  INVALID_EMAIL: 'errors.api.invalidEmail',
+  INVALID_PASSWORD: 'errors.api.invalidPassword',
+  WEAK_PASSWORD: 'errors.api.weakPassword',
+  PASSWORD_MISMATCH: 'errors.api.passwordMismatch',
+  MISSING_TOKEN: 'errors.api.invalidToken',
+  INVALID_TOKEN: 'errors.api.invalidToken',
+  TOKEN_EXPIRED: 'errors.api.tokenExpired',
+  CONFIRMATION_REQUIRED: 'errors.api.confirmationRequired',
+  USER_NOT_FOUND: 'errors.api.userNotFound',
+  MISSING_PASSWORD: 'errors.api.invalidInput',
+  NO_EMAIL: 'errors.api.invalidInput',
+  NO_PENDING_EMAIL: 'errors.api.invalidInput',
+  INVALID_USER: 'errors.authRequired',
+  SERVER_ERROR: 'errors.serverError',
 };
 
 /**
@@ -44,13 +75,17 @@ export function parseApiError(error) {
   }
 
   const { status, data } = error.response;
-  const messageFromApi = data?.message || data?.error;
+  const apiCode = data?.code;
+
+  // Resolve sanitized message from backend error code (L-11)
+  const i18nKey = apiCode ? API_ERROR_CODE_MAP[apiCode] : null;
+  const sanitizedMessage = i18nKey ? i18next.t(i18nKey) : null;
 
   // Validation errors
   if (status === 422) {
     const details = data?.errors || data?.details;
     return {
-      message: details ? `${i18next.t('errors.validationError')}: ${JSON.stringify(details)}` : i18next.t('errors.validationError'),
+      message: sanitizedMessage || i18next.t('errors.validationError'),
       code: ERROR_CODES.VALIDATION_ERROR,
       status,
       details,
@@ -59,7 +94,7 @@ export function parseApiError(error) {
 
   if (status === 401) {
     return {
-      message: i18next.t('errors.authRequired'),
+      message: sanitizedMessage || i18next.t('errors.authRequired'),
       code: ERROR_CODES.AUTH_ERROR,
       status,
     };
@@ -67,7 +102,7 @@ export function parseApiError(error) {
 
   if (status === 403) {
     return {
-      message: i18next.t('errors.forbidden'),
+      message: sanitizedMessage || i18next.t('errors.forbidden'),
       code: ERROR_CODES.FORBIDDEN,
       status,
     };
@@ -75,7 +110,7 @@ export function parseApiError(error) {
 
   if (status === 404) {
     return {
-      message: i18next.t('errors.notFound'),
+      message: sanitizedMessage || i18next.t('errors.notFound'),
       code: ERROR_CODES.NOT_FOUND,
       status,
     };
@@ -83,14 +118,15 @@ export function parseApiError(error) {
 
   if (status >= 500) {
     return {
-      message: i18next.t('errors.serverError'),
+      message: sanitizedMessage || i18next.t('errors.serverError'),
       code: ERROR_CODES.SERVER_ERROR,
       status,
     };
   }
 
+  // Default: never expose raw server messages (L-11)
   return {
-    message: messageFromApi || i18next.t('errors.unexpectedError'),
+    message: sanitizedMessage || i18next.t('errors.unexpectedError'),
     code: ERROR_CODES.UNKNOWN_ERROR,
     status,
   };

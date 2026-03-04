@@ -1,5 +1,7 @@
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
+import { useMotion } from '@/hooks/useMotion';
+import { buttonVariants, MOTION_TIMING } from '@/utils/motionPresets';
 import styles from './Button.module.scss';
 
 /**
@@ -43,12 +45,17 @@ export const Button = forwardRef((
   },
   ref
 ) => {
+  const { shouldAnimate } = useMotion();
   const isDisabled = disabled || loading;
   const isIconOnly = icon && !children;
 
-  // Animation variants for button
-  const whileHoverVariant = !isDisabled ? { scale: 1.02, y: -2 } : {};
-  const whileTapVariant = !isDisabled ? { scale: 0.98, y: 0 } : {};
+  // Animation variants for button (respects prefers-reduced-motion)
+  const whileHoverVariant = shouldAnimate && !isDisabled 
+    ? { scale: MOTION_TIMING.scaleHover, y: -2 } 
+    : {};
+  const whileTapVariant = shouldAnimate && !isDisabled 
+    ? { scale: MOTION_TIMING.scaleActive, y: 0 } 
+    : {};
 
   return (
     <motion.button

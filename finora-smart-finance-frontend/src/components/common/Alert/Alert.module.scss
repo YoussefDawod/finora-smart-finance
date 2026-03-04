@@ -62,10 +62,7 @@
     background: var(--surface-2);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // Variants

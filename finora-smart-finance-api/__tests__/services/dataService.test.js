@@ -18,7 +18,7 @@ describe('DataService', () => {
   // exportUserData Tests
   // ============================================
   describe('exportUserData', () => {
-    it('should successfully export user data', async () => {
+    it('should successfully export user data with cursor factory', async () => {
       const mockUser = {
         _id: 'user-123',
         name: 'Max Mustermann',
@@ -27,45 +27,25 @@ describe('DataService', () => {
         updatedAt: new Date('2025-01-28'),
       };
 
-      const mockTransactions = [
-        {
-          _id: 'trans-1',
-          amount: 100,
-          category: 'groceries',
-          description: 'Weekly groceries',
-          type: 'expense',
-          date: new Date('2025-01-20'),
-          tags: ['food'],
-          notes: 'test',
-          createdAt: new Date('2025-01-20'),
-          updatedAt: new Date('2025-01-20'),
-        },
-        {
-          _id: 'trans-2',
-          amount: 2000,
-          category: 'salary',
-          description: 'Monthly salary',
-          type: 'income',
-          date: new Date('2025-01-01'),
-          tags: ['work'],
-          notes: '',
-          createdAt: new Date('2025-01-01'),
-          updatedAt: new Date('2025-01-01'),
-        },
-      ];
-
+      Transaction.countDocuments = jest.fn().mockResolvedValue(2);
       Transaction.find = jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue(mockTransactions),
+        lean: jest.fn().mockReturnValue({
+          cursor: jest.fn().mockReturnValue('mock-cursor'),
+        }),
       });
 
       const result = await dataService.exportUserData('user-123', mockUser);
 
       expect(result.success).toBe(true);
-      expect(result.export.user.id).toBe('user-123');
-      expect(result.export.user.name).toBe('Max Mustermann');
-      expect(result.export.transactions).toHaveLength(2);
-      expect(result.export.transactions[0].amount).toBe(100);
-      expect(result.export.transactions[1].amount).toBe(2000);
+      expect(result.user.id).toBe('user-123');
+      expect(result.user.name).toBe('Max Mustermann');
+      expect(result.transactionCount).toBe(2);
+      expect(typeof result.getTransactionCursor).toBe('function');
+
+      // Verify cursor factory returns a cursor
+      const cursor = result.getTransactionCursor();
+      expect(cursor).toBe('mock-cursor');
+      expect(Transaction.find).toHaveBeenCalledWith({ userId: 'user-123' });
     });
 
     it('should export user with no transactions', async () => {
@@ -77,14 +57,18 @@ describe('DataService', () => {
         updatedAt: new Date('2025-01-28'),
       };
 
+      Transaction.countDocuments = jest.fn().mockResolvedValue(0);
       Transaction.find = jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue([]),
+        lean: jest.fn().mockReturnValue({
+          cursor: jest.fn().mockReturnValue('mock-cursor'),
+        }),
       });
 
       const result = await dataService.exportUserData('user-123', mockUser);
 
       expect(result.success).toBe(true);
-      expect(result.export.transactions).toHaveLength(0);
+      expect(result.transactionCount).toBe(0);
+      expect(typeof result.getTransactionCursor).toBe('function');
     });
 
     it('should handle export errors', async () => {
@@ -93,9 +77,7 @@ describe('DataService', () => {
         name: 'Max Mustermann',
       };
 
-      Transaction.find = jest.fn().mockReturnValue({
-        lean: jest.fn().mockRejectedValue(new Error('Database error')),
-      });
+      Transaction.countDocuments = jest.fn().mockRejectedValue(new Error('Database error'));
 
       await expect(dataService.exportUserData('user-123', mockUser)).rejects.toThrow(
         'Database error'

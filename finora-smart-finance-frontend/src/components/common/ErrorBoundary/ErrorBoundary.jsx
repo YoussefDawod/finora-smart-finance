@@ -19,7 +19,30 @@ class ErrorBoundary extends React.Component {
     this.setState({ errorInfo });
   }
 
+  /**
+   * Detect chunk / dynamic-import loading errors.
+   * These occur after deployments or network issues when the browser
+   * tries to fetch a JS chunk that no longer exists.
+   */
+  isChunkLoadError = () => {
+    const msg = this.state.error?.message || '';
+    return (
+      msg.includes('dynamically imported module') ||
+      msg.includes('Failed to fetch') ||
+      msg.includes('Loading chunk') ||
+      msg.includes('Loading CSS chunk')
+    );
+  };
+
   handleRetry = () => {
+    // Chunk-load errors cannot be recovered by resetting state
+    // because React lazy() caches the rejected promise.
+    // A full page reload is required.
+    if (this.isChunkLoadError()) {
+      window.location.reload();
+      return;
+    }
+
     this.setState({ hasError: false, error: null, errorInfo: null });
     // Optional: reload the page or trigger a re-fetch if a function is passed
     if (this.props.onRetry) {
@@ -37,13 +60,13 @@ class ErrorBoundary extends React.Component {
         <div style={{ 
             padding: '2rem', 
             textAlign: 'center', 
-            backgroundColor: 'var(--surface-color)', 
-            borderRadius: 'var(--border-radius)',
-            border: '1px solid var(--border-color)',
+            backgroundColor: 'var(--surface)', 
+            borderRadius: 'var(--r-md)',
+            border: '1px solid var(--border)',
             margin: '1rem'
         }}>
           <h2>{i18n.t('common.errors.somethingWrong')}</h2>
-          <p style={{ color: 'var(--error-color)', marginBottom: '1rem' }}>
+          <p style={{ color: 'var(--error)', marginBottom: '1rem' }}>
             {this.state.error && this.state.error.toString()}
           </p>
           {/* <details style={{ whiteSpace: 'pre-wrap', textAlign: 'left', marginBottom: '1rem', opacity: 0.7, fontSize: '0.8em' }}>

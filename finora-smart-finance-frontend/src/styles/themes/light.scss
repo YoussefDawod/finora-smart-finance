@@ -10,19 +10,19 @@
 // Light Theme Palette
 $light-palette: (
   // Core Colors
-  background: #f8fafc,
-  text: #0f172a,
+  background: #f5f7fb,   // kühles Off-White
+  text: #0b1220,         // Deep Navy statt Schwarz
   
   // Brand Colors
-  primary: #4f46e5,    // Indigo
-  secondary: #22c55e,  // Mint/Green
-  accent: #14b8a6,     // Teal
+  primary: #5b6cff,      // Neon Indigo / Violet
+  secondary: #2dd4ff,    // Soft Cyan (aus Linien & Glows)
+  accent: #f472d0,       // Neon Pink (kontrolliert)
   
   // Status Colors
-  success: #10b981,    // Emerald
-  warning: #f59e0b,    // Amber
-  error: #ef4444,      // Red
-  info: #3b82f6        // Blue
+  success: #22c55e,      // klar, modern
+  warning: #fbbf24,      // nicht zu warm
+  error: #f43f5e,        // harmoniert mit Pink
+  info: #38bdf8          // Cyan Info
 );
 
 // Generate all CSS custom properties
@@ -37,8 +37,8 @@ $light-palette: (
   --skeleton-from: rgba(0, 0, 0, 0.04);
   --skeleton-to: rgba(0, 0, 0, 0.08);
   
-  // Adjust overlay for light backgrounds
-  --overlay: rgba(0, 0, 0, 0.5);
+  // Adjust overlay for light backgrounds (softer, matches text tone #0b1220)
+  --overlay: rgba(15, 18, 32, 0.35);
   
   // Color scheme for form controls
   color-scheme: light;

@@ -7,12 +7,14 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
+import { useMotion } from '@/hooks/useMotion';
 import { FiX } from 'react-icons/fi';
 import styles from '../../ProfilePage.module.scss';
 
 export function ChangePasswordModal({ isOpen, onClose, onSubmit, isLoading }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { shouldAnimate } = useMotion();
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -42,16 +44,16 @@ export function ChangePasswordModal({ isOpen, onClose, onSubmit, isLoading }) {
       {isOpen && (
         <motion.div
           className={styles.modalOverlay}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={shouldAnimate ? { opacity: 0 } : false}
+          animate={shouldAnimate ? { opacity: 1 } : false}
+          exit={shouldAnimate ? { opacity: 0 } : undefined}
           onClick={onClose}
         >
           <motion.div
             className={styles.modal}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
+            animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
+            exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
@@ -70,6 +72,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSubmit, isLoading }) {
                   value={formData.currentPassword}
                   onChange={handleChange}
                   className={styles.input}
+                  autoComplete="current-password"
                   required
                 />
               </div>
@@ -82,6 +85,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSubmit, isLoading }) {
                   value={formData.newPassword}
                   onChange={handleChange}
                   className={styles.input}
+                  autoComplete="new-password"
                   required
                   minLength={8}
                 />
@@ -95,6 +99,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSubmit, isLoading }) {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className={styles.input}
+                  autoComplete="new-password"
                   required
                 />
               </div>

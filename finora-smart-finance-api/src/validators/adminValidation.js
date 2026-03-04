@@ -1,4 +1,4 @@
-const { validateEmail } = require('./authValidation');
+const { validateEmail, validatePassword } = require('./authValidation');
 const { parsePaginationParams } = require('../utils/pagination');
 const { buildUserQuery, buildUserSort } = require('../utils/queryBuilder');
 
@@ -6,9 +6,16 @@ function validateUserQuery(query = {}) {
   const errors = [];
 
   const pagination = parsePaginationParams(query, { defaultLimit: 50, maxLimit: 200 });
-  const mongoQuery = buildUserQuery(query.search, query.isVerified);
+  const mongoQuery = buildUserQuery(query.search, query.isVerified, query.role, query.isActive);
   const sort = buildUserSort(query.sortBy, query.order);
-  const showSensitive = query.showSensitive === 'true';
+
+  // showSensitive in Production deaktivieren — Sicherheitsrisiko
+  let showSensitive = query.showSensitive === 'true';
+  if (showSensitive && process.env.NODE_ENV === 'production') {
+    const logger = require('../utils/logger');
+    logger.warn('showSensitive=true wurde in Production ignoriert');
+    showSensitive = false;
+  }
 
   return { errors, query: mongoQuery, pagination, sort, showSensitive };
 }
@@ -20,13 +27,17 @@ function validateCreateUser(body = {}) {
   if (!body.name || typeof body.name !== 'string') {
     errors.push('Feld name ist erforderlich');
   } else {
-    data.name = body.name.trim();
+    const trimmed = body.name.trim();
+    if (trimmed.length < 3 || trimmed.length > 50) {
+      errors.push('name muss zwischen 3 und 50 Zeichen lang sein');
+    } else {
+      data.name = trimmed;
+    }
   }
 
-  if (!body.password || typeof body.password !== 'string') {
-    errors.push('Feld password ist erforderlich');
-  } else if (body.password.length < 6) {
-    errors.push('Passwort muss mindestens 6 Zeichen lang sein');
+  const pwResult = validatePassword(body.password);
+  if (!pwResult.valid) {
+    errors.push(pwResult.error);
   } else {
     data.password = body.password;
   }
@@ -48,9 +59,19 @@ function validateCreateUser(body = {}) {
     }
   }
 
+  if (body.role !== undefined) {
+    if (!['user', 'admin'].includes(body.role)) {
+      errors.push('role muss "user" oder "admin" sein');
+    } else {
+      data.role = body.role;
+    }
+  }
+
   if (body.lastName !== undefined) {
     if (typeof body.lastName !== 'string') {
       errors.push('lastName muss ein String sein');
+    } else if (body.lastName.length > 50) {
+      errors.push('lastName darf maximal 50 Zeichen lang sein');
     } else {
       data.lastName = body.lastName;
     }
@@ -59,6 +80,8 @@ function validateCreateUser(body = {}) {
   if (body.phone !== undefined) {
     if (typeof body.phone !== 'string') {
       errors.push('phone muss ein String sein');
+    } else if (body.phone.length > 20) {
+      errors.push('phone darf maximal 20 Zeichen lang sein');
     } else {
       data.phone = body.phone;
     }
@@ -74,6 +97,8 @@ function validateUpdateUser(body = {}) {
   if (body.name !== undefined) {
     if (typeof body.name !== 'string') {
       errors.push('name muss ein String sein');
+    } else if (body.name.trim().length < 3 || body.name.trim().length > 50) {
+      errors.push('name muss zwischen 3 und 50 Zeichen lang sein');
     } else {
       updates.name = body.name;
     }
@@ -103,6 +128,8 @@ function validateUpdateUser(body = {}) {
   if (body.lastName !== undefined) {
     if (typeof body.lastName !== 'string') {
       errors.push('lastName muss ein String sein');
+    } else if (body.lastName.length > 50) {
+      errors.push('lastName darf maximal 50 Zeichen lang sein');
     } else {
       updates.lastName = body.lastName;
     }
@@ -111,6 +138,8 @@ function validateUpdateUser(body = {}) {
   if (body.phone !== undefined) {
     if (typeof body.phone !== 'string') {
       errors.push('phone muss ein String sein');
+    } else if (body.phone.length > 20) {
+      errors.push('phone darf maximal 20 Zeichen lang sein');
     } else {
       updates.phone = body.phone;
     }

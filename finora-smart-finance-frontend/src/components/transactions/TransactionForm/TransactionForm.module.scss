@@ -143,10 +143,7 @@
     cursor: not-allowed;
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
@@ -175,7 +172,7 @@
 .select,
 .textarea {
   width: 100%;
-  height: var(--input-h);
+  height: var(--input-height-md);
   padding: var(--space-sm) var(--space-md);
   font-size: var(--fs-sm);
   color: var(--tx);
@@ -277,7 +274,7 @@
 
 .submitButton {
   flex: 1;
-  height: var(--btn-h);
+  height: var(--btn-height-md);
   padding: var(--space-sm) var(--space-lg);
   font-size: var(--fs-base);
   font-weight: var(--fw-sb);
@@ -306,14 +303,11 @@
     cursor: not-allowed;
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 .cancelButton {
-  height: var(--btn-h);
+  height: var(--btn-height-md);
   padding: var(--space-sm) var(--space-lg);
   font-size: var(--fs-base);
   font-weight: var(--fw-m);
@@ -329,10 +323,7 @@
     border-color: var(--tx-muted);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================

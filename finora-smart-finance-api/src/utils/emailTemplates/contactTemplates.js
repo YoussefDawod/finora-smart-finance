@@ -4,21 +4,8 @@
  */
 
 const { baseLayout } = require('./baseLayout');
-
-/**
- * Escapes HTML-Sonderzeichen (XSS-Schutz)
- * @param {string} str - Unescaped String
- * @returns {string} Escaped String
- */
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+const colors = require('./colors');
+const { escapeHtml } = require('../escapeHtml');
 
 /**
  * Kontaktformular Email-Template
@@ -45,33 +32,33 @@ function contactForm({ name, email, category, message }) {
   return baseLayout(`
     <div class="content">
       <h2>Neue Kontaktanfrage</h2>
-      <p style="color: #6b7280; margin-bottom: 20px;">
+      <p style="color: ${colors.textMuted}; margin-bottom: 20px;">
         Eine neue Nachricht wurde über das Kontaktformular gesendet.
       </p>
       <table style="width: 100%; border-collapse: collapse; margin: 15px 0;">
         <tr>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb; font-weight: 600; width: 120px; color: #374151; vertical-align: top;">Name</td>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${safeName}</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border}; font-weight: 600; width: 120px; color: ${colors.textLight}; vertical-align: top;">Name</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border}; color: ${colors.textSecondary};">${safeName}</td>
         </tr>
         <tr>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151; vertical-align: top;">E-Mail</td>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb;">
-            <a href="mailto:${safeEmail}" style="color: #6366f1; text-decoration: none;">${safeEmail}</a>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border}; font-weight: 600; color: ${colors.textLight}; vertical-align: top;">E-Mail</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border};">
+            <a href="mailto:${safeEmail}" style="color: ${colors.primary}; text-decoration: none;">${safeEmail}</a>
           </td>
         </tr>
         <tr>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151; vertical-align: top;">Kategorie</td>
-          <td style="padding: 12px 15px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${safeCategory}</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border}; font-weight: 600; color: ${colors.textLight}; vertical-align: top;">Kategorie</td>
+          <td style="padding: 12px 15px; border-bottom: 1px solid ${colors.border}; color: ${colors.textSecondary};">${safeCategory}</td>
         </tr>
       </table>
-      <div style="background: #f9fafb; border-radius: 8px; padding: 20px; margin-top: 20px;">
-        <h3 style="margin: 0 0 12px 0; color: #374151; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Nachricht</h3>
-        <p style="white-space: pre-wrap; color: #4b5563; line-height: 1.8; margin: 0;">${safeMessage}</p>
+      <div style="background: ${colors.surfaceAlt}; border-radius: 8px; padding: 20px; margin-top: 20px;">
+        <h3 style="margin: 0 0 12px 0; color: ${colors.textLight}; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Nachricht</h3>
+        <p style="white-space: pre-wrap; color: ${colors.textLight}; line-height: 1.8; margin: 0;">${safeMessage}</p>
       </div>
     </div>
     <div class="footer">
       <p>Diese Nachricht wurde über das Kontaktformular auf <strong>Finora</strong> gesendet.</p>
-      <p style="margin-top: 8px;">Direkt antworten an: <a href="mailto:${safeEmail}" style="color: #6366f1; text-decoration: none;">${safeEmail}</a></p>
+      <p style="margin-top: 8px;">Direkt antworten an: <a href="mailto:${safeEmail}" style="color: ${colors.primary}; text-decoration: none;">${safeEmail}</a></p>
     </div>
   `);
 }

@@ -1,0 +1,154 @@
+// ============================================
+// ☑️ CHECKBOX — Wiederverwendbare Komponente
+// ============================================
+// Rules: COLOR_USAGE_RULES.md, MOTION_GLOW_RULES.md
+// Nur var(--token) + color-mix(), keine hex/rgba/hsl
+// reduced-motion bindend, keine Deko-Animation
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ── LABEL WRAPPER ───────────────────────────
+.label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  cursor: pointer;
+  user-select: none;
+  min-height: 2.75rem; // Touch-target 44px via label, nicht checkbox
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+:global([dir='rtl']) .label {
+  flex-direction: row-reverse;
+}
+
+// ── HIDDEN NATIVE INPUT ─────────────────────
+.input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+// ── CUSTOM CHECKMARK ────────────────────────
+.checkmark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.125rem; // 18px — konsistent auf allen Viewports
+  height: 1.125rem;
+  margin-top: 1px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-sm);
+  transition: all var(--tr-fast);
+
+  svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    color: var(--text-on-primary, #fff);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all var(--tr-fast);
+  }
+
+  // Checked state
+  .input:checked + & {
+    background: var(--primary);
+    border-color: var(--primary);
+
+    svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  // Focus-visible (a11y)
+  .input:focus-visible + & {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+
+  // Hover
+  .label:hover & {
+    border-color: var(--primary);
+  }
+
+  // Disabled hover override
+  .label.disabled:hover & {
+    border-color: var(--border);
+  }
+}
+
+// ── SIZE: SMALL ─────────────────────────────
+.sm .checkmark {
+  width: 0.9375rem; // 15px
+  height: 0.9375rem;
+
+  svg {
+    width: 0.625rem;
+    height: 0.625rem;
+  }
+}
+
+// ── VARIANT: ERROR ──────────────────────────
+.error .checkmark {
+  border-color: var(--error);
+}
+
+// ── VARIANT: WARNING ────────────────────────
+.warning {
+  padding: var(--space-xs);
+  background: color-mix(in srgb, var(--warning) 5%, transparent);
+  border-radius: var(--r-md);
+
+  .checkmark {
+    border-color: var(--warning);
+  }
+
+  .input:checked + .checkmark {
+    background: var(--warning);
+    border-color: var(--warning);
+  }
+}
+
+// ── TEXT ─────────────────────────────────────
+.text {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+
+  a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: var(--fw-m);
+    transition: color var(--tr-fast);
+
+    &:hover {
+      color: var(--tx);
+    }
+  }
+}
+
+.sm .text {
+  font-size: var(--fs-xs);
+}
+
+// ── REDUCED MOTION ──────────────────────────
+@include reduced-motion {
+  .checkmark,
+  .checkmark svg {
+    transition: none;
+  }
+
+  .text a {
+    transition: none;
+  }
+}

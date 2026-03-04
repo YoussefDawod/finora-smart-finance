@@ -54,13 +54,15 @@
   }
 
   &.warning {
-    background: color-mix(in srgb, var(--warning) 15%, transparent);
+    background: color-mix(in srgb, var(--warning) 18%, transparent);
     color: var(--warning);
+    border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
   }
 
   &.danger {
-    background: color-mix(in srgb, var(--error) 15%, transparent);
+    background: color-mix(in srgb, var(--error) 18%, transparent);
     color: var(--error);
+    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
   }
 }
 
@@ -75,7 +77,7 @@
 .progressBar {
   flex: 1;
   height: 10px;
-  background: var(--border);
+  background: var(--surface-2);
   border-radius: var(--r-full);
   overflow: hidden;
 }
@@ -83,7 +85,7 @@
 .progressFill {
   height: 100%;
   border-radius: var(--r-full);
-  transition: width 0.5s ease-out;
+  transition: width var(--duration-slower) var(--ease-out);
 
   &.success {
     background: var(--success);
@@ -173,7 +175,7 @@
   gap: var(--space-xs);
   padding: var(--space-xs) var(--space-md);
   background: var(--primary);
-  color: var(--primary-contrast);
+  color: var(--on-primary);
   border: none;
   border-radius: var(--r-md);
   font-size: var(--fs-sm);

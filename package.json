@@ -1,6 +1,6 @@
 {
   "name": "expense-tracker",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "Finora Smart Finance - Moderne Finanzverwaltung mit React + Node.js",
   "private": true,
   "workspaces": [
@@ -17,6 +17,7 @@
     "format:check": "npm run format:check --workspaces",
     "test:frontend": "npm run test --workspace=finora-smart-finance-frontend",
     "test:api": "npm run test --workspace=finora-smart-finance-api",
+    "test:e2e": "npm run test:e2e --workspace=finora-smart-finance-frontend",
     "test": "npm run test:frontend && npm run test:api",
     "prepare": "node -e \"if (process.env.CI !== 'true') require('child_process').execSync('husky')\""
   },

@@ -101,7 +101,7 @@
 
 // Label unter dem Kreis
 .stepLabel {
-  margin-top: var(--space-4xs);
+  margin-top: 1px;
   font-size: 0.65rem;
   color: var(--tx-muted);
   white-space: nowrap;
@@ -133,7 +133,7 @@
 // RESPONSIVE: Tablet & Mobile
 // ============================================
 
-@media (max-width: 768px) {
+@include below-md {
   .stepIndicator {
     --circle-size: 1.75rem;
     --line-length: 2rem;
@@ -148,7 +148,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@include breakpoint($max: $bp-xs) {
   .stepIndicator {
     --circle-size: 1.5rem;
     --line-length: 1.5rem;
@@ -161,27 +161,6 @@
   .stepLabel {
     font-size: 0.55rem;
   }
-}
-
-// ============================================
-// ERROR BANNER
-// ============================================
-
-.errorBanner {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
-  background: color-mix(in srgb, var(--error) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--error) 25%, transparent);
-  border-radius: var(--r-md);
-  font-size: var(--fs-sm);
-  color: var(--error);
-}
-
-.errorIcon {
-  flex-shrink: 0;
-  font-size: var(--fs-lg);
 }
 
 // ============================================
@@ -244,7 +223,7 @@
 
 .optional {
   font-size: var(--fs-xs);
-  font-weight: var(--fw-r);
+  font-weight: var(--fw-n);
   color: var(--tx-muted);
 }
 
@@ -339,33 +318,6 @@
   padding: 0 2.5rem 0 var(--space-md);
 }
 
-.passwordToggle {
-  position: absolute;
-  right: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: var(--r-sm);
-  color: var(--tx-muted);
-  cursor: pointer;
-  transition: all var(--tr-fast);
-
-  &:hover {
-    color: var(--tx);
-    background: color-mix(in srgb, var(--tx) 5%, transparent);
-  }
-}
-
-:global([dir='rtl']) .passwordToggle {
-  right: auto;
-  left: 0.75rem;
-}
-
 .errorMessage {
   font-size: var(--fs-xs);
   color: var(--error);
@@ -391,14 +343,14 @@
   flex: 1;
   height: 4px;
   background: var(--border);
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   overflow: hidden;
 }
 
 .strengthFill {
   height: 100%;
-  border-radius: 2px;
-  transition: all var(--tr-normal);
+  border-radius: var(--r-xs);
+  transition: all var(--tr);
 
   &.weak {
     background: var(--error);
@@ -413,7 +365,7 @@
   }
 
   &.excellent {
-    background: linear-gradient(90deg, var(--success), var(--primary));
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
   }
 }
 
@@ -456,7 +408,7 @@
   p {
     font-size: var(--fs-xs);
     color: var(--tx-muted);
-    line-height: 1.5;
+    line-height: var(--lh-n);
     margin: 0;
   }
 }
@@ -493,103 +445,12 @@
   p {
     font-size: var(--fs-xs);
     color: var(--tx);
-    line-height: 1.5;
+    line-height: var(--lh-n);
     margin: 0;
 
     strong {
       font-weight: var(--fw-sb);
       color: var(--error);
-    }
-  }
-}
-
-// ============================================
-// CHECKBOX
-// ============================================
-
-.checkbox {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  cursor: pointer;
-  user-select: none;
-
-  &.error .checkmark {
-    border-color: var(--error);
-  }
-
-  &.warningCheckbox {
-    margin-top: var(--space-xs);
-    padding: var(--space-xs);
-    background: color-mix(in srgb, var(--warning) 5%, transparent);
-    border-radius: var(--r-md);
-    
-    .checkboxText {
-      color: var(--tx);
-    }
-
-    .checkmark {
-      border-color: var(--warning);
-    }
-
-    input:checked + .checkmark {
-      background: var(--warning);
-      border-color: var(--warning);
-    }
-  }
-
-  input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-}
-
-.checkmark {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.1rem;
-  height: 1.1rem;
-  margin-top: 0.125rem;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  transition: all var(--tr-fast);
-
-  svg {
-    font-size: var(--fs-2xs);
-    color: var(--on-primary);
-    opacity: 0;
-    transform: scale(0.5);
-    transition: all var(--tr-fast);
-  }
-
-  .checkbox input:checked + & {
-    background: var(--primary);
-    border-color: var(--primary);
-
-    svg {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-}
-
-.checkboxText {
-  font-size: var(--fs-xs);
-  color: var(--tx-muted);
-  line-height: 1.4;
-
-  a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: var(--fw-m);
-
-    &:hover {
-      color: var(--pri-hover);
     }
   }
 }
@@ -640,7 +501,7 @@
   flex-direction: row-reverse;
 }
 
-@media (max-width: 480px) {
+@include breakpoint($max: $bp-xs) {
   .registerForm {
     gap: var(--space-2xs);
   }
@@ -668,13 +529,6 @@
 
   .label {
     font-size: max(var(--fs-sm), 14px);
-  }
-
-  .passwordToggle {
-    width: 2rem;
-    height: 2rem;
-    min-width: 44px;
-    min-height: 44px;
   }
 
   .termsBox,

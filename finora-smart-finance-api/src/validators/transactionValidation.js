@@ -52,14 +52,14 @@ function validateObjectId(id) {
 function validateAmount(amount, required = true) {
   if (amount === undefined || amount === null) {
     if (required) {
-      return { valid: false, error: 'Amount ist erforderlich' };
+      return { valid: false, error: 'Betrag ist erforderlich' };
     }
     return { valid: true };
   }
 
   const parsed = parseFloat(amount);
   if (isNaN(parsed) || parsed <= 0) {
-    return { valid: false, error: 'Amount muss größer als 0 sein' };
+    return { valid: false, error: 'Betrag muss größer als 0 sein' };
   }
 
   return { valid: true, amount: parsed };
@@ -74,13 +74,13 @@ function validateAmount(amount, required = true) {
 function validateCategory(category, required = true) {
   if (!category) {
     if (required) {
-      return { valid: false, error: 'Category ist erforderlich' };
+      return { valid: false, error: 'Kategorie ist erforderlich' };
     }
     return { valid: true };
   }
 
   if (!ALLOWED_CATEGORIES.includes(category)) {
-    return { valid: false, error: 'Ungültige Category' };
+    return { valid: false, error: 'Ungültige Kategorie' };
   }
 
   return { valid: true, category };
@@ -95,14 +95,14 @@ function validateCategory(category, required = true) {
 function validateDescription(description, required = true) {
   if (!description || !description.trim()) {
     if (required) {
-      return { valid: false, error: 'Description ist erforderlich' };
+      return { valid: false, error: 'Beschreibung ist erforderlich' };
     }
     return { valid: true };
   }
 
   const trimmed = description.trim();
   if (trimmed.length < 3) {
-    return { valid: false, error: 'Description muss mindestens 3 Zeichen lang sein' };
+    return { valid: false, error: 'Beschreibung muss mindestens 3 Zeichen lang sein' };
   }
 
   return { valid: true, description: trimmed };
@@ -117,13 +117,13 @@ function validateDescription(description, required = true) {
 function validateType(type, required = true) {
   if (!type) {
     if (required) {
-      return { valid: false, error: 'Type ist erforderlich' };
+      return { valid: false, error: 'Typ ist erforderlich' };
     }
     return { valid: true };
   }
 
   if (!['income', 'expense'].includes(type)) {
-    return { valid: false, error: 'Type muss "income" oder "expense" sein' };
+    return { valid: false, error: 'Typ muss "income" oder "expense" sein' };
   }
 
   return { valid: true, type };
@@ -138,7 +138,7 @@ function validateType(type, required = true) {
 function validateDate(date, required = true) {
   if (!date) {
     if (required) {
-      return { valid: false, error: 'Date ist erforderlich (Format: YYYY-MM-DD)' };
+      return { valid: false, error: 'Datum ist erforderlich (Format: YYYY-MM-DD)' };
     }
     return { valid: true };
   }
@@ -163,6 +163,34 @@ function validatePagination(params) {
   const skip = (pageNum - 1) * limitNum;
 
   return { page: pageNum, limit: limitNum, skip };
+}
+
+/**
+ * Validiert und sanitiert Tags (max. 10 Tags, max. 30 Zeichen pro Tag)
+ * @param {*} tags - Die zu validierenden Tags
+ * @returns {string[]} Sanitisiertes Array
+ */
+function validateTags(tags) {
+  if (!Array.isArray(tags)) return [];
+  return tags
+    .filter(tag => typeof tag === 'string' && tag.trim().length > 0)
+    .map(tag => tag.trim().slice(0, 30))
+    .slice(0, 10);
+}
+
+/**
+ * Validiert Notes (max. 500 Zeichen)
+ * @param {*} notes - Die Notes
+ * @param {string[]} errors - Error-Array für Fehlermeldungen
+ * @returns {string|null} Sanitisierter Wert
+ */
+function validateNotes(notes, errors) {
+  if (notes === undefined || notes === null || notes === '') return null;
+  if (typeof notes !== 'string') {
+    errors.push('Notes muss ein String sein');
+    return null;
+  }
+  return notes.trim().slice(0, 500) || null;
 }
 
 /**
@@ -195,8 +223,8 @@ function validateCreateTransaction(data) {
   else validated.date = dateResult.date;
 
   // Optional fields
-  validated.tags = Array.isArray(data.tags) ? data.tags : [];
-  validated.notes = data.notes || null;
+  validated.tags = validateTags(data.tags);
+  validated.notes = validateNotes(data.notes, errors);
 
   if (errors.length > 0) {
     return { valid: false, errors };
@@ -245,11 +273,11 @@ function validateUpdateTransaction(data) {
   }
 
   if (data.tags !== undefined) {
-    validated.tags = Array.isArray(data.tags) ? data.tags : [];
+    validated.tags = validateTags(data.tags);
   }
 
   if (data.notes !== undefined) {
-    validated.notes = data.notes || null;
+    validated.notes = validateNotes(data.notes, errors);
   }
 
   if (errors.length > 0) {
@@ -268,6 +296,8 @@ module.exports = {
   validateType,
   validateDate,
   validatePagination,
+  validateTags,
+  validateNotes,
   validateCreateTransaction,
   validateUpdateTransaction,
 };

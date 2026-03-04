@@ -6,6 +6,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
+import { useMotion } from '@/hooks/useMotion';
 import { Card } from '@/components/common';
 import { FiMail, FiCheck, FiAlertCircle, FiAlertTriangle, FiEdit2, FiTrash2, FiRefreshCw, FiPlus } from 'react-icons/fi';
 import styles from '../ProfilePage.module.scss';
@@ -21,11 +22,12 @@ export function EmailManager({
 }) {
   const { t } = useTranslation();
   const toast = useToast();
+  const { shouldAnimate } = useMotion();
 
-  const itemVariants = {
+  const itemVariants = shouldAnimate ? {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  };
+  } : {};
 
   const handleResendVerification = async () => {
     const result = await onResendVerification();

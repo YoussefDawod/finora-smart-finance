@@ -3,6 +3,15 @@
  * Zentrale Validierungslogik für alle Auth-bezogenen Eingaben
  */
 
+/** Minimale Passwortlänge (zentrale Konstante) */
+const PASSWORD_MIN_LENGTH = 8;
+
+/** Maximale Passwortlänge (bcrypt trunciert bei 72 Bytes) */
+const PASSWORD_MAX_LENGTH = 128;
+
+/** Erlaubte Sonderzeichen für Passwörter (Frontend + Backend identisch) */
+const SPECIAL_CHAR_REGEX = /[!@#$%^&*()\-_=+[\]{};':"\\|,.<>/?~`]/;
+
 /**
  * Validiert einen Benutzernamen
  * @param {string} name - Der zu validierende Name
@@ -19,7 +28,7 @@ function validateName(name) {
   if (trimmed.length > 50) {
     return { valid: false, error: 'Name darf maximal 50 Zeichen haben' };
   }
-  if (!/^[a-zA-ZäöüÄÖÜß0-9\s-]+$/.test(trimmed)) {
+  if (!/^[\p{L}\p{N}\s-]+$/u.test(trimmed)) {
     return { valid: false, error: 'Name darf nur Buchstaben, Zahlen, Leerzeichen und Bindestriche enthalten' };
   }
   return { valid: true, name: trimmed };
@@ -34,16 +43,22 @@ function validatePassword(password) {
   if (!password || typeof password !== 'string') {
     return { valid: false, error: 'Passwort ist erforderlich' };
   }
-  if (password.length < 8) {
-    return { valid: false, error: 'Passwort muss mindestens 8 Zeichen haben' };
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return { valid: false, error: `Passwort muss mindestens ${PASSWORD_MIN_LENGTH} Zeichen haben` };
+  }
+  if (password.length > PASSWORD_MAX_LENGTH) {
+    return { valid: false, error: `Passwort darf maximal ${PASSWORD_MAX_LENGTH} Zeichen haben` };
   }
   if (!/[A-Z]/.test(password)) {
     return { valid: false, error: 'Passwort muss mindestens einen Großbuchstaben enthalten' };
   }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, error: 'Passwort muss mindestens einen Kleinbuchstaben enthalten' };
+  }
   if (!/[0-9]/.test(password)) {
     return { valid: false, error: 'Passwort muss mindestens eine Zahl enthalten' };
   }
-  if (!/[!@#$%^&*(),.?":{}|<>_\-+=[/\]`~]/.test(password)) {
+  if (!SPECIAL_CHAR_REGEX.test(password)) {
     return { valid: false, error: 'Passwort muss mindestens ein Sonderzeichen enthalten' };
   }
   return { valid: true };
@@ -78,6 +93,9 @@ function validateOptionalEmail(email) {
 }
 
 module.exports = {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  SPECIAL_CHAR_REGEX,
   validateName,
   validatePassword,
   validateEmail,

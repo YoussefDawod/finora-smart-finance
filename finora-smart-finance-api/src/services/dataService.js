@@ -6,15 +6,18 @@
 const Transaction = require('../models/Transaction');
 
 /**
- * Exports user data
+ * Exports user data als Stream-fähiges Objekt mit Cursor-basiertem Transaction-Iterator (L-7)
  * @param {string} userId - User ID
  * @param {Object} user - User object
- * @returns {Promise<Object>} Exported data
+ * @returns {Promise<Object>} Exported data mit cursor
  */
 async function exportUserData(userId, user) {
-  const transactions = await Transaction.find({ userId }).lean();
+  // Zähle Transaktionen zuerst für Fortschritts-Info
+  const transactionCount = await Transaction.countDocuments({ userId });
 
-  const exportDataPayload = {
+  return {
+    success: true,
+    message: 'Daten erfolgreich exportiert',
     user: {
       id: userId.toString(),
       email: user.email,
@@ -22,25 +25,16 @@ async function exportUserData(userId, user) {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     },
-    transactions: transactions.map((t) => ({
-      id: t._id.toString(),
-      amount: t.amount,
-      category: t.category,
-      description: t.description,
-      type: t.type,
-      date: t.date,
-      tags: t.tags,
-      notes: t.notes,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt,
-    })),
-    exportedAt: new Date().toISOString(),
-  };
-
-  return {
-    success: true,
-    export: exportDataPayload,
-    message: 'Daten erfolgreich exportiert',
+    transactionCount,
+    /**
+     * Gibt einen Mongoose-Cursor zurück, der Transaktionen batch-weise liefert.
+     * Verhindert Memory-Overflow bei Usern mit vielen Transaktionen.
+     */
+    getTransactionCursor() {
+      return Transaction.find({ userId })
+        .lean()
+        .cursor({ batchSize: 500 });
+    },
   };
 }
 

@@ -1,0 +1,83 @@
+
+> finora-smart-finance-api@2.1.0 lint
+> eslint .
+
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\__tests__\controllers\authController.test.js
+  9:7  warning  'emailVerificationService' is assigned a value but never used  no-unused-vars
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\__tests__\controllers\transactionController.test.js
+  37:9   warning  'rollbackQuotaReservation' is assigned a value but never used  no-unused-vars
+  37:62  warning  'getQuotaStatus' is assigned a value but never used            no-unused-vars
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\__tests__\routes\adminAuth.test.js
+  192:15  warning  'isDevelopment' is assigned a value but never used  no-unused-vars
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\__tests__\services\transactionLifecycleService.test.js
+  65:13  warning  'now' is assigned a value but never used  no-unused-vars
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\admin-cli.js
+  460:15  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\config\env.js
+  176:6   warning  Generic Object Injection Sink  security/detect-object-injection
+  184:10  warning  Generic Object Injection Sink  security/detect-object-injection
+  198:18  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\middleware\mongoSanitizer.js
+  17:14  warning  Generic Object Injection Sink        security/detect-object-injection
+  18:23  warning  Generic Object Injection Sink        security/detect-object-injection
+  19:22  warning  Function Call Object Injection Sink  security/detect-object-injection
+  34:16  warning  Generic Object Injection Sink        security/detect-object-injection
+  34:58  warning  Function Call Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailService\accountEmails.js
+  49:19  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailService\contactEmails.js
+  30:25  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailService\newsletterEmails.js
+   41:7  warning  Generic Object Injection Sink  security/detect-object-injection
+   73:7  warning  Generic Object Injection Sink  security/detect-object-injection
+  103:7  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailTemplates\accountTemplates.js
+  70:13  warning  Generic Object Injection Sink  security/detect-object-injection
+  72:12  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailTemplates\contactTemplates.js
+  29:35  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailTemplates\financialTemplates.js
+  57:28  warning  Generic Object Injection Sink  security/detect-object-injection
+  91:26  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailTemplates\newsletterStatusPage.js
+  135:16  warning  Generic Object Injection Sink  security/detect-object-injection
+  136:13  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\emailTemplates\newsletterTemplates.js
+   60:13   warning  Generic Object Injection Sink  security/detect-object-injection
+  140:13   warning  Generic Object Injection Sink  security/detect-object-injection
+  197:13   warning  Generic Object Injection Sink  security/detect-object-injection
+  254:11   warning  Generic Object Injection Sink  security/detect-object-injection
+  255:103  warning  Generic Object Injection Sink  security/detect-object-injection
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\utils\logger.js
+   62:32  warning  Found stat from package "fs/promises" with non literal argument at index 0        security/detect-non-literal-fs-filename
+   64:17  warning  Found unlink from package "fs/promises" with non literal argument at index 0      security/detect-non-literal-fs-filename
+   93:28  warning  Found stat from package "fs/promises" with non literal argument at index 0        security/detect-non-literal-fs-filename
+  101:12  warning  Found existsSync from package "fs" with non literal argument at index 0           security/detect-non-literal-fs-filename
+  106:11  warning  Found rename from package "fs/promises" with non literal argument at index 0,1    security/detect-non-literal-fs-filename
+  149:19  warning  Generic Object Injection Sink                                                     security/detect-object-injection
+  163:23  warning  Generic Object Injection Sink                                                     security/detect-object-injection
+  184:18  warning  Generic Object Injection Sink                                                     security/detect-object-injection
+  191:5   warning  Found appendFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+
+C:\Users\Youssef\WebDev\Projekte\Finora Smart-Finance\finora-smart-finance-api\src\validators\userValidation.js
+  131:5  warning  Generic Object Injection Sink  security/detect-object-injection
+
+Ô£û 41 problems (0 errors, 41 warnings)
+
+

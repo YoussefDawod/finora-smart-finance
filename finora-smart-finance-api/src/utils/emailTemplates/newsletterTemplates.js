@@ -4,6 +4,7 @@
  */
 
 const { baseLayout } = require('./baseLayout');
+const colors = require('./colors');
 
 /**
  * Newsletter-Bestätigungs-Email (Double Opt-In)
@@ -66,17 +67,17 @@ function newsletterConfirmation(confirmUrl, unsubscribeUrl, language = 'de') {
       <p>${t.greeting}</p>
       <p>${t.text}</p>
       <div style="text-align: center; margin: 30px 0;">
-        <a href="${confirmUrl}" class="button" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600;">${t.button}</a>
+        <a href="${confirmUrl}" class="button" style="display: inline-block; background: ${colors.GRADIENTS.brand}; color: ${colors.white} !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600;">${t.button}</a>
       </div>
-      <p style="font-size: 13px; color: #6b7280;">${t.fallback}</p>
-      <p class="link-fallback"><a href="${confirmUrl}" style="color: #6366f1; word-break: break-all;">${confirmUrl}</a></p>
+      <p style="font-size: 13px; color: ${colors.textMuted};">${t.fallback}</p>
+      <p class="link-fallback"><a href="${confirmUrl}" style="color: ${colors.primary}; word-break: break-all;">${confirmUrl}</a></p>
       <div class="info">
         <p style="margin: 0; font-size: 14px;">${t.note}</p>
       </div>
     </div>
     <div class="footer">
       <p>${t.footer}</p>
-      <p style="margin-top: 8px;"><a href="${unsubscribeUrl}" style="color: #6b7280; text-decoration: underline;">${t.unsubscribe}</a></p>
+      <p style="margin-top: 8px;"><a href="${unsubscribeUrl}" style="color: ${colors.textMuted}; text-decoration: underline;">${t.unsubscribe}</a></p>
       <p style="margin-top: 8px;">&copy; ${new Date().getFullYear()} Finora &mdash; Smart Finance</p>
     </div>
   `);
@@ -154,7 +155,7 @@ function newsletterWelcome(unsubscribeUrl, language = 'de') {
     </div>
     <div class="footer">
       <p>${t.footer}</p>
-      <p style="margin-top: 8px;"><a href="${unsubscribeUrl}" style="color: #6b7280; text-decoration: underline;">${t.unsubscribe}</a></p>
+      <p style="margin-top: 8px;"><a href="${unsubscribeUrl}" style="color: ${colors.textMuted}; text-decoration: underline;">${t.unsubscribe}</a></p>
       <p style="margin-top: 8px;">&copy; ${new Date().getFullYear()} Finora &mdash; Smart Finance</p>
     </div>
   `);
@@ -212,4 +213,50 @@ function newsletterGoodbye(language = 'de') {
   `);
 }
 
-module.exports = { newsletterConfirmation, newsletterWelcome, newsletterGoodbye };
+/**
+ * Newsletter-Kampagnen-Template (für Admin-Massenversand)
+ * @param {string} subject - Betreff der Kampagne
+ * @param {string} content - HTML-Inhalt der Kampagne
+ * @param {string} unsubscribeUrl - Individueller Abmelde-Link
+ * @param {string} language - Sprache (de, en, ar, ka)
+ * @returns {string} HTML-String
+ */
+function campaignTemplate(subject, content, unsubscribeUrl, language = 'de') {
+  const isRtl = language === 'ar';
+  const dir = isRtl ? 'rtl' : 'ltr';
+  const align = isRtl ? 'right' : 'left';
+
+  const footerText = {
+    de: 'Du erhältst diese E-Mail, weil du den Finora-Newsletter abonniert hast.',
+    en: 'You received this email because you subscribed to the Finora newsletter.',
+    ar: 'لقد تلقيت هذا البريد الإلكتروني لأنك اشتركت في نشرة Finora.',
+    ka: 'ეს ელფოსტა მიიღეთ, რადგან გამოწერეთ Finora-ის სიახლეები.',
+  };
+  const unsubText = {
+    de: 'Newsletter abbestellen',
+    en: 'Unsubscribe from newsletter',
+    ar: 'إلغاء الاشتراك في النشرة',
+    ka: 'სიახლეების გამოწერის გაუქმება',
+  };
+
+  // Convert plain-text line breaks to <br> for email clients
+  const formattedContent = /<[a-z][\s\S]*>/i.test(content)
+    ? content
+    : content.replace(/\n/g, '<br>\n');
+
+  return baseLayout(`
+    <div class="content" style="direction: ${dir}; text-align: ${align};">
+      ${formattedContent}
+    </div>
+    <div class="footer">
+      <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0 16px;" />
+      <p style="font-size: 12px; color: ${colors.textMuted}; text-align: center;">
+        ${footerText[language] || footerText.de}<br/>
+        <a href="${unsubscribeUrl}" style="color: ${colors.textMuted}; text-decoration: underline;">${unsubText[language] || unsubText.de}</a>
+      </p>
+      <p style="font-size: 12px; color: ${colors.textMuted}; text-align: center; margin-top: 8px;">&copy; ${new Date().getFullYear()} Finora &mdash; Smart Finance</p>
+    </div>
+  `);
+}
+
+module.exports = { newsletterConfirmation, newsletterWelcome, newsletterGoodbye, campaignTemplate };

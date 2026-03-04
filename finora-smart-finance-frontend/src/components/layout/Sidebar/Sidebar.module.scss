@@ -2,7 +2,7 @@
 // 📑 SIDEBAR COMPONENT - Professional & Clean
 // ============================================
 // Desktop: Fixed Collapsible Sidebar
-// Mobile: Overlay Sidebar (identische Logik wie HamburgerMenu)
+// Mobile: wird nicht gerendert (HamburgerMenu übernimmt)
 // ============================================
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
@@ -22,8 +22,8 @@
   padding: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: width 0.3s ease-in-out, background 0.2s ease;
-  z-index: 1000;
+  transition: width var(--tr), background var(--tr-fast);
+  z-index: var(--z-dropdown);
   border-right: 1px solid var(--border);
 
   // Collapsed State
@@ -71,45 +71,6 @@
 }
 
 // ============================================
-// MOBILE SIDEBAR (Overlay - identisch HamburgerMenu)
-// ============================================
-.mobileSidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 320px;
-  max-width: 85vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  z-index: 1200;
-  background: var(--surface);
-  box-shadow: var(--sh-xl);
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: var(--space-md);
-
-  @media (max-width: 400px) {
-    width: 288px;
-  }
-}
-
-:global([dir='rtl']) .mobileSidebar {
-  left: auto;
-  right: 0;
-}
-
-// ============================================
-// BACKDROP (Mobile Overlay)
-// ============================================
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: color-mix(in srgb, black 60%, transparent);
-  z-index: 1150;
-}
-
-// ============================================
 // HEADER (Desktop Collapse Button)
 // ============================================
 .header {
@@ -137,7 +98,7 @@
   border-radius: var(--r-md);
   color: var(--tx-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
 
   &:hover {
     border-color: var(--primary);
@@ -146,13 +107,10 @@
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.98);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: -2px;
-  }
+  @include focus-ring-inset;
 
   svg {
     width: 20px;
@@ -163,20 +121,6 @@
 // ============================================
 // MOBILE HEADER (Logo + Theme)
 // ============================================
-.mobileHeader {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
-  flex-shrink: 0;
-
-  @include mobile {
-    display: flex;
-  }
-}
-
 // ============================================
 // USER SECTION
 // ============================================
@@ -203,12 +147,53 @@
   width: 48px;
   height: 48px;
   min-width: 48px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark, var(--pri-hover)));
+  background: linear-gradient(135deg, var(--primary), var(--pri-hover));
   border-radius: var(--r-md);
   color: var(--on-primary);
   font-size: var(--fs-lg);
   font-weight: var(--fw-b);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 30%, transparent);
+  position: relative;
+}
+
+.avatarBadge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  padding: 1px var(--space-2xs);
+  font-size: 9px;
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
+  border: 1px solid var(--primary);
+  border-radius: var(--r-full);
+  line-height: 1.3;
+  white-space: nowrap;
+
+  :global([dir='rtl']) & {
+    right: auto;
+    left: -6px;
+  }
+}
+
+// Collapsed: nur Avatar
+.sidebar.collapsed .userSection {
+  padding: var(--space-sm) var(--space-2xs);
+}
+
+.sidebar.collapsed .userCard {
+  justify-content: center;
+  padding: var(--space-xs);
+  gap: 0;
+}
+
+.sidebar.collapsed .userAvatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  font-size: var(--fs-sm);
 }
 
 .userInfo {
@@ -253,12 +238,13 @@
 // THEME SELECTOR SECTION (unter Einstellungen)
 // ============================================
 .themeSection {
-  padding: 0;
-  margin-top: 0;
+  padding: 0 var(--space-md);
+  margin-top: auto;
+  width: 100%;
 }
 
 .sidebar.collapsed .themeSection {
-  padding: 0;
+  padding: 0 var(--space-xs);
 }
 
 .navItem {
@@ -274,7 +260,7 @@
   font-weight: var(--fw-m);
   text-align: left;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--tr-fast);
   position: relative;
   width: 100%;
   min-height: 44px;
@@ -291,7 +277,7 @@
     height: 0;
     background: var(--primary);
     border-radius: 0 var(--r-sm) var(--r-sm) 0;
-    transition: height 0.15s ease;
+    transition: height var(--tr-fast);
   }
 
   // Hover State
@@ -310,7 +296,7 @@
 
   // Active State
   &.active {
-    background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+    background: transparent;
     color: var(--primary);
     font-weight: var(--fw-sb);
 
@@ -344,7 +330,7 @@
   height: 28px;
   min-width: 28px;
   color: var(--tx-muted);
-  transition: color 0.15s ease, transform 0.15s ease;
+  transition: color var(--tr-fast), transform var(--tr-fast);
   flex-shrink: 0;
 
   svg {
@@ -363,7 +349,6 @@
 }
 
 :global([dir='rtl']) .navItem {
-  flex-direction: row-reverse;
   text-align: right;
 
   &::before {
@@ -374,12 +359,18 @@
 }
 
 :global([dir='rtl']) .logoutBtn {
-  flex-direction: row-reverse;
   text-align: right;
 }
 
-:global([dir='rtl']) .logoutBtn:hover .logoutIcon {
-  transform: translateX(-4px);
+// ADMIN LINK
+.adminLink {
+  margin-top: var(--space-xs);
+}
+
+:global([dir='rtl']) .logoutBtn {
+  &:hover .logoutIcon {
+    transform: translateX(-4px);
+  }
 }
 
 // ============================================
@@ -388,6 +379,7 @@
 .footer {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-sm);
   padding: var(--space-md);
   border-top: 1px solid var(--border);
@@ -412,7 +404,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
   position: relative;
   width: 100%;
   min-height: 44px;
@@ -435,10 +427,7 @@
   }
 
   // Focus State
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 .logoutIcon {
@@ -447,7 +436,7 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  transition: transform 0.2s ease;
+  transition: transform var(--tr-fast);
   flex-shrink: 0;
 
   svg {
@@ -479,7 +468,7 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--tr-fast);
   width: 100%;
   min-height: 44px;
 
@@ -492,17 +481,13 @@
     transform: scale(0.97);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 // ============================================
 // SCROLLBAR STYLING
 // ============================================
 .sidebar,
-.mobileSidebar,
 .nav {
   &::-webkit-scrollbar {
     width: 8px;
@@ -514,8 +499,8 @@
 
   &::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 4px;
-    transition: background 0.2s ease;
+    border-radius: var(--r-sm);
+    transition: background var(--tr-fast);
 
     &:hover {
       background: var(--tx-muted);
@@ -528,7 +513,6 @@
 // ============================================
 @include reduced-motion {
   .sidebar,
-  .mobileSidebar,
   .navItem,
   .navItem::before,
   .navIcon,
@@ -536,14 +520,5 @@
   .logoutBtn {
     transition: none;
     animation: none;
-  }
-}
-
-// ============================================
-// ACCESSIBILITY
-// ============================================
-@media (prefers-reduced-transparency: reduce) {
-  .backdrop {
-    background: color-mix(in srgb, black 80%, transparent);
   }
 }

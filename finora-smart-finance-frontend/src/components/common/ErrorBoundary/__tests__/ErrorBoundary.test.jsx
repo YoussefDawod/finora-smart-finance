@@ -1,26 +1,24 @@
 /**
  * @fileoverview ErrorBoundary Component Tests
- * @description Tests for error catching, fallback rendering, and retry
+ * @description Full coverage: normal render, error catch, fallback, retry, console.error, onRetry
  */
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import ErrorBoundary from '../ErrorBoundary';
 
-// Mock i18n
 vi.mock('@/i18n', () => ({
   default: {
     t: (key) => {
-      const translations = {
+      const map = {
         'common.errors.somethingWrong': 'Something went wrong',
         'common.retry': 'Try again',
       };
-      return translations[key] || key;
+      return map[key] || key;
     },
   },
 }));
 
-// Mock framer-motion
 /* eslint-disable no-unused-vars */
 vi.mock('framer-motion', () => ({
   motion: {
@@ -34,96 +32,157 @@ vi.mock('framer-motion', () => ({
 }));
 /* eslint-enable no-unused-vars */
 
-// Component that throws an error
 const ThrowError = ({ shouldThrow = true }) => {
   if (shouldThrow) throw new Error('Test error');
   return <div>No error</div>;
 };
 
 describe('ErrorBoundary', () => {
-  // Suppress console.error for expected errors
-  const originalError = console.error;
+  const originalConsoleError = console.error;
+
   beforeEach(() => {
     console.error = vi.fn();
   });
+
   afterEach(() => {
-    console.error = originalError;
+    console.error = originalConsoleError;
   });
 
-  // ==========================================
-  // Normal Rendering
-  // ==========================================
+  // ─── Normal rendering ─────────────────────────────────────────────
   it('renders children when no error occurs', () => {
     render(
       <ErrorBoundary>
         <div>Child content</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText('Child content')).toBeInTheDocument();
   });
 
-  // ==========================================
-  // Error Catching
-  // ==========================================
-  it('renders fallback UI when child throws', () => {
+  // ─── Error catching ───────────────────────────────────────────────
+  it('shows default fallback when a child throws', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText(/Test error/)).toBeInTheDocument();
   });
 
-  it('renders custom fallback if provided', () => {
+  it('logs caught error via console.error', () => {
     render(
-      <ErrorBoundary fallback={<div>Custom fallback</div>}>
+      <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    expect(screen.getByText('Custom fallback')).toBeInTheDocument();
+    expect(console.error).toHaveBeenCalledWith(
+      'ErrorBoundary caught an error:',
+      expect.any(Error),
+      expect.objectContaining({ componentStack: expect.any(String) }),
+    );
   });
 
-  // ==========================================
-  // Retry
-  // ==========================================
+  it('renders custom fallback when provided', () => {
+    render(
+      <ErrorBoundary fallback={<div>Custom oops</div>}>
+        <ThrowError />
+      </ErrorBoundary>,
+    );
+    expect(screen.getByText('Custom oops')).toBeInTheDocument();
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+  });
+
+  // ─── Retry ────────────────────────────────────────────────────────
   it('shows retry button in default fallback', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    expect(screen.getByText('Try again')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
   });
 
-  it('calls onRetry when retry button is clicked', () => {
+  it('invokes onRetry callback and resets error state', () => {
     const onRetry = vi.fn();
     render(
       <ErrorBoundary onRetry={onRetry}>
         <ThrowError />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
-    fireEvent.click(screen.getByText('Try again'));
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
-  it('resets error state on retry and recovers', () => {
-    // ErrorBoundary starts with an error
+  it('re-renders children after retry (will re-catch if still throwing)', () => {
     render(
       <ErrorBoundary>
-        <ThrowError shouldThrow={true} />
-      </ErrorBoundary>
+        <ThrowError shouldThrow />
+      </ErrorBoundary>,
     );
-    
-    // Error is caught
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    
-    // Click retry — this resets internal hasError state
-    fireEvent.click(screen.getByText('Try again'));
-    
-    // After retry, the component re-renders children.
-    // Since ThrowError still throws, it will show error again.
-    // This confirms the retry mechanism works (resets and re-renders).
+    fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+    // ThrowError still throws → error caught again
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+  });
+
+  // ─── No custom fallback → shows error string ─────────────────────
+  it('displays the error message string in default fallback', () => {
+    render(
+      <ErrorBoundary>
+        <ThrowError />
+      </ErrorBoundary>,
+    );
+    expect(screen.getByText(/Error: Test error/)).toBeInTheDocument();
+  });
+
+  // ─── Chunk-load error detection & reload ──────────────────────────
+  describe('chunk-load error handling', () => {
+    const chunkMessages = [
+      'Failed to fetch dynamically imported module: /src/pages/Dashboard.jsx',
+      'Failed to fetch',
+      'Loading chunk abc123 failed',
+      'Loading CSS chunk styles-abc123 failed',
+    ];
+
+    let reloadSpy;
+
+    beforeEach(() => {
+      // Mock window.location.reload
+      reloadSpy = vi.fn();
+      Object.defineProperty(window, 'location', {
+        value: { ...window.location, reload: reloadSpy },
+        writable: true,
+        configurable: true,
+      });
+    });
+
+    it.each(chunkMessages)(
+      'calls window.location.reload() for chunk error: "%s"',
+      (msg) => {
+        const ChunkError = () => {
+          throw new Error(msg);
+        };
+
+        render(
+          <ErrorBoundary>
+            <ChunkError />
+          </ErrorBoundary>,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+        expect(reloadSpy).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it('does NOT call reload for a normal error', () => {
+      render(
+        <ErrorBoundary>
+          <ThrowError />
+        </ErrorBoundary>,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+      expect(reloadSpy).not.toHaveBeenCalled();
+    });
   });
 });

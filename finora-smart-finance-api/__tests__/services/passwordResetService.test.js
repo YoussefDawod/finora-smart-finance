@@ -12,6 +12,9 @@ const emailService = require('../../src/utils/emailService');
 jest.mock('../../src/models/User');
 jest.mock('../../src/services/authService');
 jest.mock('../../src/utils/emailService');
+jest.mock('../../src/services/auditLogService', () => ({
+  log: jest.fn(),
+}));
 
 describe('PasswordResetService', () => {
   beforeEach(() => {
@@ -125,7 +128,7 @@ describe('PasswordResetService', () => {
       expect(result.sent).toBe(true);
     });
 
-    it('should reject unverified email', async () => {
+    it('should return sent:true for unverified email (no enumeration leak)', async () => {
       const mockUser = {
         _id: 'user-123',
         email: 'max@example.com',
@@ -136,11 +139,14 @@ describe('PasswordResetService', () => {
 
       const result = await passwordResetService.initiatePasswordReset('max@example.com');
 
-      expect(result.sent).toBe(false);
-      expect(result.code).toBe('EMAIL_NOT_VERIFIED');
+      // Muss { sent: true } zurückgeben — kein Unterschied zu "User nicht gefunden"
+      expect(result.sent).toBe(true);
+      // Keine Fehlercodes nach außen
+      expect(result.code).toBeUndefined();
+      expect(result.error).toBeUndefined();
     });
 
-    it('should reject users who cannot reset password', async () => {
+    it('should return sent:true for users who cannot reset password (no enumeration leak)', async () => {
       const mockUser = {
         _id: 'user-123',
         email: 'max@example.com',
@@ -152,8 +158,10 @@ describe('PasswordResetService', () => {
 
       const result = await passwordResetService.initiatePasswordReset('max@example.com');
 
-      expect(result.sent).toBe(false);
-      expect(result.code).toBe('RESET_NOT_ALLOWED');
+      // Muss { sent: true } zurückgeben — kein Unterschied zu "User nicht gefunden"
+      expect(result.sent).toBe(true);
+      expect(result.code).toBeUndefined();
+      expect(result.error).toBeUndefined();
     });
   });
 
@@ -221,6 +229,16 @@ describe('PasswordResetService', () => {
 
       expect(result.reset).toBe(false);
       expect(result.code).toBe('INVALID_INPUT');
+    });
+
+    it('should reject weak password on reset', async () => {
+      const result = await passwordResetService.completePasswordReset(
+        'valid-token',
+        'weak'
+      );
+
+      expect(result.reset).toBe(false);
+      expect(result.code).toBe('WEAK_PASSWORD');
     });
   });
 });

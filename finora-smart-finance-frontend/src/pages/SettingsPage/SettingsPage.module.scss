@@ -68,7 +68,7 @@
     font-size: var(--fs-sm);
     color: var(--tx-muted);
     margin: 0;
-    line-height: 1.6;
+    line-height: var(--lh-relaxed);
   }
 }
 
@@ -81,7 +81,7 @@
   width: 48px;
   height: 48px;
   border-radius: var(--r-lg);
-  background: linear-gradient(135deg, var(--primary-bg), color-mix(in srgb, var(--primary) 18%, transparent));
+  background: linear-gradient(135deg, var(--bg-secondary), color-mix(in srgb, var(--primary) 18%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,7 +174,7 @@
 .themeDescription {
   font-size: var(--fs-sm);
   color: var(--tx-muted);
-  line-height: 1.5;
+  line-height: var(--lh-n);
 }
 
 .switchRow {
@@ -277,6 +277,14 @@
 
 :global([dir='rtl']) .switchOn .switchThumb {
   transform: translateX(-26px);
+}
+
+// Newsletter divider row
+.newsletterDivider {
+  @extend .switchRow;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
 }
 
 @include tablet {

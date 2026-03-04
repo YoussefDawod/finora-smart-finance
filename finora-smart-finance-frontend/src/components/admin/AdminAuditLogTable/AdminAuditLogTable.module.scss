@@ -1,0 +1,408 @@
+// ============================================
+// 📋 ADMIN AUDIT LOG TABLE
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ── Table Container ─────────────────────────
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+// ── Table Wrapper ───────────────────────────
+.tableWrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+
+  @include custom-scrollbar;
+
+  @include below-md {
+    border: none;
+    border-radius: 0;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+
+  @include below-md {
+    display: block;
+  }
+
+  // ── thead (Desktop sichtbar, Mobile sr-only)
+  thead {
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--border);
+
+    @include below-md {
+      @include sr-only;
+    }
+
+    th {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      font-weight: var(--fw-sb);
+      color: var(--tx-muted);
+      font-size: var(--fs-xs);
+      text-transform: uppercase;
+      letter-spacing: var(--ls-n);
+      white-space: nowrap;
+      user-select: none;
+
+      [dir='rtl'] & {
+        text-align: right;
+      }
+    }
+  }
+
+  // ── tbody (Desktop normal, Mobile Grid) ───
+  tbody {
+    @include below-md {
+      display: grid;
+      gap: var(--space-md);
+    }
+  }
+
+  // ── tr (Desktop Zeile, Mobile Card) ───────
+  tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background var(--duration-fast);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 4%, transparent);
+    }
+
+    @include below-md {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: var(--space-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      box-shadow: var(--sh-sm);
+      transition:
+        box-shadow var(--duration-fast),
+        transform var(--duration-fast);
+
+      &:last-child {
+        border-bottom: 1px solid var(--border);
+      }
+
+      &:hover {
+        background: var(--surface);
+        box-shadow: var(--sh-md);
+        transform: translateY(-1px);
+      }
+    }
+
+    @include below-sm {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ── td (Desktop normal, Mobile Flex) ──────
+  td {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--tx);
+    vertical-align: middle;
+
+    @include below-md {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-xs) 0;
+      border-bottom: 1px solid var(--border-light);
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  // data-label für Mobile-Labels
+  td[data-label] {
+    @include below-md {
+      justify-content: space-between;
+
+      &::before {
+        content: attr(data-label);
+        font-size: var(--fs-2xs);
+        font-weight: var(--fw-sb);
+        color: var(--tx-muted);
+        text-transform: uppercase;
+        letter-spacing: var(--ls-n);
+        flex-shrink: 0;
+      }
+    }
+  }
+}
+
+// ── Sortable Columns ────────────────────────
+.sortable {
+  cursor: pointer;
+  transition: color var(--duration-fast);
+
+  &:hover {
+    color: var(--tx);
+  }
+}
+
+.sortIcon {
+  display: inline-block;
+  margin-inline-start: var(--space-2xs);
+  vertical-align: middle;
+  color: var(--primary);
+}
+
+// ── Cell-specific ───────────────────────────
+.dateCell {
+  white-space: nowrap;
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  min-width: 140px;
+
+  @include below-md {
+    grid-column: 1 / -1;
+    font-weight: var(--fw-sb);
+    color: var(--tx);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.adminCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  white-space: nowrap;
+  font-weight: var(--fw-m);
+}
+
+.adminIcon {
+  color: var(--tx-muted);
+  flex-shrink: 0;
+}
+
+.targetCell {
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include below-md {
+    max-width: none;
+    white-space: normal;
+    word-break: break-all;
+  }
+}
+
+.detailsCell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  font-family: var(--ff-mono);
+  cursor: default;
+
+  @include below-md {
+    max-width: none;
+    white-space: normal;
+    word-break: break-all;
+  }
+}
+
+.ipCell {
+  white-space: nowrap;
+  font-family: var(--ff-mono);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+
+  @include below-md {
+    grid-column: 1 / -1;
+    border-bottom: none;
+  }
+}
+
+.requestIdCell {
+  white-space: nowrap;
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include below-md {
+    grid-column: 1 / -1;
+    border-bottom: none;
+  }
+}
+
+.requestIdCode {
+  font-family: var(--ff-mono);
+  font-size: var(--fs-2xs);
+  color: var(--tx-muted);
+  background: color-mix(in srgb, var(--surface-2) 50%, transparent);
+  padding: 0.1em 0.4em;
+  border-radius: var(--r-sm);
+}
+
+// ── Action Badge ────────────────────────────
+.actionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-m);
+  white-space: nowrap;
+
+  &.success {
+    background: color-mix(in srgb, var(--success) 18%, transparent);
+    color: var(--success);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+  }
+
+  &.danger {
+    background: color-mix(in srgb, var(--error) 18%, transparent);
+    color: var(--error);
+    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  }
+
+  &.warning {
+    background: color-mix(in srgb, var(--warning) 18%, transparent);
+    color: var(--warning);
+    border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  }
+
+  &.info {
+    background: color-mix(in srgb, var(--info) 18%, transparent);
+    color: var(--info);
+    border: 1px solid color-mix(in srgb, var(--info) 30%, transparent);
+  }
+
+  &.neutral {
+    background: var(--surface-2);
+    color: var(--tx-muted);
+    border: 1px solid var(--border);
+  }
+}
+
+// ── Empty State ─────────────────────────────
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-md);
+  color: var(--tx-muted);
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+
+  svg {
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+}
+
+// ── Pagination ──────────────────────────────
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xs) 0;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.paginationInfo {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+.paginationButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.pageButton {
+  @include button-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  padding: 0 var(--space-xs);
+  border-radius: var(--r-md);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--tx);
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &.activePage {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+    font-weight: var(--fw-sb);
+  }
+
+  @include focus-ring;
+}
+
+.dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+}
+
+// ── Responsive ──────────────────────────────
+@include below-md {
+  .pagination {
+    justify-content: center;
+  }
+
+  .paginationInfo {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .pageButton {
+    transition: none;
+  }
+}

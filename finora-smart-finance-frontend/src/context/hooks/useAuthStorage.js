@@ -7,7 +7,7 @@
  * - rememberMe = false: Tokens in sessionStorage (cleared on browser close)
  */
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -76,7 +76,7 @@ export function useAuthStorage() {
         globalThis.sessionStorage?.removeItem(TOKEN_KEY);
         
         // Optional: Event dispatchen für Logout
-        // eslint-disable-next-line no-undef
+         
         globalThis.window?.dispatchEvent(new CustomEvent('auth:token-mismatch'));
         
         return null;
@@ -101,32 +101,24 @@ export function useAuthStorage() {
 
   // ============================================
   // REFRESH TOKEN
+  // Refresh-Token wird jetzt als httpOnly Cookie verwaltet.
+  // Diese Funktionen räumen nur noch Legacy-Einträge auf.
   // ============================================
 
-  const saveRefreshToken = useCallback((token) => {
-    try {
-      getCurrentStorage()?.setItem(REFRESH_TOKEN_KEY, token);
-    } catch (error) {
-      globalThis.console?.error('Failed to save refresh token:', error);
-    }
-  }, [getCurrentStorage]);
+  const saveRefreshToken = useCallback(() => {
+    // No-Op: Refresh-Token wird als httpOnly Cookie verwaltet
+    // und nicht mehr in localStorage/sessionStorage gespeichert.
+  }, []);
 
   const getRefreshToken = useCallback(() => {
+    // Legacy-Migration: Falls noch ein alter Token im Storage liegt, zurückgeben
     try {
-      const localRefresh = globalThis.localStorage?.getItem(REFRESH_TOKEN_KEY);
-      const sessionRefresh = globalThis.sessionStorage?.getItem(REFRESH_TOKEN_KEY);
-      
-      // Gleiche Logik wie getToken: Conflict Detection
-      if (localRefresh && sessionRefresh && localRefresh !== sessionRefresh) {
-        globalThis.console?.error('Refresh token mismatch detected! Clearing both.');
-        globalThis.localStorage?.removeItem(REFRESH_TOKEN_KEY);
-        globalThis.sessionStorage?.removeItem(REFRESH_TOKEN_KEY);
-        return null;
-      }
-      
-      return localRefresh || sessionRefresh;
-    } catch (error) {
-      globalThis.console?.error('Failed to get refresh token:', error);
+      return (
+        globalThis.localStorage?.getItem(REFRESH_TOKEN_KEY) ||
+        globalThis.sessionStorage?.getItem(REFRESH_TOKEN_KEY) ||
+        null
+      );
+    } catch {
       return null;
     }
   }, []);
@@ -154,7 +146,7 @@ export function useAuthStorage() {
     }
   }, [removeToken, removeRefreshToken]);
 
-  return {
+  return useMemo(() => ({
     // Access Token
     saveToken,
     getToken,
@@ -170,5 +162,9 @@ export function useAuthStorage() {
 
     // Remember Me
     setRememberMe,
-  };
+  }), [
+    saveToken, getToken, removeToken,
+    saveRefreshToken, getRefreshToken, removeRefreshToken,
+    clearAllTokens, setRememberMe,
+  ]);
 }

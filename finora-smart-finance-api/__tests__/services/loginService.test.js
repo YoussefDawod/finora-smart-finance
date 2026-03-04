@@ -12,6 +12,9 @@ const emailService = require('../../src/utils/emailService');
 jest.mock('../../src/models/User');
 jest.mock('../../src/services/authService');
 jest.mock('../../src/utils/emailService');
+jest.mock('../../src/services/auditLogService', () => ({
+  log: jest.fn(),
+}));
 
 describe('LoginService', () => {
   beforeEach(() => {
@@ -87,6 +90,42 @@ describe('LoginService', () => {
       expect(User.findOne).toHaveBeenCalledWith({ email: 'max@example.com' });
     });
 
+    it('should normalise email to lowercase', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        validatePassword: jest.fn().mockResolvedValue(true),
+      };
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      await loginService.authenticateUser('MAX@EXAMPLE.COM', 'Password123!');
+
+      expect(User.findOne).toHaveBeenCalledWith({ email: 'max@example.com' });
+    });
+
+    it('should trim whitespace from identifier', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        validatePassword: jest.fn().mockResolvedValue(true),
+      };
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      await loginService.authenticateUser('  Max Mustermann  ', 'Password123!');
+
+      expect(User.findOne).toHaveBeenCalledWith({ name: 'Max Mustermann' });
+    });
+
+    it('should trim whitespace from email identifier', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        validatePassword: jest.fn().mockResolvedValue(true),
+      };
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      await loginService.authenticateUser('  MAX@Example.com  ', 'Password123!');
+
+      expect(User.findOne).toHaveBeenCalledWith({ email: 'max@example.com' });
+    });
+
     it('should reject non-existent user', async () => {
       User.findOne = jest.fn().mockResolvedValue(null);
 
@@ -100,7 +139,10 @@ describe('LoginService', () => {
       const mockUser = {
         _id: 'user-123',
         name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 0,
         validatePassword: jest.fn().mockResolvedValue(false),
+        save: jest.fn().mockResolvedValue(true),
       };
 
       User.findOne = jest.fn().mockResolvedValue(mockUser);
@@ -109,6 +151,180 @@ describe('LoginService', () => {
 
       expect(result.success).toBe(false);
       expect(result.code).toBe('INVALID_CREDENTIALS');
+      expect(mockUser.failedLoginAttempts).toBe(1);
+      expect(mockUser.save).toHaveBeenCalled();
+    });
+
+    it('should reject banned user', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Banned User',
+        isActive: false,
+        validatePassword: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('Banned User', 'CorrectPassword123!');
+
+      expect(result.success).toBe(false);
+      expect(result.code).toBe('ACCOUNT_BANNED');
+    });
+
+    // ============================================
+    // Account Lockout Tests (M-1)
+    // ============================================
+    it('should lock account after 5 failed login attempts', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 4,
+        lockUntil: null,
+        validatePassword: jest.fn().mockResolvedValue(false),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+      emailService.sendSecurityAlert = jest.fn().mockResolvedValue(true);
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'WrongPassword');
+
+      expect(result.success).toBe(false);
+      expect(result.code).toBe('INVALID_CREDENTIALS');
+      expect(mockUser.failedLoginAttempts).toBe(5);
+      expect(mockUser.lockUntil).toBeInstanceOf(Date);
+      expect(mockUser.lockUntil.getTime()).toBeGreaterThan(Date.now());
+      expect(mockUser.save).toHaveBeenCalled();
+    });
+
+    it('should reject login when account is temporarily locked', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 5,
+        lockUntil: new Date(Date.now() + 15 * 60 * 1000), // locked for 15 min
+        validatePassword: jest.fn().mockResolvedValue(true),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'CorrectPassword123!');
+
+      expect(result.success).toBe(false);
+      expect(result.code).toBe('ACCOUNT_LOCKED');
+      expect(result.error).toMatch(/vorübergehend gesperrt/);
+      expect(mockUser.validatePassword).not.toHaveBeenCalled();
+    });
+
+    it('should allow login after lock duration expires', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 5,
+        lockUntil: new Date(Date.now() - 1000), // lock expired 1s ago
+        validatePassword: jest.fn().mockResolvedValue(true),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'CorrectPassword123!');
+
+      expect(result.success).toBe(true);
+      expect(mockUser.failedLoginAttempts).toBe(0);
+      expect(mockUser.lockUntil).toBeNull();
+    });
+
+    it('should reset failed attempts on successful login', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 3,
+        lockUntil: null,
+        validatePassword: jest.fn().mockResolvedValue(true),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'CorrectPassword123!');
+
+      expect(result.success).toBe(true);
+      expect(mockUser.failedLoginAttempts).toBe(0);
+      expect(mockUser.lockUntil).toBeNull();
+    });
+
+    it('should send security alert when account is locked', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        email: 'max@example.com',
+        isActive: true,
+        isVerified: true,
+        failedLoginAttempts: 4,
+        lockUntil: null,
+        validatePassword: jest.fn().mockResolvedValue(false),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+      emailService.sendSecurityAlert = jest.fn().mockResolvedValue(true);
+
+      await loginService.authenticateUser('Max Mustermann', 'WrongPassword');
+
+      expect(emailService.sendSecurityAlert).toHaveBeenCalledWith(
+        mockUser,
+        'account_locked',
+        expect.objectContaining({ failedAttempts: 5 })
+      );
+    });
+
+    it('should not fail if lockout notification fails', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        email: 'max@example.com',
+        isActive: true,
+        isVerified: true,
+        failedLoginAttempts: 4,
+        lockUntil: null,
+        validatePassword: jest.fn().mockResolvedValue(false),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+      emailService.sendSecurityAlert = jest.fn().mockRejectedValue(new Error('SMTP down'));
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'WrongPassword');
+
+      expect(result.success).toBe(false);
+      expect(result.code).toBe('INVALID_CREDENTIALS');
+      expect(mockUser.save).toHaveBeenCalled();
+    });
+
+    it('should increment failedLoginAttempts on each wrong password', async () => {
+      const mockUser = {
+        _id: 'user-123',
+        name: 'Max Mustermann',
+        isActive: true,
+        failedLoginAttempts: 2,
+        lockUntil: null,
+        validatePassword: jest.fn().mockResolvedValue(false),
+        save: jest.fn().mockResolvedValue(true),
+      };
+
+      User.findOne = jest.fn().mockResolvedValue(mockUser);
+
+      const result = await loginService.authenticateUser('Max Mustermann', 'WrongPassword');
+
+      expect(result.success).toBe(false);
+      expect(mockUser.failedLoginAttempts).toBe(3);
+      expect(mockUser.lockUntil).toBeNull(); // not yet locked (< 5)
     });
   });
 

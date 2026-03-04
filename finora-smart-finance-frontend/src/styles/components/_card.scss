@@ -41,6 +41,12 @@
   @include card-interactive;
 }
 
+// Interactive Card with Glow Outline
+// ⚠️ NUR für Container, NICHT für Finanz-Komponenten
+.card-interactive-glow {
+  @include card-interactive-glow($glow: true);
+}
+
 .card-bordered {
   @include card;
   border: 2px solid var(--border);
@@ -187,7 +193,7 @@
   .stat-value {
     font-size: var(--fs-3xl);
     font-weight: var(--fw-b);
-    line-height: 1;
+    line-height: var(--lh-none);
     color: var(--primary);
   }
 

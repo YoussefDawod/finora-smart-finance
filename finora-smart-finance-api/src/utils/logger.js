@@ -124,7 +124,7 @@ const getLogFile = (type) => {
 // Timestamp Format
 const getTimestamp = () => new Date().toISOString();
 
-// Log-Levels
+// Log-Levels mit Priorität (niedriger = kritischer)
 const LOG_LEVELS = {
   ERROR: 'ERROR',
   WARN: 'WARN',
@@ -132,11 +132,36 @@ const LOG_LEVELS = {
   DEBUG: 'DEBUG',
 };
 
+const LEVEL_PRIORITY = {
+  ERROR: 0,
+  WARN: 1,
+  INFO: 2,
+  DEBUG: 3,
+};
+
+// Konfiguriertes Log-Level laden (lazy)
+let _logLevel = null;
+function getLogLevel() {
+  if (_logLevel === null) {
+    try {
+      const config = require('../config/env');
+      const configured = (config.logging?.level || 'debug').toUpperCase();
+      _logLevel = LEVEL_PRIORITY[configured] ?? LEVEL_PRIORITY.DEBUG;
+    } catch {
+      _logLevel = LEVEL_PRIORITY.DEBUG;
+    }
+  }
+  return _logLevel;
+}
+
 // ============================================
 // Logger Funktion
 // ============================================
 
 const log = (level, message, data = null, requestId = null) => {
+  // Level-Filter: nur loggen wenn Priority ≤ konfiguriertem Level
+  const msgPriority = LEVEL_PRIORITY[level] ?? 0;
+  if (msgPriority > getLogLevel()) return;
   const timestamp = getTimestamp();
   const logEntry = {
     timestamp,

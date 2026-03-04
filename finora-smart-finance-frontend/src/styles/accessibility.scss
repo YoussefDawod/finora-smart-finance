@@ -19,7 +19,7 @@
 // Enhanced focus-visible for all interactive elements
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
 }
 
 // Form controls use their own focus styles (handled in component styles)
@@ -355,9 +355,15 @@ input[type="radio"]:focus-visible {
   button,
   [role="button"],
   a,
-  input[type="checkbox"],
-  input[type="radio"],
   select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  // Checkbox/radio: touch target via label wrapper, nicht via input
+  // (hidden inputs dürfen nicht aufgeblasen werden)
+  input[type="checkbox"]:not([class]),
+  input[type="radio"]:not([class]) {
     min-height: 44px;
     min-width: 44px;
   }

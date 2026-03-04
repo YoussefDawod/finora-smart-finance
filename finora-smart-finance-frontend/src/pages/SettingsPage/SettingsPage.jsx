@@ -19,14 +19,18 @@ import {
   FiAlertCircle,
   FiTarget,
   FiMail,
+  FiClock,
 } from 'react-icons/fi';
 import { ExportSection, BudgetSettings } from '@/components/settings';
-import Select from '@/components/common/Select/Select';
+import { RetentionBanner } from '@/components/dashboard';
+import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
 import Button from '@/components/common/Button/Button';
 import AuthRequiredOverlay from '@/components/common/AuthRequiredOverlay/AuthRequiredOverlay';
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/hooks/useAuth';
+import { useMotion } from '@/hooks/useMotion';
 import { useToast } from '@/hooks/useToast';
+import { useLifecycle } from '@/hooks/useLifecycle';
 import { userService } from '@/api';
 import { persistUserPreferences, getUserPreferences } from '@/utils/userPreferences';
 import { useTranslation } from 'react-i18next';
@@ -69,6 +73,11 @@ export default function SettingsPage() {
   const { user, refreshUser, isAuthenticated } = useAuth();
   const { success, error: showError } = useToast();
   const { t, i18n } = useTranslation();
+  const {
+    lifecycleStatus, isLoading: lifecycleLoading,
+    fetchLifecycleStatus, confirmExport,
+  } = useLifecycle();
+  const { shouldAnimate } = useMotion();
   const themeOptions = useMemo(() => ([
     {
       value: 'light',
@@ -135,8 +144,9 @@ export default function SettingsPage() {
         // Silently ignore — toggle will default to off
       }
     })();
+    fetchLifecycleStatus();
     return () => { cancelled = true; };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchLifecycleStatus]);
 
   const handleNewsletterToggle = async () => {
     if (!user?.email) {
@@ -145,7 +155,7 @@ export default function SettingsPage() {
     }
     setNewsletterLoading(true);
     try {
-      const res = await userService.toggleNewsletter();
+      const res = await userService.toggleNewsletter(preferences.language);
       setNewsletterSubscribed(res.data?.subscribed ?? false);
       if (res.data?.subscribed) {
         success(t('settings.notifications.newsletter.subscribed'));
@@ -203,8 +213,7 @@ export default function SettingsPage() {
     [preferences, initialPreferences]
   );
 
-  const handlePreferenceChange = (key) => (event) => {
-    const value = event?.target?.value;
+  const handlePreferenceChange = (key) => (value) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -273,8 +282,8 @@ export default function SettingsPage() {
     <motion.section
       className={styles.settingsPage}
       variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
     >
       <motion.div className={styles.pageHeader} variants={itemVariants}>
         <div>
@@ -297,16 +306,17 @@ export default function SettingsPage() {
 
           <div className={styles.sectionBody}>
             <div className={styles.preferenceGrid}>
-              <Select
+              <FilterDropdown
                 id="language"
                 label={t('settings.general.language')}
                 options={LANGUAGE_OPTIONS}
                 value={preferences.language}
                 onChange={handlePreferenceChange('language')}
                 placeholder={t('settings.general.languagePlaceholder')}
+                size="md"
               />
 
-              <Select
+              <FilterDropdown
                 id="currency"
                 label={t('settings.general.currency')}
                 options={CURRENCY_OPTIONS.map((option) => ({
@@ -316,9 +326,10 @@ export default function SettingsPage() {
                 value={preferences.currency}
                 onChange={handlePreferenceChange('currency')}
                 placeholder={t('settings.general.currencyPlaceholder')}
+                size="md"
               />
 
-              <Select
+              <FilterDropdown
                 id="dateFormat"
                 label={t('settings.general.dateFormat')}
                 options={DATE_FORMAT_OPTIONS.map((option) => ({
@@ -329,6 +340,7 @@ export default function SettingsPage() {
                 onChange={handlePreferenceChange('dateFormat')}
                 placeholder={t('settings.general.datePlaceholder')}
                 hint={t('settings.general.dateExample', { value: getDatePreview(preferences.dateFormat) })}
+                size="md"
               />
             </div>
           </div>
@@ -468,7 +480,7 @@ export default function SettingsPage() {
                 )}
 
                 {/* Newsletter Toggle — separate from notification preferences */}
-                <div className={styles.switchRow} style={{ marginTop: 'var(--space-md)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--border)' }}>
+                <div className={styles.newsletterDivider}>
                   <div className={styles.switchInfo}>
                     <div className={styles.switchTitle}>
                       <FiMail aria-hidden="true" />
@@ -522,7 +534,7 @@ export default function SettingsPage() {
                   <p>{t('settings.budget.description')}</p>
                 </div>
               </div>
-              <div className={styles.sectionBody} style={{ minHeight: '120px' }} />
+              <div className={styles.sectionBody} />
             </AuthRequiredOverlay>
           ) : (
             <>
@@ -537,6 +549,33 @@ export default function SettingsPage() {
               </div>
               <div className={styles.sectionBody}>
                 <BudgetSettings />
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Lifecycle / Data Retention Section */}
+        <motion.div className={styles.sectionCard} variants={itemVariants}>
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true"><FiClock /></div>
+                <div><h2>{t('lifecycle.retention.title')}</h2><p>{t('lifecycle.retention.exportReminder')}</p></div>
+              </div>
+              <div className={styles.sectionBody} />
+            </AuthRequiredOverlay>
+          ) : (
+            <>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true"><FiClock /></div>
+                <div><h2>{t('lifecycle.retention.title')}</h2><p>{t('lifecycle.retention.exportReminder')}</p></div>
+              </div>
+              <div className={styles.sectionBody}>
+                <RetentionBanner
+                  lifecycleStatus={lifecycleStatus}
+                  onConfirmExport={confirmExport}
+                  isLoading={lifecycleLoading}
+                />
               </div>
             </>
           )}

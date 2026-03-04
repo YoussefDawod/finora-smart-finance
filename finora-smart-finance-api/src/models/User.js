@@ -32,14 +32,31 @@ const UserSchema = new mongoose.Schema(
       // Index defined separately below with sparse+unique constraint
     },
     passwordHash: { type: String, required: true },
-    lastName: { type: String, default: '' },
-    avatar: { type: String, default: null },
+    lastName: { type: String, default: '', maxlength: [50, 'Nachname darf max. 50 Zeichen haben'] },
+    avatar: { type: String, default: null, maxlength: [2048, 'Avatar-URL darf max. 2048 Zeichen haben'] },
     phone: { 
       type: String, 
       default: null,
+      maxlength: [20, 'Telefonnummer darf max. 20 Zeichen haben'],
       match: [/^[\d\s+()-]+$|^$/, 'Telefonnummer hat ungültiges Format']
     },
     isVerified: { type: Boolean, default: false },
+
+    // Rollen-System: 'user' oder 'admin'
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
+    },
+
+    // Account-Status: aktiv oder gesperrt
+    isActive: { type: Boolean, default: true },
+    bannedAt: { type: Date, default: null },
+    banReason: { type: String, default: '', maxlength: 500 },
+
+    // Brute-Force-Schutz: Account-Lockout nach zu vielen Fehlversuchen
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date, default: null },
     
     // Flag: User hat bei Registration Checkbox bestätigt (kein Email = kein Reset)
     understoodNoEmailReset: { type: Boolean, default: false },
@@ -96,6 +113,25 @@ const UserSchema = new mongoose.Schema(
       },
     },
 
+    // Transaction Lifecycle Management
+    transactionLifecycle: {
+      // Monatliches Quota (150 Transaktionen/Monat)
+      monthlyTransactionCount: { type: Number, default: 0 },
+      monthlyCountResetAt: { type: Date, default: Date.now },
+
+      // Retention-Tracking (12 Monate + 3 Monate Puffer + 1 Woche)
+      retentionNotifications: {
+        reminderStartedAt: { type: Date, default: null },
+        lastReminderSentAt: { type: Date, default: null },
+        reminderCount: { type: Number, default: 0 },
+        finalWarningSentAt: { type: Date, default: null },
+        exportConfirmedAt: { type: Date, default: null },
+        deletionExecutedAt: { type: Date, default: null },
+        deletionNotificationSentAt: { type: Date, default: null },
+        lastLoginToastShownAt: { type: Date, default: null },
+      },
+    },
+
     lastLogin: { type: Date, default: null },
     lastPasswordChange: { type: Date, default: null },
     passwordChangedAt: { type: Date, default: null },
@@ -110,6 +146,11 @@ UserSchema.index({ emailChangeToken: 1 }, { sparse: true });
 UserSchema.index({ lastLogin: 1 });
 UserSchema.index({ name: 1 }, { unique: true });
 UserSchema.index({ email: 1 }, { unique: true, sparse: true }); // sparse: erlaubt null-Werte
+UserSchema.index({ role: 1 });
+UserSchema.index({ isActive: 1 });
+
+// Bcrypt-Konfiguration: 12 Rounds bieten besseren Brute-Force-Schutz
+const BCRYPT_SALT_ROUNDS = 12;
 
 // Pre-save Hook: Hash password wenn neu oder geändert
 UserSchema.pre('save', async function () {
@@ -117,7 +158,7 @@ UserSchema.pre('save', async function () {
     return;
   }
 
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
   this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
   this.lastPasswordChange = new Date();
   this.passwordChangedAt = new Date();
@@ -201,13 +242,9 @@ UserSchema.methods.canChangePassword = function () {
   return this.lastPasswordChange < oneHourAgo;
 };
 
-// generateEmailChangeToken: Generiere Token für Email-Change-Verifikation
+// generateEmailChangeToken: Alias für generateEmailAddToken (identische Logik)
 UserSchema.methods.generateEmailChangeToken = function (newEmail) {
-  const token = crypto.randomBytes(32).toString('hex');
-  this.emailChangeToken = crypto.createHash('sha256').update(token).digest('hex');
-  this.emailChangeNewEmail = newEmail;
-  this.emailChangeExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
-  return token;
+  return this.generateEmailAddToken(newEmail);
 };
 
 // recordLogin: Update lastLogin timestamp
@@ -218,15 +255,14 @@ UserSchema.methods.recordLogin = function (meta = {}) {
   }
 };
 
-// Legacy methods (kept for backward compatibility with existing code)
+// setPassword: Passwort setzen (Timestamps werden vom pre-save Hook gesetzt)
 UserSchema.methods.setPassword = async function (password) {
   this.passwordHash = password; // Store plaintext, will be hashed by pre-save hook
-  this.lastPasswordChange = new Date();
-  this.passwordChangedAt = new Date();
 };
 
+// validatePassword: Alias für comparePassword (Legacy-Kompatibilität)
 UserSchema.methods.validatePassword = async function (password) {
-  return bcrypt.compare(password, this.passwordHash);
+  return this.comparePassword(password);
 };
 
 UserSchema.methods.generateVerification = function () {
@@ -243,9 +279,22 @@ UserSchema.methods.generatePasswordReset = function () {
   return token;
 };
 
+// Maximale Anzahl gleichzeitiger Sessions pro Benutzer
+const MAX_ACTIVE_SESSIONS = 5;
+
 UserSchema.methods.addRefreshToken = function (token, ttlSeconds = 7 * 24 * 3600, meta = {}) {
+  // Cleanup: Abgelaufene Tokens entfernen, bevor ein neuer hinzugefügt wird
+  const now = Date.now();
+  this.refreshTokens = this.refreshTokens.filter((t) => t.expiresAt > now);
+
+  // Session-Limit: Älteste Sessions entfernen, wenn Maximum erreicht
+  if (this.refreshTokens.length >= MAX_ACTIVE_SESSIONS) {
+    this.refreshTokens.sort((a, b) => a.expiresAt - b.expiresAt);
+    this.refreshTokens = this.refreshTokens.slice(-(MAX_ACTIVE_SESSIONS - 1));
+  }
+
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
-  const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+  const expiresAt = new Date(now + ttlSeconds * 1000);
   this.refreshTokens.push({ tokenHash, expiresAt, ...meta });
 };
 

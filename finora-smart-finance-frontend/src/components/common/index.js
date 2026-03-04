@@ -7,13 +7,10 @@
 export { default as Button } from './Button/Button';
 
 // Inputs & Forms
+export { default as Checkbox } from './Checkbox/Checkbox';
 export { default as Input } from './Input/Input';
-export { default as FloatingLabelInput } from './FloatingLabelInput/FloatingLabelInput';
 export { default as Textarea } from './Textarea/Textarea';
 export { default as Select } from './Select/Select';
-export { default as Checkbox } from './Checkbox/Checkbox';
-export { default as Radio } from './Radio/Radio';
-export { default as Toggle } from './Toggle/Toggle';
 
 // Search & Filter
 export { default as Search } from './Search/Search';
@@ -29,7 +26,6 @@ export { default as Alert } from './Alert/Alert';
 export { default as Toast } from './Toast/Toast';
 export { default as ToastContainer } from './ToastContainer/ToastContainer';
 export { default as Modal } from './Modal/Modal';
-export { default as Spinner } from './Spinner/Spinner';
 export { default as Skeleton } from './Skeleton/Skeleton';
 
 // Theme
@@ -37,3 +33,4 @@ export { default as ThemeSelector } from './ThemeSelector/ThemeSelector';
 
 // Others
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';
+export { default as CookieConsent } from './CookieConsent/CookieConsent';

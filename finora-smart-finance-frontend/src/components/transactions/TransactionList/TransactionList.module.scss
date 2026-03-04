@@ -221,10 +221,7 @@
     box-shadow: var(--sh-sm);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 
   @include lg {
     grid-template-columns: minmax(120px, 1fr) minmax(110px, 1.6fr) 100px 95px 75px;
@@ -377,7 +374,7 @@
   max-width: 100%;
 
   // Besseres Text-Overflow-Handling für mittlere Viewports
-  @media (max-width: 1024px) and (min-width: 768px) {
+  @include breakpoint($min: $bp-md, $max: 1024px) {
     font-size: var(--fs-xs);
   }
   font-size: var(--fs-sm);
@@ -437,10 +434,7 @@
     background: color-mix(in srgb, var(--primary) 10%, transparent);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 .sortIcon {
@@ -526,7 +520,8 @@
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-sm);
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
   border-radius: var(--r-full);
   color: var(--tx);
   font-weight: var(--fw-sb);
@@ -606,7 +601,7 @@
     color: var(--error);
   }
 
-  @media (max-width: 480px) {
+  @include breakpoint($max: $bp-xs) {
     flex-direction: column;
     align-items: stretch;
   }
@@ -639,10 +634,7 @@
     transform: translateY(0) scale(0.95);
   }
 
-  &:focus-visible {
-    outline: var(--focus-w) solid var(--focus-c);
-    outline-offset: var(--focus-o);
-  }
+  @include focus-ring;
 }
 
 .deleteBtn {
@@ -763,7 +755,7 @@
   transition: all var(--tr);
 
   &:hover {
-    border-color: var(--primary-light);
+    border-color: color-mix(in srgb, var(--primary) 15%, transparent);
     background-color: var(--surface);
   }
 
@@ -816,7 +808,7 @@
 .totalInfo {
   font-size: var(--fs-sm);
   color: var(--tx-muted);
-  font-weight: var(--fw-r);
+  font-weight: var(--fw-n);
 }
 
 // ============================================================================

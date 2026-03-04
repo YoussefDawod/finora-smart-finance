@@ -9,10 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
+import { useMotion } from '@/hooks/useMotion';
 import { useToast } from '@/hooks/useToast';
 import { useProfile } from '@/hooks/useProfile';
 import userService from '@/api/userService';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
+import AuthRequiredOverlay from '@/components/common/AuthRequiredOverlay/AuthRequiredOverlay';
 import {
   ProfileHeader,
   ProfileEditForm,
@@ -29,6 +31,7 @@ import styles from './ProfilePage.module.scss';
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading, user, logout } = useAuth();
+  const { shouldAnimate } = useMotion();
   const toast = useToast();
   const { t } = useTranslation();
 
@@ -64,16 +67,47 @@ export default function ProfilePage() {
   // EFFECTS
   // ============================================
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  useEffect(() => {
     if (isAuthenticated && user) {
       fetchEmailStatus();
     }
   }, [isAuthenticated, user, fetchEmailStatus]);
+
+  // ============================================
+  // GUEST VIEW (unauthenticated)
+  // ============================================
+  if (!isLoading && !isAuthenticated) {
+    return (
+      <section className={styles.profilePage}>
+        <div className={styles.pageHeader}>
+          <h1>{t('profile.title')}</h1>
+          <p>{t('profile.subtitle')}</p>
+        </div>
+        <AuthRequiredOverlay>
+          <div className={styles.content}>
+            {/* Placeholder profile card for guests */}
+            <div className={styles.profileCard}>
+              <div className={styles.profileCardHeader}>
+                <div className={styles.skeletonAvatar} />
+                <div className={styles.skeletonInfo}>
+                  <Skeleton width="180px" height="28px" borderRadius="var(--r-md)" animated={false} />
+                  <Skeleton width="220px" height="18px" borderRadius="var(--r-sm)" animated={false} />
+                  <Skeleton width="100px" height="24px" borderRadius="var(--r-full)" animated={false} />
+                </div>
+              </div>
+            </div>
+            <div className={styles.section}>
+              <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" animated={false} />
+              <Skeleton width="100%" height="80px" borderRadius="var(--r-lg)" animated={false} />
+            </div>
+            <div className={styles.section}>
+              <Skeleton width="160px" height="24px" borderRadius="var(--r-md)" animated={false} />
+              <Skeleton count={2} width="100%" height="48px" gap="var(--space-md)" borderRadius="var(--r-lg)" animated={false} />
+            </div>
+          </div>
+        </AuthRequiredOverlay>
+      </section>
+    );
+  }
 
   // ============================================
   // LOADING SKELETON
@@ -93,7 +127,7 @@ export default function ProfilePage() {
           <div className={styles.profileCard}>
             <div className={styles.profileCardHeader}>
               <Skeleton variant="rect" width="120px" height="120px" borderRadius="var(--r-lg)" />
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+              <div className={styles.skeletonInfo}>
                 <Skeleton width="180px" height="28px" borderRadius="var(--r-md)" />
                 <Skeleton width="220px" height="18px" borderRadius="var(--r-sm)" />
                 <Skeleton width="100px" height="24px" borderRadius="var(--r-full)" />
@@ -136,14 +170,15 @@ export default function ProfilePage() {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const handleDeleteAccount = async (password) => {
     try {
-      await userService.deleteAccount(user.email);
+      await userService.deleteAccount(password);
       toast.success(t('profile.toasts.accountDeleted'));
       await logout();
       navigate('/dashboard', { replace: true });
+      return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || t('profile.toasts.accountDeleteError') };
+      return { success: false, error: error.response?.data?.error || t('profile.toasts.accountDeleteError') };
     }
   };
 
@@ -164,8 +199,8 @@ export default function ProfilePage() {
   return (
     <motion.section
       className={styles.profilePage}
-      initial="hidden"
-      animate="visible"
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
       variants={containerVariants}
     >
       {/* Page Header */}

@@ -1,0 +1,98 @@
+// ============================================
+// 📧 EMAIL VERIFICATION PAGE (Link-basiert)
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.verifyContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  background: var(--bg);
+
+  @include mobile {
+    padding: var(--space-md);
+  }
+}
+
+// ============================================
+// CARD
+// ============================================
+.verifyCard {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  padding: var(--space-3xl);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--sh-lg);
+
+  @include mobile {
+    padding: var(--space-xl);
+    border-radius: var(--r-lg);
+  }
+}
+
+// ============================================
+// STATUS ICONS
+// ============================================
+.statusIcon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+}
+
+.statusIconSuccess {
+  @extend .statusIcon;
+  color: var(--success);
+}
+
+.statusIconError {
+  @extend .statusIcon;
+  color: var(--error);
+}
+
+.statusIconLoading {
+  @extend .statusIcon;
+  color: var(--primary);
+}
+
+// ============================================
+// TEXT
+// ============================================
+.verifyTitle {
+  margin: var(--space-md) 0;
+  color: var(--tx);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-b);
+}
+
+.verifyText {
+  color: var(--tx-muted);
+  margin: var(--space-xs) 0;
+  font-size: var(--fs-base);
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// ACTION LINK
+// ============================================
+.actionLink {
+  display: inline-block;
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--primary);
+  color: var(--text-on-primary, #fff);
+  border-radius: var(--r-md);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  transition: filter var(--tr-fast), opacity var(--tr-fast);
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}

@@ -6,7 +6,7 @@
 
 ![React](https://img.shields.io/badge/react-19-blue?style=for-the-badge)
 ![Vite](https://img.shields.io/badge/vite-7-646cff?style=for-the-badge)
-![Tests](https://img.shields.io/badge/tests-69_passing-00d084?style=for-the-badge)
+![Tests](https://img.shields.io/badge/tests-1176_passing-00d084?style=for-the-badge)
 
 [⬅️ Zurück zum Hauptprojekt](../README.md)
 
@@ -47,10 +47,13 @@ src/
 │   ├── auth/         # Login, Register
 │   ├── common/       # Button, Input, Modal
 │   ├── dashboard/    # Charts, Summary Cards
-│   └── transactions/ # TransactionForm, List
-├── hooks/            # Custom Hooks
+│   ├── transactions/ # TransactionForm, List
+│   ├── admin/        # AdminStatCard, Tables, DetailModals
+│   └── layout/       # MainLayout, AdminLayout, Sidebar
+├── hooks/            # Custom Hooks (inkl. useAdmin*)
 ├── context/          # Auth, Theme, Toast Context
 ├── pages/            # Route Pages
+│   └── admin/        # Dashboard, Users, Transactions, Subscribers, AuditLog
 ├── styles/           # SCSS + Design Tokens
 ├── i18n/             # 4 Sprachen (HTTP Backend)
 └── utils/            # Helpers, Validators
@@ -71,6 +74,8 @@ npm run test:coverage     # Coverage Report
 | Hooks | ~82% |
 | Utils | ~66% |
 | Validators | 100% |
+| Admin Panel | 57 Suites |
+| **Gesamt** | **1176 Tests, 57 Suites** |
 
 ---
 

@@ -9,6 +9,12 @@ import '@testing-library/jest-dom';
 // GLOBAL MOCKS
 // ============================================
 
+// Mock useMotion – alle Komponenten die useMotion() nutzen brauchen MotionProvider.
+// Globaler Mock verhindert "useMotion must be used within a MotionProvider" Fehler.
+vi.mock('@/hooks/useMotion', () => ({
+  useMotion: () => ({ shouldAnimate: false, prefersReducedMotion: false }),
+}));
+
 // Mock für matchMedia (benötigt für responsive Hooks)
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

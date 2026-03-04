@@ -1,0 +1,43 @@
+// ============================================
+// MINI FOOTER — Standalone Pages Navigation
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.miniFooter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+.link {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  text-decoration: none;
+  transition: color var(--tr-fast);
+
+  &:hover {
+    color: var(--primary);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+    border-radius: var(--r-xs);
+  }
+}
+
+.divider {
+  color: var(--tx-muted);
+  user-select: none;
+}
+
+@include reduced-motion {
+  .link {
+    transition: none;
+  }
+}

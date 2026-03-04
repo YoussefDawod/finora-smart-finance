@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useAuth, useMotion, useToast } from '@/hooks';
-import { MainLayout } from '@/components/layout';
+import { MainLayout, AdminLayout } from '@/components/layout';
+import { AdminRoute } from '@/components/auth';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { PageFallback } from '@/components/common/Skeleton';
 
@@ -23,6 +24,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 // Public Content Pages
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+const ImpressumPage = lazy(() => import('@/pages/ImpressumPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
 const PricingPage = lazy(() => import('@/pages/PricingPage'));
@@ -36,6 +38,16 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const TransactionsPage = lazy(() => import('@/pages/TransactionsPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage/SettingsPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+
+// Admin Pages (lazy-loaded, nur für Admins)
+const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
+const AdminUsersPage = lazy(() => import('@/pages/admin/AdminUsersPage'));
+const AdminTransactionsPage = lazy(() => import('@/pages/admin/AdminTransactionsPage'));
+const AdminSubscribersPage = lazy(() => import('@/pages/admin/AdminSubscribersPage'));
+const AdminCampaignsPage = lazy(() => import('@/pages/admin/AdminCampaignsPage'));
+const AdminCampaignComposer = lazy(() => import('@/pages/admin/AdminCampaignComposer'));
+const AdminAuditLogPage = lazy(() => import('@/pages/admin/AdminAuditLogPage'));
+const AdminLifecyclePage = lazy(() => import('@/pages/admin/AdminLifecyclePage'));
 
 const PageTransition = ({ children }) => {
   const { shouldAnimate } = useMotion();
@@ -87,6 +99,11 @@ const PublicRoute = ({ children }) => {
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
 };
 
+// NOTE: ProtectedRoute existiert bewusst, wird aber NICHT auf die App-Routes angewendet.
+// Grund: Die App unterstützt einen vollständigen Guest-Modus (Offline / LocalStorage).
+// Unangemeldete User dürfen /dashboard, /transactions, /settings, /profile frei nutzen.
+// Auth-sensitive Features (API-Calls, Profil-Daten) prüfen intern per useAuth/AuthRequiredOverlay.
+// eslint-disable-next-line no-unused-vars
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -102,6 +119,20 @@ const VerifyEmailWrapper = () => {
   const params = new globalThis.URLSearchParams(location.search);
   const hasResult = params.has('success') || params.has('error');
   return hasResult ? <EmailVerificationPage /> : <VerifyEmailPage />;
+};
+
+/**
+ * ScrollToTop — scrollt bei jedem Routenwechsel automatisch nach oben.
+ * Verhindert, dass die Seite im Footer-Bereich "stecken bleibt".
+ */
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
+
+  return null;
 };
 
 /**
@@ -167,6 +198,7 @@ function AnimatedRoutes() {
 
   return (
       <>
+      <ScrollToTop />
       <NewsletterToastHandler />
       <Routes location={location}>
         {/* Auth Routes - Single AuthPage handles both login and register */}
@@ -206,6 +238,7 @@ function AnimatedRoutes() {
         />
         <Route path="/terms" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><TermsPage /></Suspense></PageTransition>)} />
         <Route path="/privacy" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><PrivacyPage /></Suspense></PageTransition>)} />
+        <Route path="/impressum" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><ImpressumPage /></Suspense></PageTransition>)} />
         <Route path="/contact" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><ContactPage /></Suspense></PageTransition>)} />
         <Route path="/features" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><FeaturesPage /></Suspense></PageTransition>)} />
         <Route path="/pricing" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><PricingPage /></Suspense></PageTransition>)} />
@@ -214,7 +247,9 @@ function AnimatedRoutes() {
         <Route path="/help" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><HelpPage /></Suspense></PageTransition>)} />
         <Route path="/faq" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><FaqPage /></Suspense></PageTransition>)} />
 
-        {/* App Routes - mit MainLayout */}
+        {/* App Routes — MainLayout OHNE ProtectedRoute:
+            Guest-Modus erlaubt vollen Zugriff ohne Login (LocalStorage-basiert).
+            Auth-sensitive Bereiche nutzen intern useAuth() + AuthRequiredOverlay. */}
         <Route element={<MainLayout />}>
           <Route
             path="/dashboard"
@@ -249,13 +284,105 @@ function AnimatedRoutes() {
           <Route
             path="/profile"
             element={(
-              <ProtectedRoute>
-                <PageTransition>
-                  <Suspense fallback={<PageFallback variant="settings" />}>
-                    <ProfilePage />
-                  </Suspense>
-                </PageTransition>
-              </ProtectedRoute>
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="settings" />}>
+                  <ProfilePage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+        </Route>
+
+        {/* Admin Routes — AdminRoute erzwingt Auth + Admin-Rolle */}
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route
+            index
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminDashboardPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="users"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminUsersPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="transactions"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="transactions" />}>
+                  <AdminTransactionsPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="subscribers"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminSubscribersPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="campaigns"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminCampaignsPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="campaigns/new"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminCampaignComposer />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="campaigns/:id/edit"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminCampaignComposer />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="audit-log"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminAuditLogPage />
+                </Suspense>
+              </PageTransition>
+            )}
+          />
+          <Route
+            path="lifecycle"
+            element={(
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminLifecyclePage />
+                </Suspense>
+              </PageTransition>
             )}
           />
         </Route>

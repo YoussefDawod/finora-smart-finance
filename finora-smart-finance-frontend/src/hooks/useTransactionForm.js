@@ -4,7 +4,7 @@
  * Extrahierte Form-Logik für TransactionForm Komponente
  * ============================================================================
  */
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from '@/hooks/useForm';
 import { useToast } from '@/hooks/useToast';
@@ -50,6 +50,10 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
   // ──────────────────────────────────────────────────────────────────────
   // FORM HOOK INTEGRATION
   // ──────────────────────────────────────────────────────────────────────
+  // Ref breaks the forward-reference cycle: resetForm is returned by useForm
+  // but used inside the callback passed TO useForm.
+  const resetFormRef = useRef(() => {});
+
   const {
     values: formData,
     errors,
@@ -76,7 +80,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
           addToast(t('transactions.createSuccess'), 'success');
         }
 
-        resetForm();
+        resetFormRef.current();
         onSuccess?.();
       } catch (err) {
         console.error('[TransactionForm] Submit error:', err);
@@ -91,6 +95,9 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
     },
     transactionSchema
   );
+
+  // Keep ref in sync (runs after render, before any user interaction)
+  useEffect(() => { resetFormRef.current = resetForm; }, [resetForm]);
 
   // ──────────────────────────────────────────────────────────────────────
   // TYPE CHANGE HANDLER

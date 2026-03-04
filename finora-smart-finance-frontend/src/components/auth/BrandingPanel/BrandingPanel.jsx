@@ -194,6 +194,8 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
             showText
             size={isDesktop ? 'large' : 'default'}
             disableNavigation
+            glow
+            animated
           />
           <span className={styles.badge}>{t('auth.branding.badge')}</span>
         </div>

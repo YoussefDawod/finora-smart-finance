@@ -19,6 +19,13 @@ describe('Auth Validation', () => {
       expect(validateName('Test123')).toEqual({ valid: true, name: 'Test123' });
     });
 
+    it('should accept Arabic and Georgian names (L-10 Unicode)', () => {
+      expect(validateName('يوسف')).toEqual({ valid: true, name: 'يوسف' });
+      expect(validateName('გიორგი')).toEqual({ valid: true, name: 'გიორგი' });
+      expect(validateName('田中太郎')).toEqual({ valid: true, name: '田中太郎' });
+      expect(validateName('Владимир')).toEqual({ valid: true, name: 'Владимир' });
+    });
+
     it('should trim whitespace', () => {
       const result = validateName('  Max  ');
       expect(result.valid).toBe(true);
@@ -64,10 +71,24 @@ describe('Auth Validation', () => {
       expect(result.error).toContain('mindestens 8 Zeichen');
     });
 
+    it('should reject passwords longer than 128 characters', () => {
+      const longPassword = 'A' + 'a'.repeat(120) + '1234567!';
+      expect(longPassword.length).toBeGreaterThan(128);
+      const result = validatePassword(longPassword);
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('maximal 128 Zeichen');
+    });
+
     it('should reject passwords without uppercase', () => {
       const result = validatePassword('password1!');
       expect(result.valid).toBe(false);
       expect(result.error).toContain('Großbuchstaben');
+    });
+
+    it('should reject passwords without lowercase', () => {
+      const result = validatePassword('PASSWORD1!');
+      expect(result.valid).toBe(false);
+      expect(result.error).toContain('Kleinbuchstaben');
     });
 
     it('should reject passwords without numbers', () => {

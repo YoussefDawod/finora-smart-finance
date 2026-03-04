@@ -5,13 +5,16 @@
 # Oder importiere diese Datei in Postman/Insomnia
 #
 # Hinweis: Ersetze <userId> mit echter User-ID aus der Liste
+# Hinweis: DELETE /users benötigt confirm + reason
 ###############################################################################
 
-@baseUrl = http://localhost:3000/api
+@baseUrl = http://localhost:3000/api/v1
 @adminUrl = {{baseUrl}}/admin
 
 ### Variables
 @userId = 60d5ec49f1b2c72b8c8e4f1a
+
+# Authentifizierung ist in allen Umgebungen erforderlich (JWT oder x-admin-key)
 
 
 ###############################################################################
@@ -56,6 +59,7 @@ GET {{adminUrl}}/users?isVerified=true
 Content-Type: application/json
 
 ### 2.5 Mit sensitiven Daten (Tokens, passwordHash, etc.)
+# Hinweis: In Production wird showSensitive ignoriert
 GET {{adminUrl}}/users?showSensitive=true
 Content-Type: application/json
 
@@ -124,10 +128,10 @@ POST {{adminUrl}}/users/{{userId}}/reset-password
 Content-Type: application/json
 
 {
-  "newPassword": "test123"
+  "newPassword": "NeuesSicheresPasswort123!"
 }
 
-### 5.2 Passwort auf "Dev123!" setzen
+### 5.2 Passwort auf "NeuesSicheresPasswort123!" setzen
 POST {{adminUrl}}/users/{{userId}}/reset-password
 Content-Type: application/json
 
@@ -149,8 +153,11 @@ Content-Type: application/json
 DELETE {{adminUrl}}/users
 Content-Type: application/json
 
+# reason ist verpflichtend
+
 {
-  "confirm": "DELETE_ALL_USERS"
+  "confirm": "DELETE_ALL_USERS",
+  "reason": "Bereinigung von Testdaten"
 }
 
 
@@ -177,9 +184,9 @@ Content-Type: application/json
 # PATCH {{adminUrl}}/users/{{userId}}
 # {"isVerified": true}
 
-# 4. Passwort auf bekannten Wert setzen
+# 4. Passwort auf sicheren Wert setzen
 # POST {{adminUrl}}/users/{{userId}}/reset-password
-# {"newPassword": "test123"}
+# {"newPassword": "NeuesSicheresPasswort123!"}
 
 
 ### Workflow 2: User Audit
@@ -198,7 +205,149 @@ Content-Type: application/json
 
 # 1. Alle User löschen
 # DELETE {{adminUrl}}/users
-# {"confirm": "DELETE_ALL_USERS"}
+# {"confirm": "DELETE_ALL_USERS", "reason": "Bereinigung von Testdaten"}
 
 # 2. Verifizieren
 # GET {{adminUrl}}/stats
+
+
+###############################################################################
+# 📚 8. AUDIT-LOG
+###############################################################################
+
+### 8.1 Alle Audit-Logs (Standard)
+GET {{adminUrl}}/audit-log
+Content-Type: application/json
+
+### 8.2 Audit-Log mit Filter nach Action
+GET {{adminUrl}}/audit-log?action=USER_DELETED
+Content-Type: application/json
+
+### 8.3 Audit-Log: gelöschte Transaktionen
+GET {{adminUrl}}/audit-log?action=TRANSACTION_DELETED
+Content-Type: application/json
+
+### 8.4 Audit-Log: gelöschte Subscriber
+GET {{adminUrl}}/audit-log?action=SUBSCRIBER_DELETED
+Content-Type: application/json
+
+### 8.5 Audit-Log: Daten-Exporte
+GET {{adminUrl}}/audit-log?action=DATA_EXPORT
+Content-Type: application/json
+
+### 8.6 Audit-Log: Freitext-Suche in Details
+GET {{adminUrl}}/audit-log?search=spam
+Content-Type: application/json
+
+### 8.7 Audit-Log-Statistiken
+GET {{adminUrl}}/audit-log/stats
+Content-Type: application/json
+
+
+###############################################################################
+# 🚫 9. BAN / UNBAN / ROLLE
+###############################################################################
+
+### 9.1 User sperren (Ban)
+PATCH {{adminUrl}}/users/{{userId}}/ban
+Content-Type: application/json
+
+{
+  "reason": "Regelverstoß"
+}
+
+### 9.2 User entsperren (Unban)
+PATCH {{adminUrl}}/users/{{userId}}/unban
+Content-Type: application/json
+
+### 9.3 Rolle ändern (auf admin)
+PATCH {{adminUrl}}/users/{{userId}}/role
+Content-Type: application/json
+
+{
+  "role": "admin"
+}
+
+### 9.4 Rolle ändern (auf user)
+PATCH {{adminUrl}}/users/{{userId}}/role
+Content-Type: application/json
+
+{
+  "role": "user"
+}
+
+
+###############################################################################
+# 📤 10. CSV EXPORT
+###############################################################################
+
+### 10.1 User-Liste als CSV exportieren
+GET {{adminUrl}}/users/export
+Content-Type: application/json
+
+### 10.2 Transaktionen als CSV exportieren
+GET {{adminUrl}}/transactions/export
+Content-Type: application/json
+
+
+###############################################################################
+# 💳 11. TRANSAKTIONEN
+###############################################################################
+
+### 11.1 Alle Transaktionen
+GET {{adminUrl}}/transactions
+Content-Type: application/json
+
+### 11.2 Transaktionen mit Filter
+GET {{adminUrl}}/transactions?type=expense&category=food&startDate=2024-01-01&endDate=2026-12-31
+Content-Type: application/json
+
+### 11.3 Transaktions-Statistiken
+GET {{adminUrl}}/transactions/stats
+Content-Type: application/json
+
+### 11.4 User mit Transaktions-Statistiken
+GET {{adminUrl}}/transactions/users?page=1&limit=15&sort=-transactionCount
+Content-Type: application/json
+
+
+###############################################################################
+# 📰 12. SUBSCRIBER
+###############################################################################
+
+### 12.1 Alle Subscriber
+GET {{adminUrl}}/subscribers
+Content-Type: application/json
+
+### 12.2 Subscriber mit Filter
+GET {{adminUrl}}/subscribers?language=de&isConfirmed=true
+Content-Type: application/json
+
+### 12.3 Subscriber-Statistiken
+GET {{adminUrl}}/subscribers/stats
+Content-Type: application/json
+
+### 12.4 Einzelnen Subscriber abrufen
+GET {{adminUrl}}/subscribers/{{userId}}
+Content-Type: application/json
+
+
+###############################################################################
+# ♻️ 13. LIFECYCLE
+###############################################################################
+
+### 13.1 Lifecycle-Statistiken
+GET {{adminUrl}}/lifecycle/stats
+Content-Type: application/json
+
+### 13.2 Lifecycle-Detail eines Users
+GET {{adminUrl}}/lifecycle/users/{{userId}}
+Content-Type: application/json
+
+### 13.3 Retention-Status zurücksetzen
+POST {{adminUrl}}/lifecycle/users/{{userId}}/reset
+Content-Type: application/json
+
+### 13.4 Retention-Verarbeitung manuell auslösen
+POST {{adminUrl}}/lifecycle/trigger
+Content-Type: application/json

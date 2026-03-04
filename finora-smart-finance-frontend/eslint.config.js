@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
@@ -13,23 +14,7 @@ export default [
       ecmaVersion: 2024,
       sourceType: 'module',
       globals: {
-        document: 'readonly',
-        window: 'readonly',
-        console: 'readonly',
-        navigator: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        fetch: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        Intl: 'readonly',
-        // Browser APIs für CSS/Animation
-        getComputedStyle: 'readonly',
-        IntersectionObserver: 'readonly',
-        MutationObserver: 'readonly',
-        requestAnimationFrame: 'readonly',
+        ...globals.browser,
       },
       parserOptions: {
         ecmaFeatures: {
@@ -53,11 +38,26 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'no-unused-vars': 'warn',
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
       ],
       'react/prop-types': 'off',
+      // react-hooks v7 (React Compiler) strikte Regeln — als Warnungen,
+      // da viele false-positives bei bestehendem, funktionierendem Code.
+      // Diese können schrittweise auf 'error' gesetzt werden.
+      'react-hooks/static-components': 'warn',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/purity': 'warn',
+      'react-hooks/immutability': 'warn',
+      'react-hooks/preserve-manual-memoization': 'warn',
+      'react-hooks/use-memo': 'warn',
+      'react-hooks/error-boundaries': 'warn',
+      'react-hooks/set-state-in-render': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/globals': 'warn',
+      'preserve-caught-error': 'warn',
     },
   },
   // Jest & Vitest Test-Dateien
@@ -65,19 +65,11 @@ export default [
     files: ['__tests__/**/*.{js,jsx}', '**/*.test.{js,jsx}', '**/*.spec.{js,jsx}', '**/test/**/*.js'],
     languageOptions: {
       globals: {
-        // Jest
-        jest: 'readonly',
-        describe: 'readonly',
-        it: 'readonly',
-        expect: 'readonly',
-        test: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        global: 'readonly',
+        ...globals.jest,
         // Vitest
         vi: 'readonly',
+        // Node.js globals used in test setup
+        global: 'readonly',
       },
     },
     rules: {

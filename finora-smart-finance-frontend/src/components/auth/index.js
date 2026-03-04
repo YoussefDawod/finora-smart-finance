@@ -13,3 +13,6 @@ export { default as VerifyEmailForm } from './VerifyEmailForm/VerifyEmailForm';
 export { default as ForgotPasswordRequestForm } from './ForgotPasswordRequestForm/ForgotPasswordRequestForm';
 export { default as ResetPasswordForm } from './ResetPasswordForm/ResetPasswordForm';
 export { default as BrandingPanel } from './BrandingPanel/BrandingPanel';
+export { default as AdminRoute } from './AdminRoute';
+export { default as ErrorBanner } from './ErrorBanner/ErrorBanner';
+export { default as PasswordInput } from './PasswordInput/PasswordInput';

@@ -20,7 +20,7 @@ jest.mock('../../src/utils/logger', () => ({
 jest.mock('../../src/config/env', () => ({
   nodeEnv: 'test',
   port: 3000,
-  jwt: { secret: 'test-secret', expiresIn: '7d' },
+  jwt: { secret: 'test-secret', expiresIn: '7d', accessExpire: 3600, refreshExpire: 604800 },
   frontendUrl: 'http://localhost:5173',
   apiUrl: 'http://localhost:3000',
 }));
@@ -63,6 +63,8 @@ beforeAll(() => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  // Default: DB-Level rate limit nicht aktiv (L-6)
+  Subscriber.countDocuments = jest.fn().mockResolvedValue(0);
 });
 
 describe('Newsletter Routes', () => {
@@ -89,6 +91,7 @@ describe('Newsletter Routes', () => {
     });
 
     it('should return 200 if subscriber is already confirmed', async () => {
+      Subscriber.countDocuments = jest.fn().mockResolvedValue(0);
       Subscriber.findOne = jest.fn().mockResolvedValue({
         email: 'exists@example.com',
         isConfirmed: true,
@@ -101,6 +104,20 @@ describe('Newsletter Routes', () => {
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       // Keine Email-Versand bei bereits bestätigtem Subscriber
+      expect(emailService.sendNewsletterConfirmation).not.toHaveBeenCalled();
+    });
+
+    it('should silently succeed when DB-level rate limit reached (L-6)', async () => {
+      Subscriber.countDocuments = jest.fn().mockResolvedValue(50);
+
+      const res = await request(app)
+        .post('/api/newsletter/subscribe')
+        .send({ email: 'new@example.com' });
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      // Should not create subscriber or send email
+      expect(Subscriber.findOne).not.toHaveBeenCalled();
       expect(emailService.sendNewsletterConfirmation).not.toHaveBeenCalled();
     });
 
@@ -214,7 +231,7 @@ describe('Newsletter Routes', () => {
       const res = await request(app).get('/api/newsletter/confirm');
 
       expect(res.status).toBe(400);
-      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
     });
 
     it('should confirm subscriber with valid token', async () => {
@@ -247,7 +264,7 @@ describe('Newsletter Routes', () => {
         'new-unsub-token',
         'de'
       );
-      expect(newsletterStatusPage).toHaveBeenCalledWith('confirmed', 'de');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('confirmed', 'de', expect.any(String));
     });
 
     it('should return 400 for invalid/expired token', async () => {
@@ -256,7 +273,7 @@ describe('Newsletter Routes', () => {
       const res = await request(app).get('/api/newsletter/confirm?token=bad-token');
 
       expect(res.status).toBe(400);
-      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
     });
 
     it('should return 500 on server error', async () => {
@@ -265,7 +282,7 @@ describe('Newsletter Routes', () => {
       const res = await request(app).get('/api/newsletter/confirm?token=some-token');
 
       expect(res.status).toBe(500);
-      expect(newsletterStatusPage).toHaveBeenCalledWith('error', 'de');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('error', 'de', expect.any(String));
     });
   });
 
@@ -277,7 +294,7 @@ describe('Newsletter Routes', () => {
       const res = await request(app).get('/api/newsletter/unsubscribe');
 
       expect(res.status).toBe(400);
-      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
     });
 
     it('should unsubscribe with valid token', async () => {
@@ -300,7 +317,7 @@ describe('Newsletter Routes', () => {
       expect(Subscriber.findOne).toHaveBeenCalledWith({ unsubscribeToken: tokenHash });
       expect(Subscriber.deleteOne).toHaveBeenCalledWith({ _id: 'sub-123' });
       expect(emailService.sendNewsletterGoodbye).toHaveBeenCalledWith('bye@example.com', 'en');
-      expect(newsletterStatusPage).toHaveBeenCalledWith('unsubscribed', 'en');
+      expect(newsletterStatusPage).toHaveBeenCalledWith('unsubscribed', 'en', expect.any(String));
     });
 
     it('should return 400 for invalid unsubscribe token', async () => {

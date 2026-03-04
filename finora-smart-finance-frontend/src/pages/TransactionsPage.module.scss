@@ -33,14 +33,8 @@
 // ============================================
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-lg);
-
-  @include tablet {
-    flex-direction: column;
-    align-items: stretch;
-  }
+  flex-direction: column;
+  gap: var(--space-sm);
 
   h1 {
     font-size: var(--fs-3xl);
@@ -57,31 +51,21 @@
     font-size: var(--fs-md);
     color: var(--tx-muted);
     margin: var(--space-2xs) 0 0 0;
-  }
 
-  button {
-    @include tablet {
-      width: 100%;
+    @include mobile {
+      display: none; // Auf Mobile Platz sparen
     }
   }
 }
 
-// ============================================
-// FORM SECTION
-// ============================================
-.formSection {
+.headerTop {
   display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: var(--space-lg);
-  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
-  border-radius: var(--r-lg);
-  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
-  box-shadow: var(--sh-md);
-  overflow: visible;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-lg);
 
-  @include tablet {
-    padding: var(--space-md);
+  @include mobile {
+    gap: var(--space-sm);
   }
 }
 

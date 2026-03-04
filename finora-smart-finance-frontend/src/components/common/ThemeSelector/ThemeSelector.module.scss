@@ -41,13 +41,16 @@
   &::before {
     content: '';
     position: absolute;
-    left: 0;
+    inset-inline-start: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 4px;
     height: 0;
     background: var(--primary);
-    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    border-start-start-radius: 0;
+    border-start-end-radius: var(--r-sm);
+    border-end-end-radius: var(--r-sm);
+    border-end-start-radius: 0;
     transition: height var(--tr-fast);
   }
 
@@ -102,7 +105,7 @@
 
 .triggerLabel {
   flex: 1;
-  text-align: left;
+  text-align: start;
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
 }
@@ -206,7 +209,7 @@
 
   span {
     flex: 1;
-    text-align: left;
+    text-align: start;
   }
 }
 
@@ -223,12 +226,7 @@
 .checkmark {
   flex-shrink: 0;
   color: var(--primary);
-  margin-left: auto;
-}
-
-:global([dir='rtl']) .checkmark {
-  margin-left: 0;
-  margin-right: auto;
+  margin-inline-start: auto;
 }
 
 // ============================================

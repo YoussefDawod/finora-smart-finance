@@ -1,0 +1,298 @@
+// ============================================
+// 💰 ADMIN TRANSACTION USER LIST
+// ============================================
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+// ── Container ───────────────────────────────
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+// ── User Grid ───────────────────────────────
+.userGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-md);
+}
+
+// ── User Card ───────────────────────────────
+.userCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  cursor: pointer;
+  transition: all var(--duration-normal);
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+    box-shadow: var(--sh-lg);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// ── Card Header ─────────────────────────────
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.userAvatar {
+  @include flex-center;
+  width: var(--space-xl);
+  height: var(--space-xl);
+  border-radius: var(--r-full);
+  // Brand gradient: primary → secondary (accent nur für dekorative Elemente)
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: var(--on-primary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-b);
+  flex-shrink: 0;
+  letter-spacing: var(--ls-tight);
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+  flex: 1;
+}
+
+.userName {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  @include truncate;
+}
+
+.userEmail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include truncate;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--tx-muted);
+  transition: transform var(--duration-fast), color var(--duration-fast);
+
+  .userCard:hover & {
+    color: var(--primary);
+    transform: translateX(3px);
+  }
+}
+
+// ── Stats Row ───────────────────────────────
+.statsRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+.statValue {
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: var(--fs-xs);
+}
+
+.income {
+  color: var(--success);
+
+  .statValue {
+    color: var(--success);
+  }
+}
+
+.expense {
+  color: var(--error);
+
+  .statValue {
+    color: var(--error);
+  }
+}
+
+// ── Card Footer ─────────────────────────────
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.lastTx {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+.balance {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  font-variant-numeric: tabular-nums;
+}
+
+.positive {
+  color: var(--success);
+}
+
+.negative {
+  color: var(--error);
+}
+
+// ── Empty State ─────────────────────────────
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) var(--space-md);
+  color: var(--tx-muted);
+  text-align: center;
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+
+  svg {
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--fs-sm);
+  }
+}
+
+// ── Pagination ──────────────────────────────
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.paginationInfo {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+.paginationButtons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.pageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--surface-2);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.activePage {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  pointer-events: none;
+}
+
+.dots {
+  @include flex-center;
+  width: var(--btn-height-sm);
+  height: var(--btn-height-sm);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+}
+
+// ── Responsive ──────────────────────────────
+@include below-md {
+  .userGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Reduced Motion ──────────────────────────
+@include reduced-motion {
+  .userCard {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .chevron {
+    transition: none;
+  }
+
+  .pageButton {
+    transition: none;
+  }
+}

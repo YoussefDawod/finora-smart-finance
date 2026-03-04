@@ -6,8 +6,13 @@
 const User = require('../models/User');
 const emailService = require('../utils/emailService');
 const authService = require('./authService');
+const auditLogService = require('./auditLogService');
 const config = require('../config/env');
 const logger = require('../utils/logger');
+
+// Account-Lockout-Konfiguration
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCK_DURATION_MS = 15 * 60 * 1000; // 15 Minuten
 
 /**
  * Validates login input
@@ -48,13 +53,77 @@ async function authenticateUser(identifier, password) {
     };
   }
 
+  // Prüfe ob der Account gesperrt ist
+  if (user.isActive === false) {
+    return {
+      success: false,
+      error: 'Dein Account wurde gesperrt. Kontaktiere den Support für weitere Informationen.',
+      code: 'ACCOUNT_BANNED',
+    };
+  }
+
+  // Prüfe ob Account wegen zu vieler Fehlversuche temporär gesperrt ist
+  if (user.lockUntil && user.lockUntil > new Date()) {
+    const remainingMs = user.lockUntil.getTime() - Date.now();
+    const remainingMin = Math.ceil(remainingMs / 60000);
+    logger.warn(`Account locked: ${user._id} — ${remainingMin} min remaining`);
+    return {
+      success: false,
+      error: `Account vorübergehend gesperrt. Versuche es in ${remainingMin} Minute(n) erneut.`,
+      code: 'ACCOUNT_LOCKED',
+    };
+  }
+
   const passwordValid = await user.validatePassword(password);
   if (!passwordValid) {
+    // Fehlversuche hochzählen
+    user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+
+    if (user.failedLoginAttempts >= MAX_FAILED_ATTEMPTS) {
+      user.lockUntil = new Date(Date.now() + LOCK_DURATION_MS);
+      logger.warn(`Account locked after ${MAX_FAILED_ATTEMPTS} failed attempts: ${user._id}`);
+
+      // Audit-Log: Account gesperrt
+      auditLogService.log({
+        action: 'USER_ACCOUNT_LOCKED',
+        targetUserId: user._id,
+        targetUserName: user.name,
+        details: { failedAttempts: user.failedLoginAttempts },
+      });
+
+      // Security-Alert bei Lockout senden (falls E-Mail vorhanden)
+      if (user.email && user.isVerified) {
+        try {
+          await emailService.sendSecurityAlert(user, 'account_locked', {
+            failedAttempts: user.failedLoginAttempts,
+          });
+        } catch (notifyError) {
+          logger.warn(`Lockout notification skipped: ${notifyError.message}`);
+        }
+      }
+    }
+
+    await user.save();
+
+    // Audit-Log: Fehlgeschlagener Login
+    auditLogService.log({
+      action: 'USER_LOGIN_FAILED',
+      targetUserId: user._id,
+      targetUserName: user.name,
+      details: { attempt: user.failedLoginAttempts },
+    });
+
     return {
       success: false,
       error: 'Ungültige Zugangsdaten',
       code: 'INVALID_CREDENTIALS',
     };
+  }
+
+  // Erfolgreicher Login: Fehlversuche zurücksetzen
+  if (user.failedLoginAttempts > 0 || user.lockUntil) {
+    user.failedLoginAttempts = 0;
+    user.lockUntil = null;
   }
 
   return { success: true, user };
@@ -97,6 +166,14 @@ async function generateLoginSession(user, requestContext = {}) {
   // Update last login
   user.lastLogin = new Date();
   await user.save();
+
+  // Audit-Log: Erfolgreicher Login
+  auditLogService.log({
+    action: 'USER_LOGIN',
+    targetUserId: user._id,
+    targetUserName: user.name,
+    details: { ip: requestContext.ip },
+  });
 
   // Send security alert if email is verified
   if (user.email && user.isVerified) {
