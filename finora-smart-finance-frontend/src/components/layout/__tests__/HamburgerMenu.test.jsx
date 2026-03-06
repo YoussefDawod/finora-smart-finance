@@ -4,9 +4,8 @@
  *              User-Card, ThemeSelector, AdminLink und Accessibility.
  */
 
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import HamburgerMenu from '../HamburgerMenu/HamburgerMenu';
 
@@ -49,9 +48,9 @@ vi.mock('framer-motion', () => {
     get: (_target, prop) => {
       if (prop === 'create') return (Component) => Component;
       return ({ children, ...props }) => {
-        const { whileHover, whileTap, whileFocus, whileInView, whileDrag,
-          initial, animate, exit, transition, variants, layout, layoutId,
-          ...htmlProps } = props;
+        const htmlProps = Object.fromEntries(
+          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
+        );
         const Tag = typeof prop === 'string' ? prop : 'div';
         return <Tag {...htmlProps}>{children}</Tag>;
       };

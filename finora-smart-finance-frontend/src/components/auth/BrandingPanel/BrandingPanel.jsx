@@ -37,52 +37,6 @@ import { BrandingBackground } from '@/components/common';
 import { useMotion } from '@/hooks';
 import styles from './BrandingPanel.module.scss';
 
-const HIGHLIGHT_KEYS = [
-  {
-    titleKey: 'auth.branding.highlights.track.title',
-    descKey: 'auth.branding.highlights.track.desc',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <path d="M4 19h16" strokeLinecap="round" />
-        <path d="M7 15V9" strokeLinecap="round" />
-        <path d="M12 15V5" strokeLinecap="round" />
-        <path d="M17 15v-6" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    titleKey: 'auth.branding.highlights.charts.title',
-    descKey: 'auth.branding.highlights.charts.desc',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <path d="M3 3v18h18" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M7 14l4-5 3 3 4-6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-  {
-    titleKey: 'auth.branding.highlights.secure.title',
-    descKey: 'auth.branding.highlights.secure.desc',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <path d="M5 10V7a7 7 0 0 1 14 0v3" strokeLinecap="round" />
-        <rect x="4" y="10" width="16" height="11" rx="2" />
-        <path d="M12 15v2" strokeLinecap="round" />
-        <circle cx="12" cy="14" r="1" />
-      </svg>
-    ),
-  },
-  {
-    titleKey: 'auth.branding.highlights.theme.title',
-    descKey: 'auth.branding.highlights.theme.desc',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-        <path d="M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.5A6.5 6.5 0 0 1 12 3Z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-  },
-];
-
 // Content based on mode (login/register/forgot)
 const getContent = (mode) => {
   const contentMap = {

@@ -27,7 +27,7 @@ export function useAuthActions(dispatch, storage) {
 
       try {
         const response = await authService.login(name, password);
-        const { accessToken, refreshToken, user } = response.data.data;
+        const { accessToken, user } = response.data.data;
 
         // Set storage preference before saving tokens
         setRememberMe(rememberMe);
@@ -81,7 +81,7 @@ export function useAuthActions(dispatch, storage) {
 
       try {
         const response = await authService.register(data);
-        const { accessToken, refreshToken, user } = response.data.data;
+        const { accessToken, user } = response.data.data;
 
         saveToken(accessToken);
         // Refresh-Token wird als httpOnly Cookie vom Backend gesetzt —

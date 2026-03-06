@@ -4,7 +4,7 @@
  * Features: Typ-abhängige Kategoriefilterung
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFilter, FiChevronDown } from 'react-icons/fi';
 import { getCategoriesForType } from '@/config/categoryConstants';

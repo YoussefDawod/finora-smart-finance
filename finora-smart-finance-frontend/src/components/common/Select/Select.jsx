@@ -66,11 +66,11 @@ export const Select = forwardRef((
   // ──────────────────────────────────────────────────────────────────────
   // HANDLERS
   // ──────────────────────────────────────────────────────────────────────
-  const handleFocus = useCallback((e) => {
+  const handleFocus = useCallback(() => {
     setIsFocused(true);
   }, []);
 
-  const handleBlur = useCallback((e) => {
+  const handleBlur = useCallback(() => {
     setIsFocused(false);
   }, []);
 

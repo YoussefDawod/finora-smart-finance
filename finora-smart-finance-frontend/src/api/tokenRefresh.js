@@ -71,6 +71,7 @@ export function getStoredRefreshToken() {
  * @param {string} accessToken
  * @param {string} _refreshToken — ignoriert (wird per Cookie verwaltet)
  */
+// eslint-disable-next-line no-unused-vars
 function saveTokens(accessToken, _refreshToken) {
   try {
     const storage = getActiveStorage();

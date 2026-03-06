@@ -50,16 +50,13 @@ vi.mock('@/hooks/useMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => {
-  // eslint-disable-next-line react/display-name
   const motion = new Proxy({}, {
     get: (_target, prop) => {
       if (prop === 'create') return (Component) => Component;
-      // Return a forward-ref wrapper for any HTML element
       return ({ children, ...props }) => {
-        // Strip framer-motion specific props
-        const { whileHover, whileTap, whileFocus, whileInView, whileDrag,
-          initial, animate, exit, transition, variants, layout, layoutId,
-          ...htmlProps } = props;
+        const htmlProps = Object.fromEntries(
+          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
+        );
         const Tag = typeof prop === 'string' ? prop : 'div';
         return <Tag {...htmlProps}>{children}</Tag>;
       };

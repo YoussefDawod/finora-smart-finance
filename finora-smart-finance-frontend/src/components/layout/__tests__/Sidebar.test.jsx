@@ -4,7 +4,6 @@
  *              User-Card, ThemeSelector, AdminLink, Logout und A11y.
  */
 
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -49,9 +48,9 @@ vi.mock('framer-motion', () => {
     get: (_target, prop) => {
       if (prop === 'create') return (Component) => Component;
       return ({ children, ...props }) => {
-        const { whileHover, whileTap, whileFocus, whileInView, whileDrag,
-          initial, animate, exit, transition, variants, layout, layoutId,
-          ...htmlProps } = props;
+        const htmlProps = Object.fromEntries(
+          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
+        );
         const Tag = typeof prop === 'string' ? prop : 'div';
         return <Tag {...htmlProps}>{children}</Tag>;
       };
@@ -65,7 +64,7 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('@/components/common', () => ({
-  ThemeSelector: ({ isCollapsed, onClose }) => (
+  ThemeSelector: ({ isCollapsed }) => (
     <div data-testid="theme-selector" data-collapsed={isCollapsed}>ThemeSelector</div>
   ),
 }));

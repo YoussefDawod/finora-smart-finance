@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { motion } from 'framer-motion';
 import { useMotion } from '@/hooks/useMotion';
-import { buttonVariants, MOTION_TIMING } from '@/utils/motionPresets';
+import { MOTION_TIMING } from '@/utils/motionPresets';
 import styles from './Button.module.scss';
 
 /**

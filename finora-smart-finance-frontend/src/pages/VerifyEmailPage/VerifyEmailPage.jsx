@@ -18,7 +18,6 @@ import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { VerifyEmailForm } from '@/components/auth';
-import { BrandingBackground } from '@/components/common';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './VerifyEmailPage.module.scss';

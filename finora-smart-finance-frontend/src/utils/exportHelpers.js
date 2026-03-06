@@ -78,7 +78,7 @@ export async function generatePDF({ title, headers, rows, filename }) {
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // Header-Bild (finora-logo-branded-export.svg)
-  let tableStartY = 14;
+  let tableStartY;
   try {
     const { dataUrl, heightMm } = await loadExportHeaderImage(pageWidth);
     doc.addImage(dataUrl, 'PNG', 0, 0, pageWidth, heightMm);

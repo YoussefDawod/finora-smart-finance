@@ -54,9 +54,9 @@ vi.mock('framer-motion', () => {
     get: (_target, prop) => {
       if (prop === 'create') return (Component) => Component;
       return ({ children, ...props }) => {
-        const { whileHover, whileTap, whileFocus, whileInView, whileDrag,
-          initial, animate, exit, transition, variants, layout, layoutId,
-          ...htmlProps } = props;
+        const htmlProps = Object.fromEntries(
+          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
+        );
         const Tag = typeof prop === 'string' ? prop : 'div';
         return <Tag {...htmlProps}>{children}</Tag>;
       };

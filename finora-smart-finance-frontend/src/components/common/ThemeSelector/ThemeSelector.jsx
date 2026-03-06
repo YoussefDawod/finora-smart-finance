@@ -19,7 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ThemeSelector.module.scss';
 
 function ThemeSelector({ isCollapsed = false, onClose }) {
-  const { theme, systemPreference, isInitialized, setTheme, resetToSystemPreference } = useTheme();
+  const { theme, isInitialized, setTheme, resetToSystemPreference } = useTheme();
   const { t, i18n } = useTranslation();
   const { shouldAnimate } = useMotion();
   const isRtl = i18n.dir() === 'rtl';
