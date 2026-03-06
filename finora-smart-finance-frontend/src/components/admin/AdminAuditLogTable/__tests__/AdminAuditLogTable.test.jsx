@@ -9,6 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdminAuditLogTable from '../AdminAuditLogTable';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, fallback) => {
       if (typeof fallback === 'string') return key;

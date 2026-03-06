@@ -128,7 +128,7 @@ describe('AdminLayout', () => {
   describe('Header', () => {
     it('rendert Logo', () => {
       renderLayout();
-      expect(screen.getByTestId('logo')).toBeInTheDocument();
+      expect(screen.getByAltText('Finora')).toBeInTheDocument();
     });
 
     it('zeigt Admin Badge', () => {

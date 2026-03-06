@@ -117,7 +117,7 @@ describe('HamburgerMenu', () => {
 
     it('rendert Logo', () => {
       renderMenu();
-      expect(screen.getByTestId('logo')).toBeInTheDocument();
+      expect(screen.getByAltText('Finora')).toBeInTheDocument();
     });
 
     it('rendert alle Nav-Items', () => {

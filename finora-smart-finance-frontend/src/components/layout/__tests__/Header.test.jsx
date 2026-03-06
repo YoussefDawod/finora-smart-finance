@@ -124,7 +124,7 @@ describe('Header', () => {
     it('zeigt Logo auf Desktop', () => {
       mockIsMobile = false;
       renderHeader();
-      expect(screen.getByTestId('logo')).toBeInTheDocument();
+      expect(screen.getByAltText('Finora')).toBeInTheDocument();
     });
 
     it('zeigt keinen Hamburger-Button auf Desktop', () => {

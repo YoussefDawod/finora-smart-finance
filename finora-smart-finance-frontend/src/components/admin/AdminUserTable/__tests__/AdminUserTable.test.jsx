@@ -9,6 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdminUserTable from '../AdminUserTable';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, params) => {
       if (params) return `${key} ${JSON.stringify(params)}`;

@@ -10,6 +10,7 @@ import userEvent from '@testing-library/user-event';
 import AdminSubscriberTable from '../AdminSubscriberTable';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, params) => {
       if (params) return `${key} ${JSON.stringify(params)}`;
