@@ -23,7 +23,6 @@ function sanitizeQueryForLog(query) {
   const safe = {};
   for (const [key, value] of Object.entries(query)) {
     const safeKey = String(key);
-    // eslint-disable-next-line security/detect-object-injection -- key aus Object.entries(), kein User-Input als Property-Accessor
     safe[safeKey] = SENSITIVE_QUERY_KEYS.has(safeKey.toLowerCase()) ? '[REDACTED]' : value;
   }
   return safe;

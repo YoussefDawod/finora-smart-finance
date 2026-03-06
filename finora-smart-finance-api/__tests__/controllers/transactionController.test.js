@@ -34,7 +34,7 @@ jest.mock('../../src/config/env', () => ({
   nodeEnv: 'test',
 }));
 
-const { rollbackQuotaReservation, decrementTransactionCount, getQuotaStatus } = require('../../src/middleware/transactionQuota');
+const { decrementTransactionCount } = require('../../src/middleware/transactionQuota');
 
 describe('TransactionController', () => {
   let req, res;

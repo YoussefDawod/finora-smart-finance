@@ -185,13 +185,15 @@ export default function DateInput({
   const PrevIcon = isRTL ? FiChevronRight : FiChevronLeft;
   const NextIcon = isRTL ? FiChevronLeft : FiChevronRight;
 
-  // Sync view when value changes externally
-  useEffect(() => {
+  // Sync view when value changes externally (adjusting state during render)
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
     if (selectedDate) {
       setViewYear(selectedDate.getFullYear());
       setViewMonth(selectedDate.getMonth());
     }
-  }, [selectedDate]);
+  }
 
   // Display text
   const displayLabel = useMemo(() => {
@@ -278,6 +280,7 @@ export default function DateInput({
 
   useLayoutEffect(() => {
     if (!isOpen) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- useLayoutEffect for DOM measurement before paint is the canonical React pattern
     updatePanelPosition();
     // Recalculate after panel renders to get actual height
     const raf = requestAnimationFrame(updatePanelPosition);
@@ -355,14 +358,12 @@ export default function DateInput({
   }, [onChange, min, max]);
 
   // ── Keyboard ──────────────────────────────────
-  // Initialize focusedDate when panel opens
-  useEffect(() => {
-    if (isOpen) {
-      setFocusedDate(selectedDate || new Date());
-    } else {
-      setFocusedDate(null);
-    }
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Initialize focusedDate when panel opens/closes (adjusting state during render)
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
+    setFocusedDate(isOpen ? (selectedDate || new Date()) : null);
+  }
 
   // Focus the active day cell when focusedDate changes
   useEffect(() => {

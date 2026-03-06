@@ -55,16 +55,17 @@ export const CategoryPicker = memo(({
     }
   }, [isOpen]);
 
-  // Reset focused index when open state changes
-  useEffect(() => {
+  // Adjusting state during render (React-empfohlenes Pattern statt useEffect)
+  const [prevIsOpen, setPrevIsOpen] = useState(false);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
-      // Focus the currently selected item, or first item
       const idx = categories.indexOf(value);
       setFocusedIndex(idx >= 0 ? idx : 0);
     } else {
       setFocusedIndex(-1);
     }
-  }, [isOpen, categories, value]);
+  }
 
   // Scroll focused item into view
   useEffect(() => {
@@ -72,6 +73,12 @@ export const CategoryPicker = memo(({
     const items = menuRef.current.querySelectorAll('[role="option"]');
     items[focusedIndex]?.scrollIntoView({ block: 'nearest' });
   }, [focusedIndex, isOpen]);
+
+  // Selection handler
+  const handleSelect = useCallback((category) => {
+    onChange({ target: { name: 'category', value: category } });
+    setIsOpen(false);
+  }, [onChange]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
@@ -115,12 +122,7 @@ export const CategoryPicker = memo(({
       default:
         break;
     }
-  }, [isOpen, categories, focusedIndex]);
-
-  const handleSelect = (category) => {
-    onChange({ target: { name: 'category', value: category } });
-    setIsOpen(false);
-  };
+  }, [isOpen, categories, focusedIndex, handleSelect]);
 
   return (
     <div 

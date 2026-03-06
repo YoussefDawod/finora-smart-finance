@@ -189,7 +189,6 @@ describe('Admin Routes Auth', () => {
 
       it('should require API-Key even in development mode', () => {
         // In development, API-Key is still required — no open bypass
-        const isDevelopment = true;
         const hasBearer = false;
         const hasApiKey = false;
 

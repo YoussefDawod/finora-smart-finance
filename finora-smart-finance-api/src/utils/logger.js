@@ -59,8 +59,10 @@ async function cleanupOldLogs() {
 
       const filePath = path.join(logsDir, file);
       try {
+        // eslint-disable-next-line security/detect-non-literal-fs-filename -- Pfad aus path.join mit kontrolliertem logsDir
         const fileStat = await stat(filePath);
         if (fileStat.mtimeMs < cutoff) {
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
           await unlink(filePath);
           deleted++;
         }
@@ -92,6 +94,7 @@ async function rotateIfNeeded(logFile) {
     const { maxSizeMB } = getRotationConfig();
     const maxBytes = maxSizeMB * 1024 * 1024;
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- logFile aus path.join mit Datum-basiertem Namen
     const fileStat = await stat(logFile).catch(() => null);
     if (!fileStat || fileStat.size < maxBytes) return;
 
@@ -100,11 +103,13 @@ async function rotateIfNeeded(logFile) {
     const baseName = path.basename(logFile, '.log');
     let rotationNum = 1;
 
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Pfad aus path.join mit kontrolliertem dir/baseName
     while (fs.existsSync(path.join(dir, `${baseName}.${rotationNum}.log`))) {
       rotationNum++;
     }
 
     const rotatedFile = path.join(dir, `${baseName}.${rotationNum}.log`);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     await rename(logFile, rotatedFile);
 
     console.log(
@@ -192,6 +197,7 @@ const log = (level, message, data = null, requestId = null) => {
 
   // Vor dem Schreiben: Datei rotieren falls zu groß
   rotateIfNeeded(logFile).finally(() => {
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
     appendFile(logFile, logString + '\n', 'utf8').catch(err => {
       console.error(`Failed to write to log file ${logFile}:`, err.message);
     });

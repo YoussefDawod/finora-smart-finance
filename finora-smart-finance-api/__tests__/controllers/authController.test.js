@@ -6,7 +6,6 @@
 const authController = require('../../src/controllers/authController');
 const registrationService = require('../../src/services/registrationService');
 const loginService = require('../../src/services/loginService');
-const emailVerificationService = require('../../src/services/emailVerificationService');
 const passwordResetService = require('../../src/services/passwordResetService');
 const authService = require('../../src/services/authService');
 const User = require('../../src/models/User');

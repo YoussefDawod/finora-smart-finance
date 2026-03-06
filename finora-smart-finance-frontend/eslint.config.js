@@ -76,4 +76,16 @@ export default [
       'react-refresh/only-export-components': 'off',
     },
   },
+  // Config-Dateien (Node.js-Umgebung)
+  {
+    files: ['vite.config.js', 'eslint.config.js', 'playwright.config.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-console': 'off',
+    },
+  },
 ];

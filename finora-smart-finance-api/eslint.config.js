@@ -24,6 +24,9 @@ module.exports = [
       ...security.configs.recommended.rules,
       'no-unused-vars': ['warn', { args: 'none', ignoreRestSiblings: true }],
       'no-console': 'off',
+      // Security: detect-object-injection erzeugt zu viele False Positives
+      // (kontrollierte Keys aus Object.keys, Validation-Allowlists, Config-Lookups)
+      'security/detect-object-injection': 'off',
       // Security: Erlaube non-literal RegExp da wir sie kontrolliert einsetzen
       'security/detect-non-literal-regexp': 'warn',
       // Security: Erlaube child_process in deploy/admin scripts

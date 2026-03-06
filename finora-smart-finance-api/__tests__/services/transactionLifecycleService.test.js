@@ -62,7 +62,6 @@ describe('TransactionLifecycleService', () => {
   describe('monthsAgo', () => {
     it('should return a date X months in the past', () => {
       const result = lifecycleService.monthsAgo(12);
-      const now = new Date();
       const expected = new Date();
       expected.setMonth(expected.getMonth() - 12);
 

@@ -192,7 +192,6 @@ function validateBudget(budget, errors) {
             errors.push(`budget.categoryLimits.${key} darf maximal 1.000.000 betragen`);
             continue;
           }
-          // eslint-disable-next-line security/detect-object-injection -- key aus Object.entries(), validiert
           validLimits[key] = value;
         }
         sanitized.categoryLimits = validLimits;
