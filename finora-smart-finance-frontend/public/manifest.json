@@ -12,9 +12,9 @@
   "categories": ["finance", "productivity"],
   "icons": [
     {
-      "src": "/finora-icon.svg",
+      "src": "/logo-branding/finora-logo-branded.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

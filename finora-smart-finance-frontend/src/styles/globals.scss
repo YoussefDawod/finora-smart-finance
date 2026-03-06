@@ -348,6 +348,66 @@ hr {
 }
 
 // ============================================
+// 🏷️ APP LOGO — Global Rules
+// ============================================
+// Gilt für alle <img class="app-logo"> Instanzen im Projekt.
+// Größen-Varianten: --sm (34px), default (40px), --lg (52px/40px)
+// Glow & Entrance: nur wenn prefers-reduced-motion erlaubt ist.
+// ============================================
+
+@keyframes logo-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--motion-entrance-y, 12px))) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.app-logo {
+  display: block;
+  width: auto;
+  height: 50px;          // Bumped up: war 32px
+  object-fit: contain;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+
+  // Entrance animation (deactivated for reduced-motion users)
+  @media (prefers-reduced-motion: no-preference) {
+    animation: logo-entrance var(--motion-entrance-duration, 250ms)
+      var(--motion-entrance-ease, ease-out) both;
+    transition:
+      filter var(--tr),
+      transform var(--tr);
+
+    // Hover: glow + minimal scale (nur Desktop mit hover-Gerät)
+    @media (hover: hover) {
+      &:hover {
+        filter: drop-shadow(0 0 var(--glow-blur-sm, 6px) var(--glow-primary));
+        transform: scale(var(--motion-scale-hover, 1.02));
+      }
+    }
+  }
+
+  // Small variant — AdminLayout Sidebar, HamburgerMenu (war 28px)
+  &--sm {
+    height: 50px;
+  }
+
+  // Large variant — Auth BrandingPanel (war 40px/32px)
+  &--lg {
+    height: 50px;
+
+    @media (max-width: 900px) {
+      height: 50px;
+    }
+  }
+}
+
+// ============================================
 // 🚀 PORTAL ROOTS (Toast, Modal, etc.)
 // ============================================
 

@@ -67,11 +67,11 @@
 
 .brandLogo {
   width: auto;
-  height: 2rem;
+  height: 2.5rem;     // war 2rem (32px) → jetzt 2.5rem (40px)
   flex-shrink: 0;
 
   @include mobile {
-    height: 1.75rem;
+    height: 2rem;     // war 1.75rem (28px) → jetzt 2rem (32px)
   }
 }
 

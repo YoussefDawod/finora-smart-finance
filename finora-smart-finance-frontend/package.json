@@ -22,6 +22,8 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
+    "@fontsource-variable/space-grotesk": "^5.2.10",
+    "@fontsource/bebas-neue": "^5.2.7",
     "@fontsource/fira-code": "^5.2.7",
     "axios": "^1.6.5",
     "framer-motion": "^11.0.3",

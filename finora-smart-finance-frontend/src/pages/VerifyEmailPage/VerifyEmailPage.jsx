@@ -18,7 +18,7 @@ import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { useAuth, useMotion } from '@/hooks';
 import { AuthLayout } from '@/components/layout';
 import { VerifyEmailForm } from '@/components/auth';
-import { Logo } from '@/components/common';
+import { BrandingBackground } from '@/components/common';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import styles from './VerifyEmailPage.module.scss';
@@ -108,7 +108,7 @@ export default function VerifyEmailPage() {
           className={styles.mobileLogo}
           variants={shouldAnimate ? itemVariants : {}}
         >
-          <Logo to="/" size="default" showText disableNavigation entrance="fade" />
+          <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo" />
         </motion.div>
 
         {/* Header */}

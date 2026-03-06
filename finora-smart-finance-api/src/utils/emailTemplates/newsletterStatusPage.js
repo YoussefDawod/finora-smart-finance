@@ -9,7 +9,7 @@
 
 const config = require('../../config/env');
 const colors = require('./colors');
-const { getEmailLogoImg } = require('./logoSvg');
+
 
 /**
  * Rendert eine eigenständige HTML-Statusseite für Newsletter-Aktionen
@@ -168,19 +168,9 @@ function newsletterStatusPage(status, language = 'de', overrideFrontendUrl) {
       box-shadow: ${colors.GRADIENTS.cardShadow};
     }
     .header {
-      background: ${colors.GRADIENTS.headerBrand};
-      color: white;
-      padding: 28px 30px;
-      text-align: center;
-    }
-    .header h1 {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    .header img {
-      display: block;
-      margin: 0 auto 8px;
+      padding: 0;
+      font-size: 0;
+      line-height: 0;
     }
     .body {
       padding: 40px 30px 30px;
@@ -239,8 +229,15 @@ function newsletterStatusPage(status, language = 'de', overrideFrontendUrl) {
 <body>
   <div class="card">
     <div class="header">
-      ${getEmailLogoImg({ size: 40 })}
-      <h1>Finora</h1>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="background-color:#3d8ed4;background-image:linear-gradient(to right,#27bbd8 0%,#4a8ed8 50%,#5060df 100%);padding:20px 30px 14px 30px;">
+            <p style="margin:0 0 3px 0;font-family:Arial,Helvetica,sans-serif;font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;line-height:1.2;">Finora</p>
+            <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-size:9px;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:1.5px;text-transform:uppercase;">SMART FINANCE</p>
+            <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:rgba(255,255,255,0.8);">Intelligente Finanzverwaltung f&#252;r dein smartes Leben</p>
+          </td>
+        </tr>
+      </table>
     </div>
     <div class="body">
       <span class="icon">${t.icon}</span>

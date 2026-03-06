@@ -312,7 +312,8 @@
       "registerSubtitle": "Get started with Finora in just a few steps.",
       "loginTitle": "Sign in",
       "loginSubtitle": "Welcome back! Sign in to continue.",
-      "registerAction": "Sign up"
+      "registerAction": "Sign up",
+      "tagline": "Track your finances – clear and secure."
     },
     "layout": {
       "login": {

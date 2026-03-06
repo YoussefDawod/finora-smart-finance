@@ -312,7 +312,8 @@
       "registerSubtitle": "დაიწყეთ Finora-ით რამდენიმე ნაბიჯში.",
       "loginTitle": "შესვლა",
       "loginSubtitle": "კეთილი დაბრუნება! შედით გასაგრძელებლად.",
-      "registerAction": "რეგისტრაცია"
+      "registerAction": "რეგისტრაცია",
+      "tagline": "გააკონტროლეთ ფინანსები – გამჭვირვალედ და უსაფრთხოდ."
     },
     "layout": {
       "login": {

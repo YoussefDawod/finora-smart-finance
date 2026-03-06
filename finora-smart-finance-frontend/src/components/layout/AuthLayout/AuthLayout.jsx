@@ -1,32 +1,24 @@
 /**
- * @fileoverview AuthLayout Component - Premium Sliding Panel Design
- * @description Modern split-screen authentication layout with sliding branding panel
- * 
+ * @fileoverview AuthLayout — Auth wrapper for VerifyEmailPage & similar standalone pages
+ *
  * DESIGN:
- * - Side-by-side layout with Login (left) and Register (right) forms
- * - Animated sliding branding panel that covers the inactive side
- * - Login: Form left, Branding right
- * - Register: Branding left, Form right
- * - Smooth 600-800ms transition animation
- * - Mobile: Vertical stack with branding on top/bottom
- * 
- * BRANDING:
- * - Delegates all visual branding to <BrandingPanel> component
- * - No duplicate branding logic here
- * 
+ * - Desktop: 50/50 sliding panel (BrandingPanel left, Form right)
+ * - Mobile: 30% branding strip + 70% form content
+ * - BrandingPanel uses BrandingBackground internally
+ * - P2-Fix: spring stiffness:420, damping:34 (MOTION_GLOW_RULES compliant)
+ *
  * @module components/layout/AuthLayout
  */
 
 import { motion } from 'framer-motion';
-import { useMotion } from '@/hooks/useMotion';
+import { useMotion } from '@/hooks';
 import BrandingPanel from '@/components/auth/BrandingPanel/BrandingPanel';
 import styles from './AuthLayout.module.scss';
 
 /**
- * AuthLayout Component
  * @param {Object} props
- * @param {React.ReactNode} props.children - Auth form content
- * @param {'login'|'register'|'forgot'|'verify'} props.variant - Auth page variant
+ * @param {React.ReactNode} props.children - Auth page content
+ * @param {'login'|'register'|'forgot'|'verify'} [props.variant]
  */
 export default function AuthLayout({ children, variant = 'login' }) {
   const { shouldAnimate } = useMotion();
@@ -34,42 +26,23 @@ export default function AuthLayout({ children, variant = 'login' }) {
   const isRegister = variant === 'register';
   const panelPosition = isRegister ? 'left' : 'right';
 
-  // ============================================
-  // ANIMATION VARIANTS
-  // ============================================
+  // Smooth page-transition spring
+  const springTransition = { type: 'spring', stiffness: 220, damping: 28 };
+
   const panelVariants = {
-    left: {
-      x: '0%',
-      transition: {
-        type: 'spring',
-        stiffness: 80,
-        damping: 20,
-        duration: 0.7,
-      },
-    },
-    right: {
-      x: '100%',
-      transition: {
-        type: 'spring',
-        stiffness: 80,
-        damping: 20,
-        duration: 0.7,
-      },
-    },
+    left:  { x: '0%',   transition: springTransition },
+    right: { x: '100%', transition: springTransition },
   };
 
-  // ============================================
-  // RENDER
-  // ============================================
   return (
     <div className={styles.authLayout}>
-      {/* Form Container - Always centered in the visible half */}
+      {/* Form Container */}
       <div className={`${styles.formPanel} ${isRegister ? styles.formRight : styles.formLeft}`}>
         <motion.div
           className={styles.formContainer}
-          initial={shouldAnimate ? { opacity: 0, y: 20 } : {}}
+          initial={shouldAnimate ? { opacity: 0, y: 12 } : false}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
         >
           {children}
         </motion.div>
@@ -86,7 +59,7 @@ export default function AuthLayout({ children, variant = 'login' }) {
         <BrandingPanel mode={variant} isDesktop />
       </motion.div>
 
-      {/* Mobile Branding */}
+      {/* Mobile Branding — 30% strip */}
       <div className={`${styles.mobileBranding} ${isRegister ? styles.mobileTop : styles.mobileBottom}`}>
         <BrandingPanel mode={variant} isDesktop={false} />
       </div>

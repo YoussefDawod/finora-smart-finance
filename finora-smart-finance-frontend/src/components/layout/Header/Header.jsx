@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MEDIA_QUERIES } from '@/constants';
 import { FiMenu } from 'react-icons/fi';
-import { Logo, UserMenu } from '@/components/common';
+import { UserMenu } from '@/components/common';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import HamburgerMenu from '../HamburgerMenu/HamburgerMenu';
 import styles from './Header.module.scss';
@@ -74,7 +74,9 @@ export default function Header() {
             </motion.button>
           ) : (
             // Desktop: Logo
-            <Logo onClick={() => setIsHamburgerOpen(false)} />
+            <Link to="/" onClick={() => setIsHamburgerOpen(false)}>
+              <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo" />
+            </Link>
           )}
         </div>
 

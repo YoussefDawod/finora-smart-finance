@@ -214,11 +214,26 @@ html, body, #root {
 }
 
 .initial-skeleton__auth-branding {
-  flex: 1;
-  background: linear-gradient(135deg, var(--primary), color-mix(in srgb, var(--primary) 70%, #000));
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 0 0 50%;
+  position: relative;
+  overflow: hidden;
+  /*
+   * Light: leicht abgedunkeltes Blau-Violett als Placeholder
+   * Dark:  leicht aufgehelltes Dunkelblau als Placeholder
+   * Kein Gradient auf --primary, da der im Dark-Theme rot ist
+   */
+  background: #3d3f8f;
+  display: none; /* Desktop-only, wie BrandingPanel */
+}
+
+@media (min-width: 769px) {
+  .initial-skeleton__auth-branding {
+    display: block;
+  }
+}
+
+[data-theme="dark"] .initial-skeleton__auth-branding {
+  background: #0d1035;
 }
 
 @media (max-width: 768px) {
@@ -226,12 +241,7 @@ html, body, #root {
     flex-direction: column;
   }
   .initial-skeleton__auth-form {
-    flex: none;
-    min-height: 60vh;
-  }
-  .initial-skeleton__auth-branding {
-    flex: none;
-    min-height: 40vh;
+    flex: 1;
   }
 }
 

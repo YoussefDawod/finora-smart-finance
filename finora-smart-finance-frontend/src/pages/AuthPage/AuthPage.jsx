@@ -1,44 +1,22 @@
 /**
- * @fileoverview AuthPage Component - Unified Auth Layout
- * 
+ * @fileoverview AuthPage — Unified Auth Layout
+ *
  * ARCHITECTURE:
- * - Single unified page for ALL auth modes: Login, Register, and Forgot Password
- * - Uses useIsDesktop hook to render ONLY ONE layout (no duplicate IDs)
- * - Supports 3 modes + optional token for password reset
- * 
- * MODES:
- * - Login:    /login
- * - Register: /register
- * - Forgot:   /forgot-password (with optional ?token=xyz for password reset)
- * 
- * DESKTOP (Horizontal 50/50):
- * - Login mode:    [Form 50%] [Branding 50%] (statisch, x: 0%)
- * - Register mode: [Branding 50%] [Form 50%] (animiert: Form x: 100%, Branding x: -100%)
- * - Forgot mode:   [Branding 50%] [Form 50%] (animiert: Form x: 100%, Branding x: -100%, wie Register)
- * 
- * MOBILE (Vertical 60/40):
- * - Login mode:    [Form 60%] / [Branding 40%] (Branding UNTEN)
- * - Register mode: [Branding 40%] / [Form 60%] (Branding OBEN, animated order swap)
- * - Forgot mode:   [Branding 40%] / [Form 60%] (Branding OBEN, animated order swap wie Register)
- * 
- * ANIMATIONS:
- * - Desktop: Register/Forgot Mode → Spring-based panel slide animation (x translation 100%)
- * - Desktop: Login Mode → Static panels at x: 0%, only form content fades
- * - Mobile: Register/Forgot Mode → CSS order property swap (Branding nach oben)
- * - Mobile: Login Mode → Static (Branding unten)
- * - Floating Shapes: Continuous loop (7-11s), all modes identical
- * - Form Content: Fade in/out (200ms) on mode/token change
- * 
- * ÜBERGÄNGE (alle animiert):
- * - Login ↔ Register: Desktop panels slide | Mobile Branding up/down
- * - Login ↔ Forgot:   Desktop panels slide | Mobile Branding up/down
- * - Register ↔ Forgot: Form content fade (both panels in same position)
- * 
- * BUTTONS IN BRANDING PANEL:
- * - Login Mode:    "Sign up now" → /register (Arrow: ←/↑)
- * - Register Mode: "Go to sign in" → /login (Arrow: →/↓)
- * - Forgot Mode:   "Back to sign in" → /login (Arrow: ←/↓)
- * 
+ * - Desktop: 50/50 horizontal split with spring-animated panel slide
+ * - Mobile:  30/70 vertical stack (branding 30% / form 70%) — P8-Fix
+ * - BrandingPanel uses BrandingBackground internally (no own gradient)
+ * - P9-Fix: removed data-auth-branding-bottom DOM mutation
+ * - P2-Fix: spring stiffness:420, damping:34 (MOTION_GLOW_RULES compliant)
+ *
+ * DESKTOP PANEL BEHAVIOR:
+ * - Login:    [Form left 0%] [Branding right 0%]
+ * - Register: [Form x:100%] [Branding x:-100%]  (panel slide)
+ * - Forgot:   [Form x:100%] [Branding x:-100%]  (panel slide)
+ *
+ * MOBILE BEHAVIOR:
+ * - Login:    Branding 30% BOTTOM, Form 70% TOP
+ * - Register: Branding 30% TOP, Form 70% BOTTOM (CSS order swap)
+ *
  * @module pages/AuthPage
  */
 
@@ -60,20 +38,16 @@ export default function AuthPage() {
   const isDesktop = useIsDesktop();
   const { t } = useTranslation();
 
-  // Determine current mode from URL
   const pathname = location.pathname;
   const isRegisterMode = pathname === '/register';
   const isForgotMode = pathname === '/forgot-password' || pathname.startsWith('/forgot-password');
   const resetToken = searchParams.get('token');
-  
-  // Mode für BrandingPanel
+
   const mode = isRegisterMode ? 'register' : isForgotMode ? 'forgot' : 'login';
-  
-  // Für Animation: 
-  // Desktop: Register/Forgot sind "rechts" (Form slides to 100%), nur Login ist "links" (0%)
-  // Mobile: Register/Forgot haben Branding "oben" (order swap), nur Login hat Branding "unten"
-  const isPanelRight = isRegisterMode || isForgotMode; // Desktop: Panel-Animation für Register & Forgot
-  const isPanelTop = isRegisterMode || isForgotMode; // Mobile: Branding oben für Register & Forgot
+  // Desktop: Register/Forgot → panels slide, Login → panels static
+  const isPanelRight = isRegisterMode || isForgotMode;
+  // Mobile: Register/Forgot → branding on top, Login → branding on bottom
+  const isPanelTop = isRegisterMode || isForgotMode;
 
   // Auto-redirect if authenticated
   useEffect(() => {
@@ -82,40 +56,23 @@ export default function AuthPage() {
     }
   }, [isAuthenticated, isLoading, navigate]);
 
-  // Set data attribute on HTML element for CSS styling
-  useEffect(() => {
-    const htmlElement = document.documentElement;
-
-    if (!isDesktop && !isPanelTop) {
-      // Mobile in login mode only: Branding panel is at bottom
-      htmlElement.setAttribute('data-auth-branding-bottom', 'true');
-    } else {
-      htmlElement.removeAttribute('data-auth-branding-bottom');
-    }
-  }, [isDesktop, isPanelTop]);
-
-  // Loading state - Skeleton statt White Screen
+  // Loading state
   if (isLoading) {
-    // Variant basierend auf dem aktuellen Pfad bestimmen
     const skeletonVariant = isRegisterMode ? 'register' : isForgotMode ? 'forgot' : 'login';
     return <AuthPageSkeleton variant={skeletonVariant} showBranding />;
   }
 
-  // ============================================
-  // SPRING ANIMATION CONFIG
-  // ============================================
+  // Smooth page-transition spring
   const springConfig = {
     type: 'spring',
-    stiffness: 50,
-    damping: 15,
-    mass: 1,
+    stiffness: 220,
+    damping: 28,
   };
 
   // ============================================
   // RENDER FORM CONTENT
   // ============================================
   const renderFormContent = () => {
-    // Determine which form to show
     const getFormKey = () => {
       if (isRegisterMode) return 'register-form';
       if (isForgotMode) return resetToken ? 'reset-form' : 'forgot-form';
@@ -168,8 +125,8 @@ export default function AuthPage() {
   if (isDesktop) {
     return (
       <div className={styles.authPage}>
-        {/* Form Panel - starts left, slides right on register */}
-        <motion.div 
+        {/* Form Panel — slides right on register/forgot */}
+        <motion.div
           className={styles.formPanel}
           initial={false}
           animate={{ x: isPanelRight ? '100%' : '0%' }}
@@ -178,8 +135,8 @@ export default function AuthPage() {
           {renderFormContent()}
         </motion.div>
 
-        {/* Branding Panel - starts right, slides left on register */}
-        <motion.div 
+        {/* Branding Panel — slides left on register/forgot */}
+        <motion.div
           className={styles.brandingPanel}
           initial={false}
           animate={{ x: isPanelRight ? '-100%' : '0%' }}
@@ -192,11 +149,11 @@ export default function AuthPage() {
   }
 
   // ============================================
-  // MOBILE LAYOUT (Vertical 60/40)
+  // MOBILE LAYOUT (Vertical 30/70)
   // ============================================
   return (
     <div className={`${styles.authPageMobile} ${isPanelTop ? styles.registerMode : ''}`}>
-      <motion.div 
+      <motion.div
         layout
         className={styles.formPanelMobile}
         transition={springConfig}
@@ -204,7 +161,7 @@ export default function AuthPage() {
         {renderFormContent()}
       </motion.div>
 
-      <motion.div 
+      <motion.div
         layout
         className={styles.brandingPanelMobile}
         transition={springConfig}

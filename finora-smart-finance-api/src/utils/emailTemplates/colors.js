@@ -86,13 +86,6 @@ const GRADIENTS = {
   brand: `linear-gradient(135deg, ${EMAIL_COLORS.primary}, ${EMAIL_COLORS.secondary})`,
 
   /**
-   * Header Brand Gradient - für E-Mail-Header und Branding-Panels
-   * Verwendet: secondary → accent (kühleres Cyan zu Neon-Pink)
-   * Entspricht dem Design-System-Gradient für Hero/Header-Flächen
-   */
-  headerBrand: `linear-gradient(135deg, ${EMAIL_COLORS.secondary}, ${EMAIL_COLORS.accent})`,
-
-  /**
    * Primary Gradient - klassischer Brand-Look
    * Zurückhaltender als brand
    */

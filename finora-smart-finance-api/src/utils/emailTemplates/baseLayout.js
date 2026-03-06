@@ -7,7 +7,7 @@
 
 const config = require('../../config/env');
 const colors = require('./colors');
-const { getEmailLogoImg } = require('./logoSvg');
+
 
 const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
@@ -42,19 +42,9 @@ function baseLayout(content) {
       box-shadow: 0 4px 12px ${colors.shadow};
     }
     .header {
-      background: ${colors.GRADIENTS.headerBrand};
-      color: ${colors.white};
-      padding: 30px;
-      text-align: center;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .header img {
-      display: block;
-      margin: 0 auto 8px;
+      padding: 0;
+      font-size: 0;
+      line-height: 0;
     }
     .content {
       padding: 30px;
@@ -110,8 +100,7 @@ function baseLayout(content) {
 <body>
   <div class="container">
     <div class="header">
-      ${getEmailLogoImg({ size: 40 })}
-      <h1>Finora</h1>
+      <img src="${frontendBaseUrl}/logo-branding/finora-logo-branded.png" alt="Finora Smart Finance" width="600" style="width:100%;max-width:600px;height:auto;display:block;" />
     </div>
     ${content}
   </div>

@@ -5,13 +5,13 @@
  */
 
 import React, { useEffect, useRef, useCallback } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useMotion } from '@/hooks/useMotion';
 import { MOTION_EASING } from '@/utils/motionPresets';
-import { ThemeSelector, Logo } from '@/components/common';
+import { ThemeSelector } from '@/components/common';
 import { NAV_ITEMS } from '@/config/navigation';
 import { FiLogOut, FiLogIn, FiShield } from 'react-icons/fi';
 import styles from './HamburgerMenu.module.scss';
@@ -122,7 +122,9 @@ export default function HamburgerMenu({ isOpen, onClose }) {
           >
             {/* Mobile Header: Logo */}
             <div className={styles.menuHeader}>
-              <Logo onClick={onClose} entrance="none" />
+              <Link to="/" onClick={onClose}>
+                <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo app-logo--sm" />
+              </Link>
             </div>
 
             {/* User Section */}

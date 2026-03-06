@@ -15,7 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMotion } from '@/hooks/useMotion';
 import { MEDIA_QUERIES } from '@/constants';
 import { MOTION_EASING } from '@/utils/motionPresets';
-import { Logo, UserMenu, ThemeSelector } from '@/components/common';
+import { UserMenu, ThemeSelector } from '@/components/common';
 import { ADMIN_NAV_ITEMS, ADMIN_BACK_LINK } from '@/config/adminNavigation';
 import { FiMenu, FiChevronLeft, FiChevronRight, FiLogOut } from 'react-icons/fi';
 import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary/AdminErrorBoundary';
@@ -111,7 +111,7 @@ export default function AdminLayout() {
               <FiMenu size={22} />
             </motion.button>
           )}
-          {!isMobile && <Logo size="small" entrance="fade" />}
+          {!isMobile && <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo app-logo--sm" />}
         </div>
         <div className={styles.headerRight}>
           <span className={styles.headerAdminBadge}>{t('admin.badge', 'Admin')}</span>
@@ -257,7 +257,7 @@ export default function AdminLayout() {
                 >
                   {/* Mobile Header: Logo */}
                   <div className={styles.mobileHeader}>
-                    <Logo size="small" onClick={handleMobileClose} entrance="none" />
+                    <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo app-logo--sm" />
                   </div>
 
                   {/* User Card */}

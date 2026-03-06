@@ -71,20 +71,13 @@
 .brandingPanel {
   display: none;
   flex: 0 0 50%;
-  background: linear-gradient(135deg, var(--primary), var(--pri-hover));
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
+  position: relative;
+  overflow: hidden;
   
   @include desktop {
     display: flex;
+    align-items: stretch;
   }
 }
 
-.brandingContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-md);
-  text-align: center;
-}
+// brandingContent removed — BrandingBackground renders directly

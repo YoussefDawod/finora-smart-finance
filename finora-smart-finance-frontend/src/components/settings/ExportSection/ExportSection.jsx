@@ -20,7 +20,6 @@ import { formatCurrency, formatDate } from '@/utils/formatters';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { getLocaleForLanguage, getUserPreferences } from '@/utils/userPreferences';
 import Button from '@/components/common/Button/Button';
-import { getLogoIconSVG, getLogoFaviconSVG, svgToDataURI, LOGO_COLORS } from '@/utils/logoSvgStrings';
 import styles from './ExportSection.module.scss';
 
 // ============================================================================
@@ -55,7 +54,7 @@ const generateCSV = (transactions, t) => {
 // ============================================================================
 // PDF-EXPORT HELPER (Professional HTML-to-Print approach)
 // ============================================================================
-const generatePDFContent = (transactions, userInfo = {}, t) => {
+const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null, iconDataUri = null) => {
   const { language } = getUserPreferences();
   const locale = getLocaleForLanguage(language);
   const totalIncome = transactions
@@ -74,14 +73,6 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
     return acc;
   }, {});
 
-  // Logo SVGs from Single Source of Truth
-  const logoSVG = getLogoIconSVG({ size: 40, theme: 'light' });
-  const logoSmall = getLogoIconSVG({ size: 20, theme: 'light' });
-
-  // Favicon für Browser-Tab
-  const faviconSVG = getLogoFaviconSVG({ theme: 'light' });
-  const faviconDataURI = svgToDataURI(faviconSVG);
-
   const exportDate = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: 'long',
@@ -99,16 +90,16 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${t('export.pdf.reportTitle')}</title>
-  <link rel="icon" type="image/svg+xml" href="${faviconDataURI}">
+  ${iconDataUri ? `<link rel="icon" type="image/svg+xml" href="${iconDataUri}">` : ''}
   <style>
     :root {
-      --primary: ${LOGO_COLORS.light.primary};
-      --success: ${LOGO_COLORS.light.success};
-      --error: ${LOGO_COLORS.light.error};
+      --primary: #5b6cff;
+      --success: #22c55e;
+      --error: #f43f5e;
       --surface: #ffffff;
-      --text: ${LOGO_COLORS.light.text};
-      --text-muted: ${LOGO_COLORS.light.textMuted};
-      --border: ${LOGO_COLORS.light.border};
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -122,62 +113,49 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
     }
     
     /* ═══════════════════════════════════════════════════════════════════
-       HEADER - Kompakt, volle Breite
+       HEADER
     ═══════════════════════════════════════════════════════════════════ */
     .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      border-bottom: 2px solid var(--primary);
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      position: relative;
+      line-height: 0;
+      font-size: 0;
     }
     
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .header img {
+      width: 100%;
+      height: auto;
+      display: block;
     }
     
-    .brand-text {
+    .header-user-info {
+      position: absolute;
+      top: 0;
+      right: 24px;
+      bottom: 0;
       display: flex;
       flex-direction: column;
-    }
-    
-    .brand-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--primary);
-      line-height: 1.1;
-    }
-    
-    .brand-tagline {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-    
-    .header-right {
+      justify-content: center;
       text-align: right;
+      line-height: 1.4;
     }
     
     .user-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--text);
+      color: white;
     }
     
     .user-email {
       font-size: 11px;
-      color: var(--text-muted);
+      color: rgba(255,255,255,0.8);
     }
     
     .export-date {
       font-size: 10px;
-      color: var(--text-muted);
+      color: rgba(255,255,255,0.65);
       margin-top: 4px;
       padding-top: 4px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(255,255,255,0.3);
     }
     
     /* ═══════════════════════════════════════════════════════════════════
@@ -376,14 +354,11 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
 <body>
   <!-- HEADER -->
   <header class="header">
-    <div class="brand">
-      ${logoSVG}
-      <div class="brand-text">
-        <span class="brand-name">Finora</span>
-        <span class="brand-tagline">Smart Finance</span>
-      </div>
-    </div>
-    <div class="header-right">
+    ${headerDataUri
+      ? `<img src="${headerDataUri}" alt="Finora" />`
+      : `<div style="background:linear-gradient(to right,#27bbd8,#4a8ed8,#5060df);padding:16px 24px;"><span style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:#fff;">Finora</span></div>`
+    }
+    <div class="header-user-info">
       <div class="user-name">${userName}</div>
       ${userEmail ? `<div class="user-email">${userEmail}</div>` : ''}
       <div class="export-date">${t('export.pdf.createdLabel')}: ${exportDate}</div>
@@ -456,27 +431,12 @@ const generatePDFContent = (transactions, userInfo = {}, t) => {
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-brand">
-      ${logoSmall}
+      ${iconDataUri ? `<img src="${iconDataUri}" alt="Finora" style="height:20px;width:auto;vertical-align:middle;">` : ''}
       <span>Finora Smart Finance</span>
     </div>
     <div>${t('export.pdf.footer', { count: transactions.length, year: new Date().getFullYear() })}</div>
   </footer>
   
-  <script>
-    // Favicon dynamisch setzen — aus logoSvgStrings Single Source of Truth
-    (function() {
-      var link = document.createElement('link');
-      link.rel = 'icon';
-      link.type = 'image/svg+xml';
-      link.href = '${faviconDataURI}';
-      
-      // Alte Favicons entfernen
-      var existing = document.querySelectorAll('link[rel*="icon"]');
-      existing.forEach(function(el) { el.parentNode.removeChild(el); });
-      
-      document.head.appendChild(link);
-    })();
-  </script>
 </body>
 </html>`;
 };
@@ -587,7 +547,20 @@ export default function ExportSection() {
         email: user.email || '',
       } : null;
 
-      const htmlContent = generatePDFContent(transactions, userInfo, t);
+      // Branded Header-SVG als Base64 laden
+      let headerDataUri = null;
+      let iconDataUri = null;
+      try {
+        const [headerResp, iconResp] = await Promise.all([
+          fetch('/logo-branding/finora-logo-branded-export.svg'),
+          fetch('/logo-branding/finora-logo-icon.svg'),
+        ]);
+        const [headerSvg, iconSvg] = await Promise.all([headerResp.text(), iconResp.text()]);
+        headerDataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(headerSvg)));
+        iconDataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(iconSvg)));
+      } catch { /* Fallback: keine Bilder */ }
+
+      const htmlContent = generatePDFContent(transactions, userInfo, t, headerDataUri, iconDataUri);
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const blobUrl = URL.createObjectURL(blob);
       const printWindow = window.open(blobUrl, '_blank');

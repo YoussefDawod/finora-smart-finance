@@ -15,7 +15,6 @@ export { default as Select } from './Select/Select';
 // Search & Filter
 export { default as Search } from './Search/Search';
 export { default as Filter } from './Filter/Filter';
-export { default as Logo } from './Logo/Logo';
 export { default as UserMenu } from './UserMenu/UserMenu';
 
 // Cards & Containers
@@ -30,6 +29,9 @@ export { default as Skeleton } from './Skeleton/Skeleton';
 
 // Theme
 export { default as ThemeSelector } from './ThemeSelector/ThemeSelector';
+
+// Branding
+export { default as BrandingBackground } from './BrandingBackground/BrandingBackground';
 
 // Others
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';

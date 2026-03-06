@@ -7,6 +7,7 @@
 
 import { memo } from 'react';
 import Skeleton from './Skeleton';
+import BrandingBackground from '../BrandingBackground/BrandingBackground';
 import styles from './AuthPageSkeleton.module.scss';
 
 /**
@@ -67,10 +68,7 @@ const AuthPageSkeleton = memo(({
       {/* Branding Panel (Desktop) */}
       {showBranding && (
         <div className={styles.brandingPanel}>
-          <div className={styles.brandingContent}>
-            <Skeleton width="200px" height="40px" variant="rect" />
-            <Skeleton width="280px" height="20px" variant="text" />
-          </div>
+          <BrandingBackground />
         </div>
       )}
     </div>

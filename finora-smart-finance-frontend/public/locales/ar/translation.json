@@ -312,7 +312,8 @@
       "registerSubtitle": "ابدأ مع فينورا في خطوات قليلة.",
       "loginTitle": "تسجيل الدخول",
       "loginSubtitle": "مرحبًا بعودتك! سجّل الدخول للمتابعة.",
-      "registerAction": "سجّل"
+      "registerAction": "سجّل",
+      "tagline": "تابع ماليّاتك – بوضوح وأمان."
     },
     "layout": {
       "login": {

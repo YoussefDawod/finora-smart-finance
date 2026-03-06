@@ -1,26 +1,24 @@
 /**
- * AuthPage Styles - Compact Finora Design
- * 
- * GOALS:
- * - NO scrolling on any viewport (content fits)
- * - Desktop: Content vertically CENTERED
- * - Mobile: Content fills space without overflow
- * - Minimal gaps, professional look
+ * AuthPage Styles — 50/50 Sliding Panel Layout
+ *
+ * - Desktop: .authPage fixed viewport, .formPanel (50% left) + .brandingPanel (50% right)
+ * - Mobile:  .authPageMobile flex-column, .brandingPanelMobile 30%, .formPanelMobile 70%
+ * - BrandingBackground is rendered INSIDE BrandingPanel — no gradient here
+ * - P8-Fix: Mobile branding 30% (was 40%)
+ * - P9-Fix: data-auth-branding-bottom removed from JSX
+ * - P2-Fix: spring stiffness:420, damping:34
  */
 
 @use '../../styles/mixins' as *;
 
 // ============================================
-// DESKTOP PAGE CONTAINER
+// DESKTOP ROOT
 // ============================================
 .authPage {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
   overflow: hidden;
-  background: var(--bg-primary);
+  background: var(--bg);
 }
 
 // ============================================
@@ -33,15 +31,16 @@
   width: 50%;
   height: 100%;
   display: flex;
-  align-items: center;  // Vertically centered!
+  align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  background: var(--bg);
   z-index: 5;
   will-change: transform;
 }
 
 // ============================================
 // DESKTOP: BRANDING PANEL (50% right)
+// Background is handled by BrandingBackground inside BrandingPanel
 // ============================================
 .brandingPanel {
   position: absolute;
@@ -49,107 +48,51 @@
   right: 0;
   width: 50%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;  // Vertically centered!
-  z-index: 10;
   overflow: hidden;
+  z-index: 10;
   will-change: transform;
-  
-  background: 
-    radial-gradient(ellipse 80% 50% at 50% 0%, color-mix(in srgb, var(--primary) 25%, transparent) 0%, transparent 50%),
-    linear-gradient(145deg, var(--primary) 0%, color-mix(in srgb, var(--primary) 70%, var(--secondary)) 50%, var(--secondary) 100%);
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: 
-      radial-gradient(circle at 20% 80%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--info) 15%, transparent) 0%, transparent 40%);
-    opacity: 0.8;
-    pointer-events: none;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.03;
-    pointer-events: none;
-    mix-blend-mode: overlay;
-  }
 }
 
 // ============================================
-// MOBILE PAGE CONTAINER
+// MOBILE ROOT
 // ============================================
 .authPageMobile {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
-  height: 100svh;
   display: flex;
   flex-direction: column;
-  
-  @supports (height: 100dvh) {
-    height: 100dvh;
-  }
-  
   overflow: hidden;
-  background: var(--bg-primary);
 }
 
 // ============================================
-// MOBILE: FORM PANEL (60% top)
+// MOBILE: FORM PANEL (70%)
 // ============================================
 .formPanelMobile {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;  // Vertically centered!
-  justify-content: center;
-  background: var(--bg-primary);
-  z-index: 5;
-  will-change: transform;
-  overflow: hidden;
-  flex: 1 1 60%;
+  flex: 1 1 70%;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  overflow: hidden;
 }
 
 // ============================================
-// MOBILE: BRANDING PANEL (40% bottom)
+// MOBILE: BRANDING PANEL (30%) — P8-Fix (was 40%)
 // ============================================
 .brandingPanelMobile {
   position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;  // Vertically centered!
-  z-index: 10;
+  flex: 0 0 30%;
   overflow: hidden;
-  will-change: transform;
-  flex: 0 0 40%;
-  
-  background: 
-    radial-gradient(ellipse 100% 60% at 50% 100%, color-mix(in srgb, var(--accent) 20%, transparent) 0%, transparent 60%),
-    linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
 }
 
+// Register/Forgot: Branding on top
 .registerMode {
-  .formPanelMobile {
-    order: 2;
-    flex-basis: 60%;
-  }
-
-  .brandingPanelMobile {
-    order: 1;
-    flex-basis: 40%;
-  }
+  .formPanelMobile { order: 2; }
+  .brandingPanelMobile { order: 1; }
 }
 
 // ============================================
@@ -171,23 +114,33 @@
   }
 }
 
+// Flex column, kein margin/padding zwischen Elementen
 .formWrapper {
   width: 100%;
-}
-
-// ============================================
-// HEADER
-// ============================================
-.header {
-  text-align: center;
-  margin-bottom: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 
   @include lg {
-    margin-bottom: var(--space-md);
+    gap: var(--space-md);
   }
 
   @include breakpoint($max: $bp-xs) {
-    margin-bottom: var(--space-2xs);
+    gap: var(--space-xs);
+  }
+}
+
+// ============================================
+// FORM HEADER
+// ============================================
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  text-align: center;
+
+  @include breakpoint($max: $bp-xs) {
+    gap: 2px;
   }
 }
 
@@ -195,18 +148,16 @@
   font-size: var(--fs-xl);
   font-weight: var(--fw-b);
   color: var(--tx);
-  margin-bottom: var(--space-2xs);
+  margin: 0;
   letter-spacing: var(--ls-tight);
   line-height: var(--lh-tight);
 
   @include lg {
     font-size: var(--fs-2xl);
-    margin-bottom: var(--space-xs);
   }
 
   @include breakpoint($max: $bp-xs) {
     font-size: var(--fs-lg);
-    margin-bottom: var(--space-3xs);
   }
 }
 
@@ -226,155 +177,6 @@
 }
 
 // ============================================
-// BRANDING CONTENT (if used separately)
-// ============================================
-.brandingContent {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--space-md);
-  max-width: 100%;
-  width: 100%;
-}
-
-// ============================================
-// FLOATING SHAPES
-// ============================================
-.shapesContainer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.floatingShape {
-  position: absolute;
-  border-radius: var(--r-full);
-  background: radial-gradient(circle at 30% 30%, color-mix(in srgb, white 20%, transparent) 0%, color-mix(in srgb, white 8%, transparent) 40%, color-mix(in srgb, white 3%, transparent) 100%);
-  border: 1px solid color-mix(in srgb, white 12%, transparent);
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--text) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 15%, transparent);
-}
-
-// ============================================
-// HEADLINE (in branding)
-// ============================================
-.headline {
-  margin-bottom: var(--space-sm);
-
-  h2 {
-    font-size: var(--fs-lg);
-    font-weight: var(--fw-b);
-    color: var(--text-on-primary);
-    margin: 0 0 var(--space-2xs);
-    letter-spacing: var(--ls-tight);
-
-    @include lg {
-      font-size: var(--fs-2xl);
-    }
-  }
-
-  p {
-    font-size: var(--fs-sm);
-    color: color-mix(in srgb, white 90%, transparent);
-    margin: 0;
-    line-height: var(--lh-snug);
-  }
-}
-
-// ============================================
-// CTA BUTTON
-// ============================================
-.ctaButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xs) var(--space-lg);
-  min-height: 40px;
-  background: var(--surface);
-  color: var(--primary);
-  font-weight: var(--fw-sb);
-  font-size: var(--fs-sm);
-  text-decoration: none;
-  border-radius: var(--r-lg);
-  border: none;
-  cursor: pointer;
-  transition: transform var(--tr-fast), box-shadow var(--tr-fast);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--text) 20%, transparent);
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--text) 25%, transparent);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-  
-  @include focus-ring;
-}
-
-// ============================================
-// FEATURES (Desktop only)
-// ============================================
-.features {
-  display: none;
-
-  @include lg {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-xs);
-    justify-content: center;
-    margin-top: var(--space-lg);
-  }
-}
-
-.featurePill {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2xs);
-  padding: var(--space-2xs) var(--space-sm);
-  background: color-mix(in srgb, white 12%, transparent);
-  border: 1px solid color-mix(in srgb, white 18%, transparent);
-  border-radius: var(--r-full);
-  color: var(--text-on-primary);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-m);
-}
-
-.featureIcon {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  opacity: 0.9;
-}
-
-// ============================================
-// FOOTER (Desktop only)
-// ============================================
-.brandingFooter {
-  display: none;
-
-  @include lg {
-    display: block;
-    position: absolute;
-    bottom: var(--space-md);
-    left: 0;
-    right: 0;
-    text-align: center;
-    z-index: 2;
-
-    p {
-      font-size: var(--fs-2xs);
-      color: color-mix(in srgb, white 50%, transparent);
-      margin: 0;
-    }
-  }
-}
-
-// ============================================
 // REDUCED MOTION
 // ============================================
 @include reduced-motion {
@@ -383,10 +185,5 @@
   .formPanelMobile,
   .brandingPanelMobile {
     transition: none !important;
-  }
-  
-  .ctaButton,
-  .featurePill {
-    transition: none;
   }
 }

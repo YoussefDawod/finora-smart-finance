@@ -33,7 +33,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Logo } from '@/components/common';
+import { BrandingBackground } from '@/components/common';
 import { useMotion } from '@/hooks';
 import styles from './BrandingPanel.module.scss';
 
@@ -83,25 +83,6 @@ const HIGHLIGHT_KEYS = [
   },
 ];
 
-// Responsive floating shapes configuration
-const getFloatingShapes = (isDesktop) => {
-  if (isDesktop) {
-    return [
-      { size: 120, x: '10%', y: '18%', delay: 0, duration: 9 },
-      { size: 90, x: '78%', y: '16%', delay: 0.6, duration: 10 },
-      { size: 70, x: '24%', y: '72%', delay: 1, duration: 8 },
-      { size: 110, x: '82%', y: '66%', delay: 0.3, duration: 11 },
-      { size: 48, x: '58%', y: '42%', delay: 1.4, duration: 7 },
-    ];
-  }
-  // Mobile/Tablet: Fewer, smaller shapes
-  return [
-    { size: 60, x: '12%', y: '20%', delay: 0, duration: 9 },
-    { size: 45, x: '80%', y: '30%', delay: 0.8, duration: 10 },
-    { size: 35, x: '65%', y: '75%', delay: 1.2, duration: 8 },
-  ];
-};
-
 // Content based on mode (login/register/forgot)
 const getContent = (mode) => {
   const contentMap = {
@@ -137,11 +118,36 @@ const getContent = (mode) => {
   };
 };
 
+// ============================================
+// ARROW ICON
+// ============================================
+const ARROW_PATHS = {
+  left:  'M19 12H5M12 5l-7 7 7 7',
+  right: 'M5 12h14M12 5l7 7-7 7',
+  up:    'M12 19V5M5 12l7-7 7 7',
+  down:  'M12 5v14M5 12l7 7 7-7',
+};
+
+const ArrowIcon = ({ direction }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d={ARROW_PATHS[direction]} />
+  </svg>
+);
+
 export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
   const { shouldAnimate } = useMotion();
   const { t, i18n } = useTranslation();
   const content = getContent(mode);
-  const floatingShapes = getFloatingShapes(isDesktop);
   const isRtl = i18n.dir() === 'rtl';
 
   // Arrow direction based on layout and mode
@@ -149,60 +155,32 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
   // Mobile: Login points up (↑), Register/Forgot point down (↓)
   const isLoginMode = mode === 'login';
   
-  const arrowSymbol = isDesktop
-    ? (isLoginMode ? (isRtl ? '→' : '←') : (isRtl ? '←' : '→'))
-    : (isLoginMode ? (isRtl ? '↓' : '↑') : (isRtl ? '↑' : '↓'));
+  const arrowDir = isDesktop
+    ? (isLoginMode ? (isRtl ? 'right' : 'left') : (isRtl ? 'left' : 'right'))
+    : (isLoginMode ? (isRtl ? 'down' : 'up') : (isRtl ? 'up' : 'down'));
 
   return (
     <div className={styles.panel}>
-      {/* Gradient Background */}
-      <div className={styles.backdrop} />
-
-      {/* Decorative Floating Shapes */}
-      <div className={styles.shapesContainer} aria-hidden="true">
-        {floatingShapes.map((shape, index) => (
-          <motion.div
-            key={index}
-            className={styles.floatingShape}
-            style={{
-              width: shape.size,
-              height: shape.size,
-              left: shape.x,
-              top: shape.y,
-            }}
-            animate={shouldAnimate ? {
-              y: [0, -12, 0],
-              rotate: [0, 4, -3, 0],
-              scale: [1, 1.02, 1],
-            } : {}}
-            transition={{
-              duration: shape.duration,
-              delay: shape.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
-      </div>
+      {/* BrandingBackground — gradient + animated shapes, no blur */}
+      <BrandingBackground compact={!isDesktop} />
 
       {/* Main Content */}
       <div className={styles.content}>
         {/* Header: Logo + Badge */}
         <div className={styles.headerRow}>
-          <Logo
-            to="/"
-            showText
-            size={isDesktop ? 'large' : 'default'}
-            disableNavigation
-            glow
-            animated
+          <img
+            src="/logo-branding/finora-logo.svg"
+            alt="Finora"
+            className="app-logo app-logo--lg"
           />
           <span className={styles.badge}>{t('auth.branding.badge')}</span>
         </div>
 
+        {/* Tagline */}
+        <p className={styles.tagline}>Intelligente Finanzverwaltung für dein smartes Leben</p>
+
         {/* Copy: Headline + Subline */}
         <div className={styles.copy}>
-          <p className={styles.kicker}>{t(content.kickerKey)}</p>
           <AnimatePresence mode="wait">
             <motion.div
               key={mode}
@@ -222,27 +200,15 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
         <div className={styles.actions}>
           <Link to={content.ctaPath} className={styles.ctaButton}>
             <span>{t(content.ctaTextKey)}</span>
-            <span aria-hidden="true" className={styles.arrow}>{arrowSymbol}</span>
+            <span className={styles.arrow} aria-hidden="true"><ArrowIcon direction={arrowDir} /></span>
           </Link>
         </div>
 
-        {/* Feature Highlights */}
-        <div className={styles.highlights}>
-          {HIGHLIGHT_KEYS.map(({ titleKey, descKey, icon }) => (
-            <div key={titleKey} className={styles.highlightItem}>
-              <span className={styles.highlightIcon}>{icon}</span>
-              <div className={styles.highlightContent}>
-                <p className={styles.highlightTitle}>{t(titleKey)}</p>
-                <p className={styles.highlightDesc}>{t(descKey)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      </div>
 
-        {/* Footer */}
-        <div className={styles.brandingFooter}>
-          <p>{t('auth.branding.footer')}</p>
-        </div>
+      {/* Footer — pinned to bottom of panel */}
+      <div className={styles.brandingFooter}>
+        <p>{t('auth.branding.footer')}</p>
       </div>
     </div>
   );

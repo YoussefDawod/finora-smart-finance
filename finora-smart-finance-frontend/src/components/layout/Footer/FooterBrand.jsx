@@ -5,7 +5,6 @@
 
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Logo } from '@/components/common';
 import styles from './Footer.module.scss';
 
 function FooterBrand() {
@@ -13,7 +12,7 @@ function FooterBrand() {
 
   return (
     <div className={styles.brand}>
-      <Logo className={styles.brandLogo} disableNavigation entrance="none" />
+      <img src="/logo-branding/finora-logo.svg" alt="Finora" className={`app-logo ${styles.brandLogo}`} />
       <p className={styles.brandDescription}>{t('footer.brand.description')}</p>
     </div>
   );
