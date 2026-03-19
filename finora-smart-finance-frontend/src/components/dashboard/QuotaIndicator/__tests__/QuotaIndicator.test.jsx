@@ -39,9 +39,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('@/components/common/Skeleton/Skeleton', () => ({
-  default: ({ width, height }) => (
-    <div data-testid="skeleton" style={{ width, height }} />
-  ),
+  default: ({ width, height }) => <div data-testid="skeleton" style={{ width, height }} />,
 }));
 
 // ============================================================================
@@ -59,8 +57,10 @@ describe('QuotaIndicator', () => {
       render(<QuotaIndicator quota={defaultQuota} />);
 
       expect(screen.getByText('lifecycle.quota.title')).toBeInTheDocument();
-      expect(screen.getByText('lifecycle.quota.used')).toBeInTheDocument();
-      expect(screen.getByText('lifecycle.quota.remaining')).toBeInTheDocument();
+      expect(screen.getByText('lifecycle.quota.thisMonth')).toBeInTheDocument();
+      expect(screen.getByText('lifecycle.quota.remainingLabel')).toBeInTheDocument();
+      expect(screen.getByText('42 / 150')).toBeInTheDocument();
+      expect(screen.getByText('108')).toBeInTheDocument();
       expect(screen.getByText(/28\s*%/)).toBeInTheDocument();
     });
 
@@ -114,9 +114,7 @@ describe('QuotaIndicator', () => {
   // ──────────────────────────────────────────────────────────
   describe('Edge Cases', () => {
     it('should handle zero limit gracefully', () => {
-      const { container } = render(
-        <QuotaIndicator quota={{ used: 0, limit: 0, remaining: 0 }} />
-      );
+      const { container } = render(<QuotaIndicator quota={{ used: 0, limit: 0, remaining: 0 }} />);
       expect(container.firstChild).not.toBeNull();
       expect(screen.getByText(/0\s*%/)).toBeInTheDocument();
     });
@@ -124,7 +122,9 @@ describe('QuotaIndicator', () => {
     it('should handle zero usage', () => {
       render(<QuotaIndicator quota={{ used: 0, limit: 150, remaining: 150 }} />);
       expect(screen.getByText(/0\s*%/)).toBeInTheDocument();
-      expect(screen.getByText('lifecycle.quota.remaining')).toBeInTheDocument();
+      expect(screen.getByText('lifecycle.quota.remainingLabel')).toBeInTheDocument();
+      expect(screen.getByText('0 / 150')).toBeInTheDocument();
+      expect(screen.getByText('150')).toBeInTheDocument();
     });
   });
 });

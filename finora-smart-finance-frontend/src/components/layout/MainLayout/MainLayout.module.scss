@@ -1,7 +1,6 @@
 // ============================================
 // 📐 MAIN LAYOUT COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -12,7 +11,7 @@
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background-color: var(--bg);
+  background-color: var(--layout-bg, var(--bg));
 }
 
 // ============================================
@@ -26,8 +25,8 @@
   transition: padding-left var(--tr);
 
   // Mobile: No padding, no sidebar - full width content
-  @include mobile {
-    padding-left: 0 !important;
+  // Synced with JS MEDIA_QUERIES.mobile (max-width: 768px)
+  @include below-md {
     min-height: auto;
   }
 
@@ -65,7 +64,7 @@
   width: 100%;
   min-width: 0; // Prevent flex overflow
   overflow-x: clip; // clip statt hidden: verhindert Scrollbar, clipped aber keine position:absolute/fixed Kinder
-  background-color: var(--bg);
+  background-color: var(--layout-bg, var(--bg));
 }
 
 // ============================================
@@ -76,11 +75,11 @@
   flex-direction: column;
   width: 100%;
   min-height: auto;
-  background-color: var(--bg);
+  background-color: var(--layout-bg, var(--bg));
   padding: var(--space-lg);
   flex: 1;
 
-  @include mobile {
+  @include below-md {
     padding: var(--space-md);
   }
 

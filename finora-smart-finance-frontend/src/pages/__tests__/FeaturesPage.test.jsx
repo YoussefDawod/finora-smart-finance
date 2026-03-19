@@ -7,11 +7,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useNavigate: () => vi.fn() };
-});
-
 const mockFeatures = [
   { title: 'Transaktionen', description: 'Verwalte deine Ein-/Ausgaben' },
   { title: 'Dashboard', description: 'Finanz-Übersicht auf einen Blick' },
@@ -30,8 +25,11 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/useCookieConsent', () => ({
   useCookieConsent: () => ({
-    noticeSeen: true, showNotice: false,
-    dismissNotice: vi.fn(), reopenNotice: vi.fn(), closeNotice: vi.fn(),
+    noticeSeen: true,
+    showNotice: false,
+    dismissNotice: vi.fn(),
+    reopenNotice: vi.fn(),
+    closeNotice: vi.fn(),
   }),
 }));
 
@@ -43,11 +41,15 @@ describe('FeaturesPage — Feature-Karten', () => {
   });
 
   const renderPage = () =>
-    render(<MemoryRouter><FeaturesPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <FeaturesPage />
+      </MemoryRouter>
+    );
 
   it('rendert alle Feature-Karten', () => {
     renderPage();
-    mockFeatures.forEach((f) => {
+    mockFeatures.forEach(f => {
       expect(screen.getByText(f.title)).toBeInTheDocument();
       expect(screen.getByText(f.description)).toBeInTheDocument();
     });
@@ -55,7 +57,7 @@ describe('FeaturesPage — Feature-Karten', () => {
 
   it('rendert korrekte Anzahl Feature-Karten', () => {
     renderPage();
-    const titles = mockFeatures.map((f) => screen.getByText(f.title));
+    const titles = mockFeatures.map(f => screen.getByText(f.title));
     expect(titles).toHaveLength(mockFeatures.length);
   });
 
@@ -63,15 +65,5 @@ describe('FeaturesPage — Feature-Karten', () => {
     renderPage();
     expect(screen.getByText('features.title')).toBeInTheDocument();
     expect(screen.getByText('features.subtitle')).toBeInTheDocument();
-  });
-
-  it('rendert MiniFooter', () => {
-    renderPage();
-    expect(screen.getByText('miniFooter.home')).toBeInTheDocument();
-  });
-
-  it('rendert Zurück-Button mit aria-label', () => {
-    renderPage();
-    expect(screen.getByLabelText('common.back')).toBeInTheDocument();
   });
 });

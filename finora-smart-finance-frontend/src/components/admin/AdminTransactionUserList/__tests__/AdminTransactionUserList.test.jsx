@@ -18,11 +18,22 @@ vi.mock('react-i18next', () => ({
     },
     i18n: { language: 'de' },
   }),
+  initReactI18next: { type: '3rdParty', init: () => {} },
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({
+    isViewer: false,
+    isAuthenticated: true,
+    user: { role: 'admin' },
+  }),
 }));
 
 vi.mock('@/components/common/Skeleton', () => ({
-  SkeletonTableRow: (props) => (
-    <div data-testid="skeleton" data-count={props.count}>Skeleton</div>
+  SkeletonTableRow: props => (
+    <div data-testid="skeleton" data-count={props.count}>
+      Skeleton
+    </div>
   ),
 }));
 
@@ -32,7 +43,7 @@ vi.mock('@/utils/adminTableHelpers', () => ({
     for (let i = 1; i <= total; i++) pages.push(i);
     return pages;
   },
-  formatAdminCurrency: (amount) => {
+  formatAdminCurrency: amount => {
     if (amount == null || Number.isNaN(Number(amount))) return '—';
     return `${Number(amount).toFixed(2).replace('.', ',')} €`;
   },
@@ -199,7 +210,7 @@ describe('AdminTransactionUserList', () => {
       // Eva: 0 - 0 = 0 → "+0,00 €" im Balance-Bereich
       const matches = screen.getAllByText(/0,00\s€/);
       // Mindestens ein Element mit positive class (Balance)
-      const balanceEl = matches.find((el) => el.className.includes('balance'));
+      const balanceEl = matches.find(el => el.className.includes('balance'));
       expect(balanceEl).toBeTruthy();
     });
   });
@@ -236,34 +247,19 @@ describe('AdminTransactionUserList', () => {
     });
 
     it('zeigt Pagination bei mehreren Seiten', () => {
-      render(
-        <AdminTransactionUserList
-          {...defaultProps}
-          pagination={multiPagePagination}
-        />,
-      );
+      render(<AdminTransactionUserList {...defaultProps} pagination={multiPagePagination} />);
       expect(screen.getByRole('navigation')).toBeInTheDocument();
     });
 
     it('zeigt Page-Buttons', () => {
-      render(
-        <AdminTransactionUserList
-          {...defaultProps}
-          pagination={multiPagePagination}
-        />,
-      );
+      render(<AdminTransactionUserList {...defaultProps} pagination={multiPagePagination} />);
       // 5 Seiten → Buttons 1-5
       expect(screen.getByText('1')).toBeInTheDocument();
       expect(screen.getByText('5')).toBeInTheDocument();
     });
 
     it('markiert aktuelle Seite', () => {
-      render(
-        <AdminTransactionUserList
-          {...defaultProps}
-          pagination={multiPagePagination}
-        />,
-      );
+      render(<AdminTransactionUserList {...defaultProps} pagination={multiPagePagination} />);
       const currentPage = screen.getByText('2');
       expect(currentPage).toHaveAttribute('aria-current', 'page');
     });
@@ -275,7 +271,7 @@ describe('AdminTransactionUserList', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByText('3'));
@@ -289,7 +285,7 @@ describe('AdminTransactionUserList', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const prevButton = screen.getByLabelText('admin.transactions.prevPage');
@@ -304,7 +300,7 @@ describe('AdminTransactionUserList', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const nextButton = screen.getByLabelText('admin.transactions.nextPage');
@@ -317,7 +313,7 @@ describe('AdminTransactionUserList', () => {
         <AdminTransactionUserList
           {...defaultProps}
           pagination={{ ...multiPagePagination, page: 1 }}
-        />,
+        />
       );
 
       const prevButton = screen.getByLabelText('admin.transactions.prevPage');
@@ -329,7 +325,7 @@ describe('AdminTransactionUserList', () => {
         <AdminTransactionUserList
           {...defaultProps}
           pagination={{ ...multiPagePagination, page: 5, pages: 5 }}
-        />,
+        />
       );
 
       const nextButton = screen.getByLabelText('admin.transactions.nextPage');
@@ -337,12 +333,7 @@ describe('AdminTransactionUserList', () => {
     });
 
     it('zeigt showing-Info mit korrekter Range', () => {
-      render(
-        <AdminTransactionUserList
-          {...defaultProps}
-          pagination={multiPagePagination}
-        />,
-      );
+      render(<AdminTransactionUserList {...defaultProps} pagination={multiPagePagination} />);
       // Page 2, limit 6, total 25 → "from: 7, to: 12, total: 25"
       expect(screen.getByText(/admin\.transactions\.showing/)).toBeInTheDocument();
     });

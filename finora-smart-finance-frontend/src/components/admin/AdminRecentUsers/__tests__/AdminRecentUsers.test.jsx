@@ -9,10 +9,15 @@ import { render, screen } from '@testing-library/react';
 import AdminRecentUsers from '../AdminRecentUsers';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'en' },
   }),
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
 }));
 
 // ── Test-Daten ────────────────────────────────────
@@ -100,14 +105,12 @@ describe('AdminRecentUsers', () => {
     it('zeigt Titel "admin.dashboard.recentUsers"', () => {
       render(<AdminRecentUsers users={mockUsers} loading={false} />);
       expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
-        'admin.dashboard.recentUsers',
+        'admin.dashboard.recentUsers'
       );
     });
 
     it('rendert korrekte Anzahl an Zeilen', () => {
-      render(
-        <AdminRecentUsers users={mockUsers} loading={false} />,
-      );
+      render(<AdminRecentUsers users={mockUsers} loading={false} />);
       const userNames = screen.getAllByText(/Alice|Bob|Charlie/);
       expect(userNames).toHaveLength(3);
     });
@@ -117,18 +120,14 @@ describe('AdminRecentUsers', () => {
 
   describe('Verification Icons', () => {
     it('zeigt Verified-Icon für verifizierte Benutzer', () => {
-      const { container } = render(
-        <AdminRecentUsers users={[mockUsers[0]]} loading={false} />,
-      );
+      const { container } = render(<AdminRecentUsers users={[mockUsers[0]]} loading={false} />);
       // FiCheckCircle rendert mit class "verified"
       const verifiedIcon = container.querySelector('[class*="verified"]');
       expect(verifiedIcon).toBeInTheDocument();
     });
 
     it('zeigt Unverified-Icon für nicht-verifizierte Benutzer', () => {
-      const { container } = render(
-        <AdminRecentUsers users={[mockUsers[2]]} loading={false} />,
-      );
+      const { container } = render(<AdminRecentUsers users={[mockUsers[2]]} loading={false} />);
       const unverifiedIcon = container.querySelector('[class*="unverified"]');
       expect(unverifiedIcon).toBeInTheDocument();
     });
@@ -152,9 +151,7 @@ describe('AdminRecentUsers', () => {
 
   describe('Relative Datum', () => {
     it('zeigt relatives Datum für Benutzer', () => {
-      render(
-        <AdminRecentUsers users={mockUsers} loading={false} />,
-      );
+      render(<AdminRecentUsers users={mockUsers} loading={false} />);
       // 3 Benutzer → 3 relative Datumsanzeigen
       const rows = screen.getAllByText(/Alice|Bob|Charlie/);
       expect(rows).toHaveLength(3);
@@ -172,7 +169,12 @@ describe('AdminRecentUsers', () => {
   describe('Edge Cases', () => {
     it('rendert Benutzer ohne _id (benutzt Index als Key)', () => {
       const usersWithoutId = [
-        { name: 'KeylessUser', isVerified: false, role: 'user', createdAt: new Date().toISOString() },
+        {
+          name: 'KeylessUser',
+          isVerified: false,
+          role: 'user',
+          createdAt: new Date().toISOString(),
+        },
       ];
       render(<AdminRecentUsers users={usersWithoutId} loading={false} />);
       expect(screen.getByText('KeylessUser')).toBeInTheDocument();

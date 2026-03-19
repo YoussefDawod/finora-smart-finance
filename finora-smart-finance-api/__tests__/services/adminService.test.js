@@ -229,7 +229,7 @@ describe('AdminService', () => {
     it('should reject invalid role', async () => {
       const result = await adminService.changeUserRole('user-123', 'superadmin', 'admin-999');
 
-      expect(result.error).toBe('Ungültige Rolle. Erlaubt: user, admin');
+      expect(result.error).toBe('Ungültige Rolle. Erlaubt: user, admin, viewer');
       expect(result.code).toBe('INVALID_ROLE');
     });
 
@@ -282,7 +282,9 @@ describe('AdminService', () => {
     const mockSort = { createdAt: -1 };
 
     beforeEach(() => {
-      const mockUsers = [{ _id: 'u1', name: 'Test', toObject: () => ({ _id: 'u1', name: 'Test' }) }];
+      const mockUsers = [
+        { _id: 'u1', name: 'Test', toObject: () => ({ _id: 'u1', name: 'Test' }) },
+      ];
       const mockQuery = {
         sort: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
@@ -348,13 +350,14 @@ describe('AdminService', () => {
       ];
 
       // Mock alle countDocuments Aufrufe
-      User.countDocuments = jest.fn()
-        .mockResolvedValueOnce(10)   // totalUsers
-        .mockResolvedValueOnce(8)    // verifiedUsers
-        .mockResolvedValueOnce(9)    // activeUsers
-        .mockResolvedValueOnce(1)    // adminUsers
-        .mockResolvedValueOnce(3)    // usersLast7Days
-        .mockResolvedValueOnce(5);   // usersLast30Days
+      User.countDocuments = jest
+        .fn()
+        .mockResolvedValueOnce(10) // totalUsers
+        .mockResolvedValueOnce(8) // verifiedUsers
+        .mockResolvedValueOnce(9) // activeUsers
+        .mockResolvedValueOnce(1) // adminUsers
+        .mockResolvedValueOnce(3) // usersLast7Days
+        .mockResolvedValueOnce(5); // usersLast30Days
 
       Transaction.countDocuments = jest.fn().mockResolvedValue(100);
 
@@ -456,7 +459,8 @@ describe('AdminService', () => {
 
     /** Standard-Setup für alle 4 User.find-Aufrufe */
     function setupFindMocks({ finalWarning = [], reminding = [], exported = [], quota = [] } = {}) {
-      User.find = jest.fn()
+      User.find = jest
+        .fn()
         .mockReturnValueOnce(createQueryMock(finalWarning))
         .mockReturnValueOnce(createQueryMock(reminding))
         .mockReturnValueOnce(createQueryMock(exported))
@@ -499,7 +503,10 @@ describe('AdminService', () => {
             name: 'User3',
             email: 'u3@test.com',
             transactionLifecycle: {
-              retentionNotifications: { reminderStartedAt: new Date('2026-01-15'), reminderCount: 2 },
+              retentionNotifications: {
+                reminderStartedAt: new Date('2026-01-15'),
+                reminderCount: 2,
+              },
             },
           },
         ],
@@ -662,10 +669,11 @@ describe('AdminService', () => {
         },
       });
 
-      Transaction.countDocuments = jest.fn()
-        .mockResolvedValueOnce(100)  // total
-        .mockResolvedValueOnce(10)   // old
-        .mockResolvedValueOnce(90);  // recent
+      Transaction.countDocuments = jest
+        .fn()
+        .mockResolvedValueOnce(100) // total
+        .mockResolvedValueOnce(10) // old
+        .mockResolvedValueOnce(90); // recent
 
       const result = await adminService.getUserLifecycleDetail('user-1');
 

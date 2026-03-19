@@ -35,11 +35,17 @@ function validateCreateUser(body = {}) {
     }
   }
 
-  const pwResult = validatePassword(body.password);
-  if (!pwResult.valid) {
-    errors.push(pwResult.error);
+  // autoGeneratePassword: wenn true, wird das Passwort im Service generiert
+  if (body.autoGeneratePassword === true || body.autoGeneratePassword === 'true') {
+    data.autoGeneratePassword = true;
   } else {
-    data.password = body.password;
+    data.autoGeneratePassword = false;
+    const pwResult = validatePassword(body.password);
+    if (!pwResult.valid) {
+      errors.push(pwResult.error);
+    } else {
+      data.password = body.password;
+    }
   }
 
   if (body.email !== undefined && body.email !== null && body.email !== '') {
@@ -60,8 +66,8 @@ function validateCreateUser(body = {}) {
   }
 
   if (body.role !== undefined) {
-    if (!['user', 'admin'].includes(body.role)) {
-      errors.push('role muss "user" oder "admin" sein');
+    if (!['user', 'admin', 'viewer'].includes(body.role)) {
+      errors.push('role muss "user", "admin" oder "viewer" sein');
     } else {
       data.role = body.role;
     }
@@ -85,6 +91,18 @@ function validateCreateUser(body = {}) {
     } else {
       data.phone = body.phone;
     }
+  }
+
+  // Email-Sprache für Zugangsdaten-Versand (optional, default: 'de')
+  const ALLOWED_EMAIL_LANGUAGES = ['de', 'en', 'ar', 'ka'];
+  if (body.emailLanguage !== undefined) {
+    if (!ALLOWED_EMAIL_LANGUAGES.includes(body.emailLanguage)) {
+      errors.push('emailLanguage muss "de", "en", "ar" oder "ka" sein');
+    } else {
+      data.emailLanguage = body.emailLanguage;
+    }
+  } else {
+    data.emailLanguage = 'de';
   }
 
   return { errors, data };

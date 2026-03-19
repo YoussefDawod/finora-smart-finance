@@ -1,13 +1,13 @@
 /**
  * @fileoverview Axios Client Instance
  * @description Configured axios instance with interceptors for auth and logging
- * 
+ *
  * FEATURES:
  * - Auto token injection in headers
  * - Request/Response logging
  * - Error handling
  * - 401 Unauthorized handling (auto logout)
- * 
+ *
  * @module api/client
  */
 
@@ -16,9 +16,12 @@ import i18next from 'i18next';
 import { API_CONFIG } from './config';
 import { logRequest, logResponse, logError } from './logger';
 import { isUnauthorized, isForbidden, isNetworkError } from './errorHandler';
-import { refreshAccessToken, isExcludedFromRefresh } from './tokenRefresh';
-
- 
+import {
+  refreshAccessToken,
+  isExcludedFromRefresh,
+  getAccessToken,
+  clearAccessToken,
+} from './tokenRefresh';
 
 /**
  * Create axios instance with config
@@ -52,25 +55,17 @@ const dispatchToast = (type, message, duration = 5000) => {
 // ============================================
 
 /**
- * Get auth token from storage
- * Checks both localStorage and sessionStorage (for rememberMe support)
+ * Get auth token from in-memory storage (XSS-sicher)
  * @returns {string|null} The auth token or null
  */
-const getAuthToken = () => {
-  try {
-    return globalThis.localStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY) || 
-           globalThis.sessionStorage?.getItem(API_CONFIG.TOKEN_STORAGE_KEY);
-  } catch {
-    return null;
-  }
-};
+const getAuthToken = () => getAccessToken();
 
 /**
  * Request Interceptor
  * Injects auth token into every request
  */
 client.interceptors.request.use(
-  (config) => {
+  config => {
     const token = getAuthToken();
 
     if (token) {
@@ -81,7 +76,7 @@ client.interceptors.request.use(
 
     return config;
   },
-  (error) => {
+  error => {
     dispatchToast('error', i18next.t('errors.requestFailed'));
     return Promise.reject(error);
   }
@@ -96,7 +91,7 @@ client.interceptors.request.use(
  * Handles responses and errors
  */
 client.interceptors.response.use(
-  (response) => {
+  response => {
     logResponse(
       response.config.method?.toUpperCase?.() || 'GET',
       response.config.url,
@@ -106,7 +101,7 @@ client.interceptors.response.use(
 
     return response;
   },
-  (error) => {
+  error => {
     // ── ABORT / CANCEL ────────────────────────────────────────────────
     // Requests aborted by AbortController (e.g. unmount, single-flight)
     // are expected — skip logging AND toasts entirely.
@@ -121,10 +116,10 @@ client.interceptors.response.use(
     }
 
     const isMeEndpoint = error?.config?.url?.includes('/auth/me');
-    
+
     // Don't log 401 errors for /auth/me - they're expected during initial auth check
     const shouldLog = !(isUnauthorized(error) && isMeEndpoint);
-    
+
     if (shouldLog && !isUnauthorized(error)) {
       logError(error.config?.method?.toUpperCase?.(), error.config?.url, error);
     }
@@ -132,12 +127,19 @@ client.interceptors.response.use(
     // ── TOKEN REFRESH ON 401 ──────────────────────────────────────────
     // If 401 and not an excluded endpoint (login/register/refresh itself)
     // → attempt silent token refresh and retry the original request
-    if (isUnauthorized(error) && !isExcludedFromRefresh(error.config) && !error.config?._isRetryAfterRefresh) {
+    if (
+      isUnauthorized(error) &&
+      !isExcludedFromRefresh(error.config) &&
+      !error.config?._isRetryAfterRefresh
+    ) {
       return refreshAccessToken()
-        .then((newAccessToken) => {
+        .then(newAccessToken => {
           // Retry original request with new token
           const retryConfig = { ...error.config };
-          retryConfig.headers = { ...retryConfig.headers, Authorization: `Bearer ${newAccessToken}` };
+          retryConfig.headers = {
+            ...retryConfig.headers,
+            Authorization: `Bearer ${newAccessToken}`,
+          };
           retryConfig._isRetryAfterRefresh = true;
           return client(retryConfig);
         })
@@ -157,14 +159,12 @@ client.interceptors.response.use(
 
     if (isUnauthorized(error)) {
       try {
-        // Clear token from both storages
-        globalThis.localStorage?.removeItem(API_CONFIG.TOKEN_STORAGE_KEY);
-        globalThis.sessionStorage?.removeItem(API_CONFIG.TOKEN_STORAGE_KEY);
+        clearAccessToken();
         globalThis.window?.dispatchEvent(new CustomEvent('auth:unauthorized'));
       } catch (err) {
         globalThis.console?.warn('Failed to handle 401 error:', err);
       }
-      
+
       // Only show auth toast if not the initial auth check
       if (shouldShowAuthToast) {
         dispatchToast('error', i18next.t('errors.authRequired'));
@@ -179,6 +179,9 @@ client.interceptors.response.use(
       dispatchToast('error', i18next.t('errors.networkError'));
     } else if (error?.code === 'ECONNABORTED') {
       dispatchToast('error', i18next.t('errors.timeout'));
+    } else if (error?.response?.status >= 400 && error?.response?.status < 500) {
+      // 4xx Domain-/Validierungsfehler (400, 405, 409 …)
+      // Der jeweilige Aufrufer zeigt die passende Fehlermeldung — kein generischer Toast hier.
     } else {
       dispatchToast('error', i18next.t('errors.unexpectedError'));
     }

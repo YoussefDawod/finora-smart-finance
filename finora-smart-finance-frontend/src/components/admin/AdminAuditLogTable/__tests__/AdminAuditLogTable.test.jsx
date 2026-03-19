@@ -20,6 +20,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
 // ── Test-Daten ────────────────────────────────────
 
 const mockLogs = [
@@ -80,8 +84,12 @@ describe('AdminAuditLogTable', () => {
 
   describe('Loading State', () => {
     it('zeigt Skeleton-Platzhalter beim Laden', () => {
-      const { container } = render(<AdminAuditLogTable {...defaultProps} loading={true} logs={[]} />);
-      expect(container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')).toBeInTheDocument();
+      const { container } = render(
+        <AdminAuditLogTable {...defaultProps} loading={true} logs={[]} />
+      );
+      expect(
+        container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')
+      ).toBeInTheDocument();
     });
 
     it('zeigt keine Tabelle im Loading-State', () => {
@@ -157,11 +165,13 @@ describe('AdminAuditLogTable', () => {
 
     it('setzt desc-Sort bei Klick auf inaktive Spalte', () => {
       const onSortChange = vi.fn();
-      render(<AdminAuditLogTable {...defaultProps} sort="-createdAt" onSortChange={onSortChange} />);
+      render(
+        <AdminAuditLogTable {...defaultProps} sort="-createdAt" onSortChange={onSortChange} />
+      );
 
       const actionHeaders = screen.getAllByText(/admin\.auditLog\.action/);
       // The first match should be the header
-      const headerAction = actionHeaders.find((el) => el.closest('th'));
+      const headerAction = actionHeaders.find(el => el.closest('th'));
       if (headerAction) fireEvent.click(headerAction);
 
       expect(onSortChange).toHaveBeenCalledWith('-action');
@@ -219,7 +229,7 @@ describe('AdminAuditLogTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByText('3'));
@@ -247,7 +257,7 @@ describe('AdminAuditLogTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const prevBtn = screen.getByLabelText('admin.auditLog.prevPage');
@@ -262,7 +272,7 @@ describe('AdminAuditLogTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const nextBtn = screen.getByLabelText('admin.auditLog.nextPage');

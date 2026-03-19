@@ -5,7 +5,6 @@
 // Design: Modern, kompakt, harmonisch mit Gesamtprojekt
 // ============================================
 
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -55,7 +54,7 @@
   }
 
   &:hover {
-    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+    background: var(--glass-bg-hover);
     color: var(--tx);
     &::before {
       height: 50%;
@@ -66,14 +65,11 @@
     }
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
+  @include focus-ring;
 }
 
 .triggerOpen {
-  background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+  background: color-mix(in srgb, var(--primary) 15%, var(--glass-bg));
   color: var(--primary);
   font-weight: var(--fw-sb);
 
@@ -194,14 +190,11 @@
   position: relative;
 
   &:hover {
-    background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+    background: var(--glass-bg-hover);
     color: var(--primary);
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: -2px;
-  }
+  @include focus-ring-inset;
 
   svg {
     flex-shrink: 0;
@@ -234,7 +227,7 @@
 // ============================================
 .divider {
   height: 1px;
-  background: var(--border);
+  background: var(--glass-border-light);
   margin: var(--space-xs) var(--space-md);
 }
 

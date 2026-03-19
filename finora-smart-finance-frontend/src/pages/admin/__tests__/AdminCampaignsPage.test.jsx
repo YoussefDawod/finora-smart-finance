@@ -17,6 +17,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, opts) => {
       if (opts?.count !== undefined) return `${key} (${opts.count})`;
@@ -26,10 +27,21 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
+vi.mock('@/hooks/useViewerGuard', () => ({
+  useViewerGuard: () => ({ isViewer: false, guard: fn => fn() }),
+}));
+
 vi.mock('@/hooks/useCookieConsent', () => ({
   useCookieConsent: () => ({
-    noticeSeen: true, showNotice: false,
-    dismissNotice: vi.fn(), reopenNotice: vi.fn(), closeNotice: vi.fn(),
+    noticeSeen: true,
+    showNotice: false,
+    dismissNotice: vi.fn(),
+    reopenNotice: vi.fn(),
+    closeNotice: vi.fn(),
   }),
 }));
 
@@ -69,7 +81,9 @@ const mockCampaigns = [
 const mockActions = {
   refresh: vi.fn(),
   deleteCampaign: vi.fn().mockResolvedValue({ success: true }),
-  sendCampaign: vi.fn().mockResolvedValue({ success: true, data: { successCount: 50, recipientCount: 50 } }),
+  sendCampaign: vi
+    .fn()
+    .mockResolvedValue({ success: true, data: { successCount: 50, recipientCount: 50 } }),
   resetAllCampaigns: vi.fn().mockResolvedValue({ success: true }),
 };
 
@@ -123,7 +137,11 @@ describe('AdminCampaignsPage', () => {
   });
 
   const renderPage = () =>
-    render(<MemoryRouter><AdminCampaignsPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <AdminCampaignsPage />
+      </MemoryRouter>
+    );
 
   // ── Rendering ────────────────────────────────
   it('rendert den Seitentitel', () => {
@@ -159,7 +177,7 @@ describe('AdminCampaignsPage', () => {
   it('navigiert zum Composer bei Klick auf Create-Button', () => {
     renderPage();
     const createBtn = screen.getByLabelText
-      ? screen.getAllByRole('button').find((b) => b.textContent.includes('admin.campaigns.create'))
+      ? screen.getAllByRole('button').find(b => b.textContent.includes('admin.campaigns.create'))
       : null;
     if (createBtn) {
       fireEvent.click(createBtn);

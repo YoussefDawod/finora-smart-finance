@@ -5,7 +5,15 @@
     "settings": "Settings",
     "profile": "Profile",
     "logout": "Sign out",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "features": "Features",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "help": "Help",
+    "login": "Sign in",
+    "register": "Sign up",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
   },
   "common": {
     "saveChanges": "Save changes",
@@ -85,6 +93,8 @@
       "emailTitle": "Email notifications",
       "emailDescription": "Receive important account and finance updates by email.",
       "emailAria": "Toggle email notifications",
+      "noEmailRequired": "Please add an email address in your profile first to enable notifications.",
+      "noEmailHint": "Add an email address in your profile to receive notifications.",
       "security": {
         "title": "Security alerts",
         "description": "Login attempts, password changes, and suspicious activity.",
@@ -161,6 +171,9 @@
     "currentMonth": "Current month",
     "savingsRate": "Savings rate",
     "deficit": "Deficit",
+    "saved": "Saved",
+    "totalIncome": "Total income",
+    "totalExpenses": "Total expenses",
     "monthlyTrend": "Monthly trend",
     "lastMonths": "Last {{count}} months",
     "noDataShort": "No data",
@@ -207,6 +220,28 @@
       "afternoon": "Good afternoon",
       "evening": "Good evening",
       "night": "Good night"
+    },
+    "timeline": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "earlier": "Earlier"
+    },
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "commandBar": {
+      "placeholder": "Search or type a command…",
+      "noResults": "No results",
+      "sections": {
+        "navigation": "Navigation",
+        "actions": "Actions"
+      },
+      "goToDashboard": "Go to Dashboard",
+      "goToTransactions": "Go to Transactions",
+      "goToSettings": "Go to Settings",
+      "goToProfile": "Go to Profile",
+      "newTransaction": "New Transaction",
+      "toggleTheme": "Toggle Theme"
     }
   },
   "transactions": {
@@ -345,6 +380,7 @@
     "branding": {
       "badge": "Budget • Insights • Trust",
       "kicker": "Finora • Smart Finance",
+      "tagline": "Smart finance management for your smart life",
       "login": {
         "headline": "New here?",
         "subline": "Create your free account and get started today.",
@@ -358,6 +394,11 @@
       "forgot": {
         "headline": "Forgot password?",
         "subline": "No worries – we'll help you reset it.",
+        "cta": "Back to sign in"
+      },
+      "verify": {
+        "headline": "Almost there!",
+        "subline": "Verify your email address to activate your account.",
         "cta": "Back to sign in"
       },
       "default": {
@@ -566,7 +607,10 @@
       "pendingUseDifferent": "Use a different email",
       "noEmailTitle": "No email address",
       "noEmailDescription": "Without an email you cannot reset your password if you forget it.",
-      "addEmail": "Add email"
+      "addEmail": "Add email",
+      "accountNotVerified": "Account not yet verified.",
+      "accountNotVerifiedHint": "Please contact the administrator to activate your account before adding an email address.",
+      "accountNotVerifiedAddEmail": "Add an email address to verify your account and unlock all features."
     },
     "personal": {
       "title": "Personal details",
@@ -621,7 +665,13 @@
         "confirmLabel": "Confirm password",
         "cancel": "Cancel",
         "submit": "Change password",
-        "changing": "Changing..."
+        "changing": "Changing...",
+        "req": {
+          "length": "At least 8 characters",
+          "uppercase": "At least one uppercase letter",
+          "number": "At least one number",
+          "special": "At least one special character"
+        }
       },
       "deleteAccount": {
         "title": "Delete account",
@@ -659,7 +709,8 @@
       "passwordWeak": "At least 8 characters, uppercase, number & special character required",
       "passwordChanged": "Password changed successfully!",
       "passwordChangeError": "Password could not be changed",
-      "invalidPassword": "Password is incorrect",
+      "samePassword": "New password must be different from your current password",
+      "invalidPassword": "Current password is incorrect",
       "accountDeleted": "Account deleted",
       "accountDeleteError": "Account could not be deleted"
     },
@@ -700,7 +751,7 @@
           "Keep your credentials confidential",
           "Notify us promptly about unauthorized use",
           "Create only one account per person",
-          "The Service is intended for persons who have legal capacity under applicable law. Use by minors is the responsibility of their legal guardians."
+          "The Service is intended for persons aged 16 or older. Use by minors under 16 is only permitted with the express consent of a legal guardian."
         ]
       },
       {
@@ -737,6 +788,9 @@
           "Uninterrupted availability",
           "Error-free operation",
           "Accuracy of user-provided data"
+        ],
+        "additionalParagraphs": [
+          "This does not affect our liability for intent and gross negligence, nor for damages to life, body, or health. Statutory consumer rights remain unaffected."
         ]
       },
       {
@@ -748,7 +802,7 @@
       {
         "title": "8. Changes to the terms",
         "paragraphs": [
-          "We may update these terms from time to time. We will notify you of material changes in advance."
+          "We may update these terms from time to time. We will notify you of material changes at least 30 days before they take effect by email. Changes that substantially affect your rights require your renewed consent."
         ]
       },
       {
@@ -781,6 +835,9 @@
           "The platform is used for unlawful purposes",
           "Repeated or serious violations of usage rules occur",
           "Automated access or manipulation attempts are detected"
+        ],
+        "additionalParagraphs": [
+          "Before permanent deletion, you will receive a notification stating the reasons and a reasonable period to respond, provided circumstances allow."
         ]
       },
       {
@@ -911,7 +968,8 @@
       "invalidToken": "Invalid or expired token.",
       "tokenExpired": "Your token has expired. Please request a new one.",
       "confirmationRequired": "Confirmation required.",
-      "userNotFound": "User not found."
+      "userNotFound": "User not found.",
+      "ACCOUNT_NOT_VERIFIED": "Account not yet verified. Please activate your account first."
     }
   },
   "footer": {
@@ -976,15 +1034,15 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: February 2026",
+    "lastUpdated": "Last updated: March 2026",
     "sections": [
       {
         "title": "§ 1 Data Controller (Art. 13(1)(a) GDPR)",
         "paragraphs": [
-          "The data controller responsible for data processing on this website is:",
+          "The data controller responsible for data processing in this application is:",
           "Youssef Dawod",
           "Bahnhofstraße 1, 29614 Soltau, Germany",
-          "Email: Contact form at /contact",
+          "Email: info@finora.dawoddev.com | Alternatively: Contact form at /contact",
           "The controller determines the purposes and means of processing personal data."
         ]
       },
@@ -996,21 +1054,25 @@
       },
       {
         "title": "§ 3 Data Collected",
-        "paragraphs": ["In the course of using our application, we collect and process the following personal data:"],
+        "paragraphs": [
+          "In the course of using our application, we collect and process the following personal data:"
+        ],
         "list": [
           "Username (required) and email address (optional) during registration",
           "Password (stored as a cryptographic hash, bcrypt with 12 rounds)",
           "Financial transaction data (amount, category, description, date)",
           "Language settings, theme preferences, and sidebar state",
           "Privacy notice status (whether the notice has been acknowledged)",
-          "IP address and user agent on login (security audit log)",
+          "IP address, user agent, and geographic origin (country, city – derived offline from IP address, no third party) on admin actions (security audit log)",
           "Contact form data (name, email, category, message)",
           "Newsletter subscription (email, double opt-in status)"
         ]
       },
       {
         "title": "§ 4 Legal Bases for Processing (Art. 13(1)(c) GDPR)",
-        "paragraphs": ["We process personal data based on the following legal grounds:"],
+        "paragraphs": [
+          "We process personal data based on the following legal grounds:"
+        ],
         "list": [
           "Art. 6(1)(a) GDPR (Consent): Newsletter subscription, contact form consent",
           "Art. 6(1)(b) GDPR (Contract performance): Registration, login, transaction management, budget management — to fulfill the usage agreement",
@@ -1022,15 +1084,18 @@
         "title": "§ 5 Legitimate Interests (Art. 13(1)(d) GDPR)",
         "paragraphs": [
           "Where we base processing on legitimate interests (Art. 6(1)(f) GDPR), we pursue the following interests:",
-          "Protecting our application from unauthorized access and misuse by logging login attempts and suspicious activities. Ensuring system stability and security through technical error logs. Your interests, fundamental rights and freedoms do not override these interests, as processing is limited to what is technically necessary and automatic deletion periods apply."
+          "Protecting our application from unauthorized access and misuse by logging login attempts and suspicious activities. Ensuring system stability and security through technical error logs. Your interests, fundamental rights and freedoms do not override these interests, as processing is limited to what is technically necessary and automatic deletion periods apply.",
+          "We have conducted and internally documented a Legitimate Interest Assessment (LIA). The result confirms that processing is limited to the technically necessary minimum (e.g., IP masking, deletion after 365 days) and does not disproportionately affect the rights of data subjects."
         ]
       },
       {
         "title": "§ 6 Retention Periods and Deletion (Art. 13(2)(a) GDPR)",
-        "paragraphs": ["We store personal data only as long as necessary for the respective purpose:"],
+        "paragraphs": [
+          "We store personal data only as long as necessary for the respective purpose:"
+        ],
         "list": [
           "Account data (username, email, password hash): Until account deletion by the user",
-          "Transaction data: According to the configured retention period (lifecycle policy); automatically deleted after expiry with prior email notification",
+          "Transaction data: According to the configured retention period (lifecycle policy); automatically deleted after expiry with prior email notification. Where transaction data is subject to statutory retention obligations, it will be stored in accordance with applicable legal periods (§ 147 AO: up to 10 years).",
           "Security audit logs: 365 days, then automatically deleted via TTL index",
           "Consent records (ConsentLog): 3 years (legal proof obligation under Art. 7(1) GDPR)",
           "Unconfirmed newsletter subscriptions: 48 hours, then automatically deleted",
@@ -1043,8 +1108,8 @@
           "We only use technically necessary cookies and local storage entries. No tracking cookies or third-party cookies are used."
         ],
         "list": [
-          "auth_token (localStorage): JWT access token for authentication — validity 1 hour",
-          "refreshToken (httpOnly cookie): Refresh token for token renewal — validity 7 days",
+          "accessToken (In-Memory): JWT access token for authentication — validity 1 hour; stored exclusively as a JavaScript variable in memory, not persisted (XSS protection)",
+          "refreshToken (httpOnly Secure cookie): Refresh token for token renewal — validity 7 days; httpOnly, Secure, SameSite=strict",
           "privacyNoticeSeen (localStorage): Privacy notice acknowledgment status (read/not read)",
           "theme (localStorage): Selected color scheme (light/dark)",
           "i18nextLng (localStorage): Selected language",
@@ -1063,11 +1128,16 @@
           "Hosting (Backend/API): Render Services, Inc., San Francisco, USA. Data processing on servers in the EU/EEA region. Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
           "Database: MongoDB, Inc. (MongoDB Atlas), New York, USA. Cluster location: EU (Frankfurt). Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
           "Newsletter delivery: Handled via our own SMTP server. No external newsletter service provider is used."
+        ],
+        "additionalParagraphs": [
+          "We use data processors to operate our services. Written agreements pursuant to Art. 28 GDPR (Data Processing Agreements) are in place with all named service providers. Where personal data is transferred to third countries (e.g., USA), we use the Standard Contractual Clauses (SCC) approved by the European Commission and conduct Transfer Impact Assessments as well as, where necessary, supplementary technical and organizational measures to ensure a level of data protection comparable to the EU standard (cf. EDPB Recommendations 01/2020)."
         ]
       },
       {
         "title": "§ 9 Your Rights as a Data Subject",
-        "paragraphs": ["Under the GDPR, you have the following rights:"],
+        "paragraphs": [
+          "Under the GDPR, you have the following rights:"
+        ],
         "list": [
           "Right of access (Art. 15 GDPR): You can request information about your stored data",
           "Right to rectification (Art. 16 GDPR): You can request correction of inaccurate data",
@@ -1075,13 +1145,17 @@
           "Right to restriction (Art. 18 GDPR): You can request restriction of processing",
           "Right to data portability (Art. 20 GDPR): You can export your data in a machine-readable format (CSV export in the application)",
           "Right to object (Art. 21 GDPR): You can object to processing based on legitimate interests"
+        ],
+        "additionalParagraphs": [
+          "To exercise your rights, please send an email to info@finora.dawoddev.com or use the contact form at /contact. For identity verification, please include your username and, if applicable, additional information suitable for verification. We will respond to your request within one month (Art. 12(3) GDPR)."
         ]
       },
       {
         "title": "§ 10 Right to Withdraw Consent (Art. 13(2)(c) GDPR)",
         "paragraphs": [
           "If the processing of your data is based on consent (Art. 6(1)(a) GDPR), you have the right to withdraw this consent at any time. The lawfulness of the processing carried out on the basis of consent until its withdrawal is not affected.",
-          "You can unsubscribe from the newsletter at any time via the unsubscribe link in every email or via the newsletter toggle in account settings."
+          "You can unsubscribe from the newsletter at any time via the unsubscribe link in every email or via the newsletter toggle in account settings.",
+          "The newsletter subscription uses a double opt-in process: after entering your email address, you will receive a confirmation email. Your subscription is only activated after clicking the link contained therein. Proof of consent (ConsentLog) is retained for 3 years (Art. 7(1) GDPR)."
         ]
       },
       {
@@ -1107,17 +1181,26 @@
         "list": [
           "HTTPS encryption for all data transmissions",
           "Password hashing with bcrypt (12 rounds of salting)",
-          "JWT-based authentication with short-lived access tokens (1h) and httpOnly refresh cookies (7d)",
+          "JWT-based authentication with short-lived access tokens (1h, stored exclusively in memory) and httpOnly Secure refresh cookies (7d, SameSite=strict)",
           "Rate limiting and account lockout after failed login attempts",
           "Content Security Policy (CSP), HSTS and other HTTP security headers via Helmet",
           "MongoDB query injection prevention through input sanitization",
-          "Regular security audits (npm audit)"
+          "Regular security audits (npm audit, dependency scans) and annual review of security measures",
+          "No storage of authentication data in localStorage or sessionStorage — access tokens are held exclusively as in-memory variables to minimize XSS risks"
         ]
       },
       {
         "title": "§ 14 Contact for Privacy Concerns",
         "paragraphs": [
-          "For questions about data protection, the processing of your personal data, or to exercise your rights as a data subject, you can contact us at any time via our contact form at /contact. We will respond to your inquiry without delay, but at the latest within one month (Art. 12(3) GDPR)."
+          "For questions about data protection, the processing of your personal data, or to exercise your rights as a data subject, you can contact us at any time by email at info@finora.dawoddev.com or via our contact form at /contact. We will respond to your inquiry without delay, but at the latest within one month (Art. 12(3) GDPR)."
+        ]
+      },
+      {
+        "title": "§ 15 Data Breaches and Notification Obligations (Art. 33, 34 GDPR)",
+        "paragraphs": [
+          "In the event of a personal data breach, we will notify the competent supervisory authority without undue delay, and no later than 72 hours after becoming aware of it, insofar as the breach is likely to result in a risk to the rights and freedoms of natural persons (Art. 33(1) GDPR).",
+          "Where a breach is likely to result in a high risk to your personal rights and freedoms, we will inform you as the affected data subject without undue delay (Art. 34 GDPR).",
+          "Our internal procedures, responsibilities, and contact points for handling data breaches are documented internally."
         ]
       }
     ]
@@ -1280,7 +1363,142 @@
     "subtitle": "Tips, insights, and updates about personal finance",
     "backLink": "Back to Home",
     "comingSoon": "Coming Soon",
-    "comingSoonDescription": "We're working on great content about personal finance, tips for saving money, and updates about Finora. Stay tuned!"
+    "comingSoonDescription": "We're working on great content about personal finance, tips for saving money, and updates about Finora. Stay tuned!",
+    "readMore": "Read more",
+    "backToBlog": "Back to Blog",
+    "comingBadge": "Coming soon",
+    "minRead": "min read",
+    "posts": [
+      {
+        "id": "budgeting-basics",
+        "title": "Budgeting Made Easy: 5 Steps to Financial Clarity",
+        "excerpt": "A good budget is the foundation of financial freedom. Learn the key steps to effectively manage your income and expenses.",
+        "date": "2026-02-15",
+        "readingTime": 5,
+        "tags": ["Budgeting", "Basics"],
+        "available": true,
+        "sections": [
+          {
+            "title": "Why a Budget Matters",
+            "content": [
+              "Without a plan, most people spend more than they earn — not because they earn too little, but because they have no overview. A budget changes that. It's not a cage, it's a compass.",
+              "Studies show: people with a written budget save on average 20% more per month than those without. The reason is simple — awareness leads to better decisions."
+            ]
+          },
+          {
+            "title": "Step 1: Track Your Income",
+            "content": [
+              "The first step is the easiest: list all sources of income. Salary, freelance earnings, rental income, government benefits — everything counts. Enter only your net income, meaning the amount that actually arrives in your account.",
+              "If your income fluctuates, use a realistic average of the last three months."
+            ]
+          },
+          {
+            "title": "Step 2: Categorize Your Expenses",
+            "content": [
+              "Divide your expenses into two groups: fixed costs (rent, insurance, subscriptions) and variable costs (groceries, leisure, clothing). Fixed costs are hard to change in the short term — variable costs are your lever.",
+              "Use Finora to automatically categorize transactions. This way you see at a glance where your money is really going."
+            ]
+          },
+          {
+            "title": "Step 3: Apply the 50/30/20 Rule",
+            "content": [
+              "One of the most proven budgeting methods is the 50/30/20 rule: 50% for essentials (housing, food, transport), 30% for personal wants (restaurants, hobbies, entertainment) and 20% for saving and debt repayment.",
+              "This split is a good starting point — adapt it to your reality. If you live in a big city, you might spend 60% on essentials. That's not failure, it's a signal to adjust."
+            ]
+          },
+          {
+            "title": "Step 4: Set a Savings Goal",
+            "content": [
+              "A budget without a savings goal is just a spending list. Define concrete goals: emergency fund (3–6 months' salary), vacation, new tech, or long-term retirement savings.",
+              "'I'm saving for a trip to Japan in September' is more motivating than 'I'm somehow saving'. Concrete goals make the difference."
+            ]
+          },
+          {
+            "title": "Step 5: Review Regularly",
+            "content": [
+              "A budget is not a document you create once and never look at again. Review it monthly. Has anything changed? New expenses? Pay raise?",
+              "Finora shows you with interactive charts how your spending develops over months. This way you spot trends before they become a problem."
+            ]
+          },
+          {
+            "title": "Conclusion",
+            "content": [
+              "Budgeting is not a restriction — it is financial self-determination. With the right tools and a little discipline, you regain control over your money.",
+              "Start today: enter your first transaction in Finora and feel what having a real overview is like."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "saving-strategies",
+        "title": "Saving Strategies That Actually Work",
+        "excerpt": "Discover proven methods for saving — from the 50/30/20 rule to automated savings goals with Finora.",
+        "date": "2026-03-01",
+        "readingTime": 7,
+        "tags": ["Saving", "Finance Tips"],
+        "available": true,
+        "sections": [
+          {
+            "title": "Why Do So Many People Fail at Saving?",
+            "content": [
+              "Most people want to save — but at the end of the month, nothing is left. This is rarely about income, usually about order: spend first, then save. Whatever's left rarely ends up in savings.",
+              "The solution: saving has to be the first expense, not the last."
+            ]
+          },
+          {
+            "title": "Pay Yourself First",
+            "content": [
+              "The 'Pay Yourself First' principle is simple: as soon as your salary arrives, immediately transfer a fixed amount to a separate savings account. Only then do you plan your remaining expenses.",
+              "This method works because it automates saving and removes it from the realm of willpower. You don't save because you were strong enough — you save because the system does it."
+            ]
+          },
+          {
+            "title": "The 50/30/20 Rule for Savers",
+            "content": [
+              "As a reminder: 20% of your net income should go to savings and debt repayment. At $2,000 net that's $400 per month — $4,800 per year.",
+              "Start smaller if needed. 5% is better than 0%. The goal is to establish a habit, not to be perfect immediately."
+            ]
+          },
+          {
+            "title": "Automated Saving with Finora",
+            "content": [
+              "In Finora's settings you can set a monthly budget limit and a warning threshold. When you've reached 80% of your budget, Finora warns you — in time to be more conscious for the rest of the month.",
+              "Combine this with an automatic standing order to your savings account — and you have a completely automated savings system."
+            ]
+          },
+          {
+            "title": "Small Habits — Big Impact",
+            "content": [
+              "Big saving success often doesn't come from a single decision, but from many small habits: buying coffee out less often, reviewing subscriptions, waiting 24 hours before impulse purchases.",
+              "The compound interest effect also applies to habits: small, consistent savings add up to impressive amounts over the years."
+            ]
+          },
+          {
+            "title": "Emergency Fund — Your Financial Foundation",
+            "content": [
+              "Before investing or pursuing larger savings goals, build an emergency fund: 3 to 6 months' salary in an easily accessible account. This buffer protects you from unexpected expenses without having to take on debt.",
+              "Financial stress is one of the most common stressors in everyday life — with a buffer it loses its power over you."
+            ]
+          },
+          {
+            "title": "Conclusion",
+            "content": [
+              "Saving is not a question of discipline — it is a question of systems. Automate what you can, track your progress with Finora and start small.",
+              "Every euro you save today works for you tomorrow. Start now."
+            ]
+          }
+        ]
+      },
+      {
+        "id": "finora-updates-q2",
+        "title": "Finora Q2 2026: New Features and Improvements",
+        "excerpt": "A look at upcoming features — including expanded categories, improved export options and more.",
+        "date": "2026-04-01",
+        "readingTime": 4,
+        "tags": ["Finora", "Updates"],
+        "available": false
+      }
+    ]
   },
   "help": {
     "title": "Help Center",
@@ -1406,28 +1624,47 @@
     "lastUpdated": "Last updated: February 2026",
     "sections": [
       {
-        "title": "Information according to \u00a7 5 DDG",
-        "paragraphs": ["Youssef Dawod", "Bahnhofstraße 1", "29614 Soltau", "Germany", "No commercial register entry."]
+        "title": "Information according to § 5 DDG",
+        "paragraphs": [
+          "Youssef Dawod",
+          "Bahnhofstraße 1",
+          "29614 Soltau",
+          "Germany",
+          "No commercial register entry."
+        ]
       },
       {
         "title": "Contact",
-        "paragraphs": ["Email: info@finora.dawoddev.com", "Contact form: /contact"]
+        "paragraphs": [
+          "Email: info@finora.dawoddev.com",
+          "Contact form: /contact"
+        ]
       },
       {
-        "title": "Responsible for content according to \u00a7 18 Abs. 2 MStV",
-        "paragraphs": ["Youssef Dawod", "Bahnhofstraße 1, 29614 Soltau"]
+        "title": "Responsible for content according to § 18 Abs. 2 MStV",
+        "paragraphs": [
+          "Youssef Dawod",
+          "Bahnhofstraße 1, 29614 Soltau"
+        ]
       },
       {
         "title": "Dispute Resolution",
-        "paragraphs": ["The European Commission provides a platform for online dispute resolution (ODR): https://ec.europa.eu/consumers/odr/", "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board."]
+        "paragraphs": [
+          "The European Commission provides a platform for online dispute resolution (ODR): https://ec.europa.eu/consumers/odr/",
+          "We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board."
+        ]
       },
       {
         "title": "Liability for Content",
-        "paragraphs": ["As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to \u00a7 7 Abs.1 DDG. According to \u00a7\u00a7 8 to 10 DDG, we are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity."]
+        "paragraphs": [
+          "As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to § 7 Abs.1 DDG. According to §§ 8 to 10 DDG, we are not obligated to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity."
+        ]
       },
       {
         "title": "Liability for Links",
-        "paragraphs": ["Our website contains links to external third-party websites over whose content we have no influence. We therefore cannot assume any liability for such external content. The respective provider or operator of the pages is always responsible for the content of the linked pages."]
+        "paragraphs": [
+          "Our website contains links to external third-party websites over whose content we have no influence. We therefore cannot assume any liability for such external content. The respective provider or operator of the pages is always responsible for the content of the linked pages."
+        ]
       }
     ]
   },
@@ -1445,6 +1682,12 @@
   },
   "admin": {
     "badge": "Admin",
+    "viewerBadge": "Viewer",
+    "viewer": {
+      "banner": "You are in viewer mode. Sensitive data is hidden and actions are blocked.",
+      "noAccess": "Actions are not available in viewer mode.",
+      "sensitiveHidden": "Sensitive data is hidden in viewer mode."
+    },
     "loadingPanel": "Loading admin panel...",
     "placeholder": "This page will be implemented soon.",
     "nav": {
@@ -1505,6 +1748,7 @@
       "pagination": "Page {{page}} of {{pages}}",
       "roleAdmin": "Admin",
       "roleUser": "User",
+      "roleViewer": "Viewer",
       "active": "Active",
       "banned": "Banned",
       "unverifiedLabel": "Unverified",
@@ -1566,13 +1810,29 @@
         "errorPassword_noSpecial": "At least one special character required.",
         "submit": "Create",
         "success": "User created successfully.",
-        "error": "Failed to create user."
+        "error": "Failed to create user.",
+        "autoGeneratePassword": "Auto-generate",
+        "manualPassword": "Set manually",
+        "placeholderPasswordAuto": "Will be auto-generated...",
+        "regeneratePassword": "Regenerate",
+        "labelEmailOptional": "(optional)",
+        "noEmailFormHint": "Without an email, the user will receive credentials directly from the admin.",
+        "noEmailHint": "No email sent – the user will receive their credentials directly from the admin.",
+        "securityChangePasswordHint": "Please change your password after your first login in the profile area.",
+        "generatedPasswordTitle": "Generated Password",
+        "generatedPasswordHint": "This password is only shown once. Please store it securely.",
+        "copyPassword": "Copy",
+        "passwordCopied": "Copied!",
+        "credentialsSentBanner": "Login credentials have been sent to the user by email.",
+        "labelEmailLanguage": "Email Language",
+        "emailLanguageHint": "In which language should the credentials email be sent?"
       },
       "edit": {
         "button": "Edit",
         "title": "Edit User",
         "save": "Save",
-        "success": "User updated successfully."
+        "success": "User updated successfully.",
+        "verifyRequiresEmail": "An email address is required to mark the account as verified."
       },
       "export": {
         "button": "Export",
@@ -1810,6 +2070,26 @@
       "statMostCommon": "Most Common Action",
       "statActiveAdmins": "Active Admins",
       "searchPlaceholder": "Search audit logs…",
+      "country": "Country",
+      "city": "City",
+      "unknownLocation": "Unknown",
+      "selectMonth": "Select month",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "exportCSV": "Export CSV",
+      "exportPDF": "Export PDF",
+      "deleteAll": "Delete all",
+      "deleteSelected": "Delete selected",
+      "deleteConfirmTitle": "Delete entries",
+      "deleteConfirmAll": "Are you sure you want to permanently delete all audit log entries?",
+      "deleteConfirmSelected": "Are you sure you want to permanently delete {{count}} selected entries?",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "selectEntry": "Select entry",
+      "selectedCount": "{{count}} selected",
+      "retentionInfo": "Entries are automatically deleted after 365 days.",
+      "filterCountry": "Filter by country",
+      "allCountries": "All Countries",
       "actions_enum": {
         "USER_CREATED": "User Created",
         "USER_UPDATED": "User Updated",
@@ -1839,7 +2119,9 @@
         "PASSWORD_CHANGED": "Password Changed",
         "PASSWORD_RESET_REQUESTED": "Password Reset Requested",
         "PASSWORD_RESET_COMPLETED": "Password Reset Completed",
-        "EMAIL_CHANGED": "Email Changed"
+        "EMAIL_CHANGED": "Email Changed",
+        "AUDIT_LOG_CLEARED": "Audit Log Cleared",
+        "AUDIT_LOG_ENTRIES_DELETED": "Audit Log Entries Deleted"
       },
       "details_format": {
         "newRole": "New role: {{role}}",
@@ -1866,7 +2148,9 @@
     "quota": {
       "title": "Transaction Quota",
       "used": "{{used}} of {{limit}} this month",
+      "thisMonth": "This Month",
       "remaining": "{{remaining}} remaining",
+      "remainingLabel": "Remaining",
       "exceeded": "Monthly limit reached",
       "resetInfo": "Resets on {{date}}"
     },
@@ -1969,5 +2253,49 @@
       "daysUntilDeletion": "Days until deletion",
       "quotaResetDate": "Quota resets on {{date}}"
     }
+  },
+  "privacyNoticePage": {
+    "title": "Privacy Notice",
+    "lastUpdated": "Last updated: January 2026",
+    "intro": "This notice summarizes how Finora collects, processes, and protects your personal data. For detailed information, please read our full Privacy Policy.",
+    "fullPolicyLink": "Read full Privacy Policy",
+    "sections": [
+      {
+        "title": "What Data We Collect",
+        "paragraphs": [
+          "We collect account data (name, email, password hash), transaction data you enter, and technical usage data such as IP address, browser type, and device type."
+        ]
+      },
+      {
+        "title": "Why We Process Data",
+        "paragraphs": [
+          "Your data is used exclusively to provide and improve our service, for authentication and account security, analytics, and to fulfill legal obligations."
+        ]
+      },
+      {
+        "title": "How We Protect Data",
+        "paragraphs": [
+          "All data is transmitted (TLS) and stored encrypted. Passwords are hashed with bcrypt. We use HTTP-only cookies and implement CSRF protection."
+        ]
+      },
+      {
+        "title": "Cookies",
+        "paragraphs": [
+          "Finora only uses technically necessary cookies for session management. Analytical cookies are only set after your explicit consent."
+        ]
+      },
+      {
+        "title": "Your Rights",
+        "paragraphs": [
+          "You have the right to access, rectification, erasure, restriction of processing, and data portability. Contact us using the details below."
+        ]
+      },
+      {
+        "title": "Contact",
+        "paragraphs": [
+          "For privacy-related questions, reach us at: privacy@finora.app"
+        ]
+      }
+    ]
   }
 }

@@ -1,14 +1,14 @@
 /**
  * @fileoverview useAuth Custom Hook
  * @description Wrapper around AuthContext for authentication state and actions
- * 
+ *
  * USAGE:
  * const { user, isAuthenticated, login, logout } = useAuth()
- * 
+ *
  * if (!isAuthenticated) {
  *   return <Navigate to="/login" />
  * }
- * 
+ *
  * @module useAuth
  */
 
@@ -28,10 +28,10 @@ import { AuthContext } from '@/context/AuthContext';
  * @returns {Function} logout - Logout user
  * @returns {Function} verifyEmail - Verify email with token
  * @returns {Function} clearError - Clear error message
- * 
+ *
  * @example
  * const { user, login, error } = useAuth();
- * 
+ *
  * const handleLogin = async (email, password) => {
  *   try {
  *     await login(email, password);
@@ -46,7 +46,7 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error(
       'useAuth must be used within an AuthProvider. ' +
-      'Make sure your component tree is wrapped with <AuthProvider>.'
+        'Make sure your component tree is wrapped with <AuthProvider>.'
     );
   }
 
@@ -57,6 +57,10 @@ export function useAuth() {
     isLoading: context.isLoading,
     error: context.error,
     token: context.token,
+
+    // Derived role flags
+    isAdmin: context.isAdmin,
+    isViewer: context.isViewer,
 
     // Actions
     login: context.login,

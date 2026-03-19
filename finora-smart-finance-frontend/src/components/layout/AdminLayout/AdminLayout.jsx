@@ -21,9 +21,15 @@ import { FiMenu, FiChevronLeft, FiChevronRight, FiLogOut } from 'react-icons/fi'
 import AdminErrorBoundary from '@/components/admin/AdminErrorBoundary/AdminErrorBoundary';
 import styles from './AdminLayout.module.scss';
 
+// Stabile Motion-Konstanten (kein Inline-Object in JSX)
+const MENU_HOVER = { scale: 1.02 };
+const MENU_TAP = { scale: 0.98 };
+const COLLAPSE_HOVER = { scale: 1.05 };
+const COLLAPSE_TAP = { scale: 0.95 };
+
 export default function AdminLayout() {
   const { t, i18n } = useTranslation();
-  const { user, logout } = useAuth();
+  const { user, logout, isViewer } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const { shouldAnimate } = useMotion();
@@ -39,17 +45,33 @@ export default function AdminLayout() {
     return false;
   });
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [autoExpandedForTheme, setAutoExpandedForTheme] = useState(false);
 
   const handleToggleCollapse = useCallback(() => {
-    setIsSidebarCollapsed((prev) => {
+    setIsSidebarCollapsed(prev => {
       const next = !prev;
       localStorage.setItem('admin-sidebar-collapsed', JSON.stringify(next));
       return next;
     });
+    setAutoExpandedForTheme(false);
   }, []);
 
+  const handleThemeSectionClick = useCallback(() => {
+    if (isSidebarCollapsed) {
+      setIsSidebarCollapsed(false);
+      setAutoExpandedForTheme(true);
+    }
+  }, [isSidebarCollapsed]);
+
+  const handleThemeClose = useCallback(() => {
+    if (autoExpandedForTheme) {
+      setIsSidebarCollapsed(true);
+      setAutoExpandedForTheme(false);
+    }
+  }, [autoExpandedForTheme]);
+
   const handleMobileToggle = useCallback(() => {
-    setIsMobileSidebarOpen((prev) => !prev);
+    setIsMobileSidebarOpen(prev => !prev);
   }, []);
 
   const handleMobileClose = useCallback(() => {
@@ -73,7 +95,7 @@ export default function AdminLayout() {
 
   // ── Escape-Key schließt Mobile-Sidebar ───────
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       if (e.key === 'Escape' && isMobileSidebarOpen) {
         handleMobileClose();
       }
@@ -104,17 +126,25 @@ export default function AdminLayout() {
             <motion.button
               className={styles.menuButton}
               onClick={handleMobileToggle}
-              whileHover={shouldAnimate ? { scale: 1.02 } : undefined}
-              whileTap={shouldAnimate ? { scale: 0.98 } : undefined}
+              whileHover={shouldAnimate ? MENU_HOVER : undefined}
+              whileTap={shouldAnimate ? MENU_TAP : undefined}
               aria-label={t('common.menu')}
             >
               <FiMenu size={22} />
             </motion.button>
           )}
-          {!isMobile && <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo app-logo--sm" />}
+          {!isMobile && (
+            <img
+              src="/logo-branding/finora-logo.svg"
+              alt="Finora"
+              className={styles.adminLogoImg}
+            />
+          )}
         </div>
         <div className={styles.headerRight}>
-          <span className={styles.headerAdminBadge}>{t('admin.badge', 'Admin')}</span>
+          <span className={isViewer ? styles.headerViewerBadge : styles.headerAdminBadge}>
+            {isViewer ? t('admin.viewerBadge') : t('admin.badge')}
+          </span>
           <UserMenu user={user} onLogout={handleLogout} />
         </div>
       </header>
@@ -137,19 +167,29 @@ export default function AdminLayout() {
           >
             {/* Collapse toggle */}
             <div className={styles.sidebarHeader}>
-              <button
+              <motion.button
                 className={styles.collapseToggle}
                 onClick={handleToggleCollapse}
+                whileHover={shouldAnimate ? COLLAPSE_HOVER : undefined}
+                whileTap={shouldAnimate ? COLLAPSE_TAP : undefined}
                 aria-label={
                   isSidebarCollapsed
                     ? t('sidebar.expand', 'Sidebar ausklappen')
                     : t('sidebar.collapse', 'Sidebar einklappen')
                 }
               >
-                {isSidebarCollapsed
-                  ? (isRtl ? <FiChevronLeft size={20} /> : <FiChevronRight size={20} />)
-                  : (isRtl ? <FiChevronRight size={20} /> : <FiChevronLeft size={20} />)}
-              </button>
+                {isSidebarCollapsed ? (
+                  isRtl ? (
+                    <FiChevronLeft size={20} />
+                  ) : (
+                    <FiChevronRight size={20} />
+                  )
+                ) : isRtl ? (
+                  <FiChevronRight size={20} />
+                ) : (
+                  <FiChevronLeft size={20} />
+                )}
+              </motion.button>
             </div>
 
             {/* User Card */}
@@ -159,10 +199,12 @@ export default function AdminLayout() {
                   <div className={styles.userAvatar}>
                     {user.name
                       ?.split(' ')
-                      .map((p) => p[0])
+                      .map(p => p[0])
                       .join('')
                       .toUpperCase() || 'U'}
-                    <span className={styles.avatarBadge}>{t('admin.badge', 'Admin')}</span>
+                    <span className={isViewer ? styles.avatarViewerBadge : styles.avatarBadge}>
+                      {isViewer ? t('admin.viewerBadge') : t('admin.badge')}
+                    </span>
                   </div>
                   {!isSidebarCollapsed && (
                     <div className={styles.userInfo}>
@@ -176,7 +218,7 @@ export default function AdminLayout() {
 
             {/* Nav Items */}
             <ul className={styles.navList}>
-              {ADMIN_NAV_ITEMS.map((item) => (
+              {ADMIN_NAV_ITEMS.map(item => (
                 <li key={item.path}>
                   <NavLink
                     to={item.path}
@@ -198,8 +240,20 @@ export default function AdminLayout() {
             </ul>
 
             {/* Theme Selector */}
-            <div className={styles.themeSection}>
-              <ThemeSelector isCollapsed={isSidebarCollapsed} />
+            <div
+              className={styles.themeSection}
+              onClick={handleThemeSectionClick}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleThemeSectionClick();
+                }
+              }}
+              role={isSidebarCollapsed ? 'button' : undefined}
+              tabIndex={isSidebarCollapsed ? 0 : undefined}
+              aria-label={isSidebarCollapsed ? t('themeSelector.ariaLabel') : undefined}
+            >
+              <ThemeSelector isCollapsed={isSidebarCollapsed} onClose={handleThemeClose} />
             </div>
 
             {/* Bottom section */}
@@ -216,18 +270,18 @@ export default function AdminLayout() {
                   <span className={styles.navLabel}>{t(ADMIN_BACK_LINK.labelKey)}</span>
                 )}
               </NavLink>
-              <button
+              <motion.button
                 className={styles.logoutButton}
                 onClick={handleLogout}
                 title={isSidebarCollapsed ? t('nav.logout') : undefined}
+                whileHover={shouldAnimate ? MENU_HOVER : undefined}
+                whileTap={shouldAnimate ? MENU_TAP : undefined}
               >
                 <span className={styles.logoutIcon}>
                   <FiLogOut size={24} />
                 </span>
-                {!isSidebarCollapsed && (
-                  <span className={styles.navLabel}>{t('nav.logout')}</span>
-                )}
-              </button>
+                {!isSidebarCollapsed && <span className={styles.navLabel}>{t('nav.logout')}</span>}
+              </motion.button>
             </div>
           </nav>
         )}
@@ -257,7 +311,11 @@ export default function AdminLayout() {
                 >
                   {/* Mobile Header: Logo */}
                   <div className={styles.mobileHeader}>
-                    <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo app-logo--sm" />
+                    <img
+                      src="/logo-branding/finora-logo.svg"
+                      alt="Finora"
+                      className="app-logo app-logo--sm"
+                    />
                   </div>
 
                   {/* User Card */}
@@ -267,10 +325,14 @@ export default function AdminLayout() {
                         <div className={styles.userAvatar}>
                           {user.name
                             ?.split(' ')
-                            .map((p) => p[0])
+                            .map(p => p[0])
                             .join('')
                             .toUpperCase() || 'U'}
-                          <span className={styles.avatarBadge}>{t('admin.badge', 'Admin')}</span>
+                          <span
+                            className={isViewer ? styles.avatarViewerBadge : styles.avatarBadge}
+                          >
+                            {isViewer ? t('admin.viewerBadge') : t('admin.badge')}
+                          </span>
                         </div>
                         <div className={styles.userInfo}>
                           <div className={styles.userName}>{user.name}</div>
@@ -282,7 +344,7 @@ export default function AdminLayout() {
 
                   {/* Nav Items */}
                   <ul className={styles.navList}>
-                    {ADMIN_NAV_ITEMS.map((item) => (
+                    {ADMIN_NAV_ITEMS.map(item => (
                       <li key={item.path}>
                         <NavLink
                           to={item.path}
@@ -318,15 +380,17 @@ export default function AdminLayout() {
                       </span>
                       <span className={styles.navLabel}>{t(ADMIN_BACK_LINK.labelKey)}</span>
                     </NavLink>
-                    <button
+                    <motion.button
                       className={styles.logoutButton}
                       onClick={handleLogout}
+                      whileHover={shouldAnimate ? MENU_HOVER : undefined}
+                      whileTap={shouldAnimate ? MENU_TAP : undefined}
                     >
                       <span className={styles.logoutIcon}>
                         <FiLogOut size={24} />
                       </span>
                       <span className={styles.navLabel}>{t('nav.logout')}</span>
-                    </button>
+                    </motion.button>
                   </div>
                 </motion.nav>
               </>
@@ -336,12 +400,9 @@ export default function AdminLayout() {
 
         {/* ── CONTENT ──────────────────────────────── */}
         <div className={styles.contentWrapper}>
-          <main
-            id="admin-content"
-            className={styles.adminContent}
-            tabIndex="-1"
-          >
+          <main id="admin-content" className={styles.adminContent} tabIndex="-1">
             <AdminErrorBoundary t={t}>
+              {isViewer && <div className={styles.viewerBanner}>{t('admin.viewer.banner')}</div>}
               <Outlet />
             </AdminErrorBoundary>
           </main>

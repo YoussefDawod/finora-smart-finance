@@ -51,12 +51,12 @@
   @include desktop {
     display: none;
   }
-  
+
   @include mobile {
     display: flex;
     justify-content: center;
   }
-  
+
   @include tablet {
     display: flex;
     justify-content: center;
@@ -72,7 +72,7 @@
   margin-bottom: var(--space-xl);
 
   @include lg {
-    text-align: left;
+    text-align: start;
   }
 }
 
@@ -144,7 +144,9 @@
   font-weight: var(--fw-sb);
   color: var(--primary);
   text-decoration: none;
-  transition: color var(--tr-fast), gap var(--tr-fast);
+  transition:
+    color var(--tr-fast),
+    gap var(--tr-fast);
 
   &:hover {
     color: var(--pri-hover);
@@ -160,5 +162,9 @@
 
   .loginLink:hover & {
     transform: translateX(-2px);
+  }
+
+  :global([dir='rtl']) .loginLink:hover & {
+    transform: translateX(2px);
   }
 }

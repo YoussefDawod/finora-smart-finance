@@ -15,6 +15,12 @@ import { useMotion } from '@/hooks';
 import BrandingPanel from '@/components/auth/BrandingPanel/BrandingPanel';
 import styles from './AuthLayout.module.scss';
 
+const SPRING_TRANSITION = { type: 'spring', stiffness: 220, damping: 28 };
+const PANEL_VARIANTS = {
+  left: { x: '0%', transition: SPRING_TRANSITION },
+  right: { x: '100%', transition: SPRING_TRANSITION },
+};
+
 /**
  * @param {Object} props
  * @param {React.ReactNode} props.children - Auth page content
@@ -25,14 +31,6 @@ export default function AuthLayout({ children, variant = 'login' }) {
 
   const isRegister = variant === 'register';
   const panelPosition = isRegister ? 'left' : 'right';
-
-  // Smooth page-transition spring
-  const springTransition = { type: 'spring', stiffness: 220, damping: 28 };
-
-  const panelVariants = {
-    left:  { x: '0%',   transition: springTransition },
-    right: { x: '100%', transition: springTransition },
-  };
 
   return (
     <div className={styles.authLayout}>
@@ -51,7 +49,7 @@ export default function AuthLayout({ children, variant = 'login' }) {
       {/* Sliding Branding Panel (desktop) */}
       <motion.div
         className={styles.brandingPanel}
-        variants={shouldAnimate ? panelVariants : {}}
+        variants={shouldAnimate ? PANEL_VARIANTS : {}}
         initial={panelPosition}
         animate={panelPosition}
         key={panelPosition}
@@ -60,10 +58,11 @@ export default function AuthLayout({ children, variant = 'login' }) {
       </motion.div>
 
       {/* Mobile Branding — 30% strip */}
-      <div className={`${styles.mobileBranding} ${isRegister ? styles.mobileTop : styles.mobileBottom}`}>
+      <div
+        className={`${styles.mobileBranding} ${isRegister ? styles.mobileTop : styles.mobileBottom}`}
+      >
         <BrandingPanel mode={variant} isDesktop={false} />
       </div>
     </div>
   );
 }
-

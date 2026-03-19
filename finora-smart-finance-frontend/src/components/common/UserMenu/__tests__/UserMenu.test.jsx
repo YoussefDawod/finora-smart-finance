@@ -1,6 +1,7 @@
 /**
- * @fileoverview UserMenu Component Tests
- * @description Coverage: initials, dropdown toggle, click-outside, Escape, profile link, logout
+ * @fileoverview UserMenu Component Tests — Aurora Flow Glass
+ * @description Coverage: initials, dropdown toggle, click-outside, Escape, profile link, logout,
+ *              shouldAnimate guard, glass classes, useMemo
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -11,21 +12,26 @@ import UserMenu from '../UserMenu';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de' },
   }),
 }));
 
+let mockShouldAnimate = true;
+
 vi.mock('@/hooks/useMotion', () => ({
-  useMotion: () => ({ shouldAnimate: true, prefersReducedMotion: false }),
+  useMotion: () => ({ shouldAnimate: mockShouldAnimate, prefersReducedMotion: !mockShouldAnimate }),
 }));
 
 /* eslint-disable no-unused-vars */
+let capturedMotionProps = {};
+
 vi.mock('framer-motion', () => ({
   motion: {
-    button: ({ children, whileHover, whileTap, transition, ...props }) => (
-      <button {...props}>{children}</button>
-    ),
+    button: ({ children, whileHover, whileTap, transition, ...props }) => {
+      capturedMotionProps = { whileHover, whileTap };
+      return <button {...props}>{children}</button>;
+    },
     div: ({ children, initial, animate, exit, transition, ...props }) => (
       <div {...props}>{children}</div>
     ),
@@ -46,6 +52,8 @@ const renderMenu = (props = {}) =>
 describe('UserMenu', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    mockShouldAnimate = true;
+    capturedMotionProps = {};
   });
 
   // ─── Avatar & Initials ────────────────────────────────────────────
@@ -72,7 +80,10 @@ describe('UserMenu', () => {
   // ─── Dropdown Toggle ──────────────────────────────────────────────
   it('starts with dropdown closed (aria-expanded=false)', () => {
     renderMenu();
-    expect(screen.getByRole('button', { name: /common\.userMenu/i })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /common\.userMenu/i })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('opens dropdown on click', async () => {
@@ -87,7 +98,10 @@ describe('UserMenu', () => {
     const user = userEvent.setup();
     renderMenu();
     await user.click(screen.getByRole('button', { name: /common\.userMenu/i }));
-    expect(screen.getByRole('button', { name: /common\.userMenu/i })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: /common\.userMenu/i })).toHaveAttribute(
+      'aria-expanded',
+      'true'
+    );
   });
 
   it('toggles dropdown closed on second click', async () => {
@@ -162,5 +176,20 @@ describe('UserMenu', () => {
     await waitFor(() => {
       expect(screen.queryByText(defaultUser.email)).toBeNull();
     });
+  });
+
+  // ─── shouldAnimate guard ──────────────────────────────────────────
+  it('passes no motion props when shouldAnimate is false', () => {
+    mockShouldAnimate = false;
+    renderMenu();
+    expect(capturedMotionProps.whileHover).toBeUndefined();
+    expect(capturedMotionProps.whileTap).toBeUndefined();
+  });
+
+  it('passes motion props when shouldAnimate is true', () => {
+    mockShouldAnimate = true;
+    renderMenu();
+    expect(capturedMotionProps.whileHover).toEqual({ scale: 1.02 });
+    expect(capturedMotionProps.whileTap).toEqual({ scale: 0.98 });
   });
 });

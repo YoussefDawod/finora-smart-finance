@@ -1,7 +1,6 @@
 // ============================================
 // 📊 SUMMARY CARD COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -13,10 +12,16 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: var(--space-lg);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
   cursor: pointer;
   transition: all var(--tr);
   overflow: hidden;
@@ -46,12 +51,15 @@
   border-color: color-mix(in srgb, var(--success) 20%, transparent);
 
   .gradient {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--success) 10%, transparent) 0%, transparent 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--success) 10%, transparent) 0%,
+      transparent 100%
+    );
   }
 
   .iconWrapper {
     color: var(--success);
-    background: color-mix(in srgb, var(--success) 10%, transparent);
   }
 
   .trendBadge {
@@ -64,12 +72,15 @@
   border-color: color-mix(in srgb, var(--error) 20%, transparent);
 
   .gradient {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--error) 10%, transparent) 0%, transparent 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--error) 10%, transparent) 0%,
+      transparent 100%
+    );
   }
 
   .iconWrapper {
     color: var(--error);
-    background: color-mix(in srgb, var(--error) 10%, transparent);
   }
 
   .trendBadge {
@@ -82,12 +93,15 @@
   border-color: color-mix(in srgb, var(--info) 20%, transparent);
 
   .gradient {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--info) 10%, transparent) 0%, transparent 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--info) 10%, transparent) 0%,
+      transparent 100%
+    );
   }
 
   .iconWrapper {
     color: var(--info);
-    background: color-mix(in srgb, var(--info) 10%, transparent);
   }
 
   .trendBadge.up {
@@ -105,12 +119,15 @@
   border-color: color-mix(in srgb, var(--primary) 20%, transparent);
 
   .gradient {
-    background: linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent) 0%, transparent 100%);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--primary) 10%, transparent) 0%,
+      transparent 100%
+    );
   }
 
   .iconWrapper {
     color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
   }
 }
 
@@ -200,7 +217,6 @@
   justify-content: center;
   width: var(--space-2xl);
   height: var(--space-2xl);
-  border-radius: var(--r-lg);
   font-size: var(--fs-xl);
   flex-shrink: 0;
   // ❌ GESPERRT: Kein Scale auf Finanz-Komponenten
@@ -280,9 +296,9 @@
   }
 
   &.neutral {
-    background: var(--surface-2);
+    background: var(--glass-bg-hover);
     color: var(--tx-muted);
-    border: 1px solid color-mix(in srgb, var(--surface-2) 30%, transparent);
+    border: 1px solid var(--glass-border);
   }
 }
 
@@ -324,19 +340,31 @@
 
   .value,
   .title,
-  .trendBadge,
-  .iconWrapper {
-    background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface) 50%, var(--surface-2) 100%);
+  .trendBadge {
+    background: linear-gradient(
+      90deg,
+      var(--glass-bg-hover) 0%,
+      var(--glass-bg) 50%,
+      var(--glass-bg-hover) 100%
+    );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     color: transparent;
     border-radius: var(--r-sm);
   }
+
+  .iconWrapper {
+    opacity: 0.3;
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 // ============================================

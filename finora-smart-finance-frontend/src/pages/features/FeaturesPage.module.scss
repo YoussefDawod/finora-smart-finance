@@ -1,0 +1,153 @@
+// ============================================
+// 📄 FEATURES PAGE — Glass Cards
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+// ============================================
+// CONTENT
+// ============================================
+.pageContent {
+  max-width: 64rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// ============================================
+// HEADER
+// ============================================
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+
+  @include mobile {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+.title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  background: linear-gradient(135deg, var(--tx) 30%, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  font-size: clamp(var(--fs-sm), 2vw, var(--fs-lg));
+  color: var(--tx-muted);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// FEATURES GRID
+// ============================================
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
+
+// ============================================
+// FEATURE CARD — Glass
+// ============================================
+.featureCard {
+  background: color-mix(in srgb, var(--glass-bg) 65%, transparent);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  border-radius: var(--r-xl);
+  padding: var(--space-xl);
+  transition:
+    border-color var(--tr),
+    box-shadow var(--tr),
+    transform var(--tr);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: var(--glass-shadow);
+    transform: translateY(-2px);
+  }
+
+  @include mobile {
+    padding: var(--space-lg);
+  }
+}
+
+.featureIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-lg);
+  background: color-mix(
+    in srgb,
+    var(--primary) 15%,
+    color-mix(in srgb, var(--glass-bg) 70%, transparent)
+  );
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+  font-size: var(--fs-xl);
+}
+
+.featureTitle {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin-bottom: var(--space-xs);
+
+  @include mobile {
+    font-size: var(--fs-base);
+  }
+}
+
+.featureDescription {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .featureCard {
+    transition: none;
+  }
+}

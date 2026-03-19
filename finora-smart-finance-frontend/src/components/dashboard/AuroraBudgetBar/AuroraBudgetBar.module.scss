@@ -1,0 +1,204 @@
+// ============================================
+// 🎯 AURORA BUDGET BAR
+// ============================================
+@use '@/styles/mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  h3 {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-sb);
+    color: var(--tx-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+    @include glass-text;
+  }
+}
+
+.icon {
+  color: var(--primary);
+  width: 30px;
+  height: 30px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  line-height: var(--lh-none);
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &.warning {
+    background: color-mix(in srgb, var(--warning) 15%, transparent);
+    color: var(--warning);
+  }
+
+  &.danger {
+    background: color-mix(in srgb, var(--error) 15%, transparent);
+    color: var(--error);
+  }
+}
+
+// Progress bar
+.progressContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.progressBar {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--glass-border) 50%, transparent);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
+
+  &.success {
+    background: var(--aurora-3);
+  }
+
+  &.info {
+    background: var(--aurora-2);
+  }
+
+  &.warning {
+    background: var(--warning);
+  }
+
+  &.danger {
+    background: var(--aurora-warn);
+  }
+}
+
+.percentLabel {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+  @include glass-text;
+}
+
+// Stats row
+.stats {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.statLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include glass-text;
+}
+
+.statValue {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+  @include glass-text;
+
+  &.negative {
+    color: var(--aurora-warn);
+  }
+}
+
+// No budget state
+.noBudget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    margin: 0;
+    @include glass-text;
+  }
+}
+
+.noBudgetIcon {
+  color: var(--tx-muted);
+  opacity: 0.5;
+  width: 30px;
+  height: 30px;
+}
+
+.setupBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-2xs) var(--space-md);
+  border-radius: var(--r-full);
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--primary);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  @include focus-ring;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Reduced Motion
+@include reduced-motion {
+  .progressFill {
+    transition: none;
+  }
+
+  .setupBtn {
+    transition: none;
+  }
+}

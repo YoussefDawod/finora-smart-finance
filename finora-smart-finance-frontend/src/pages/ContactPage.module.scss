@@ -1,7 +1,6 @@
 // ============================================
 // 📧 CONTACT PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -9,7 +8,7 @@
 // ============================================
 .contactContainer {
   min-height: 100vh;
-  background: var(--bg);
+  min-height: 100svh;
   padding: var(--space-xl);
   display: flex;
   justify-content: center;
@@ -27,11 +26,18 @@
 .contactContent {
   max-width: 50rem;
   width: 100%;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   padding: var(--space-3xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
   margin: var(--space-xl) 0;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
 
   @include mobile {
     padding: var(--space-lg);
@@ -118,13 +124,17 @@
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--r-md);
-  border: 1px solid var(--border);
-  background: var(--bg);
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
   color: var(--tx);
   font-size: var(--fs-base);
   font-family: inherit;
   min-height: 44px;
   transition: border-color var(--tr-fast);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
 
   &:focus {
     outline: none;
@@ -186,7 +196,9 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-sm);
-  transition: opacity var(--tr), filter var(--tr);
+  transition:
+    opacity var(--tr),
+    filter var(--tr);
 
   &:hover:not(:disabled) {
     filter: brightness(1.08);

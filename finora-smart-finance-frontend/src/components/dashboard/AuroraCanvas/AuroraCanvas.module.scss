@@ -1,0 +1,42 @@
+// ============================================
+// 🌌 AURORA CANVAS — Gradient Background
+// ============================================
+// Positioned absolutely inside .auroraLayout (parent)
+// so it lives inside the dashboard content area,
+// NOT behind the MainLayout's opaque backgrounds.
+// ============================================
+@use '@/styles/mixins' as *;
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+// ── Ambient Mesh Blobs ──
+.blob {
+  @include aurora-mesh-blob(400px);
+}
+
+.blob1 {
+  top: 10%;
+  left: 15%;
+  background: var(--aurora-1);
+  animation: auroraMeshDrift1 45s ease-in-out infinite;
+}
+
+.blob2 {
+  top: 55%;
+  right: 10%;
+  background: var(--aurora-2);
+  animation: auroraMeshDrift2 38s ease-in-out infinite;
+}
+
+.blob3 {
+  bottom: 15%;
+  left: 40%;
+  background: var(--aurora-3);
+  animation: auroraMeshDrift3 52s ease-in-out infinite;
+}

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { useAuth, useMotion, useToast } from '@/hooks';
-import { MainLayout, AdminLayout } from '@/components/layout';
+import { MainLayout, AdminLayout, PublicLayout } from '@/components/layout';
 import { AdminRoute } from '@/components/auth';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { PageFallback } from '@/components/common/Skeleton';
@@ -30,8 +30,10 @@ const FeaturesPage = lazy(() => import('@/pages/FeaturesPage'));
 const PricingPage = lazy(() => import('@/pages/PricingPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const BlogPage = lazy(() => import('@/pages/BlogPage'));
+const BlogPostPage = lazy(() => import('@/pages/BlogPostPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const FaqPage = lazy(() => import('@/pages/FaqPage'));
+const PrivacyNoticePage = lazy(() => import('@/pages/PrivacyNoticePage'));
 
 // Protected App Pages
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
@@ -197,55 +199,172 @@ function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-      <>
+    <>
       <ScrollToTop />
       <NewsletterToastHandler />
       <Routes location={location}>
         {/* Auth Routes - Single AuthPage handles both login and register */}
         <Route
           path="/login"
-          element={(
+          element={
             <PublicRoute>
               <AuthPage />
             </PublicRoute>
-          )}
+          }
         />
         <Route
           path="/register"
-          element={(
+          element={
             <PublicRoute>
               <AuthPage />
             </PublicRoute>
-          )}
+          }
         />
         <Route
           path="/verify-email"
-          element={(
+          element={
             <PublicRoute>
               <PageTransition>
                 <VerifyEmailWrapper />
               </PageTransition>
             </PublicRoute>
-          )}
+          }
         />
         <Route
           path="/forgot-password"
-          element={(
+          element={
             <PublicRoute>
               <AuthPage />
             </PublicRoute>
-          )}
+          }
         />
-        <Route path="/terms" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><TermsPage /></Suspense></PageTransition>)} />
-        <Route path="/privacy" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><PrivacyPage /></Suspense></PageTransition>)} />
-        <Route path="/impressum" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><ImpressumPage /></Suspense></PageTransition>)} />
-        <Route path="/contact" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><ContactPage /></Suspense></PageTransition>)} />
-        <Route path="/features" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><FeaturesPage /></Suspense></PageTransition>)} />
-        <Route path="/pricing" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><PricingPage /></Suspense></PageTransition>)} />
-        <Route path="/about" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><AboutPage /></Suspense></PageTransition>)} />
-        <Route path="/blog" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><BlogPage /></Suspense></PageTransition>)} />
-        <Route path="/help" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><HelpPage /></Suspense></PageTransition>)} />
-        <Route path="/faq" element={(<PageTransition><Suspense fallback={<PageFallback variant="content" />}><FaqPage /></Suspense></PageTransition>)} />
+        {/* Public Product Pages — PublicLayout mit BrandingBackground */}
+        <Route element={<PublicLayout variant="product" />}>
+          <Route
+            path="/features"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <FeaturesPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <PricingPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <AboutPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/blog"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <BlogPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/blog/:id"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <BlogPostPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/faq"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <FaqPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/help"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <HelpPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <ContactPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+        </Route>
+
+        {/* Public Legal Pages — PublicLayout ohne BrandingBackground */}
+        <Route element={<PublicLayout variant="legal" />}>
+          <Route
+            path="/terms"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <TermsPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <PrivacyPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/privacy-notice"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <PrivacyNoticePage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/impressum"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="content" />}>
+                  <ImpressumPage />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+        </Route>
 
         {/* App Routes — MainLayout OHNE ProtectedRoute:
             Guest-Modus erlaubt vollen Zugriff ohne Login (LocalStorage-basiert).
@@ -253,145 +372,159 @@ function AnimatedRoutes() {
         <Route element={<MainLayout />}>
           <Route
             path="/dashboard"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <DashboardPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="/transactions"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="transactions" />}>
                   <TransactionsPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="/settings"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="settings" />}>
                   <SettingsPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="/profile"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="settings" />}>
                   <ProfilePage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
         </Route>
 
         {/* Admin Routes — AdminRoute erzwingt Auth + Admin-Rolle */}
-        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
           <Route
             index
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminDashboardPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="users"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminUsersPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="transactions"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="transactions" />}>
                   <AdminTransactionsPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="subscribers"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminSubscribersPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="campaigns"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminCampaignsPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="campaigns/new"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminCampaignComposer />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="campaigns/:id/edit"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminCampaignComposer />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="audit-log"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminAuditLogPage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
           <Route
             path="lifecycle"
-            element={(
+            element={
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminLifecyclePage />
                 </Suspense>
               </PageTransition>
-            )}
+            }
           />
         </Route>
 
         {/* Default & Fallback Routes — RootRedirect preserviert Query-Parameter */}
         <Route path="/" element={<RootRedirect />} />
-        <Route path="*" element={(<PageTransition><NotFoundPage /></PageTransition>)} />
+        <Route
+          path="*"
+          element={
+            <PageTransition>
+              <NotFoundPage />
+            </PageTransition>
+          }
+        />
       </Routes>
-      </>
+    </>
   );
 }
 

@@ -2,7 +2,7 @@
  * @fileoverview ThemeSelector Component - Redesigned für Navigation
  * @description Moderne, kompakte Theme-Auswahl Komponente für Sidebar & HamburgerMenu
  * Positioniert UNTER dem "Einstellungen" Navigation-Link
- * 
+ *
  * FEATURES:
  * - Light/Dark/System Theme Auswahl
  * - Kompaktes, professionelles Design
@@ -18,6 +18,13 @@ import { FiSun, FiMoon, FiMonitor, FiCheck, FiChevronDown } from 'react-icons/fi
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './ThemeSelector.module.scss';
 
+// Stabile Motion-Konstanten (kein Inline-Object in JSX)
+const TRIGGER_HOVER = { scale: 1.02 };
+const TRIGGER_TAP = { scale: 0.98 };
+const OPTION_HOVER_LTR = { x: 2 };
+const OPTION_HOVER_RTL = { x: -2 };
+const OPTION_TAP = { scale: 0.98 };
+
 function ThemeSelector({ isCollapsed = false, onClose }) {
   const { theme, isInitialized, setTheme, resetToSystemPreference } = useTheme();
   const { t, i18n } = useTranslation();
@@ -25,8 +32,11 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   const isRtl = i18n.dir() === 'rtl';
   const [isOpen, setIsOpen] = useState(false);
   const [isSystemMode, setIsSystemMode] = useState(() => {
-    try { return localStorage.getItem('et-theme-system-mode') === 'true'; }
-    catch { return false; }
+    try {
+      return localStorage.getItem('et-theme-system-mode') === 'true';
+    } catch {
+      return false;
+    }
   });
   const containerRef = useRef(null);
 
@@ -34,7 +44,7 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   // CLOSE ON CLICK OUTSIDE
   // ============================================
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = e => {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setIsOpen(false);
         onClose?.();
@@ -51,7 +61,7 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   // CLOSE ON ESCAPE
   // ============================================
   useEffect(() => {
-    const handleEscape = (e) => {
+    const handleEscape = e => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false);
         onClose?.();
@@ -95,21 +105,27 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
   // ============================================
   // HANDLERS
   // ============================================
-  const handleThemeSelect = (selectedTheme) => {
+  const handleThemeSelect = selectedTheme => {
     if (selectedTheme === 'system') {
       resetToSystemPreference();
       setIsSystemMode(true);
-      try { localStorage.setItem('et-theme-system-mode', 'true'); } catch { /* ignore */ }
+      try {
+        localStorage.setItem('et-theme-system-mode', 'true');
+      } catch {
+        /* ignore */
+      }
     } else {
       setTheme(selectedTheme);
       setIsSystemMode(false);
-      try { localStorage.setItem('et-theme-system-mode', 'false'); } catch { /* ignore */ }
+      try {
+        localStorage.setItem('et-theme-system-mode', 'false');
+      } catch {
+        /* ignore */
+      }
     }
     setIsOpen(false);
     onClose?.();
   };
-
-
 
   // ============================================
   // RENDER
@@ -120,21 +136,27 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
       <motion.button
         className={`${styles.trigger} ${isOpen ? styles.triggerOpen : ''} ${isCollapsed ? styles.triggerCollapsed : ''}`}
         onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        whileHover={shouldAnimate ? TRIGGER_HOVER : undefined}
+        whileTap={shouldAnimate ? TRIGGER_TAP : undefined}
         aria-expanded={isOpen}
         aria-label={t('themeSelector.ariaLabel')}
         title={isCollapsed ? getCurrentLabel() : undefined}
       >
         <span className={styles.triggerIcon}>
-          {theme === 'dark' ? <FiMoon size={20} /> : theme === 'light' ? <FiSun size={20} /> : <FiMonitor size={20} />}
+          {theme === 'dark' ? (
+            <FiMoon size={20} />
+          ) : theme === 'light' ? (
+            <FiSun size={20} />
+          ) : (
+            <FiMonitor size={20} />
+          )}
         </span>
         {!isCollapsed && (
           <>
             <span className={styles.triggerLabel}>{t('themeSelector.title')}</span>
             <motion.span
               className={styles.triggerArrow}
-              animate={{ rotate: isOpen ? 180 : 0 }}
+              animate={shouldAnimate ? { rotate: isOpen ? 180 : 0 } : undefined}
               transition={{ duration: 0.2 }}
             >
               <FiChevronDown size={12} />
@@ -157,18 +179,21 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
             <div className={styles.section}>
               <div className={styles.sectionTitle}>{t('themeSelector.colorScheme')}</div>
               <div className={styles.options}>
-                {themes.map((themeOption) => {
+                {themes.map(themeOption => {
                   const Icon = themeOption.icon;
-                  const isActive = themeOption.value === 'system'
-                    ? isSystemMode
-                    : (!isSystemMode && theme === themeOption.value);
+                  const isActive =
+                    themeOption.value === 'system'
+                      ? isSystemMode
+                      : !isSystemMode && theme === themeOption.value;
                   return (
                     <motion.button
                       key={themeOption.value}
                       className={`${styles.option} ${isActive ? styles.optionActive : ''}`}
                       onClick={() => handleThemeSelect(themeOption.value)}
-                      whileHover={{ x: isRtl ? -2 : 2 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={
+                        shouldAnimate ? (isRtl ? OPTION_HOVER_RTL : OPTION_HOVER_LTR) : undefined
+                      }
+                      whileTap={shouldAnimate ? OPTION_TAP : undefined}
                     >
                       <Icon size={18} />
                       <span>{themeOption.label}</span>
@@ -178,8 +203,6 @@ function ThemeSelector({ isCollapsed = false, onClose }) {
                 })}
               </div>
             </div>
-
-
           </motion.div>
         )}
       </AnimatePresence>

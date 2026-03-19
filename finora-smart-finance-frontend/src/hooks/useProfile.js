@@ -49,12 +49,12 @@ export function useProfile() {
   // ============================================
   // PROFILE HANDLERS
   // ============================================
-  const handleInputChange = (e) => {
+  const handleInputChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async (password) => {
+  const handleSave = async password => {
     if (!password) {
       return { success: false, error: 'passwordRequired' };
     }
@@ -104,7 +104,7 @@ export function useProfile() {
       });
     } catch (error) {
       console.error('Failed to fetch email status:', error);
-      setEmailStatus((prev) => ({ ...prev, loading: false }));
+      setEmailStatus(prev => ({ ...prev, loading: false }));
     }
   }, []);
 
@@ -193,6 +193,11 @@ export function useProfile() {
       return { success: false, error: 'passwordMismatch' };
     }
 
+    // Schnell-Check: neues Passwort identisch mit dem eingegebenen aktuellen
+    if (newPassword === currentPassword) {
+      return { success: false, error: 'samePassword' };
+    }
+
     const passwordError = validatePassword(newPassword);
     if (passwordError) {
       return { success: false, error: 'passwordWeak' };
@@ -204,7 +209,14 @@ export function useProfile() {
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || 'passwordChangeError' };
+      const code = error.response?.data?.code;
+      const errorKey =
+        code === 'SAME_PASSWORD'
+          ? 'samePassword'
+          : code === 'INVALID_PASSWORD'
+            ? 'invalidPassword'
+            : 'passwordChangeError';
+      return { success: false, error: errorKey };
     } finally {
       setIsChangingPassword(false);
     }

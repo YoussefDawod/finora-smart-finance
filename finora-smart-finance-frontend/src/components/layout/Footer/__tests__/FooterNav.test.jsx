@@ -1,8 +1,4 @@
-/**
- * @fileoverview Tests für FooterNav Component
- * @description Testet Navigation-Links, Social Icons, Privacy-Notice-Button und shouldAnimate-Guard.
- */
-
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -29,29 +25,42 @@ vi.mock('@/hooks/useCookieConsent', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de', dir: () => 'ltr' },
   }),
 }));
 
 const MOTION_PROPS = new Set([
-  'whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag',
-  'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId',
+  'whileHover',
+  'whileTap',
+  'whileFocus',
+  'whileInView',
+  'whileDrag',
+  'initial',
+  'animate',
+  'exit',
+  'transition',
+  'variants',
+  'layout',
+  'layoutId',
 ]);
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([key]) => !MOTION_PROPS.has(key)),
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(([key]) => !MOTION_PROPS.has(key))
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return React.createElement(Tag, htmlProps, children);
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -65,7 +74,7 @@ const renderFooterNav = () => {
   return render(
     <MemoryRouter>
       <FooterNav />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -78,9 +87,8 @@ describe('FooterNav', () => {
   });
 
   describe('Navigation-Links', () => {
-    it('rendert alle Navigations-Sektionen', () => {
+    it('rendert alle 4 Navigations-Sektionen', () => {
       renderFooterNav();
-      // 4 Sektions-Titel
       expect(screen.getByText('footer.sections.company')).toBeInTheDocument();
       expect(screen.getByText('footer.sections.product')).toBeInTheDocument();
       expect(screen.getByText('footer.sections.resources')).toBeInTheDocument();

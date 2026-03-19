@@ -20,6 +20,9 @@ import {
   FiHash,
 } from 'react-icons/fi';
 import Modal from '@/components/common/Modal/Modal';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import { translateCategory } from '@/utils/categoryTranslations';
 import { formatAdminCurrency } from '@/utils/adminTableHelpers';
 import styles from './AdminTransactionDetail.module.scss';
@@ -54,6 +57,8 @@ function AdminTransactionDetail({
   onError,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
+  const { guard } = useViewerGuard();
   const [view, setView] = useState(VIEW.DETAILS);
 
   const txId = transaction?._id || transaction?.id;
@@ -83,7 +88,7 @@ function AdminTransactionDetail({
   if (!transaction) return null;
 
   // ── Formatierung ────────────────────────────────
-  const formatDate = (dateStr) => {
+  const formatDate = dateStr => {
     if (!dateStr) return '—';
     try {
       return new Intl.DateTimeFormat(i18n.language, {
@@ -96,7 +101,7 @@ function AdminTransactionDetail({
     }
   };
 
-  const formatAmount = (amount) => {
+  const formatAmount = amount => {
     if (amount == null) return '—';
     return formatAdminCurrency(amount, i18n.language);
   };
@@ -117,10 +122,20 @@ function AdminTransactionDetail({
         })}
       </p>
       <div className={styles.confirmActions}>
-        <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+        <button
+          className={styles.cancelButton}
+          onClick={backToDetails}
+          disabled={isBusy}
+          type="button"
+        >
           {t('common.cancel')}
         </button>
-        <button className={styles.dangerButton} onClick={handleDelete} disabled={isBusy} type="button">
+        <button
+          className={styles.dangerButton}
+          onClick={handleDelete}
+          disabled={isBusy}
+          type="button"
+        >
           {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiTrash2 size={14} />}
           {t('admin.transactions.delete')}
         </button>
@@ -137,7 +152,9 @@ function AdminTransactionDetail({
           {isIncome ? <FiTrendingUp size={24} /> : <FiTrendingDown size={24} />}
         </div>
         <div className={styles.headerInfo}>
-          <h3 className={styles.txDescription}>{transaction.description || '—'}</h3>
+          <h3 className={styles.txDescription}>
+            <SensitiveData active={isViewer}>{transaction.description || '—'}</SensitiveData>
+          </h3>
           <div className={styles.headerBadges}>
             <span className={`${styles.badge} ${styles[transaction.type]}`}>
               {isIncome ? t('admin.transactions.income') : t('admin.transactions.expense')}
@@ -148,27 +165,54 @@ function AdminTransactionDetail({
           </div>
         </div>
         <div className={`${styles.amountDisplay} ${isIncome ? styles.income : styles.expense}`}>
-          {isIncome ? '+' : '-'}{formatAmount(transaction.amount)}
+          <SensitiveData active={isViewer}>
+            {isIncome ? '+' : '-'}
+            {formatAmount(transaction.amount)}
+          </SensitiveData>
         </div>
       </div>
 
       {/* Info Grid */}
       <div className={styles.infoGrid}>
-        <InfoRow icon={FiCalendar} label={t('admin.transactions.date')} value={formatDate(transaction.date)} />
-        <InfoRow icon={FiTag} label={t('admin.transactions.category')} value={translateCategory(transaction.category, t)} />
+        <InfoRow
+          icon={FiCalendar}
+          label={t('admin.transactions.date')}
+          value={formatDate(transaction.date)}
+        />
+        <InfoRow
+          icon={FiTag}
+          label={t('admin.transactions.category')}
+          value={translateCategory(transaction.category, t)}
+        />
         <InfoRow
           icon={FiUser}
           label={t('admin.transactions.user')}
-          value={transaction.userId?.name || transaction.userId?.email || '—'}
+          value={
+            <SensitiveData active={isViewer}>
+              {transaction.userId?.name || transaction.userId?.email || '—'}
+            </SensitiveData>
+          }
         />
         {transaction.userId?.email && transaction.userId?.name && (
-          <InfoRow icon={FiUser} label={t('admin.transactions.userEmail')} value={transaction.userId.email} />
+          <InfoRow
+            icon={FiUser}
+            label={t('admin.transactions.userEmail')}
+            value={<SensitiveData active={isViewer}>{transaction.userId.email}</SensitiveData>}
+          />
         )}
         {transaction.notes && (
-          <InfoRow icon={FiFileText} label={t('admin.transactions.notes')} value={transaction.notes} />
+          <InfoRow
+            icon={FiFileText}
+            label={t('admin.transactions.notes')}
+            value={<SensitiveData active={isViewer}>{transaction.notes}</SensitiveData>}
+          />
         )}
         {transaction.tags && transaction.tags.length > 0 && (
-          <InfoRow icon={FiHash} label={t('admin.transactions.tags')} value={transaction.tags.join(', ')} />
+          <InfoRow
+            icon={FiHash}
+            label={t('admin.transactions.tags')}
+            value={transaction.tags.join(', ')}
+          />
         )}
       </div>
 
@@ -176,7 +220,7 @@ function AdminTransactionDetail({
       <div className={styles.actionGrid}>
         <button
           className={styles.dangerOutlineButton}
-          onClick={() => setView(VIEW.DELETE)}
+          onClick={() => guard(() => setView(VIEW.DELETE))}
           disabled={isBusy}
           type="button"
         >

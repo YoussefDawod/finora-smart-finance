@@ -33,6 +33,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, fallback) => fallback || key,
     i18n: { language: 'en', dir: () => 'ltr' },
@@ -44,18 +45,37 @@ vi.mock('@/hooks/useMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(
+              ([k]) =>
+                ![
+                  'whileHover',
+                  'whileTap',
+                  'whileFocus',
+                  'whileInView',
+                  'whileDrag',
+                  'initial',
+                  'animate',
+                  'exit',
+                  'transition',
+                  'variants',
+                  'layout',
+                  'layoutId',
+                ].includes(k)
+            )
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return <Tag {...htmlProps}>{children}</Tag>;
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -65,15 +85,29 @@ vi.mock('framer-motion', () => {
 
 vi.mock('@/components/common', () => ({
   ThemeSelector: ({ isCollapsed }) => (
-    <div data-testid="theme-selector" data-collapsed={isCollapsed}>ThemeSelector</div>
+    <div data-testid="theme-selector" data-collapsed={isCollapsed}>
+      ThemeSelector
+    </div>
   ),
 }));
 
 vi.mock('@/config/navigation', () => ({
   NAV_ITEMS: [
-    { path: '/dashboard', labelKey: 'nav.dashboard', icon: () => <span data-testid="icon-dashboard" /> },
-    { path: '/transactions', labelKey: 'nav.transactions', icon: () => <span data-testid="icon-transactions" /> },
-    { path: '/settings', labelKey: 'nav.settings', icon: () => <span data-testid="icon-settings" /> },
+    {
+      path: '/dashboard',
+      labelKey: 'nav.dashboard',
+      icon: () => <span data-testid="icon-dashboard" />,
+    },
+    {
+      path: '/transactions',
+      labelKey: 'nav.transactions',
+      icon: () => <span data-testid="icon-transactions" />,
+    },
+    {
+      path: '/settings',
+      labelKey: 'nav.settings',
+      icon: () => <span data-testid="icon-settings" />,
+    },
   ],
 }));
 
@@ -87,7 +121,7 @@ const renderSidebar = (props = {}) => {
   return render(
     <MemoryRouter initialEntries={['/dashboard']}>
       <Sidebar {...defaultProps} {...props} />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -196,7 +230,7 @@ describe('Sidebar', () => {
       mockAuthState.user = { name: 'AdminUser', email: 'a@t.com', role: 'admin' };
       renderSidebar();
       // admin.badge fallback is 'Admin'
-      const badges = screen.getAllByText('Admin');
+      const badges = screen.getAllByText('admin.badge');
       expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 

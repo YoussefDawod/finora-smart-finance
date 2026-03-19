@@ -25,9 +25,21 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useMotion, useIsDesktop } from '@/hooks';
-import { LoginForm, MultiStepRegisterForm, ForgotPasswordRequestForm, ResetPasswordForm, BrandingPanel } from '@/components/auth';
+import {
+  LoginForm,
+  MultiStepRegisterForm,
+  ForgotPasswordRequestForm,
+  ResetPasswordForm,
+  BrandingPanel,
+} from '@/components/auth';
 import { AuthPageSkeleton } from '@/components/common/Skeleton';
 import styles from './AuthPage.module.scss';
+
+const SPRING_CONFIG = {
+  type: 'spring',
+  stiffness: 220,
+  damping: 28,
+};
 
 export default function AuthPage() {
   const location = useLocation();
@@ -62,13 +74,6 @@ export default function AuthPage() {
     return <AuthPageSkeleton variant={skeletonVariant} showBranding />;
   }
 
-  // Smooth page-transition spring
-  const springConfig = {
-    type: 'spring',
-    stiffness: 220,
-    damping: 28,
-  };
-
   // ============================================
   // RENDER FORM CONTENT
   // ============================================
@@ -93,7 +98,12 @@ export default function AuthPage() {
 
     const renderForm = () => {
       if (isRegisterMode) return <MultiStepRegisterForm />;
-      if (isForgotMode) return resetToken ? <ResetPasswordForm token={resetToken} /> : <ForgotPasswordRequestForm />;
+      if (isForgotMode)
+        return resetToken ? (
+          <ResetPasswordForm token={resetToken} />
+        ) : (
+          <ForgotPasswordRequestForm />
+        );
       return <LoginForm />;
     };
 
@@ -130,7 +140,7 @@ export default function AuthPage() {
           className={styles.formPanel}
           initial={false}
           animate={{ x: isPanelRight ? '100%' : '0%' }}
-          transition={springConfig}
+          transition={SPRING_CONFIG}
         >
           {renderFormContent()}
         </motion.div>
@@ -140,7 +150,7 @@ export default function AuthPage() {
           className={styles.brandingPanel}
           initial={false}
           animate={{ x: isPanelRight ? '-100%' : '0%' }}
-          transition={springConfig}
+          transition={SPRING_CONFIG}
         >
           <BrandingPanel mode={mode} isDesktop={isDesktop} />
         </motion.div>
@@ -153,19 +163,11 @@ export default function AuthPage() {
   // ============================================
   return (
     <div className={`${styles.authPageMobile} ${isPanelTop ? styles.registerMode : ''}`}>
-      <motion.div
-        layout
-        className={styles.formPanelMobile}
-        transition={springConfig}
-      >
+      <motion.div layout className={styles.formPanelMobile} transition={SPRING_CONFIG}>
         {renderFormContent()}
       </motion.div>
 
-      <motion.div
-        layout
-        className={styles.brandingPanelMobile}
-        transition={springConfig}
-      >
+      <motion.div layout className={styles.brandingPanelMobile} transition={SPRING_CONFIG}>
         <BrandingPanel mode={mode} isDesktop={isDesktop} />
       </motion.div>
     </div>

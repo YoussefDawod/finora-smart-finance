@@ -1,24 +1,14 @@
 /**
- * @fileoverview Tests für Legal/Public Pages — navigate-Fallback
- * @description Testet handleBack mit history.length > 1 und leerer History,
- *              sowie Content-Rendering und MiniFooter-Integration.
+ * @fileoverview Tests für Legal/Public Pages — Content-Rendering
+ * @description Testet, ob alle öffentlichen Seiten ihren Titel korrekt rendern.
+ *              Back-Button und MiniFooter wurden durch PublicLayout ersetzt.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mock Setup ───────────────────────────────────────────
-
-const mockNavigate = vi.fn();
-
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -59,12 +49,7 @@ import PricingPage from '@/pages/PricingPage';
 
 // ── Tests ────────────────────────────────────────────────
 
-describe('Legal/Public Pages — navigate Fallback', () => {
-  beforeEach(() => {
-    mockNavigate.mockClear();
-  });
-
-  // Generische Tests für alle Seiten
+describe('Legal/Public Pages — Content Rendering', () => {
   const pages = [
     { name: 'ImpressumPage', Component: ImpressumPage, titleKey: 'impressum.title' },
     { name: 'TermsPage', Component: TermsPage, titleKey: 'terms.title' },
@@ -78,68 +63,13 @@ describe('Legal/Public Pages — navigate Fallback', () => {
   ];
 
   pages.forEach(({ name, Component, titleKey }) => {
-    describe(name, () => {
-      it('rendert den Seitentitel', () => {
-        render(
-          <MemoryRouter>
-            <Component />
-          </MemoryRouter>,
-        );
-        expect(screen.getByText(titleKey)).toBeInTheDocument();
-      });
-
-      it('rendert den Zurück-Button mit aria-label', () => {
-        render(
-          <MemoryRouter>
-            <Component />
-          </MemoryRouter>,
-        );
-        const backButton = screen.getByLabelText('common.back');
-        expect(backButton).toBeInTheDocument();
-      });
-
-      it('navigiert zu "/" wenn history leer (history.length <= 1)', () => {
-        // window.history.length ist normalerweise >= 1
-        Object.defineProperty(window, 'history', {
-          writable: true,
-          value: { length: 1 },
-        });
-
-        render(
-          <MemoryRouter>
-            <Component />
-          </MemoryRouter>,
-        );
-
-        fireEvent.click(screen.getByLabelText('common.back'));
-        expect(mockNavigate).toHaveBeenCalledWith('/');
-      });
-
-      it('navigiert mit navigate(-1) wenn History vorhanden', () => {
-        Object.defineProperty(window, 'history', {
-          writable: true,
-          value: { length: 5 },
-        });
-
-        render(
-          <MemoryRouter>
-            <Component />
-          </MemoryRouter>,
-        );
-
-        fireEvent.click(screen.getByLabelText('common.back'));
-        expect(mockNavigate).toHaveBeenCalledWith(-1);
-      });
-
-      it('rendert MiniFooter', () => {
-        render(
-          <MemoryRouter>
-            <Component />
-          </MemoryRouter>,
-        );
-        // MiniFooter rendert Links wie miniFooter.home
-        expect(screen.getByText('miniFooter.home')).toBeInTheDocument();
-      });
+    it(`${name} — rendert den Seitentitel`, () => {
+      render(
+        <MemoryRouter>
+          <Component />
+        </MemoryRouter>
+      );
+      expect(screen.getByText(titleKey)).toBeInTheDocument();
     });
   });
 });

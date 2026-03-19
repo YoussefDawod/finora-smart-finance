@@ -1,6 +1,6 @@
 /**
  * @fileoverview AdminAuditLogTable – Audit-Log-Tabelle für Admin-Panel
- * @description Read-only sortierbare Tabelle mit Pagination und
+ * @description Sortierbare Tabelle mit Pagination, Selektion und
  *              farbcodierten Action-Badges.
  *
  * @module components/admin/AdminAuditLogTable
@@ -39,6 +39,8 @@ import {
   FiUnlock,
 } from 'react-icons/fi';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
 import { getSortDirection, generatePageNumbers } from '@/utils/adminTableHelpers';
 import styles from './AdminAuditLogTable.module.scss';
 
@@ -73,6 +75,8 @@ const ACTION_CONFIG = {
   PASSWORD_RESET_REQUESTED: { icon: FiUnlock, color: 'warning' },
   PASSWORD_RESET_COMPLETED: { icon: FiKey, color: 'success' },
   EMAIL_CHANGED: { icon: FiMail, color: 'info' },
+  AUDIT_LOG_CLEARED: { icon: FiTrash2, color: 'danger' },
+  AUDIT_LOG_ENTRIES_DELETED: { icon: FiTrash2, color: 'warning' },
 };
 
 const DEFAULT_SKELETON_ROWS = 8;
@@ -87,6 +91,9 @@ const DEFAULT_SKELETON_ROWS = 8;
  * @param {string} props.sort
  * @param {Function} props.onSortChange
  * @param {Function} props.onPageChange
+ * @param {Set} [props.selectedIds] - Set selektierter Log-IDs
+ * @param {Function} [props.onSelectId] - Toggle einer einzelnen ID
+ * @param {Function} [props.onSelectAll] - Alle auf Seite an/abwählen
  */
 function AdminAuditLogTable({
   logs = [],
@@ -95,12 +102,16 @@ function AdminAuditLogTable({
   sort = '-createdAt',
   onSortChange,
   onPageChange,
+  selectedIds,
+  onSelectId,
+  onSelectAll,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
 
   // ── Sort Handler ────────────────────────────────
   const handleSort = useCallback(
-    (field) => {
+    field => {
       const currentField = sort.replace(/^-/, '');
       const isDesc = sort.startsWith('-');
 
@@ -110,11 +121,11 @@ function AdminAuditLogTable({
         onSortChange?.(`-${field}`);
       }
     },
-    [sort, onSortChange],
+    [sort, onSortChange]
   );
 
   const getSortIcon = useCallback(
-    (field) => {
+    field => {
       const currentField = sort.replace(/^-/, '');
       if (currentField !== field) return null;
       return sort.startsWith('-') ? (
@@ -123,84 +134,98 @@ function AdminAuditLogTable({
         <FiArrowUp size={12} className={styles.sortIcon} />
       );
     },
-    [sort],
+    [sort]
   );
 
   // ── Formatierungen ──────────────────────────────
-  const formatDateTime = useCallback((dateStr) => {
-    if (!dateStr) return '—';
-    try {
-      return new Intl.DateTimeFormat(i18n.language, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }).format(new Date(dateStr));
-    } catch {
-      return '—';
-    }
-  }, [i18n.language]);
-
-  const translateRole = useCallback(
-    (role) => t(`admin.auditLog.roles.${role}`, role),
-    [t],
+  const formatDateTime = useCallback(
+    dateStr => {
+      if (!dateStr) return '—';
+      try {
+        return new Intl.DateTimeFormat(i18n.language, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(new Date(dateStr));
+      } catch {
+        return '—';
+      }
+    },
+    [i18n.language]
   );
 
-  const formatDetails = useCallback((details) => {
-    if (!details || (typeof details === 'object' && Object.keys(details).length === 0)) {
-      return '—';
-    }
-    if (typeof details === 'string') {
-      return details.length > 80 ? `${details.slice(0, 80)}…` : details;
-    }
+  const translateRole = useCallback(role => t(`admin.auditLog.roles.${role}`, role), [t]);
 
-    const parts = [];
+  const formatDetails = useCallback(
+    details => {
+      if (!details || (typeof details === 'object' && Object.keys(details).length === 0)) {
+        return '—';
+      }
+      if (typeof details === 'string') {
+        return details.length > 80 ? `${details.slice(0, 80)}…` : details;
+      }
 
-    // newRole  →  "Neue Rolle: Admin"
-    if (details.newRole) {
-      parts.push(t('admin.auditLog.details_format.newRole', { role: translateRole(details.newRole) }));
-    }
+      const parts = [];
 
-    // deletedTransactions  →  "3 Transaktionen gelöscht"
-    if (details.deletedTransactions != null) {
-      parts.push(t('admin.auditLog.details_format.deletedTransactions', { count: details.deletedTransactions }));
-    }
+      // newRole  →  "Neue Rolle: Admin"
+      if (details.newRole) {
+        parts.push(
+          t('admin.auditLog.details_format.newRole', { role: translateRole(details.newRole) })
+        );
+      }
 
-    // role (on user creation)  →  "Rolle: Admin"
-    if (details.role && !details.newRole) {
-      parts.push(t('admin.auditLog.details_format.role', { role: translateRole(details.role) }));
-    }
+      // deletedTransactions  →  "3 Transaktionen gelöscht"
+      if (details.deletedTransactions != null) {
+        parts.push(
+          t('admin.auditLog.details_format.deletedTransactions', {
+            count: details.deletedTransactions,
+          })
+        );
+      }
 
-    // email  →  "E-Mail: user@example.com"
-    if (details.email) {
-      parts.push(t('admin.auditLog.details_format.email', { email: details.email }));
-    }
+      // role (on user creation)  →  "Rolle: Admin"
+      if (details.role && !details.newRole) {
+        parts.push(t('admin.auditLog.details_format.role', { role: translateRole(details.role) }));
+      }
 
-    // reason (bans etc.)  →  "Grund: ..."
-    if (details.reason) {
-      parts.push(t('admin.auditLog.details_format.reason', { reason: details.reason }));
-    }
+      // email  →  "E-Mail: user@example.com"
+      if (details.email) {
+        parts.push(t('admin.auditLog.details_format.email', { email: details.email }));
+      }
 
-    if (parts.length > 0) {
-      const result = parts.join(', ');
-      return result.length > 100 ? `${result.slice(0, 100)}…` : result;
-    }
+      // reason (bans etc.)  →  "Grund: ..."
+      if (details.reason) {
+        parts.push(t('admin.auditLog.details_format.reason', { reason: details.reason }));
+      }
 
-    // Fallback for unknown keys
-    try {
-      const str = JSON.stringify(details);
-      return str.length > 80 ? `${str.slice(0, 80)}…` : str;
-    } catch {
-      return '—';
-    }
-  }, [t, translateRole]);
+      if (parts.length > 0) {
+        const result = parts.join(', ');
+        return result.length > 100 ? `${result.slice(0, 100)}…` : result;
+      }
+
+      // Fallback for unknown keys
+      try {
+        const str = JSON.stringify(details);
+        return str.length > 80 ? `${str.slice(0, 80)}…` : str;
+      } catch {
+        return '—';
+      }
+    },
+    [t, translateRole]
+  );
 
   // ── Loading ─────────────────────────────────────
+  const selectable = !!selectedIds;
+  const allPageIds = logs.map(l => l._id || l.id);
+  const allSelected =
+    selectable && allPageIds.length > 0 && allPageIds.every(id => selectedIds.has(id));
+
   if (loading && logs.length === 0) {
     return (
       <div className={styles.tableWrapper}>
-        <SkeletonTableRow columns={7} hasIcon count={DEFAULT_SKELETON_ROWS} density="normal" />
+        <SkeletonTableRow columns={9} hasIcon count={DEFAULT_SKELETON_ROWS} density="normal" />
       </div>
     );
   }
@@ -223,6 +248,16 @@ function AdminAuditLogTable({
         <table className={styles.table} role="table">
           <thead>
             <tr>
+              {selectable && (
+                <th className={styles.checkboxCell}>
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={() => onSelectAll?.()}
+                    aria-label={t('admin.auditLog.selectAll')}
+                  />
+                </th>
+              )}
               <th
                 className={styles.sortable}
                 onClick={() => handleSort('createdAt')}
@@ -240,12 +275,20 @@ function AdminAuditLogTable({
               </th>
               <th>{t('admin.auditLog.target')}</th>
               <th>{t('admin.auditLog.details')}</th>
+              <th
+                className={styles.sortable}
+                onClick={() => handleSort('country')}
+                aria-sort={getSortDirection('country', sort)}
+              >
+                {t('admin.auditLog.country')} {getSortIcon('country')}
+              </th>
+              <th>{t('admin.auditLog.city')}</th>
               <th>{t('admin.auditLog.ipAddress')}</th>
               <th>{t('admin.auditLog.requestId')}</th>
             </tr>
           </thead>
           <tbody>
-            {logs.map((log) => {
+            {logs.map(log => {
               const logId = log._id || log.id;
               const actionCfg = ACTION_CONFIG[log.action] || {
                 icon: FiFileText,
@@ -254,14 +297,31 @@ function AdminAuditLogTable({
               const ActionIcon = actionCfg.icon;
 
               return (
-                <tr key={logId} className={styles.row}>
+                <tr
+                  key={logId}
+                  className={`${styles.row} ${selectable && selectedIds.has(logId) ? styles.selectedRow : ''}`}
+                >
+                  {/* Checkbox */}
+                  {selectable && (
+                    <td className={styles.checkboxCell} data-label="">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(logId)}
+                        onChange={() => onSelectId?.(logId)}
+                        aria-label={t('admin.auditLog.selectEntry')}
+                      />
+                    </td>
+                  )}
+
                   {/* Date/Time */}
-                  <td className={styles.dateCell} data-label={t('admin.auditLog.date')}>{formatDateTime(log.createdAt)}</td>
+                  <td className={styles.dateCell} data-label={t('admin.auditLog.date')}>
+                    {formatDateTime(log.createdAt)}
+                  </td>
 
                   {/* Admin */}
                   <td className={styles.adminCell} data-label={t('admin.auditLog.admin')}>
                     <FiUser size={12} className={styles.adminIcon} />
-                    {log.adminName || '—'}
+                    <SensitiveData active={isViewer}>{log.adminName || '—'}</SensitiveData>
                   </td>
 
                   {/* Action Badge */}
@@ -274,22 +334,42 @@ function AdminAuditLogTable({
 
                   {/* Target */}
                   <td className={styles.targetCell} data-label={t('admin.auditLog.target')}>
-                    {log.targetUserName || '—'}
+                    <SensitiveData active={isViewer}>{log.targetUserName || '—'}</SensitiveData>
                   </td>
 
                   {/* Details */}
-                  <td className={styles.detailsCell} data-label={t('admin.auditLog.details')} title={typeof log.details === 'object' ? JSON.stringify(log.details) : log.details}>
+                  <td
+                    className={styles.detailsCell}
+                    data-label={t('admin.auditLog.details')}
+                    title={
+                      typeof log.details === 'object' ? JSON.stringify(log.details) : log.details
+                    }
+                  >
                     {formatDetails(log.details)}
                   </td>
 
+                  {/* Country */}
+                  <td className={styles.countryCell} data-label={t('admin.auditLog.country')}>
+                    {log.country || '—'}
+                  </td>
+
+                  {/* City */}
+                  <td className={styles.cityCell} data-label={t('admin.auditLog.city')}>
+                    {log.city || '—'}
+                  </td>
+
                   {/* IP */}
-                  <td className={styles.ipCell} data-label={t('admin.auditLog.ipAddress')}>{log.ipAddress || '—'}</td>
+                  <td className={styles.ipCell} data-label={t('admin.auditLog.ipAddress')}>
+                    <SensitiveData active={isViewer}>{log.ipAddress || '—'}</SensitiveData>
+                  </td>
 
                   {/* Request ID */}
                   <td className={styles.requestIdCell} data-label={t('admin.auditLog.requestId')}>
                     {log.requestId ? (
                       <code className={styles.requestIdCode}>{log.requestId}</code>
-                    ) : '—'}
+                    ) : (
+                      '—'
+                    )}
                   </td>
                 </tr>
               );
@@ -300,7 +380,11 @@ function AdminAuditLogTable({
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className={styles.pagination} role="navigation" aria-label={t('admin.auditLog.pagination')}>
+        <div
+          className={styles.pagination}
+          role="navigation"
+          aria-label={t('admin.auditLog.pagination')}
+        >
           <span className={styles.paginationInfo}>
             {t('admin.auditLog.showing', {
               from: (page - 1) * (pagination.limit || DEFAULT_SKELETON_ROWS) + 1,
@@ -320,7 +404,9 @@ function AdminAuditLogTable({
             </button>
             {generatePageNumbers(page, pages).map((p, idx) =>
               p === '...' ? (
-                <span key={`dots-${idx}`} className={styles.dots}>…</span>
+                <span key={`dots-${idx}`} className={styles.dots}>
+                  …
+                </span>
               ) : (
                 <button
                   key={p}
@@ -332,7 +418,7 @@ function AdminAuditLogTable({
                 >
                   {p}
                 </button>
-              ),
+              )
             )}
             <button
               className={styles.pageButton}

@@ -8,7 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
 import { useMotion } from '@/hooks/useMotion';
 import { Card } from '@/components/common';
-import { FiMail, FiCheck, FiAlertCircle, FiAlertTriangle, FiEdit2, FiTrash2, FiRefreshCw, FiPlus } from 'react-icons/fi';
+import {
+  FiMail,
+  FiCheck,
+  FiAlertCircle,
+  FiAlertTriangle,
+  FiEdit2,
+  FiTrash2,
+  FiRefreshCw,
+  FiPlus,
+} from 'react-icons/fi';
 import styles from '../ProfilePage.module.scss';
 
 export function EmailManager({
@@ -24,10 +33,12 @@ export function EmailManager({
   const toast = useToast();
   const { shouldAnimate } = useMotion();
 
-  const itemVariants = shouldAnimate ? {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  } : {};
+  const itemVariants = shouldAnimate
+    ? {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+      }
+    : {};
 
   const handleResendVerification = async () => {
     const result = await onResendVerification();
@@ -88,8 +99,14 @@ export function EmailManager({
                 <div className={styles.warningBanner}>
                   <FiAlertTriangle />
                   <span>{t('profile.email.warningUnverified')}</span>
-                  <button onClick={handleResendVerification} disabled={isResendingVerification} className={styles.resendBtn}>
-                    {isResendingVerification ? t('profile.email.resendSending') : t('profile.email.resend')}
+                  <button
+                    onClick={handleResendVerification}
+                    disabled={isResendingVerification}
+                    className={styles.resendBtn}
+                  >
+                    {isResendingVerification
+                      ? t('profile.email.resendSending')
+                      : t('profile.email.resend')}
                   </button>
                 </div>
               )}
@@ -110,7 +127,8 @@ export function EmailManager({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FiTrash2 /> {isRemovingEmail ? t('profile.email.removing') : t('profile.email.remove')}
+                  <FiTrash2 />{' '}
+                  {isRemovingEmail ? t('profile.email.removing') : t('profile.email.remove')}
                 </motion.button>
               </div>
             </>
@@ -135,7 +153,10 @@ export function EmailManager({
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <FiRefreshCw /> {isResendingVerification ? t('profile.email.pendingResendSending') : t('profile.email.pendingResend')}
+                  <FiRefreshCw />{' '}
+                  {isResendingVerification
+                    ? t('profile.email.pendingResendSending')
+                    : t('profile.email.pendingResend')}
                 </motion.button>
                 <motion.button
                   className={styles.btnSecondary}
@@ -156,6 +177,15 @@ export function EmailManager({
                   <p>{t('profile.email.noEmailDescription')}</p>
                 </div>
               </div>
+              {emailStatus.isVerified === false ? (
+                <div className={styles.accountNotVerifiedBanner}>
+                  <FiAlertCircle />
+                  <div>
+                    <strong>{t('profile.email.accountNotVerified')}</strong>
+                    <p>{t('profile.email.accountNotVerifiedAddEmail')}</p>
+                  </div>
+                </div>
+              ) : null}
               <motion.button
                 className={styles.btnPrimary}
                 onClick={() => onAddEmail()}

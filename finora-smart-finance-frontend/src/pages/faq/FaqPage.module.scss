@@ -1,0 +1,153 @@
+// ============================================
+// 📄 FAQ PAGE — Glass Accordion
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+.pageContent {
+  max-width: 50rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+// ============================================
+// HEADER
+// ============================================
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+
+  @include mobile {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+.title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  background: linear-gradient(135deg, var(--tx) 30%, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  font-size: clamp(var(--fs-sm), 2vw, var(--fs-lg));
+  color: var(--tx-muted);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// FAQ LIST
+// ============================================
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+// ============================================
+// FAQ ITEM — Glass
+// ============================================
+.faqItem {
+  background: color-mix(in srgb, var(--glass-bg) 50%, transparent);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  transition: border-color var(--tr);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+
+  &:hover {
+    border-color: var(--primary);
+  }
+}
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: start;
+  font-size: var(--fs-base);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  transition: color var(--tr);
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    transition: transform var(--tr);
+    color: var(--tx-muted);
+  }
+
+  @include mobile {
+    padding: var(--space-md);
+    font-size: var(--fs-sm);
+  }
+}
+
+.faqQuestionOpen svg {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.faqAnswer {
+  padding: 0 var(--space-lg) var(--space-lg);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: 1.7;
+
+  @include mobile {
+    padding: 0 var(--space-md) var(--space-md);
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .faqItem {
+    transition: none;
+  }
+
+  .faqQuestion {
+    transition: none;
+
+    svg {
+      transition: none;
+    }
+  }
+}

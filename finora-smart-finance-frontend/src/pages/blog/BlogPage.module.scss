@@ -1,0 +1,201 @@
+// ============================================
+// 📄 BLOG PAGE — Glass Cards Grid
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER
+// ============================================
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+
+  @include mobile {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+.title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  background: linear-gradient(135deg, var(--tx) 30%, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  font-size: clamp(var(--fs-sm), 2vw, var(--fs-lg));
+  color: var(--tx-muted);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// BLOG GRID
+// ============================================
+.blogGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-xl);
+}
+
+// ============================================
+// POST CARD — Glass
+// ============================================
+.postCard {
+  background: color-mix(in srgb, var(--glass-bg) 65%, transparent);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  border-radius: var(--r-xl);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  transition:
+    border-color var(--tr),
+    box-shadow var(--tr),
+    transform var(--tr);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: var(--glass-shadow);
+    transform: translateY(-2px);
+  }
+
+  @include mobile {
+    padding: var(--space-lg);
+  }
+}
+
+.postDate {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.postTitle {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  line-height: var(--lh-snug);
+
+  @include mobile {
+    font-size: var(--fs-base);
+  }
+}
+
+.postExcerpt {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+  flex: 1;
+}
+
+// ============================================
+// TAGS
+// ============================================
+.postTags {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.postTag {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  color: var(--primary);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-m);
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--r-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ============================================
+// COMING BADGE
+// ============================================
+.comingBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  border: 1px solid var(--glass-border);
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--r-full);
+}
+
+// ============================================
+// READ MORE LINK
+// ============================================
+.readLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-top: auto;
+  color: var(--primary);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  text-decoration: none;
+  transition:
+    gap var(--tr),
+    opacity var(--tr);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  :global([dir='rtl']) & {
+    svg {
+      transform: scaleX(-1);
+    }
+  }
+
+  &:hover {
+    gap: var(--space-xs);
+    opacity: 0.85;
+  }
+}
+
+.comingOverlay {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .postCard {
+    transition: none;
+  }
+}

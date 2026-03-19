@@ -4,7 +4,7 @@
  */
 
 const authMiddleware = require('../../src/middleware/authMiddleware');
-const { requireAdmin } = require('../../src/middleware/authMiddleware');
+const { requireAdmin, requireAdminOrViewer } = require('../../src/middleware/authMiddleware');
 const { verifyAccessToken } = require('../../src/services/authService');
 const User = require('../../src/models/User');
 
@@ -292,6 +292,66 @@ describe('AuthMiddleware', () => {
   });
 
   // ============================================
+  // requireAdminOrViewer Tests
+  // ============================================
+  describe('requireAdminOrViewer', () => {
+    it('should allow admin access', () => {
+      req.user = { _id: 'admin-1', name: 'Admin', role: 'admin' };
+
+      requireAdminOrViewer(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it('should allow viewer access', () => {
+      req.user = { _id: 'viewer-1', name: 'Viewer', role: 'viewer' };
+
+      requireAdminOrViewer(req, res, next);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it('should reject regular user', () => {
+      req.user = { _id: 'user-1', name: 'User', role: 'user' };
+
+      requireAdminOrViewer(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith(
+        expect.objectContaining({ success: false, code: 'FORBIDDEN' })
+      );
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should reject when no user on request', () => {
+      requireAdminOrViewer(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should reject null role', () => {
+      req.user = { _id: 'user-1', role: null };
+
+      requireAdminOrViewer(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should reject wrong casing (Viewer)', () => {
+      req.user = { _id: 'user-1', role: 'Viewer' };
+
+      requireAdminOrViewer(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  // ============================================
   // Module Export Tests
   // ============================================
   describe('Module Exports', () => {
@@ -301,6 +361,10 @@ describe('AuthMiddleware', () => {
 
     it('should export requireAdmin as named export', () => {
       expect(typeof requireAdmin).toBe('function');
+    });
+
+    it('should export requireAdminOrViewer as named export', () => {
+      expect(typeof requireAdminOrViewer).toBe('function');
     });
 
     it('should allow chaining authMiddleware + requireAdmin', async () => {
@@ -319,7 +383,7 @@ describe('AuthMiddleware', () => {
       });
 
       // Simulate the chain: authMiddleware → requireAdmin
-      await authMiddleware(req, res, (err) => {
+      await authMiddleware(req, res, err => {
         if (err) return;
         requireAdmin(req, res, next);
       });
@@ -344,7 +408,7 @@ describe('AuthMiddleware', () => {
       });
 
       // Simulate the chain: authMiddleware → requireAdmin
-      await authMiddleware(req, res, (err) => {
+      await authMiddleware(req, res, err => {
         if (err) return;
         requireAdmin(req, res, next);
       });
@@ -369,16 +433,62 @@ describe('AuthMiddleware', () => {
         select: jest.fn().mockResolvedValue(bannedAdmin),
       });
 
-      await authMiddleware(req, res, (err) => {
+      await authMiddleware(req, res, err => {
         if (err) return;
         requireAdmin(req, res, next);
       });
 
       // authMiddleware should block before requireAdmin
       expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ code: 'ACCOUNT_BANNED' })
-      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'ACCOUNT_BANNED' }));
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should allow viewer in chained authMiddleware + requireAdminOrViewer', async () => {
+      const viewerUser = {
+        _id: 'viewer-1',
+        name: 'Viewer User',
+        role: 'viewer',
+        isActive: true,
+      };
+
+      req.headers.authorization = 'Bearer viewer-token';
+      verifyAccessToken.mockReturnValue({ sub: 'viewer-1' });
+
+      User.findById = jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue(viewerUser),
+      });
+
+      await authMiddleware(req, res, err => {
+        if (err) return;
+        requireAdminOrViewer(req, res, next);
+      });
+
+      expect(req.user).toEqual(viewerUser);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should block viewer in chained authMiddleware + requireAdmin', async () => {
+      const viewerUser = {
+        _id: 'viewer-1',
+        name: 'Viewer User',
+        role: 'viewer',
+        isActive: true,
+      };
+
+      req.headers.authorization = 'Bearer viewer-token';
+      verifyAccessToken.mockReturnValue({ sub: 'viewer-1' });
+
+      User.findById = jest.fn().mockReturnValue({
+        select: jest.fn().mockResolvedValue(viewerUser),
+      });
+
+      await authMiddleware(req, res, err => {
+        if (err) return;
+        requireAdmin(req, res, next);
+      });
+
+      expect(res.status).toHaveBeenCalledWith(403);
       expect(next).not.toHaveBeenCalled();
     });
   });

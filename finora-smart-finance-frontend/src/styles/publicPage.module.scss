@@ -1,0 +1,53 @@
+// ============================================
+// 📄 PUBLIC PAGE — SHARED BASE STYLES
+// Used by: About, Features, Pricing, FAQ, Help, Blog
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER
+// ============================================
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+
+  @include mobile {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+.pageTitle {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  background: linear-gradient(135deg, var(--tx) 30%, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.pageSubtitle {
+  font-size: clamp(var(--fs-sm), 2vw, var(--fs-lg));
+  color: var(--tx-muted);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--lh-relaxed);
+}

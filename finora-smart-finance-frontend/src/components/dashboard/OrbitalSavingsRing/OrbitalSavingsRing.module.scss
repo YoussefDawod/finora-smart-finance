@@ -1,0 +1,201 @@
+// ============================================
+// 🔮 ORBITAL SAVINGS RING — Redesign
+// ============================================
+// Modernes Donut-Chart mit Gradient-Stroke, Glow,
+// zentriertem Layout und animiertem Eingang.
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Panel Layout ──
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--space-md);
+}
+
+// ── Title ──
+.header {
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  @include glass-text;
+}
+
+// ── Ring Area ──
+.ringArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  overflow: visible;
+}
+
+.ringWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+}
+
+.svg {
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 1px color-mix(in srgb, var(--tx) 5%, transparent));
+  overflow: visible;
+  transition: filter 0.4s ease;
+
+  @include desktop {
+    width: 240px;
+    height: 240px;
+  }
+
+  .ringWrapper:hover & {
+    filter: drop-shadow(0 0 16px color-mix(in srgb, var(--aurora-1) 55%, transparent));
+  }
+}
+
+// ── Track: sichtbar in Light + Dark ──
+.trackRing {
+  fill: none;
+  stroke: color-mix(in srgb, var(--tx) 10%, transparent);
+  stroke-width: 14;
+}
+
+// ── Value Ring: Gradient-Stroke via <linearGradient> ──
+.valueRing {
+  fill: none;
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+// ── Center Label ──
+.centerLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3xs);
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  .ringWrapper:hover & {
+    transform: scale(1.06);
+  }
+}
+
+.rateValue {
+  font-size: var(--fs-2xl);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  @include glass-text;
+
+  @include mobile {
+    font-size: var(--fs-xl);
+  }
+}
+
+.rateValue.positive {
+  color: var(--aurora-1);
+}
+
+.rateValue.negative {
+  color: var(--aurora-warn);
+}
+
+.rateLabel {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  letter-spacing: 0.02em;
+  @include glass-text;
+}
+
+// ── Footer: Gespart + Trend ──
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding-top: var(--space-sm);
+  border-top: 1px solid color-mix(in srgb, var(--tx) 15%, transparent);
+}
+
+.footerStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.footerText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.footerLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include glass-text;
+}
+
+.footerValue {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+  @include glass-text;
+
+  &[data-positive='true'] {
+    color: var(--success);
+  }
+  &[data-positive='false'] {
+    color: var(--error);
+  }
+}
+
+.footerBadge {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  font-variant-numeric: tabular-nums;
+  @include glass-text;
+
+  &[data-positive='true'] {
+    color: var(--success);
+  }
+  &[data-positive='false'] {
+    color: var(--error);
+  }
+}
+
+// ── Reduced Motion ──
+@include reduced-motion {
+  .valueRing,
+  .ringWrapper,
+  .svg,
+  .centerLabel,
+  .footerStat {
+    transition: none;
+  }
+}

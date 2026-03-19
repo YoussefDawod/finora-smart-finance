@@ -19,8 +19,12 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
 vi.mock('@/utils/categoryTranslations', () => ({
-  translateCategory: (cat) => `translated_${cat}`,
+  translateCategory: cat => `translated_${cat}`,
 }));
 
 // ── Test-Daten ────────────────────────────────────
@@ -85,8 +89,12 @@ describe('AdminTransactionTable', () => {
 
   describe('Loading State', () => {
     it('zeigt Skeleton-Platzhalter beim Laden', () => {
-      const { container } = render(<AdminTransactionTable {...defaultProps} loading={true} transactions={[]} />);
-      expect(container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')).toBeInTheDocument();
+      const { container } = render(
+        <AdminTransactionTable {...defaultProps} loading={true} transactions={[]} />
+      );
+      expect(
+        container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')
+      ).toBeInTheDocument();
     });
 
     it('zeigt keine Tabelle im Loading-State', () => {
@@ -242,7 +250,7 @@ describe('AdminTransactionTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByText('3'));
@@ -270,7 +278,7 @@ describe('AdminTransactionTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByLabelText('admin.transactions.prevPage'));
@@ -284,7 +292,7 @@ describe('AdminTransactionTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByLabelText('admin.transactions.nextPage'));
@@ -304,7 +312,9 @@ describe('AdminTransactionTable', () => {
       const onViewTransaction = vi.fn();
       render(<AdminTransactionTable {...defaultProps} onViewTransaction={onViewTransaction} />);
 
-      const viewButtons = screen.getAllByRole('button', { name: /admin\.transactions\.viewDetails/ });
+      const viewButtons = screen.getAllByRole('button', {
+        name: /admin\.transactions\.viewDetails/,
+      });
       fireEvent.click(viewButtons[0]);
 
       expect(onViewTransaction).toHaveBeenCalledWith(mockTransactions[0]);

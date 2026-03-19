@@ -1,11 +1,10 @@
 // ============================================
-// 📊 DASHBOARD PAGE
+// 🌌 AURORA FLOW — DASHBOARD PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
-// LOADING CONTAINER
+// ERROR / LOADING FALLBACK
 // ============================================
 .loadingContainer {
   display: flex;
@@ -16,12 +15,12 @@
   min-height: 100dvh;
   gap: var(--space-md);
   padding: var(--space-xl);
-  background: var(--bg);
 
   p {
     font-size: var(--fs-md);
     color: var(--tx-muted);
     margin: 0;
+    @include glass-text;
   }
 
   @include mobile {
@@ -31,15 +30,28 @@
 }
 
 // ============================================
-// PAGE CONTAINER
+// AURORA LAYOUT (content wrapper)
 // ============================================
-.dashboardPage {
+.auroraLayout {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  max-width: 1200px;
   width: 100%;
+  margin: 0 auto;
   min-height: 100vh;
-  min-height: 100dvh; // Dynamic viewport height für bessere Mobile-Kompatibilität
+  min-height: 100dvh;
+
+  // Gradient jetzt auf <html.page-dashboard> — auroraLayout bleibt transparent,
+  // damit der page-level Aurora-Gradient durchscheint.
+
+  // All direct children sit above the AuroraCanvas (z-index: 0)
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   @include tablet {
     gap: var(--space-lg);
@@ -55,12 +67,12 @@
 // ============================================
 // HEADER SECTION
 // ============================================
-
 .headerSection {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-lg);
+  z-index: 2;
 
   @include tablet {
     flex-direction: column;
@@ -75,10 +87,6 @@
   }
 }
 
-// ============================================
-// HEADER ACTIONS (Filter + New Transaction)
-// Beide Buttons immer nebeneinander, gleiche Höhe
-// ============================================
 .headerActions {
   display: flex;
   align-items: center;
@@ -94,15 +102,12 @@
     justify-content: stretch;
   }
 
-  // Alle direkten Button-Kinder: gleiche Höhe
   > button,
-  > :global(.button) {
+  > :global(.button),
+  > :global([class*='filterWrapper']) {
     height: var(--btn-height-sm, 2rem);
     flex-shrink: 0;
-  }
 
-  // "Neue Transaktion" Button nimmt restlichen Platz
-  > :global(.button) {
     @include mobile {
       flex: 1;
       min-width: 0;
@@ -125,6 +130,7 @@
     margin: 0 0 var(--space-2xs) 0;
     letter-spacing: -0.01em;
     line-height: 1.4;
+    @include glass-text;
 
     @include tablet {
       font-size: var(--fs-lg);
@@ -142,6 +148,7 @@
     color: var(--tx-muted);
     margin: 0;
     line-height: var(--lh-n);
+    @include glass-text;
 
     @include mobile {
       font-size: var(--fs-xs);
@@ -152,7 +159,7 @@
 
 .greetingTitle {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: var(--space-xs);
   flex-wrap: wrap;
 }
@@ -160,38 +167,40 @@
 .greetingIcon {
   display: inline-flex;
   align-items: center;
-  // ⚠️ --accent nur für Glow/Hero/Decor, nicht für UI-Icons
-  // Verwende --primary für konsistente Brand-Präsenz
+  align-self: center; // Icon zentriert sich im row, nicht auf Baseline
   color: var(--primary);
-  font-size: 1.1em;
+  font-size: 1.15em;
+  line-height: 1;
 }
 
 .greetingIntro {
   color: var(--tx-muted);
   font-weight: var(--fw-m);
+  line-height: 1;
 }
 
 .greetingName {
-  color: var(--tx);
-  font-weight: var(--fw-sb);
+  color: var(--primary);
+  font-weight: var(--fw-b);
+  font-size: 1.45em;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 // ============================================
-// SUMMARY CARDS GRID
+// PANEL ROW (2-column grid)
 // ============================================
-.summaryGrid {
+.panelRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
-  width: 100%;
 
-  @include tablet {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
+  @include below-lg {
+    grid-template-columns: 1fr;
   }
 
   @include mobile {
-    grid-template-columns: 1fr;
+    gap: var(--space-md);
   }
 }
 
@@ -204,48 +213,15 @@
   gap: var(--space-md);
 }
 
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-
-  h2 {
-    font-size: var(--fs-xl);
-    font-weight: var(--fw-sb);
-    color: var(--tx);
-    margin: 0;
-
-    @include mobile {
-      font-size: var(--fs-lg);
-    }
-  }
-}
-
-.sectionLink {
-  font-size: var(--fs-sm);
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: var(--fw-m);
-  transition: color var(--tr);
-
-  &:hover {
-    color: var(--pri-hover);
-    text-decoration: underline;
-  }
-
-  @include focus-ring;
-}
-
 // ============================================
-// CHARTS GRID
+// SKELETON GRID (loading state)
 // ============================================
-.chartsGrid {
+.skeletonGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-lg);
 
-  @include tablet {
+  @include below-lg {
     grid-template-columns: 1fr;
   }
 }
@@ -254,7 +230,7 @@
 // REDUCED MOTION
 // ============================================
 @include reduced-motion {
-  .sectionLink {
+  .headerActions {
     transition: none;
   }
 }

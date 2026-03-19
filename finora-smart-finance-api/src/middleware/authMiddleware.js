@@ -45,5 +45,22 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+/**
+ * Middleware: Prüft ob der eingeloggte User 'admin' oder 'viewer' ist.
+ * Viewer haben Read-only-Zugriff auf Admin-Bereich.
+ * Muss NACH authMiddleware verwendet werden.
+ */
+function requireAdminOrViewer(req, res, next) {
+  if (!req.user || (req.user.role !== 'admin' && req.user.role !== 'viewer')) {
+    return sendError(res, req, {
+      error: 'Zugriff verweigert: Admin- oder Zuschauer-Rechte erforderlich',
+      code: 'FORBIDDEN',
+      status: 403,
+    });
+  }
+  next();
+}
+
 module.exports = authMiddleware;
 module.exports.requireAdmin = requireAdmin;
+module.exports.requireAdminOrViewer = requireAdminOrViewer;

@@ -5,7 +5,7 @@
  * - NO scrolling needed on any viewport
  * - Minimal gaps - content fits in available space
  * - Desktop: Content vertically centered
- * - Mobile: Content fills available space without overflow
+ * - Mobile: Compact single-column, everything fits in ~25svh
  */
 
 @use '../../../styles/mixins' as *;
@@ -24,7 +24,11 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--space-xs);
-  overflow: hidden;
+
+  @include below-md {
+    padding: var(--space-3xs);
+    justify-content: center;
+  }
 }
 
 // ============================================
@@ -54,8 +58,9 @@
   }
 
   @include below-md {
-    gap: var(--space-2xs);
-    padding: var(--space-xs) var(--space-sm);
+    gap: var(--space-3xs);
+    padding: var(--space-3xs) var(--space-xs);
+    margin: 0;
   }
 }
 
@@ -68,6 +73,10 @@
   justify-content: space-between;
   gap: var(--space-xs);
   flex-wrap: wrap;
+
+  @include below-md {
+    gap: var(--space-3xs);
+  }
 }
 
 .badge {
@@ -76,8 +85,8 @@
   gap: var(--space-2xs);
   padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--r-full);
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  border: 1px solid var(--glass-border);
   color: var(--primary);
   font-size: var(--fs-2xs);
   font-weight: var(--fw-m);
@@ -91,8 +100,8 @@
   }
 
   @include below-md {
-    font-size: 0.6rem;
-    padding: 2px var(--space-2xs);
+    font-size: 0.55rem;
+    padding: 1px var(--space-3xs);
   }
 }
 
@@ -101,14 +110,10 @@
 // ============================================
 .tagline {
   margin: 0;
-  font-size: var(--fs-sm);
+  font-size: clamp(0.65rem, 1.5svh, var(--fs-sm));
   font-weight: var(--fw-m);
-  color: color-mix(in srgb, var(--text-on-primary) 80%, transparent);
+  color: var(--tx-muted);
   letter-spacing: var(--ls-normal);
-
-  @include below-md {
-    font-size: var(--fs-xs);
-  }
 }
 
 // ============================================
@@ -122,7 +127,7 @@
 
 .kicker {
   display: none;
-  
+
   @include lg {
     display: block;
     font-size: var(--fs-xs);
@@ -136,19 +141,18 @@
 .headline {
   h2 {
     margin: 0;
-    font-size: var(--fs-lg);
+    font-size: clamp(var(--fs-md), 4svh, var(--fs-3xl));
     font-weight: var(--fw-b);
     letter-spacing: var(--ls-tight);
     color: var(--tx);
     line-height: var(--lh-tight);
 
-    @include md {
-      font-size: var(--fs-xl);
+    @include lg {
+      margin-bottom: var(--space-2xs);
     }
 
-    @include lg {
-      font-size: var(--fs-3xl);
-      margin-bottom: var(--space-2xs);
+    @include below-md {
+      font-size: clamp(0.75rem, 2.5svh, var(--fs-md));
     }
   }
 
@@ -166,7 +170,7 @@
 }
 
 // ============================================
-// CTA BUTTON — harmonisch mit Button.module.scss primary variant
+// CTA BUTTON — Frosted Glass auf Aurora-Gradient
 // ============================================
 .actions {
   display: flex;
@@ -178,35 +182,64 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-xs) var(--space-lg);
   height: var(--btn-height-md, 2.5rem);
-  border-radius: var(--r-md);
-  background: var(--primary);
-  color: var(--on-primary);
-  border: none;
+  border-radius: var(--r-xl);
+  background: color-mix(in srgb, white 18%, transparent);
+  color: var(--tx);
+  border: 1px solid color-mix(in srgb, white 28%, transparent);
   text-decoration: none;
   font-weight: var(--fw-sb);
   font-size: var(--fs-sm);
-  transition: all var(--tr);
+  letter-spacing: var(--ls-wide);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 25%, transparent),
+    0 2px 8px color-mix(in srgb, black 12%, transparent);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 30%, transparent);
+  transition:
+    background var(--tr-fast),
+    border-color var(--tr-fast),
+    box-shadow var(--tr-fast),
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
 
   @include lg {
     padding: var(--space-sm) var(--space-xl);
     font-size: var(--fs-md);
+    height: var(--btn-height-lg, 3rem);
+  }
+
+  @include below-md {
+    padding: var(--space-3xs) var(--space-sm);
+    height: auto;
+    font-size: var(--fs-xs);
+    gap: var(--space-2xs);
+    border-radius: var(--r-lg);
   }
 
   &:hover {
-    background: var(--pri-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px color-mix(in srgb, var(--primary) 40%, transparent);
+    background: color-mix(in srgb, white 26%, transparent);
+    border-color: color-mix(in srgb, white 40%, transparent);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, white 30%, transparent),
+      0 8px 24px color-mix(in srgb, black 18%, transparent);
   }
 
   &:active {
-    transform: translateY(0);
-    box-shadow: none;
+    transform: translateY(0) scale(0.99);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, white 20%, transparent),
+      0 2px 6px color-mix(in srgb, black 10%, transparent);
+    transition-duration: 80ms;
   }
 
   @include focus-ring;
@@ -217,7 +250,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform var(--tr-fast);
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
   svg {
     width: 1em;
@@ -225,7 +258,7 @@
   }
 
   .ctaButton:hover & {
-    transform: translateX(3px);
+    transform: translateX(4px);
   }
 }
 
@@ -271,9 +304,9 @@
   z-index: 2;
   margin-bottom: var(--space-sm);
   font-size: var(--fs-2xs);
-  color: color-mix(in srgb, var(--text-on-primary) 65%, transparent);
+  color: var(--tx-muted);
   text-align: center;
-  
+
   p {
     margin: 0;
   }
@@ -283,7 +316,7 @@
   }
 
   @include below-md {
-    font-size: 0.55rem;
+    display: none;
   }
 }
 
@@ -291,7 +324,8 @@
 // REDUCED MOTION
 // ============================================
 @include reduced-motion {
-  .ctaButton {
+  .ctaButton,
+  .arrow {
     transition: none;
   }
 }

@@ -1,7 +1,6 @@
 // ============================================
 // 📧 ADMIN SUBSCRIBER DETAIL
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .content {
@@ -205,11 +204,9 @@
   justify-content: center;
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: var(--r-full);
   margin-bottom: var(--space-2xs);
 
   &.danger {
-    background: color-mix(in srgb, var(--error) 12%, transparent);
     color: var(--error);
   }
 }

@@ -1,4 +1,5 @@
 const User = require('../../models/User');
+const Subscriber = require('../../models/Subscriber');
 const config = require('../../config/env');
 const logger = require('../../utils/logger');
 const authService = require('../../services/authService');
@@ -18,6 +19,9 @@ async function addEmail(req, res) {
         status: 400,
       });
     }
+
+    // Nur blockieren wenn bereits eine Email existiert UND Konto nicht verifiziert
+    // Ohne Email muss der User eine hinzufügen dürfen, um sich zu verifizieren
 
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
@@ -94,7 +98,37 @@ async function verifyAddEmailGet(req, res) {
     user.emailChangeToken = undefined;
     user.emailChangeNewEmail = undefined;
     user.emailChangeExpires = undefined;
+
+    // Alle Benachrichtigungen aktivieren wenn erstmals Email hinzugefügt
+    if (!user.preferences) user.preferences = {};
+    user.preferences.emailNotifications = true;
+    user.preferences.notificationCategories = {
+      security: true,
+      transactions: true,
+      reports: true,
+      alerts: true,
+    };
+    user.markModified('preferences');
+
     await user.save();
+
+    // Newsletter-Abo aktivieren (fire & forget)
+    Subscriber.findOne({ email: verifiedEmail })
+      .then(existingSub => {
+        if (!existingSub) {
+          const sub = new Subscriber({
+            email: verifiedEmail,
+            userId: user._id,
+            isConfirmed: true,
+            subscribedAt: new Date(),
+            confirmedAt: new Date(),
+            language: 'de',
+          });
+          sub.generateUnsubscribeToken();
+          return sub.save();
+        }
+      })
+      .catch(() => {});
 
     return res.redirect(
       `${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(verifiedEmail)}&type=add`
@@ -132,7 +166,38 @@ async function verifyAddEmailPost(req, res) {
     user.emailChangeToken = undefined;
     user.emailChangeNewEmail = undefined;
     user.emailChangeExpires = undefined;
+
+    // Alle Benachrichtigungen aktivieren wenn erstmals Email hinzugefügt
+    if (!user.preferences) user.preferences = {};
+    user.preferences.emailNotifications = true;
+    user.preferences.notificationCategories = {
+      security: true,
+      transactions: true,
+      reports: true,
+      alerts: true,
+    };
+    user.markModified('preferences');
+
     await user.save();
+
+    // Newsletter-Abo aktivieren (fire & forget)
+    const verifiedEmailPost = user.email;
+    Subscriber.findOne({ email: verifiedEmailPost })
+      .then(existingSub => {
+        if (!existingSub) {
+          const sub = new Subscriber({
+            email: verifiedEmailPost,
+            userId: user._id,
+            isConfirmed: true,
+            subscribedAt: new Date(),
+            confirmedAt: new Date(),
+            language: 'de',
+          });
+          sub.generateUnsubscribeToken();
+          return sub.save();
+        }
+      })
+      .catch(() => {});
 
     return res.status(200).json({
       success: true,

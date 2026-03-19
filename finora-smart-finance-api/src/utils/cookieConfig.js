@@ -25,10 +25,15 @@ const REFRESH_MAX_AGE_MS = (config.jwt.refreshExpire || 604800) * 1000;
  * @returns {Object} Cookie-Optionen für res.cookie()
  */
 function getRefreshCookieOptions() {
+  const isProd = config.nodeEnv === 'production';
   return {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    // Production: 'none' weil Frontend (finora.app) und Backend (api.youssefdawod.com)
+    // unterschiedliche Origins sind — 'strict'/'lax' blockieren Cross-Site-Cookies.
+    // Benötigt secure: true (HTTPS), was in Production gegeben ist.
+    // Development: 'lax' reicht, da Vite-Proxy alles same-origin hält.
+    sameSite: isProd ? 'none' : 'lax',
     path: '/api/v1/auth',
     maxAge: REFRESH_MAX_AGE_MS,
   };
@@ -40,10 +45,11 @@ function getRefreshCookieOptions() {
  * @returns {Object} Cookie-Optionen für res.clearCookie()
  */
 function getClearCookieOptions() {
+  const isProd = config.nodeEnv === 'production';
   return {
     httpOnly: true,
-    secure: config.nodeEnv === 'production',
-    sameSite: 'strict',
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
     path: '/api/v1/auth',
   };
 }

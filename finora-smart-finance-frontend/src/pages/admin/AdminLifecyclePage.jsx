@@ -33,6 +33,9 @@ import {
 } from 'react-icons/fi';
 import { useAdminLifecycle } from '@/hooks';
 import { AdminStatCard } from '@/components/admin';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import styles from './AdminLifecyclePage.module.scss';
 
 /** Tab-Konfiguration */
@@ -42,37 +45,42 @@ export default function AdminLifecyclePage() {
   const { t, i18n } = useTranslation();
   const { stats, userDetail, triggerResult, loading, actionLoading, error, actions } =
     useAdminLifecycle();
+  const { isViewer } = useAuth();
+  const { guard } = useViewerGuard();
   const [confirmAction, setConfirmAction] = useState(null);
   const [activeTab, setActiveTab] = useState('critical');
   const [searchQuery, setSearchQuery] = useState('');
 
   // ── Tab-Metadaten ───────────────────────────
-  const tabConfig = useMemo(() => ({
-    critical: {
-      label: t('lifecycle.admin.tabCritical'),
-      icon: FiAlertTriangle,
-      users: stats?.usersInFinalWarningPhase || [],
-      emptyText: t('lifecycle.admin.noCriticalUsers'),
-    },
-    reminding: {
-      label: t('lifecycle.admin.tabReminding'),
-      icon: FiClock,
-      users: stats?.usersInRemindingPhase || [],
-      emptyText: t('lifecycle.admin.noRemindingUsers'),
-    },
-    exported: {
-      label: t('lifecycle.admin.tabExported'),
-      icon: FiDownload,
-      users: stats?.usersWithExport || [],
-      emptyText: t('lifecycle.admin.noExportedUsers'),
-    },
-    quota: {
-      label: t('lifecycle.admin.tabQuota'),
-      icon: FiTrendingUp,
-      users: stats?.usersApproachingQuota || [],
-      emptyText: t('lifecycle.admin.noQuotaUsers'),
-    },
-  }), [stats, t]);
+  const tabConfig = useMemo(
+    () => ({
+      critical: {
+        label: t('lifecycle.admin.tabCritical'),
+        icon: FiAlertTriangle,
+        users: stats?.usersInFinalWarningPhase || [],
+        emptyText: t('lifecycle.admin.noCriticalUsers'),
+      },
+      reminding: {
+        label: t('lifecycle.admin.tabReminding'),
+        icon: FiClock,
+        users: stats?.usersInRemindingPhase || [],
+        emptyText: t('lifecycle.admin.noRemindingUsers'),
+      },
+      exported: {
+        label: t('lifecycle.admin.tabExported'),
+        icon: FiDownload,
+        users: stats?.usersWithExport || [],
+        emptyText: t('lifecycle.admin.noExportedUsers'),
+      },
+      quota: {
+        label: t('lifecycle.admin.tabQuota'),
+        icon: FiTrendingUp,
+        users: stats?.usersApproachingQuota || [],
+        emptyText: t('lifecycle.admin.noQuotaUsers'),
+      },
+    }),
+    [stats, t]
+  );
 
   // ── Gefilterte User ─────────────────────────
   const filteredUsers = useMemo(() => {
@@ -80,7 +88,7 @@ export default function AdminLifecyclePage() {
     if (!searchQuery.trim()) return users;
     const q = searchQuery.toLowerCase();
     return users.filter(
-      (u) => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q),
+      u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
     );
   }, [tabConfig, activeTab, searchQuery]);
 
@@ -151,61 +159,70 @@ export default function AdminLifecyclePage() {
   }, [confirmAction, actions]);
 
   // ── Reset-Handler ───────────────────────────────
-  const handleReset = useCallback(async (userId) => {
-    if (confirmAction !== `reset-${userId}`) {
-      setConfirmAction(`reset-${userId}`);
-      return;
-    }
-    try {
-      await actions.resetRetention(userId);
-      setConfirmAction(null);
-    } catch {
-      setConfirmAction(null);
-    }
-  }, [confirmAction, actions]);
+  const handleReset = useCallback(
+    async userId => {
+      if (confirmAction !== `reset-${userId}`) {
+        setConfirmAction(`reset-${userId}`);
+        return;
+      }
+      try {
+        await actions.resetRetention(userId);
+        setConfirmAction(null);
+      } catch {
+        setConfirmAction(null);
+      }
+    },
+    [confirmAction, actions]
+  );
 
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString(i18n.language, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  }, [i18n.language]);
+  const formatDate = useCallback(
+    dateStr => {
+      if (!dateStr) return '—';
+      return new Date(dateStr).toLocaleDateString(i18n.language, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+    },
+    [i18n.language]
+  );
 
   /** Rendert die Badge/Info für einen User basierend auf dem aktiven Tab */
-  const renderUserBadge = useCallback((user) => {
-    switch (activeTab) {
-      case 'critical':
-        return (
-          <span className={styles.dateBadge}>
-            {t('lifecycle.admin.finalWarningSentAt')}: {formatDate(user.finalWarningSentAt)}
-          </span>
-        );
-      case 'reminding':
-        return (
-          <span className={styles.dateBadge}>
-            {t('lifecycle.admin.reminderStartedAt')}: {formatDate(user.reminderStartedAt)}
-            {' · '}
-            {t('lifecycle.admin.reminderCount', { count: user.reminderCount || 0 })}
-          </span>
-        );
-      case 'exported':
-        return (
-          <span className={`${styles.dateBadge} ${styles.successBadge}`}>
-            {t('lifecycle.admin.exportConfirmedAt')}: {formatDate(user.exportConfirmedAt)}
-          </span>
-        );
-      case 'quota':
-        return (
-          <span className={styles.quotaBadge}>
-            {t('lifecycle.admin.monthlyCount', { count: user.monthlyTransactionCount })}
-          </span>
-        );
-      default:
-        return null;
-    }
-  }, [activeTab, formatDate, t]);
+  const renderUserBadge = useCallback(
+    user => {
+      switch (activeTab) {
+        case 'critical':
+          return (
+            <span className={styles.dateBadge}>
+              {t('lifecycle.admin.finalWarningSentAt')}: {formatDate(user.finalWarningSentAt)}
+            </span>
+          );
+        case 'reminding':
+          return (
+            <span className={styles.dateBadge}>
+              {t('lifecycle.admin.reminderStartedAt')}: {formatDate(user.reminderStartedAt)}
+              {' · '}
+              {t('lifecycle.admin.reminderCount', { count: user.reminderCount || 0 })}
+            </span>
+          );
+        case 'exported':
+          return (
+            <span className={`${styles.dateBadge} ${styles.successBadge}`}>
+              {t('lifecycle.admin.exportConfirmedAt')}: {formatDate(user.exportConfirmedAt)}
+            </span>
+          );
+        case 'quota':
+          return (
+            <span className={styles.quotaBadge}>
+              {t('lifecycle.admin.monthlyCount', { count: user.monthlyTransactionCount })}
+            </span>
+          );
+        default:
+          return null;
+      }
+    },
+    [activeTab, formatDate, t]
+  );
 
   // ── Error State ─────────────────────────────────
   if (error && !loading) {
@@ -213,11 +230,7 @@ export default function AdminLifecyclePage() {
       <div className={styles.page}>
         <div className={styles.errorState}>
           <p className={styles.errorText}>{error}</p>
-          <button
-            className={styles.retryButton}
-            onClick={actions.refresh}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={actions.refresh} type="button">
             <FiRefreshCw size={16} />
             {t('admin.dashboard.retry')}
           </button>
@@ -239,7 +252,7 @@ export default function AdminLifecyclePage() {
         <div className={styles.headerActions}>
           <button
             className={styles.triggerButton}
-            onClick={handleTrigger}
+            onClick={() => guard(handleTrigger)}
             disabled={!!actionLoading}
             type="button"
           >
@@ -302,40 +315,40 @@ export default function AdminLifecyclePage() {
           <FiChevronDown size={16} className={styles.chevron} />
         </summary>
         <div className={styles.timeline}>
-        <div className={styles.timelinePhase}>
-          <span className={`${styles.timelineDot} ${styles.dotActive}`} />
-          <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseActive')}</span>
-        </div>
-        <div className={styles.timelineConnector}>
-          <span className={styles.timelineDuration}>
-            {config ? `${config.retentionMonths} ${t('lifecycle.admin.months')}` : '—'}
-          </span>
-          <FiArrowRight size={14} />
-        </div>
-        <div className={styles.timelinePhase}>
-          <span className={`${styles.timelineDot} ${styles.dotReminding}`} />
-          <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseReminding')}</span>
-        </div>
-        <div className={styles.timelineConnector}>
-          <span className={styles.timelineDuration}>
-            {config ? `${config.gracePeriodMonths} ${t('lifecycle.admin.months')}` : '—'}
-          </span>
-          <FiArrowRight size={14} />
-        </div>
-        <div className={styles.timelinePhase}>
-          <span className={`${styles.timelineDot} ${styles.dotFinalWarning}`} />
-          <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseFinalWarning')}</span>
-        </div>
-        <div className={styles.timelineConnector}>
-          <span className={styles.timelineDuration}>
-            {config ? `${config.finalWarningDays} ${t('lifecycle.admin.days')}` : '—'}
-          </span>
-          <FiArrowRight size={14} />
-        </div>
-        <div className={styles.timelinePhase}>
-          <span className={`${styles.timelineDot} ${styles.dotDeletion}`} />
-          <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseDeletion')}</span>
-        </div>
+          <div className={styles.timelinePhase}>
+            <span className={`${styles.timelineDot} ${styles.dotActive}`} />
+            <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseActive')}</span>
+          </div>
+          <div className={styles.timelineConnector}>
+            <span className={styles.timelineDuration}>
+              {config ? `${config.retentionMonths} ${t('lifecycle.admin.months')}` : '—'}
+            </span>
+            <FiArrowRight size={14} />
+          </div>
+          <div className={styles.timelinePhase}>
+            <span className={`${styles.timelineDot} ${styles.dotReminding}`} />
+            <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseReminding')}</span>
+          </div>
+          <div className={styles.timelineConnector}>
+            <span className={styles.timelineDuration}>
+              {config ? `${config.gracePeriodMonths} ${t('lifecycle.admin.months')}` : '—'}
+            </span>
+            <FiArrowRight size={14} />
+          </div>
+          <div className={styles.timelinePhase}>
+            <span className={`${styles.timelineDot} ${styles.dotFinalWarning}`} />
+            <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseFinalWarning')}</span>
+          </div>
+          <div className={styles.timelineConnector}>
+            <span className={styles.timelineDuration}>
+              {config ? `${config.finalWarningDays} ${t('lifecycle.admin.days')}` : '—'}
+            </span>
+            <FiArrowRight size={14} />
+          </div>
+          <div className={styles.timelinePhase}>
+            <span className={`${styles.timelineDot} ${styles.dotDeletion}`} />
+            <span className={styles.timelineLabel}>{t('lifecycle.admin.phaseDeletion')}</span>
+          </div>
         </div>
       </details>
 
@@ -364,19 +377,27 @@ export default function AdminLifecyclePage() {
           <div className={styles.triggerResultGrid}>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.processed ?? 0}</span>
-              <span className={styles.triggerResultLabel}>{t('lifecycle.admin.resultProcessed')}</span>
+              <span className={styles.triggerResultLabel}>
+                {t('lifecycle.admin.resultProcessed')}
+              </span>
             </div>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.reminders ?? 0}</span>
-              <span className={styles.triggerResultLabel}>{t('lifecycle.admin.resultReminders')}</span>
+              <span className={styles.triggerResultLabel}>
+                {t('lifecycle.admin.resultReminders')}
+              </span>
             </div>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.finalWarnings ?? 0}</span>
-              <span className={styles.triggerResultLabel}>{t('lifecycle.admin.resultFinalWarnings')}</span>
+              <span className={styles.triggerResultLabel}>
+                {t('lifecycle.admin.resultFinalWarnings')}
+              </span>
             </div>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.deletions ?? 0}</span>
-              <span className={styles.triggerResultLabel}>{t('lifecycle.admin.resultDeletions')}</span>
+              <span className={styles.triggerResultLabel}>
+                {t('lifecycle.admin.resultDeletions')}
+              </span>
             </div>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.errors ?? 0}</span>
@@ -384,7 +405,9 @@ export default function AdminLifecyclePage() {
             </div>
             <div className={styles.triggerResultItem}>
               <span className={styles.triggerResultValue}>{triggerResult.skipped ?? 0}</span>
-              <span className={styles.triggerResultLabel}>{t('lifecycle.admin.resultSkipped')}</span>
+              <span className={styles.triggerResultLabel}>
+                {t('lifecycle.admin.resultSkipped')}
+              </span>
             </div>
           </div>
         </section>
@@ -394,7 +417,7 @@ export default function AdminLifecyclePage() {
       <section className={styles.section} aria-label={t('lifecycle.admin.criticalLabel')}>
         {/* Tabs */}
         <div className={styles.tabs} role="tablist">
-          {TABS.map((tab) => {
+          {TABS.map(tab => {
             const TabIcon = tabConfig[tab]?.icon;
             return (
               <button
@@ -402,14 +425,15 @@ export default function AdminLifecyclePage() {
                 role="tab"
                 aria-selected={activeTab === tab}
                 className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
-                onClick={() => { setActiveTab(tab); setSearchQuery(''); }}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setSearchQuery('');
+                }}
                 type="button"
               >
                 {TabIcon && <TabIcon size={14} />}
                 {tabConfig[tab]?.label}
-                <span className={styles.tabCount}>
-                  {tabConfig[tab]?.users.length ?? 0}
-                </span>
+                <span className={styles.tabCount}>{tabConfig[tab]?.users.length ?? 0}</span>
               </button>
             );
           })}
@@ -423,7 +447,7 @@ export default function AdminLifecyclePage() {
             className={styles.searchInput}
             placeholder={t('lifecycle.admin.searchPlaceholder')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
             <button
@@ -440,7 +464,7 @@ export default function AdminLifecyclePage() {
         {/* User List */}
         <div className={styles.userList} role="tabpanel">
           {!loading && filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => {
+            filteredUsers.map(user => {
               const TabIcon = tabConfig[activeTab]?.icon;
               return (
                 <div key={user._id} className={styles.userCard}>
@@ -448,13 +472,19 @@ export default function AdminLifecyclePage() {
                     {TabIcon && (
                       <TabIcon
                         size={16}
-                        className={activeTab === 'critical' ? styles.criticalIcon : styles.warningIcon}
+                        className={
+                          activeTab === 'critical' ? styles.criticalIcon : styles.warningIcon
+                        }
                       />
                     )}
                     <div>
-                      <span className={styles.userName}>{user.name}</span>
+                      <span className={styles.userName}>
+                        <SensitiveData active={isViewer}>{user.name}</SensitiveData>
+                      </span>
                       {user.email && (
-                        <span className={styles.userEmail}>{user.email}</span>
+                        <span className={styles.userEmail}>
+                          <SensitiveData active={isViewer}>{user.email}</SensitiveData>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -475,9 +505,7 @@ export default function AdminLifecyclePage() {
             })
           ) : !loading ? (
             <p className={styles.emptyText}>
-              {searchQuery
-                ? t('lifecycle.admin.noSearchResults')
-                : tabConfig[activeTab]?.emptyText}
+              {searchQuery ? t('lifecycle.admin.noSearchResults') : tabConfig[activeTab]?.emptyText}
             </p>
           ) : (
             <div className={styles.loadingPlaceholder} />
@@ -490,14 +518,12 @@ export default function AdminLifecyclePage() {
         <div className={styles.detailOverlay} onClick={actions.closeDetail} role="presentation">
           <div
             className={styles.detailPanel}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
             role="dialog"
             aria-label={t('lifecycle.admin.userDetail')}
           >
             <div className={styles.detailHeader}>
-              <h3 className={styles.detailTitle}>
-                {t('lifecycle.admin.userDetail')}
-              </h3>
+              <h3 className={styles.detailTitle}>{t('lifecycle.admin.userDetail')}</h3>
               <button
                 className={styles.closeButton}
                 onClick={actions.closeDetail}
@@ -512,18 +538,23 @@ export default function AdminLifecyclePage() {
               {/* User Info */}
               <div className={styles.detailSection}>
                 <h4 className={styles.detailSectionTitle}>
-                  <FiUser size={14} /> {userDetail.user?.name}
+                  <FiUser size={14} />{' '}
+                  <SensitiveData active={isViewer}>{userDetail.user?.name}</SensitiveData>
                 </h4>
-                <p className={styles.detailEmail}>{userDetail.user?.email}</p>
+                <p className={styles.detailEmail}>
+                  <SensitiveData active={isViewer}>{userDetail.user?.email}</SensitiveData>
+                </p>
               </div>
 
               {/* Retention Phase */}
               <div className={styles.detailSection}>
-                <h4 className={styles.detailSectionTitle}>
-                  {t('lifecycle.admin.retentionPhase')}
-                </h4>
-                <span className={`${styles.phaseBadge} ${styles[`phase-${userDetail.lifecycle?.retention?.phase || 'active'}`]}`}>
-                  {t(`lifecycle.retention.phase.${userDetail.lifecycle?.retention?.phase || 'active'}`)}
+                <h4 className={styles.detailSectionTitle}>{t('lifecycle.admin.retentionPhase')}</h4>
+                <span
+                  className={`${styles.phaseBadge} ${styles[`phase-${userDetail.lifecycle?.retention?.phase || 'active'}`]}`}
+                >
+                  {t(
+                    `lifecycle.retention.phase.${userDetail.lifecycle?.retention?.phase || 'active'}`
+                  )}
                 </span>
               </div>
 
@@ -535,7 +566,9 @@ export default function AdminLifecyclePage() {
                 <div className={styles.timestampList}>
                   {userDetail.lifecycle?.retention?.reminderStartedAt && (
                     <div className={styles.timestampItem}>
-                      <span className={styles.timestampLabel}>{t('lifecycle.admin.reminderStartedAt')}</span>
+                      <span className={styles.timestampLabel}>
+                        {t('lifecycle.admin.reminderStartedAt')}
+                      </span>
                       <span className={styles.timestampValue}>
                         {formatDate(userDetail.lifecycle.retention.reminderStartedAt)}
                       </span>
@@ -543,7 +576,9 @@ export default function AdminLifecyclePage() {
                   )}
                   {userDetail.lifecycle?.retention?.reminderCount > 0 && (
                     <div className={styles.timestampItem}>
-                      <span className={styles.timestampLabel}>{t('lifecycle.admin.remindersLabel')}</span>
+                      <span className={styles.timestampLabel}>
+                        {t('lifecycle.admin.remindersLabel')}
+                      </span>
                       <span className={styles.timestampValue}>
                         {userDetail.lifecycle.retention.reminderCount}
                       </span>
@@ -551,7 +586,9 @@ export default function AdminLifecyclePage() {
                   )}
                   {userDetail.lifecycle?.retention?.finalWarningSentAt && (
                     <div className={styles.timestampItem}>
-                      <span className={styles.timestampLabel}>{t('lifecycle.admin.finalWarningSentAt')}</span>
+                      <span className={styles.timestampLabel}>
+                        {t('lifecycle.admin.finalWarningSentAt')}
+                      </span>
                       <span className={styles.timestampValue}>
                         {formatDate(userDetail.lifecycle.retention.finalWarningSentAt)}
                       </span>
@@ -559,7 +596,9 @@ export default function AdminLifecyclePage() {
                   )}
                   {userDetail.lifecycle?.retention?.exportConfirmedAt && (
                     <div className={styles.timestampItem}>
-                      <span className={styles.timestampLabel}>{t('lifecycle.admin.exportConfirmedAt')}</span>
+                      <span className={styles.timestampLabel}>
+                        {t('lifecycle.admin.exportConfirmedAt')}
+                      </span>
                       <span className={styles.timestampValue}>
                         {formatDate(userDetail.lifecycle.retention.exportConfirmedAt)}
                       </span>
@@ -567,7 +606,9 @@ export default function AdminLifecyclePage() {
                   )}
                   {userDetail.lifecycle?.retention?.daysUntilDeletion != null && (
                     <div className={styles.timestampItem}>
-                      <span className={styles.timestampLabel}>{t('lifecycle.admin.daysUntilDeletion')}</span>
+                      <span className={styles.timestampLabel}>
+                        {t('lifecycle.admin.daysUntilDeletion')}
+                      </span>
                       <span className={`${styles.timestampValue} ${styles.breakdownDanger}`}>
                         {userDetail.lifecycle.retention.daysUntilDeletion}
                       </span>
@@ -616,15 +657,15 @@ export default function AdminLifecyclePage() {
 
               {/* Quota */}
               <div className={styles.detailSection}>
-                <h4 className={styles.detailSectionTitle}>
-                  {t('lifecycle.admin.quotaStatus')}
-                </h4>
+                <h4 className={styles.detailSectionTitle}>{t('lifecycle.admin.quotaStatus')}</h4>
                 <p className={styles.quotaText}>
                   {userDetail.quota?.used ?? 0} / {userDetail.quota?.limit ?? 150}
                 </p>
                 {userDetail.quota?.resetDate && (
                   <p className={styles.quotaResetDate}>
-                    {t('lifecycle.admin.quotaResetDate', { date: formatDate(userDetail.quota.resetDate) })}
+                    {t('lifecycle.admin.quotaResetDate', {
+                      date: formatDate(userDetail.quota.resetDate),
+                    })}
                   </p>
                 )}
               </div>
@@ -633,7 +674,7 @@ export default function AdminLifecyclePage() {
               <div className={styles.detailActions}>
                 <button
                   className={styles.resetButton}
-                  onClick={() => handleReset(userDetail.user?._id)}
+                  onClick={() => guard(() => handleReset(userDetail.user?._id))}
                   disabled={!!actionLoading}
                   type="button"
                 >

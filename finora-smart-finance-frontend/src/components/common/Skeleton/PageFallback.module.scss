@@ -14,13 +14,17 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--s-lg) var(--s-md);
+  padding: var(--space-lg) var(--space-md);
   animation: fadeIn 0.2s ease-out;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ============================================
@@ -30,8 +34,8 @@
 .contentHeader {
   display: flex;
   flex-direction: column;
-  gap: var(--s-sm);
-  margin-bottom: var(--s-xl);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
 }
 
 .contentBody {
@@ -40,7 +44,7 @@
 }
 
 .contentSpacer {
-  height: var(--s-lg);
+  height: var(--space-lg);
 }
 
 /* ============================================
@@ -50,18 +54,18 @@
 .summaryRow {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--s-md);
-  margin-bottom: var(--s-lg);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .chartArea {
-  margin-bottom: var(--s-lg);
+  margin-bottom: var(--space-lg);
 }
 
 .recentList {
   display: flex;
   flex-direction: column;
-  gap: var(--s-md);
+  gap: var(--space-md);
 }
 
 /* ============================================
@@ -70,8 +74,8 @@
 
 .filterBar {
   display: flex;
-  gap: var(--s-sm);
-  margin-bottom: var(--s-lg);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
   flex-wrap: wrap;
 }
 
@@ -87,17 +91,17 @@
 .settings {
   display: flex;
   flex-direction: column;
-  gap: var(--s-lg);
+  gap: var(--space-lg);
 }
 
 .settingsSections {
   display: flex;
   flex-direction: column;
-  gap: var(--s-xl);
+  gap: var(--space-xl);
 }
 
 .settingsSection {
   display: flex;
   flex-direction: column;
-  gap: var(--s-sm);
+  gap: var(--space-sm);
 }

@@ -1,7 +1,6 @@
 // ============================================
 // 📋 ADMIN AUDIT LOG TABLE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ── Table Container ─────────────────────────
@@ -20,9 +19,10 @@
 
   @include custom-scrollbar;
 
-  @include below-md {
+  @include below-lg {
     border: none;
     border-radius: 0;
+    overflow-x: visible;
   }
 }
 
@@ -31,7 +31,7 @@
   border-collapse: collapse;
   font-size: var(--fs-sm);
 
-  @include below-md {
+  @include below-lg {
     display: block;
   }
 
@@ -40,7 +40,7 @@
     background: var(--surface-2);
     border-bottom: 2px solid var(--border);
 
-    @include below-md {
+    @include below-lg {
       @include sr-only;
     }
 
@@ -61,15 +61,15 @@
     }
   }
 
-  // ── tbody (Desktop normal, Mobile Grid) ───
+  // ── tbody (Desktop normal, Tablet/Mobile Grid)
   tbody {
-    @include below-md {
+    @include below-lg {
       display: grid;
       gap: var(--space-md);
     }
   }
 
-  // ── tr (Desktop Zeile, Mobile Card) ───────
+  // ── tr (Desktop Zeile, Tablet/Mobile Card)
   tbody tr {
     border-bottom: 1px solid var(--border-light);
     transition: background var(--duration-fast);
@@ -82,15 +82,17 @@
       background: color-mix(in srgb, var(--primary) 4%, transparent);
     }
 
-    @include below-md {
+    @include below-lg {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
-      padding: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       box-shadow: var(--sh-sm);
+      overflow: hidden;
+      word-break: break-word;
       transition:
         box-shadow var(--duration-fast),
         transform var(--duration-fast);
@@ -108,20 +110,21 @@
 
     @include below-sm {
       grid-template-columns: 1fr;
+      padding: var(--space-md);
     }
   }
 
-  // ── td (Desktop normal, Mobile Flex) ──────
+  // ── td (Desktop normal, Tablet/Mobile Flex)
   td {
     padding: var(--space-sm) var(--space-md);
     color: var(--tx);
     vertical-align: middle;
 
-    @include below-md {
+    @include below-lg {
       display: flex;
       align-items: center;
       gap: var(--space-sm);
-      padding: var(--space-xs) 0;
+      padding: var(--space-sm) 0;
       border-bottom: 1px solid var(--border-light);
 
       &:last-child {
@@ -132,14 +135,14 @@
 
   // data-label für Mobile-Labels
   td[data-label] {
-    @include below-md {
+    @include below-lg {
       justify-content: space-between;
 
       &::before {
         content: attr(data-label);
         font-size: var(--fs-2xs);
         font-weight: var(--fw-sb);
-        color: var(--tx-muted);
+        color: var(--primary);
         text-transform: uppercase;
         letter-spacing: var(--ls-n);
         flex-shrink: 0;
@@ -166,13 +169,37 @@
 }
 
 // ── Cell-specific ───────────────────────────
+.checkboxCell {
+  width: 2.5rem;
+  text-align: center;
+  vertical-align: middle;
+
+  input[type='checkbox'] {
+    cursor: pointer;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
+  }
+
+  @include below-lg {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-xs);
+  }
+}
+
+.selectedRow {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+}
+
 .dateCell {
   white-space: nowrap;
   color: var(--tx-muted);
   font-size: var(--fs-sm);
   min-width: 140px;
 
-  @include below-md {
+  @include below-lg {
     grid-column: 1 / -1;
     font-weight: var(--fw-sb);
     color: var(--tx);
@@ -200,7 +227,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @include below-md {
+  @include below-lg {
     max-width: none;
     white-space: normal;
     word-break: break-all;
@@ -217,7 +244,7 @@
   font-family: var(--ff-mono);
   cursor: default;
 
-  @include below-md {
+  @include below-lg {
     max-width: none;
     white-space: normal;
     word-break: break-all;
@@ -230,9 +257,31 @@
   font-size: var(--fs-xs);
   color: var(--tx-muted);
 
-  @include below-md {
+  @include below-lg {
     grid-column: 1 / -1;
     border-bottom: none;
+  }
+}
+
+.countryCell {
+  white-space: nowrap;
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  min-width: 80px;
+
+  @include below-lg {
+    grid-column: 1 / 2;
+  }
+}
+
+.cityCell {
+  white-space: nowrap;
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  min-width: 80px;
+
+  @include below-lg {
+    grid-column: 2 / -1;
   }
 }
 
@@ -242,7 +291,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 
-  @include below-md {
+  @include below-lg {
     grid-column: 1 / -1;
     border-bottom: none;
   }

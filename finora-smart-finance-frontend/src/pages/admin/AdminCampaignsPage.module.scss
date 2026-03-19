@@ -1,7 +1,6 @@
 // ============================================
 // 📨 ADMIN CAMPAIGNS PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -578,6 +577,100 @@
   @include focus-ring;
 }
 
+// ── Responsive: Tablet ──────────────────────
+@include tablet-md {
+  .searchWrapper {
+    min-width: 180px;
+    max-width: none;
+    flex: 1 1 auto;
+  }
+
+  .headerActions {
+    gap: var(--space-xs);
+  }
+}
+
+// ── Table → Card layout (Tablet + Mobile) ───
+@include below-lg {
+  .tableWrapper {
+    overflow-x: visible;
+    border: none;
+    border-radius: 0;
+    background: none;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table,
+  .table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    width: 100%;
+  }
+
+  .table .row {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-xs);
+    overflow: hidden;
+    word-break: break-word;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  .table .row td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm) 0;
+    border: none;
+    font-size: var(--fs-sm);
+
+    &::before {
+      content: attr(data-label);
+      font-weight: var(--fw-sb);
+      color: var(--primary);
+      font-size: var(--fs-2xs);
+      text-transform: uppercase;
+      letter-spacing: var(--ls-tight);
+      min-width: 100px;
+      flex-shrink: 0;
+    }
+  }
+
+  .table .row .subjectCell {
+    font-weight: var(--fw-sb);
+    font-size: var(--fs-base);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-2xs);
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .table .row .actionsCell {
+    justify-content: flex-end;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-2xs);
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
 // ── Responsive ──────────────────────────────
 @include below-md {
   .page {
@@ -631,80 +724,6 @@
 
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  // ── Table → Card layout on mobile ─────────
-  .tableWrapper {
-    overflow-x: visible;
-  }
-
-  .table thead {
-    display: none;
-  }
-
-  .table,
-  .table tbody {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    width: 100%;
-  }
-
-  .table .row {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    padding: var(--space-md);
-    gap: var(--space-xs);
-
-    &:hover {
-      transform: none;
-    }
-  }
-
-  .table .row td {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-2xs) 0;
-    border: none;
-    font-size: var(--fs-sm);
-
-    &::before {
-      content: attr(data-label);
-      font-weight: var(--fw-sb);
-      color: var(--tx-muted);
-      font-size: var(--fs-2xs);
-      text-transform: uppercase;
-      letter-spacing: var(--ls-tight);
-      min-width: 100px;
-      flex-shrink: 0;
-    }
-  }
-
-  .table .row .subjectCell {
-    font-weight: var(--fw-sb);
-    font-size: var(--fs-base);
-    padding-bottom: var(--space-xs);
-    border-bottom: 1px solid var(--border);
-    margin-bottom: var(--space-2xs);
-
-    &::before {
-      display: none;
-    }
-  }
-
-  .table .row .actionsCell {
-    justify-content: flex-end;
-    padding-top: var(--space-xs);
-    border-top: 1px solid var(--border);
-    margin-top: var(--space-2xs);
-
-    &::before {
-      display: none;
-    }
   }
 }
 

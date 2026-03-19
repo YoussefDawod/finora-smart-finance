@@ -1,0 +1,34 @@
+// ============================================
+// 🧩 COMPACT WIDGET ROW
+// ============================================
+@use '@/styles/mixins' as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  width: 100%;
+
+  @include mobile {
+    gap: var(--space-md);
+  }
+}
+
+.widgetRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+  width: 100%;
+
+  @include below-lg {
+    grid-template-columns: 1fr;
+  }
+
+  @include mobile {
+    gap: var(--space-md);
+  }
+}
+
+.slot {
+  min-width: 0;
+}

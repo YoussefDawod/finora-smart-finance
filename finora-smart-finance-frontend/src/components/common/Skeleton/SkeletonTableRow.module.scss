@@ -1,7 +1,6 @@
 // ============================================
 // 💀 SKELETON TABLE ROW COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .container {
@@ -16,7 +15,7 @@
   padding: var(--space-sm) var(--space-md);
   border-bottom: 1px solid var(--border);
   background: var(--surface);
-  
+
   &:last-child {
     border-bottom: none;
   }

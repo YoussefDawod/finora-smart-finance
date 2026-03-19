@@ -2,7 +2,6 @@
 // 📄 SHARED INFO PAGE STYLES
 // Used by: Features, Pricing, About, Blog, Help, FAQ
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -29,6 +28,7 @@
   max-width: 50rem;
   width: 100%;
   background: var(--surface);
+  border: 1px solid var(--glass-border-light);
   border-radius: var(--r-xl);
   padding: var(--space-3xl);
   box-shadow: var(--sh-lg);
@@ -72,6 +72,7 @@
 }
 
 .subtitle {
+  @include glass-text;
   font-size: var(--fs-lg);
   color: var(--tx-muted);
   line-height: var(--lh-n);
@@ -101,10 +102,12 @@
 
 .featureCard {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
   padding: var(--space-xl);
-  transition: box-shadow var(--tr), border-color var(--tr);
+  transition:
+    box-shadow var(--tr),
+    border-color var(--tr);
 
   &:hover {
     box-shadow: var(--sh-md);
@@ -163,13 +166,15 @@
 
 .pricingCard {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   padding: var(--space-xl);
   position: relative;
   display: flex;
   flex-direction: column;
-  transition: box-shadow var(--tr), border-color var(--tr);
+  transition:
+    box-shadow var(--tr),
+    border-color var(--tr);
 
   &:hover {
     box-shadow: var(--sh-md);
@@ -300,13 +305,15 @@
   padding: var(--space-xs) var(--space-sm);
   margin-bottom: var(--space-md);
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
   color: var(--primary);
   font-size: var(--fs-sm);
   font-weight: var(--fw-m);
   cursor: pointer;
-  transition: background var(--tr), border-color var(--tr);
+  transition:
+    background var(--tr),
+    border-color var(--tr);
 
   &:hover {
     background: var(--bg);
@@ -361,7 +368,7 @@
   align-items: center;
   gap: var(--space-lg);
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   padding: var(--space-xl);
   margin-top: var(--space-md);
@@ -531,7 +538,7 @@
 
 .faqItem {
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
   overflow: hidden;
   transition: border-color var(--tr);

@@ -1,7 +1,6 @@
 // ============================================
 // 🔘 BUTTON COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -81,7 +80,7 @@
 
     // Glow: nur Primary, nur Hover, nur Desktop
     @media (hover: hover) and (pointer: fine) {
-      box-shadow: 
+      box-shadow:
         0 4px 12px color-mix(in srgb, var(--primary) 35%, transparent),
         var(--glow-sm);
     }
@@ -212,7 +211,9 @@
 // ANIMATION
 // ============================================
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ============================================

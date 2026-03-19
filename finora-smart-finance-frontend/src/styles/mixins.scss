@@ -16,38 +16,96 @@
 // Breakpoint Values (müssen als SCSS-Variablen existieren für @media)
 $bp-xs: 480px;
 $bp-sm: 640px;
-$bp-md: 768px;   // Tablets / Mobile-Breakpoint (konsistent mit --bp-md in variables.scss)
+$bp-md: 768px; // Tablets / Mobile-Breakpoint (konsistent mit --bp-md in variables.scss)
 $bp-lg: 1024px;
 $bp-xl: 1280px;
 $bp-2xl: 1536px;
 
 // Mobile-First (min-width)
-@mixin xs { @media (min-width: $bp-xs) { @content; } }
-@mixin sm { @media (min-width: $bp-sm) { @content; } }
-@mixin md { @media (min-width: $bp-md) { @content; } }
-@mixin lg { @media (min-width: $bp-lg) { @content; } }
-@mixin xl { @media (min-width: $bp-xl) { @content; } }
-@mixin xxl { @media (min-width: $bp-2xl) { @content; } }
+@mixin xs {
+  @media (min-width: $bp-xs) {
+    @content;
+  }
+}
+@mixin sm {
+  @media (min-width: $bp-sm) {
+    @content;
+  }
+}
+@mixin md {
+  @media (min-width: $bp-md) {
+    @content;
+  }
+}
+@mixin lg {
+  @media (min-width: $bp-lg) {
+    @content;
+  }
+}
+@mixin xl {
+  @media (min-width: $bp-xl) {
+    @content;
+  }
+}
+@mixin xxl {
+  @media (min-width: $bp-2xl) {
+    @content;
+  }
+}
 
 // Legacy (max-width) - für spezielle Fälle
-@mixin mobile { @media (max-width: ($bp-sm - 1)) { @content; } }
-@mixin tablet { @media (min-width: $bp-sm) and (max-width: ($bp-lg - 1)) { @content; } }
-@mixin tablet-md { @media (min-width: $bp-md) and (max-width: ($bp-lg - 1)) { @content; } }  // Größere Tablets
-@mixin desktop { @media (min-width: $bp-lg) { @content; } }
+@mixin mobile {
+  @media (max-width: ($bp-sm - 1)) {
+    @content;
+  }
+}
+@mixin tablet {
+  @media (min-width: $bp-sm) and (max-width: ($bp-lg - 1)) {
+    @content;
+  }
+}
+@mixin tablet-md {
+  @media (min-width: $bp-md) and (max-width: ($bp-lg - 1)) {
+    @content;
+  }
+} // Größere Tablets
+@mixin desktop {
+  @media (min-width: $bp-lg) {
+    @content;
+  }
+}
 
 // Below breakpoints (max-width) - für "und kleiner" Szenarien
-@mixin below-sm { @media (max-width: ($bp-sm - 1)) { @content; } }
-@mixin below-md { @media (max-width: $bp-md) { @content; } }
-@mixin below-lg { @media (max-width: ($bp-lg - 1)) { @content; } }
+@mixin below-sm {
+  @media (max-width: ($bp-sm - 1)) {
+    @content;
+  }
+}
+@mixin below-md {
+  @media (max-width: $bp-md) {
+    @content;
+  }
+}
+@mixin below-lg {
+  @media (max-width: ($bp-lg - 1)) {
+    @content;
+  }
+}
 
 // Custom Breakpoint
 @mixin breakpoint($min: null, $max: null) {
   @if $min and $max {
-    @media (min-width: $min) and (max-width: $max) { @content; }
+    @media (min-width: $min) and (max-width: $max) {
+      @content;
+    }
   } @else if $min {
-    @media (min-width: $min) { @content; }
+    @media (min-width: $min) {
+      @content;
+    }
   } @else if $max {
-    @media (max-width: $max) { @content; }
+    @media (max-width: $max) {
+      @content;
+    }
   }
 }
 
@@ -57,39 +115,59 @@ $bp-2xl: 1536px;
 
 // Orientation-basierte Queries (für Tablets)
 @mixin portrait {
-  @media (orientation: portrait) { @content; }
+  @media (orientation: portrait) {
+    @content;
+  }
 }
 
 @mixin landscape {
-  @media (orientation: landscape) { @content; }
+  @media (orientation: landscape) {
+    @content;
+  }
 }
 
 // Kombinierte Mixin: Tablet Portrait + Mobile (Card-Layout)
 @mixin card-view {
-  @media (max-width: 1023px) and (orientation: portrait) { @content; }
-  @include mobile { @content; }
+  @media (max-width: 1023px) and (orientation: portrait) {
+    @content;
+  }
+  @include mobile {
+    @content;
+  }
 }
 
-// Kombinierte Mixin: Tablet Landscape + Desktop (Table-Layout)  
+// Kombinierte Mixin: Tablet Landscape + Desktop (Table-Layout)
 @mixin table-view {
-  @media (min-width: 1024px) { @content; }
-  @media (max-width: 1023px) and (orientation: landscape) { @content; }
+  @media (min-width: 1024px) {
+    @content;
+  }
+  @media (max-width: 1023px) and (orientation: landscape) {
+    @content;
+  }
 }
 
 @mixin reduced-motion {
-  @media (prefers-reduced-motion: reduce) { @content; }
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
 }
 
 @mixin high-contrast {
-  @media (prefers-contrast: high) { @content; }
+  @media (prefers-contrast: high) {
+    @content;
+  }
 }
 
 @mixin dark-mode {
-  @media (prefers-color-scheme: dark) { @content; }
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
 }
 
 @mixin light-mode {
-  @media (prefers-color-scheme: light) { @content; }
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
 }
 
 // ============================================
@@ -102,19 +180,21 @@ $bp-2xl: 1536px;
   flex-direction: $direction;
   justify-content: $justify;
   align-items: $align;
-  @if $gap { gap: $gap; }
+  @if $gap {
+    gap: $gap;
+  }
 }
 
-@mixin flex-center { 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@mixin flex-between { 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 @mixin flex-start {
@@ -216,10 +296,15 @@ $bp-2xl: 1536px;
 
 // Shadows (nutzt CSS vars)
 @mixin shadow($level: md) {
-  @if $level == sm { box-shadow: var(--sh-sm); }
-  @else if $level == md { box-shadow: var(--sh-md); }
-  @else if $level == lg { box-shadow: var(--sh-lg); }
-  @else if $level == xl { box-shadow: var(--sh-xl); }
+  @if $level == sm {
+    box-shadow: var(--sh-sm);
+  } @else if $level == md {
+    box-shadow: var(--sh-md);
+  } @else if $level == lg {
+    box-shadow: var(--sh-lg);
+  } @else if $level == xl {
+    box-shadow: var(--sh-xl);
+  }
 }
 
 // ============================================
@@ -254,7 +339,9 @@ $bp-2xl: 1536px;
 @mixin hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // ============================================
@@ -262,7 +349,9 @@ $bp-2xl: 1536px;
 // ============================================
 
 @mixin focus-ring {
-  &:focus { outline: none; }
+  &:focus {
+    outline: none;
+  }
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
@@ -270,19 +359,21 @@ $bp-2xl: 1536px;
 }
 
 @mixin focus-ring-inset {
-  &:focus { 
-    outline: none; 
+  &:focus {
+    outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
-  &:focus-visible { 
+  &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
 @mixin focus-ring-custom($color) {
-  &:focus { outline: none; }
+  &:focus {
+    outline: none;
+  }
   &:focus-visible {
     outline: none;
     box-shadow: 0 0 0 2px color-mix(in srgb, $color 40%, transparent);
@@ -313,8 +404,10 @@ $bp-2xl: 1536px;
   font-weight: var(--fw-m);
   z-index: var(--z-max);
   transition: top var(--tr-fast);
-  
-  &:focus { top: 0; }
+
+  &:focus {
+    top: 0;
+  }
 }
 
 // ============================================
@@ -337,7 +430,7 @@ $bp-2xl: 1536px;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  transition: 
+  transition:
     background var(--tr-fast),
     color var(--tr-fast),
     border-color var(--tr-fast),
@@ -345,9 +438,9 @@ $bp-2xl: 1536px;
     transform var(--tr-fast);
 
   &:disabled,
-  &[aria-disabled='true'] { 
-    opacity: 0.5; 
-    cursor: not-allowed; 
+  &[aria-disabled='true'] {
+    opacity: 0.5;
+    cursor: not-allowed;
     pointer-events: none;
   }
 
@@ -361,13 +454,13 @@ $bp-2xl: 1536px;
 @mixin button-variant($bg, $color: var(--on-primary), $hover-darken: 10%) {
   background: $bg;
   color: $color;
-  
+
   &:hover:not(:disabled) {
     filter: brightness(1.1);
     transform: translateY(-1px);
     box-shadow: var(--sh-md);
   }
-  
+
   &:active:not(:disabled) {
     transform: translateY(0);
   }
@@ -388,26 +481,26 @@ $bp-2xl: 1536px;
   font-family: var(--ff-base);
   font-size: var(--fs-md);
   line-height: var(--lh-n);
-  transition: 
+  transition:
     background var(--tr-fast),
     border-color var(--tr-fast),
     box-shadow var(--tr-fast);
 
-  &::placeholder { 
-    color: var(--tx-muted); 
-    opacity: 0.65; 
+  &::placeholder {
+    color: var(--tx-muted);
+    opacity: 0.65;
   }
 
   &:focus {
     outline: none;
     border-color: var(--primary);
     background: var(--bg);
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.1);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 
   &:disabled {
@@ -438,15 +531,15 @@ $bp-2xl: 1536px;
   border-radius: var(--card-radius);
   padding: $padding;
   box-shadow: var(--sh-sm);
-  transition: 
+  transition:
     background var(--tr-fast),
     border-color var(--tr-fast),
     box-shadow var(--tr-fast),
     transform var(--tr-fast);
 
   @if $hover {
-    &:hover { 
-      box-shadow: var(--sh-md); 
+    &:hover {
+      box-shadow: var(--sh-md);
     }
   }
 }
@@ -476,7 +569,7 @@ $bp-2xl: 1536px;
   @if $glow {
     @media (hover: hover) and (pointer: fine) {
       &:hover {
-        box-shadow: 
+        box-shadow:
           var(--sh-lg),
           0 0 var(--glow-blur-sm) 0 var(--glow-primary);
       }
@@ -537,7 +630,7 @@ $bp-2xl: 1536px;
 // Will-change für bekannte Animationen (mit auto-reset)
 @mixin will-animate($properties...) {
   will-change: $properties;
-  
+
   // Auto-reset nach Animation (optional via Klasse)
   &.animation-complete {
     will-change: auto;
@@ -555,7 +648,7 @@ $bp-2xl: 1536px;
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   will-change: background-position;
-  
+
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     background: color-mix(in srgb, var(--tx) 10%, transparent);
@@ -575,12 +668,13 @@ $bp-2xl: 1536px;
 
 // Konvertiert Farbe zu RGB-Werten (für rgba)
 @function color-rgb($color) {
-  @return #{color.channel($color, "red", $space: rgb)}, #{color.channel($color, "green", $space: rgb)}, #{color.channel($color, "blue", $space: rgb)};
+  @return #{color.channel($color, 'red', $space: rgb)},
+    #{color.channel($color, 'green', $space: rgb)}, #{color.channel($color, 'blue', $space: rgb)};
 }
 
 // Ermittelt Kontrastfarbe (Hell/Dunkel)
 @function contrast-color($color, $dark, $light) {
-  @if color.channel($color, "lightness", $space: hsl) > 60% {
+  @if color.channel($color, 'lightness', $space: hsl) > 60% {
     @return $dark;
   } @else {
     @return $light;
@@ -628,13 +722,13 @@ $bp-2xl: 1536px;
   $error: map-get-default($palette, error, $pri);
   $info: map-get-default($palette, info, $pri);
 
-  [data-theme="#{$name}"] {
+  [data-theme='#{$name}'] {
     // ========== BACKGROUNDS ==========
     --background: #{$bg};
     --bg: #{$bg};
     --bg-primary: #{$bg};
     --bg-secondary: #{tint($bg, 6%)};
-    
+
     // ========== TEXT ==========
     --text: #{$tx};
     --tx: #{$tx};
@@ -643,7 +737,7 @@ $bp-2xl: 1536px;
     --text-primary: #{$tx};
     --text-secondary: #{tint($tx, 30%)};
     --text-muted: #{tint($tx, 45%)};
-    
+
     // ========== SURFACES & BORDERS ==========
     --surface: #{tint($bg, 6%)};
     --surface-2: #{tint($bg, 10%)};
@@ -654,7 +748,7 @@ $bp-2xl: 1536px;
     --border-strong: #{alpha($tx, 0.18)};
     --border-primary: #{alpha($tx, 0.12)};
     --divider: var(--border);
-    
+
     // ========== PRIMARY ==========
     --primary: #{$pri};
     --pri: var(--primary);
@@ -662,7 +756,7 @@ $bp-2xl: 1536px;
     --primary-rgb: #{color-rgb($pri)};
     --on-primary: #{contrast-color($pri, $tx, $bg)};
     --accent-primary: #{$pri};
-    
+
     // ========== SECONDARY ==========
     --secondary: #{$sec};
     --sec: var(--secondary);
@@ -670,43 +764,43 @@ $bp-2xl: 1536px;
     --secondary-rgb: #{color-rgb($sec)};
     --on-secondary: #{contrast-color($sec, $tx, $bg)};
     --accent-secondary: #{$sec};
-    
+
     // ========== ACCENT ==========
     --accent: #{$acc};
     --acc: var(--accent);
     --acc-hover: #{shade($acc, 10%)};
     --accent-rgb: #{color-rgb($acc)};
     --on-accent: #{contrast-color($acc, $tx, $bg)};
-    
+
     // ========== STATUS COLORS ==========
     --success: #{$success};
     --success-hover: #{shade($success, 10%)};
     --success-rgb: #{color-rgb($success)};
     --on-success: #{contrast-color($success, $tx, $bg)};
-    
+
     --warning: #{$warning};
     --warning-hover: #{shade($warning, 10%)};
     --warning-rgb: #{color-rgb($warning)};
     --on-warning: #{contrast-color($warning, $tx, $bg)};
-    
+
     --error: #{$error};
     --error-hover: #{shade($error, 10%)};
     --error-rgb: #{color-rgb($error)};
     --on-error: #{contrast-color($error, $tx, $bg)};
-    
+
     --info: #{$info};
     --info-hover: #{shade($info, 10%)};
     --info-rgb: #{color-rgb($info)};
     --on-info: #{contrast-color($info, $tx, $bg)};
-    
+
     // ========== SHADOWS ==========
     --sh-xs: 0 1px 1px 0 #{alpha($tx, 0.03)};
     --sh-sm: 0 1px 2px 0 #{alpha($tx, 0.05)};
     --sh-md: 0 4px 6px -1px #{alpha($tx, 0.08)}, 0 2px 4px -1px #{alpha($tx, 0.06)};
     --sh-lg: 0 10px 15px -3px #{alpha($tx, 0.12)}, 0 4px 6px -2px #{alpha($tx, 0.08)};
-    --sh-xl: 0 20px 25px -5px #{alpha($tx, 0.16)}, 0 10px 10px -5px #{alpha($tx, 0.10)};
+    --sh-xl: 0 20px 25px -5px #{alpha($tx, 0.16)}, 0 10px 10px -5px #{alpha($tx, 0.1)};
     --sh-2xl: 0 25px 50px -12px #{alpha($tx, 0.25)};
-    
+
     // ========== FOCUS RING ==========
     --focus-ring-color: #{$pri};
   }
@@ -733,7 +827,7 @@ $bp-2xl: 1536px;
   width: 100%;
   height: 100%;
   padding: var(--auth-content-padding);
-  
+
   @include mobile {
     padding: var(--auth-content-padding-mobile);
   }
@@ -745,7 +839,7 @@ $bp-2xl: 1536px;
 @mixin safe-viewport-height($property: min-height) {
   #{$property}: 100vh;
   #{$property}: 100svh;
-  
+
   @supports (#{$property}: 100dvh) {
     #{$property}: 100dvh;
   }
@@ -821,7 +915,114 @@ $bp-2xl: 1536px;
 /// Use inside CSS-module files so the animation name is scoped correctly.
 @mixin spin-keyframes {
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// ============================================
+// 🪟 GLASS PANEL SYSTEM (Aurora Flow)
+// ============================================
+
+/// Glass Panel — Basis-Baustein für alle Aurora-Panels
+/// @param {String} $variant ['standard'] - 'standard' | 'hero' | 'compact'
+@mixin glass-panel($variant: 'standard') {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--glass-shadow);
+  padding: var(--space-xl);
+
+  @if $variant == 'hero' {
+    padding: var(--space-2xl);
+    border-radius: var(--r-2xl);
+  }
+
+  @if $variant == 'compact' {
+    padding: var(--space-md);
+    border-radius: var(--r-lg);
+  }
+
+  // Progressive Blur-Reduktion für Performance
+  @include tablet {
+    backdrop-filter: blur(var(--glass-blur-reduced));
+    -webkit-backdrop-filter: blur(var(--glass-blur-reduced));
+  }
+
+  @include mobile {
+    backdrop-filter: blur(var(--glass-blur-minimal));
+    -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+    padding: var(--space-lg);
+    border-radius: var(--r-lg);
+  }
+
+  // Fallback für fehlenden backdrop-filter
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+}
+
+/// Glass Panel Hover — Lift + Shadow-Deepening
+@mixin glass-hover {
+  transition:
+    transform var(--tr),
+    box-shadow var(--tr),
+    background var(--tr);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--glass-shadow-elevated);
+    background: var(--glass-bg-hover);
+  }
+
+  @include reduced-motion {
+    &:hover {
+      transform: none;
+    }
+  }
+}
+
+/// Aurora Canvas — Fixed Gradient Background
+@mixin aurora-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-below);
+  overflow: hidden;
+  background: var(--aurora-gradient);
+}
+
+/// Ambient Mesh Blob — Langsam driftende Farbpunkte
+/// @param {Length} $size [400px] - Blob-Durchmesser
+@mixin aurora-mesh-blob($size: 400px) {
+  position: absolute;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  will-change: transform;
+  pointer-events: none;
+
+  @include reduced-motion {
+    animation: none !important;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+/// Text auf Glass — Lesbarkeits-Boost via text-shadow
+@mixin glass-text {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  [data-theme='dark'] & {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 }

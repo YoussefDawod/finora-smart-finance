@@ -40,8 +40,9 @@ afterEach(() => {
 // Da die CLI `main()` sofort aufruft, müssen wir require + process.argv patchen
 
 function runCli(command, ...args) {
-  // Reset module cache
+  // Reset module cache – top-level jest.mock('readline') bleibt aktiv
   jest.resetModules();
+
   global.fetch = mockFetch;
 
   // Set process.argv
@@ -57,7 +58,7 @@ function runCli(command, ...args) {
   // main() ist async und returned nichts direkt,
   // aber wir können auf die Promise warten
   // Da require die main() aufruft, müssen wir kurz warten
-  return new Promise((resolve) => setTimeout(resolve, 50));
+  return new Promise(resolve => setTimeout(resolve, 50));
 }
 
 // ── Helper: Successful API Response ───────────────────────
@@ -81,9 +82,15 @@ describe('Admin CLI — Auth Headers', () => {
     process.env.ADMIN_TOKEN = 'my-jwt-token';
     mockApiSuccess({
       overview: {
-        totalUsers: 0, verifiedUsers: 0, unverifiedUsers: 0,
-        activeUsers: 0, bannedUsers: 0, adminUsers: 0,
-        usersLast7Days: 0, usersLast30Days: 0, totalTransactions: 0,
+        totalUsers: 0,
+        verifiedUsers: 0,
+        unverifiedUsers: 0,
+        activeUsers: 0,
+        bannedUsers: 0,
+        adminUsers: 0,
+        usersLast7Days: 0,
+        usersLast30Days: 0,
+        totalTransactions: 0,
       },
       recentUsers: [],
     });
@@ -96,7 +103,7 @@ describe('Admin CLI — Auth Headers', () => {
         headers: expect.objectContaining({
           Authorization: 'Bearer my-jwt-token',
         }),
-      }),
+      })
     );
   });
 
@@ -104,9 +111,15 @@ describe('Admin CLI — Auth Headers', () => {
     process.env.ADMIN_API_KEY = 'my-api-key';
     mockApiSuccess({
       overview: {
-        totalUsers: 0, verifiedUsers: 0, unverifiedUsers: 0,
-        activeUsers: 0, bannedUsers: 0, adminUsers: 0,
-        usersLast7Days: 0, usersLast30Days: 0, totalTransactions: 0,
+        totalUsers: 0,
+        verifiedUsers: 0,
+        unverifiedUsers: 0,
+        activeUsers: 0,
+        bannedUsers: 0,
+        adminUsers: 0,
+        usersLast7Days: 0,
+        usersLast30Days: 0,
+        totalTransactions: 0,
       },
       recentUsers: [],
     });
@@ -119,7 +132,7 @@ describe('Admin CLI — Auth Headers', () => {
         headers: expect.objectContaining({
           'x-admin-key': 'my-api-key',
         }),
-      }),
+      })
     );
   });
 
@@ -128,9 +141,15 @@ describe('Admin CLI — Auth Headers', () => {
     process.env.ADMIN_API_KEY = 'key';
     mockApiSuccess({
       overview: {
-        totalUsers: 0, verifiedUsers: 0, unverifiedUsers: 0,
-        activeUsers: 0, bannedUsers: 0, adminUsers: 0,
-        usersLast7Days: 0, usersLast30Days: 0, totalTransactions: 0,
+        totalUsers: 0,
+        verifiedUsers: 0,
+        unverifiedUsers: 0,
+        activeUsers: 0,
+        bannedUsers: 0,
+        adminUsers: 0,
+        usersLast7Days: 0,
+        usersLast30Days: 0,
+        totalTransactions: 0,
       },
       recentUsers: [],
     });
@@ -150,9 +169,15 @@ describe('Admin CLI — stats', () => {
   it('ruft /admin/stats auf und zeigt Daten an', async () => {
     mockApiSuccess({
       overview: {
-        totalUsers: 42, verifiedUsers: 30, unverifiedUsers: 12,
-        activeUsers: 40, bannedUsers: 2, adminUsers: 3,
-        usersLast7Days: 5, usersLast30Days: 15, totalTransactions: 200,
+        totalUsers: 42,
+        verifiedUsers: 30,
+        unverifiedUsers: 12,
+        activeUsers: 40,
+        bannedUsers: 2,
+        adminUsers: 3,
+        usersLast7Days: 5,
+        usersLast30Days: 15,
+        totalTransactions: 200,
       },
       recentUsers: [
         { name: 'Alice', email: 'alice@test.com', isVerified: true, role: 'admin' },
@@ -164,7 +189,7 @@ describe('Admin CLI — stats', () => {
 
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/stats'),
-      expect.any(Object),
+      expect.any(Object)
     );
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('User Statistics'));
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('42'));
@@ -183,7 +208,14 @@ describe('Admin CLI — stats', () => {
 describe('Admin CLI — list', () => {
   const mockUsers = {
     users: [
-      { _id: '1', name: 'Alice', email: 'alice@test.com', role: 'admin', isVerified: true, createdAt: '2025-01-01' },
+      {
+        _id: '1',
+        name: 'Alice',
+        email: 'alice@test.com',
+        role: 'admin',
+        isVerified: true,
+        createdAt: '2025-01-01',
+      },
     ],
     pagination: { total: 1 },
   };
@@ -194,7 +226,7 @@ describe('Admin CLI — list', () => {
 
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users'),
-      expect.any(Object),
+      expect.any(Object)
     );
   });
 
@@ -236,7 +268,13 @@ describe('Admin CLI — list', () => {
 // ============================================
 describe('Admin CLI — create', () => {
   it('erstellt User mit Name, Passwort, Email', async () => {
-    mockApiSuccess({ _id: '123', name: 'Test', email: 'test@test.com', role: 'user', isVerified: false });
+    mockApiSuccess({
+      _id: '123',
+      name: 'Test',
+      email: 'test@test.com',
+      role: 'user',
+      isVerified: false,
+    });
 
     await runCli('create', 'Test', 'Pass123!', 'test@test.com');
 
@@ -245,7 +283,7 @@ describe('Admin CLI — create', () => {
       expect.objectContaining({
         method: 'POST',
         body: expect.stringContaining('"name":"Test"'),
-      }),
+      })
     );
   });
 
@@ -273,8 +311,14 @@ describe('Admin CLI — get', () => {
   it('ruft User-Details ab', async () => {
     mockApiSuccess({
       user: {
-        _id: '123', name: 'Alice', email: 'alice@test.com', role: 'user',
-        isActive: true, isVerified: true, createdAt: '2025-01-01', lastLogin: null,
+        _id: '123',
+        name: 'Alice',
+        email: 'alice@test.com',
+        role: 'user',
+        isActive: true,
+        isVerified: true,
+        createdAt: '2025-01-01',
+        lastLogin: null,
         preferences: { theme: 'dark', currency: 'EUR', language: 'de' },
       },
       stats: { transactionCount: 5 },
@@ -283,7 +327,7 @@ describe('Admin CLI — get', () => {
     await runCli('get', '123');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users/123'),
-      expect.any(Object),
+      expect.any(Object)
     );
   });
 
@@ -303,7 +347,7 @@ describe('Admin CLI — delete', () => {
     await runCli('delete', '123');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users/123'),
-      expect.objectContaining({ method: 'DELETE' }),
+      expect.objectContaining({ method: 'DELETE' })
     );
   });
 
@@ -341,7 +385,9 @@ describe('Admin CLI — reset-password', () => {
 
     await runCli('reset-password', '123');
 
-    expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('automatisch generiertes Passwort'));
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('automatisch generiertes Passwort')
+    );
   });
 
   it('zeigt Fehler wenn User-ID fehlt', async () => {
@@ -363,7 +409,7 @@ describe('Admin CLI — ban/unban', () => {
     expect(body.reason).toBe('Spam Account');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users/123/ban'),
-      expect.objectContaining({ method: 'PATCH' }),
+      expect.objectContaining({ method: 'PATCH' })
     );
   });
 
@@ -373,7 +419,7 @@ describe('Admin CLI — ban/unban', () => {
     await runCli('unban', '123');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users/123/unban'),
-      expect.objectContaining({ method: 'PATCH' }),
+      expect.objectContaining({ method: 'PATCH' })
     );
   });
 
@@ -438,11 +484,11 @@ describe('Admin CLI — clean-all', () => {
 
     expect(mockQuestion).toHaveBeenCalledWith(
       expect.stringContaining('JA LÖSCHEN'),
-      expect.any(Function),
+      expect.any(Function)
     );
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('/admin/users'),
-      expect.objectContaining({ method: 'DELETE' }),
+      expect.objectContaining({ method: 'DELETE' })
     );
     const body = JSON.parse(mockFetch.mock.calls[0][1].body);
     expect(body.confirm).toBe('DELETE_ALL_USERS');
@@ -476,7 +522,7 @@ describe('Admin CLI — help & unknown', () => {
     process.argv = ['node', 'admin-cli.js'];
     require('../admin-cli.js');
     process.argv = originalArgv;
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('Admin CLI'));
   });

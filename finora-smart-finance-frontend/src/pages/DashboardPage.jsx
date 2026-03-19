@@ -1,27 +1,38 @@
 /**
- * @fileoverview DashboardPage Component
- * @description Haupt-Dashboard mit Summary Cards, Charts und Statistiken
- * Nutzt aggregierte Daten vom Server (keine Client-Side-Berechnung)
- * 
+ * @fileoverview DashboardPage Component — Aurora Flow
+ * @description Haupt-Dashboard mit Glass-Panels, Aurora-Canvas-Hintergrund
+ * und animierten Metriken. Nutzt aggregierte Daten vom Server.
+ *
  * LAYOUT:
- * - Header mit Begrüßung
- * - 3 Summary Cards: Einkommen | Ausgaben | Balance
- * - Charts & Breakdowns
- * - Recent Transactions
+ * - AuroraCanvas (fixed ambient background)
+ * - Header mit Begrüßung + Filter
+ * - HeroMetricPanel (Balance hero + Income/Expense)
+ * - panelRow: OrbitalSavingsRing | FlowAreaChart
+ * - panelRow: GlassCategoryList | FlowTransactionList
+ * - CompactWidgetRow: Budget | Quota | Retention
  */
 
 import { createElement, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth, useMotion } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
-import { useNavigate } from 'react-router-dom';
-import { SummaryCard, RecentTransactions, DashboardCharts, DashboardFilter, BudgetWidget, QuotaIndicator, RetentionBanner } from '@/components/dashboard';
+import { useDashboardChartData } from '@/hooks/useDashboardChartData';
+import { DashboardFilter } from '@/components/dashboard';
+import AuroraCanvas from '@/components/dashboard/AuroraCanvas/AuroraCanvas';
+import HeroMetricPanel from '@/components/dashboard/HeroMetricPanel/HeroMetricPanel';
+import OrbitalSavingsRing from '@/components/dashboard/OrbitalSavingsRing/OrbitalSavingsRing';
+import FlowAreaChart from '@/components/dashboard/FlowAreaChart/FlowAreaChart';
+import GlassCategoryList from '@/components/dashboard/GlassCategoryList/GlassCategoryList';
+import FlowTransactionList from '@/components/dashboard/FlowTransactionList/FlowTransactionList';
+import CompactWidgetRow from '@/components/dashboard/CompactWidgetRow/CompactWidgetRow';
+import GlassPanel from '@/components/dashboard/GlassPanel/GlassPanel';
 import Button from '@/components/common/Button/Button';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
 import { formatCurrency } from '@/utils/formatters';
 import { getTimeOfDay, getTimeIcon } from '@/utils/getGreeting';
-import { FiDollarSign, FiCreditCard, FiTrendingUp, FiPlus } from 'react-icons/fi';
+import { FiPlus } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useLifecycle } from '@/hooks/useLifecycle';
 import styles from './DashboardPage.module.scss';
@@ -30,18 +41,17 @@ import i18n from '@/i18n';
 // ──────────────────────────────────────────────────────────────────────
 // ANIMATION VARIANTS (module-level constants — stable references)
 // ──────────────────────────────────────────────────────────────────────
-const containerVariants = {
+const staggerContainer = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-const itemVariants = {
+const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
 export default function DashboardPage() {
-  // Wrap content in ErrorBoundary to prevent white screen
   return (
     <ErrorBoundary>
       <DashboardContent />
@@ -53,14 +63,26 @@ function DashboardContent() {
   const { user, isAuthenticated } = useAuth();
   const { shouldAnimate } = useMotion();
   const {
-    dashboardData, dashboardLoading, error, fetchDashboardData, fetchTransactions,
-    dashboardMonth, dashboardYear, setDashboardMonth, filter,
+    dashboardData,
+    dashboardLoading,
+    error,
+    fetchDashboardData,
+    fetchTransactions,
+    dashboardMonth,
+    dashboardYear,
+    setDashboardMonth,
+    filter,
   } = useTransactions();
+  const { trendData } = useDashboardChartData();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const {
-    lifecycleStatus, quota, isLoading: lifecycleLoading,
-    fetchLifecycleStatus, fetchQuota, confirmExport,
+    lifecycleStatus,
+    quota,
+    isLoading: lifecycleLoading,
+    fetchLifecycleStatus,
+    fetchQuota,
+    confirmExport,
   } = useLifecycle();
 
   // Lifecycle-Daten und Quota einmalig laden (nur wenn authentifiziert)
@@ -68,7 +90,7 @@ function DashboardContent() {
     if (!isAuthenticated || !user) return;
     fetchLifecycleStatus();
     fetchQuota();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   // Safety-Fallback: Dashboard-Daten laden, falls TransactionContext sie noch nicht hat
@@ -78,39 +100,81 @@ function DashboardContent() {
       fetchDashboardData();
       fetchTransactions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user]);
 
   // ──────────────────────────────────────────────────────────────────────
-  // FORMAT SUMMARY DATA FROM SERVER
+  // PAGE-LEVEL AURORA GRADIENT BACKGROUND
+  // ──────────────────────────────────────────────────────────────────────
+  // Setzt .page-dashboard auf <html>, damit der Aurora-Gradient
+  // als Page-Background dargestellt wird (Layout-BGs → transparent).
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.add('page-dashboard');
+    return () => root.classList.remove('page-dashboard');
+  }, []);
+
+  // Scroll-basierter Gradient-Wave-Effekt für "lebendigen" Premium-Look.
+  // Kombiniert Winkel-Rotation + Farbstop-Verschiebung → sichtbare Wellenbewegung.
+  useEffect(() => {
+    if (!shouldAnimate) return;
+
+    const root = document.documentElement;
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        const maxScroll = document.body.scrollHeight - window.innerHeight;
+        const progress = maxScroll > 0 ? Math.min(scrollY / maxScroll, 1) : 0;
+
+        // Sinuswelle für organische Bewegung (nicht linear)
+        // Winkel: 135° → 180° → 135° (Hin-und-Zurück-Welle)
+        const angle = 135 + Math.sin(progress * Math.PI) * 45;
+
+        // Farbstop-Positionen verschieben sich gegenläufig → Wellen-Effekt
+        // stop2: 35% → 20% → 50% → 20% → 35% (doppelte Frequenz)
+        // stop3: 70% → 85% → 55% → 85% → 70% (gegenläufig)
+        const waveOffset = Math.sin(progress * Math.PI * 2) * 15;
+        const pos2 = 35 + waveOffset;
+        const pos3 = 70 - waveOffset;
+
+        root.style.setProperty('--aurora-angle', `${angle.toFixed(1)}deg`);
+        root.style.setProperty('--aurora-pos-2', `${pos2.toFixed(1)}%`);
+        root.style.setProperty('--aurora-pos-3', `${pos3.toFixed(1)}%`);
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      root.style.removeProperty('--aurora-angle');
+      root.style.removeProperty('--aurora-pos-2');
+      root.style.removeProperty('--aurora-pos-3');
+    };
+  }, [shouldAnimate]);
+
+  // ──────────────────────────────────────────────────────────────────────
+  // FORMAT SUMMARY DATA FOR HeroMetricPanel
   // ──────────────────────────────────────────────────────────────────────
   const summaryData = useMemo(() => {
     try {
       const buildTrendInfo = (percent, mode = 'standard') => {
-        // Kein Trend-Vergleich möglich (Vormonat hatte keine Daten)
         if (percent === null || percent === undefined) {
-          return {
-            label: null, // Kein Label anzeigen
-            variant: 'neutral',
-            showTrend: false,
-          };
+          return { label: null, variant: 'neutral', showTrend: false };
         }
-
-        // Keine Änderung
         if (percent === 0) {
-          return {
-            label: t('dashboard.noChange'),
-            variant: 'neutral',
-            showTrend: true,
-          };
+          return { label: t('dashboard.noChange'), variant: 'neutral', showTrend: true };
         }
-
         let variant = percent > 0 ? 'up' : 'down';
-        // Bei Ausgaben ist "mehr" schlecht (down) und "weniger" gut (up)
         if (mode === 'expense') {
           variant = percent > 0 ? 'down' : 'up';
         }
-
         return {
           label: `${percent > 0 ? '+' : ''}${percent}%`,
           variant,
@@ -118,95 +182,129 @@ function DashboardContent() {
         };
       };
 
-      // Fallback wenn keine Daten
       if (!dashboardData?.summary) {
         return {
-          income: {
+          balance: {
+            label: t('dashboard.balance'),
             value: formatCurrency(0),
-            amount: 0,
-            trend: null,
             trendLabel: null,
             trendVariant: 'neutral',
-            trendPercent: null,
+            trend: null,
+            trendTooltip: null,
+          },
+          income: {
+            label: t('dashboard.income'),
+            value: formatCurrency(0),
+            trendLabel: null,
+            trendVariant: 'neutral',
+            trend: null,
+            trendTooltip: null,
           },
           expense: {
+            label: t('dashboard.expenses'),
             value: formatCurrency(0),
-            amount: 0,
-            trend: null,
             trendLabel: null,
             trendVariant: 'neutral',
-            trendPercent: null,
-          },
-          balance: {
-            value: formatCurrency(0),
-            amount: 0,
             trend: null,
-            trendLabel: null,
-            trendVariant: 'neutral',
-            trendPercent: null,
+            trendTooltip: null,
           },
         };
       }
 
       const { currentMonth, trends } = dashboardData.summary;
-      
+
       const incomeTrend = buildTrendInfo(trends?.income, 'standard');
       const expenseTrend = buildTrendInfo(trends?.expense, 'expense');
-      const balanceTrend = buildTrendInfo(trends?.balance, currentMonth?.balance >= 0 ? 'standard' : 'expense');
+      const balanceTrend = buildTrendInfo(
+        trends?.balance,
+        currentMonth?.balance >= 0 ? 'standard' : 'expense'
+      );
 
-      // Trend-Text nur anzeigen wenn wirklich ein Vergleich möglich ist
-      const getTrendText = (trendInfo) => {
-        return trendInfo.showTrend ? i18n.t('dashboard.vsLastMonth') : null;
+      const getTrendText = trendInfo =>
+        trendInfo.showTrend ? i18n.t('dashboard.vsLastMonth') : null;
+
+      // Actual data direction (not inverted for expenses)
+      const getDataTrend = percent => {
+        if (percent === null || percent === undefined || percent === 0) return 'neutral';
+        return percent > 0 ? 'up' : 'down';
       };
 
+      // Sparkline data from monthly trend (last N months)
+      const balanceSparkline = trendData.length >= 2 ? trendData.map(d => d.balance) : null;
+      const incomeSparkline = trendData.length >= 2 ? trendData.map(d => d.income) : null;
+      const expenseSparkline = trendData.length >= 2 ? trendData.map(d => d.expense) : null;
+
       return {
-        income: {
-          value: formatCurrency(currentMonth?.income || 0),
-          amount: currentMonth?.income || 0,
-          trend: getTrendText(incomeTrend),
-          trendLabel: incomeTrend.label,
-          trendVariant: incomeTrend.variant,
-          trendPercent: trends?.income,
-          trendTooltip: incomeTrend.showTrend ? i18n.t('dashboard.incomeTrendTooltip') : null,
-        },
-        expense: {
-          value: formatCurrency(currentMonth?.expense || 0),
-          amount: currentMonth?.expense || 0,
-          trend: getTrendText(expenseTrend),
-          trendLabel: expenseTrend.label,
-          trendVariant: expenseTrend.variant,
-          trendPercent: trends?.expense,
-          trendTooltip: expenseTrend.showTrend ? i18n.t('dashboard.expenseTrendTooltip') : null,
-        },
         balance: {
+          label: t('dashboard.balance'),
           value: formatCurrency(currentMonth?.balance || 0),
-          amount: currentMonth?.balance || 0,
-          trend: getTrendText(balanceTrend),
           trendLabel: balanceTrend.label,
           trendVariant: balanceTrend.variant,
-          trendPercent: trends?.balance,
+          trend: getTrendText(balanceTrend),
           trendTooltip: balanceTrend.showTrend ? i18n.t('dashboard.balanceTrendTooltip') : null,
+          sparkline: balanceSparkline,
+          dataTrend: getDataTrend(trends?.balance),
+        },
+        income: {
+          label: t('dashboard.income'),
+          value: formatCurrency(currentMonth?.income || 0),
+          trendLabel: incomeTrend.label,
+          trendVariant: incomeTrend.variant,
+          trend: getTrendText(incomeTrend),
+          trendTooltip: incomeTrend.showTrend ? i18n.t('dashboard.incomeTrendTooltip') : null,
+          sparkline: incomeSparkline,
+          dataTrend: getDataTrend(trends?.income),
+        },
+        expense: {
+          label: t('dashboard.expenses'),
+          value: formatCurrency(currentMonth?.expense || 0),
+          trendLabel: expenseTrend.label,
+          trendVariant: expenseTrend.variant,
+          trend: getTrendText(expenseTrend),
+          trendTooltip: expenseTrend.showTrend ? i18n.t('dashboard.expenseTrendTooltip') : null,
+          sparkline: expenseSparkline,
+          dataTrend: getDataTrend(trends?.expense),
         },
       };
     } catch (err) {
-      console.error("Error calculating summary data", err);
-      // Return safe default keys
+      console.error('Error calculating summary data', err);
       return {
-        income: { value: formatCurrency(0), amount: 0, trend: null },
-        expense: { value: formatCurrency(0), amount: 0, trend: null },
-        balance: { value: formatCurrency(0), amount: 0, trend: null }
+        balance: {
+          label: t('dashboard.balance'),
+          value: formatCurrency(0),
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trend: null,
+          trendTooltip: null,
+        },
+        income: {
+          label: t('dashboard.income'),
+          value: formatCurrency(0),
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trend: null,
+          trendTooltip: null,
+        },
+        expense: {
+          label: t('dashboard.expenses'),
+          value: formatCurrency(0),
+          trendLabel: null,
+          trendVariant: 'neutral',
+          trend: null,
+          trendTooltip: null,
+        },
       };
     }
-  }, [dashboardData, t]);
-
-  // Animations are defined as module-level constants (see top of file)
+  }, [dashboardData, t, trendData]);
 
   // ──────────────────────────────────────────────────────────────────────
-  // LOADING STATE - Skeleton Grid
+  // LOADING STATE — Aurora Skeleton
   // ──────────────────────────────────────────────────────────────────────
   if (dashboardLoading) {
     return (
-      <div className={styles.dashboardPage} aria-busy="true" aria-label={t('common.loading')}>
+      <div className={styles.auroraLayout} aria-busy="true" aria-label={t('common.loading')}>
+        <AuroraCanvas />
+
         {/* Header Skeleton */}
         <section className={styles.headerSection}>
           <div className={styles.greeting}>
@@ -216,30 +314,34 @@ function DashboardContent() {
           <Skeleton width="160px" height="40px" borderRadius="var(--r-lg)" />
         </section>
 
-        {/* Summary Cards Skeleton Grid */}
-        <section className={styles.summaryGrid}>
-          <SummaryCard isLoading color="income" icon={FiDollarSign} />
-          <SummaryCard isLoading color="expense" icon={FiCreditCard} />
-          <SummaryCard isLoading color="balance" icon={FiTrendingUp} />
-        </section>
+        {/* Hero Skeleton */}
+        <HeroMetricPanel summaryData={summaryData} isLoading />
 
-        {/* Charts Skeleton */}
-        <section className={styles.chartsGrid}>
-          <div className={styles.section}>
-            <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" />
-            <Skeleton width="100%" height="280px" borderRadius="var(--r-lg)" />
-          </div>
-          <div className={styles.section}>
-            <Skeleton width="140px" height="24px" borderRadius="var(--r-md)" />
-            <Skeleton width="100%" height="280px" borderRadius="var(--r-lg)" />
-          </div>
-        </section>
+        {/* Panel Row Skeleton */}
+        <div className={styles.skeletonGrid}>
+          <GlassPanel variant="standard">
+            <Skeleton width="100%" height="200px" borderRadius="var(--r-lg)" />
+          </GlassPanel>
+          <GlassPanel variant="standard">
+            <Skeleton width="100%" height="200px" borderRadius="var(--r-lg)" />
+          </GlassPanel>
+        </div>
 
-        {/* Recent Transactions Skeleton */}
-        <section className={styles.section}>
-          <Skeleton width="200px" height="28px" borderRadius="var(--r-md)" />
-          <Skeleton count={5} width="100%" height="64px" gap="var(--space-sm)" borderRadius="var(--r-lg)" />
-        </section>
+        {/* Second Row Skeleton */}
+        <div className={styles.skeletonGrid}>
+          <GlassPanel variant="standard">
+            <Skeleton width="100%" height="240px" borderRadius="var(--r-lg)" />
+          </GlassPanel>
+          <GlassPanel variant="standard">
+            <Skeleton
+              count={4}
+              width="100%"
+              height="56px"
+              gap="var(--space-sm)"
+              borderRadius="var(--r-lg)"
+            />
+          </GlassPanel>
+        </div>
       </div>
     );
   }
@@ -248,10 +350,13 @@ function DashboardContent() {
     return (
       <div className={styles.loadingContainer}>
         <p>{t('dashboard.errors.load')}</p>
-        <Button variant="secondary" onClick={() => {
-          fetchDashboardData();
-          fetchTransactions();
-        }}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            fetchDashboardData();
+            fetchTransactions();
+          }}
+        >
           {t('common.retry')}
         </Button>
       </div>
@@ -259,13 +364,19 @@ function DashboardContent() {
   }
 
   // ──────────────────────────────────────────────────────────────────────
-  // RENDER CONTENT
+  // RENDER — Aurora Flow Layout
   // ──────────────────────────────────────────────────────────────────────
   return (
-    <div className={styles.dashboardPage}>
+    <motion.div
+      className={styles.auroraLayout}
+      variants={staggerContainer}
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
+    >
+      <AuroraCanvas />
 
-      {/* Header Section */}
-      <motion.section className={styles.headerSection} variants={itemVariants}>
+      {/* Header */}
+      <motion.section className={styles.headerSection} variants={fadeUp}>
         <div className={styles.greeting}>
           <h1 className={styles.greetingTitle}>
             <span className={styles.greetingIcon} aria-hidden="true">
@@ -274,14 +385,7 @@ function DashboardContent() {
             <span className={styles.greetingIntro}>
               {t(`dashboard.greeting.${getTimeOfDay()}`)}
             </span>
-            {user?.name && (
-              <>
-                {', '}
-                <span className={styles.greetingName}>
-                  {user.name.split(' ')[0]}
-                </span>
-              </>
-            )}
+            {user?.name && <span className={styles.greetingName}>{user.name.split(' ')[0]}</span>}
           </h1>
           <p>{t('dashboard.overview')}</p>
         </div>
@@ -309,107 +413,42 @@ function DashboardContent() {
         </div>
       </motion.section>
 
-      {/* Summary Cards Grid */}
-      <motion.section
-        className={styles.summaryGrid}
-        variants={containerVariants}
-        initial={shouldAnimate ? 'hidden' : false}
-        animate={shouldAnimate ? 'visible' : false}
-      >
-        {/* Income Card */}
-        <motion.div variants={itemVariants} key="income">
-          <SummaryCard
-            title={t('dashboard.income')}
-            value={summaryData.income.value}
-            icon={FiDollarSign}
-            trend={summaryData.income.trend}
-            trendPercent={summaryData.income.trendPercent}
-            trendLabel={summaryData.income.trendLabel}
-            trendVariant={summaryData.income.trendVariant}
-            trendTooltip={summaryData.income.trendTooltip}
-            color="income"
-            size="medium"
-            isLoading={dashboardLoading}
-          />
-        </motion.div>
+      {/* Hero KPIs: Balance | Income | Expense */}
+      <motion.div variants={fadeUp}>
+        <HeroMetricPanel summaryData={summaryData} isLoading={dashboardLoading} />
+      </motion.div>
 
-        {/* Expense Card */}
-        <motion.div variants={itemVariants} key="expense">
-          <SummaryCard
-            title={t('dashboard.expenses')}
-            value={summaryData.expense.value}
-            icon={FiCreditCard}
-            trend={summaryData.expense.trend}
-            trendPercent={summaryData.expense.trendPercent}
-            trendLabel={summaryData.expense.trendLabel}
-            trendVariant={summaryData.expense.trendVariant}
-            trendTooltip={summaryData.expense.trendTooltip}
-            color="expense"
-            size="medium"
-            isLoading={dashboardLoading}
-          />
-        </motion.div>
-
-        {/* Balance Card */}
-        <motion.div variants={itemVariants} key="balance">
-          <SummaryCard
-            title={t('dashboard.balance')}
-            value={summaryData.balance.value}
-            icon={FiTrendingUp}
-            trend={summaryData.balance.trend}
-            trendPercent={summaryData.balance.trendPercent}
-            trendLabel={summaryData.balance.trendLabel}
-            trendVariant={summaryData.balance.trendVariant}
-            trendTooltip={summaryData.balance.trendTooltip}
-            color="balance"
-            size="medium"
-            isLoading={dashboardLoading}
-          />
-        </motion.div>
-      </motion.section>
-
-      {/* Charts Section */}
-      <motion.section className={styles.section} variants={itemVariants}>
-        <div className={styles.sectionHeader}>
-          <h2>{t('dashboard.chartsTitle')}</h2>
-        </div>
+      {/* Row 1: Savings Ring + Trend Chart */}
+      <motion.div className={styles.panelRow} variants={fadeUp}>
         <ErrorBoundary>
-          <DashboardCharts />
+          <OrbitalSavingsRing />
         </ErrorBoundary>
-      </motion.section>
-
-      {/* Budget Widget */}
-      <motion.section className={styles.section} variants={itemVariants}>
         <ErrorBoundary>
-          <BudgetWidget />
+          <FlowAreaChart />
         </ErrorBoundary>
-      </motion.section>
+      </motion.div>
 
-      {/* Quota Indicator */}
-      <motion.section className={styles.section} variants={itemVariants}>
+      {/* Row 2: Category Breakdown + Recent Transactions */}
+      <motion.div className={styles.panelRow} variants={fadeUp}>
         <ErrorBoundary>
-          <QuotaIndicator quota={quota} isLoading={lifecycleLoading} />
+          <GlassCategoryList />
         </ErrorBoundary>
-      </motion.section>
-
-      {/* Retention Banner */}
-      <motion.section className={styles.section} variants={itemVariants}>
         <ErrorBoundary>
-          <RetentionBanner
+          <FlowTransactionList />
+        </ErrorBoundary>
+      </motion.div>
+
+      {/* Row 3: Budget | Quota | Retention (nur authentifiziert) */}
+      {isAuthenticated && (
+        <motion.div variants={fadeUp}>
+          <CompactWidgetRow
+            quota={quota}
             lifecycleStatus={lifecycleStatus}
-            onExport={() => navigate('/settings')}
-            onConfirmExport={confirmExport}
-            isLoading={lifecycleLoading}
+            lifecycleLoading={lifecycleLoading}
+            confirmExport={confirmExport}
           />
-        </ErrorBoundary>
-      </motion.section>
-
-      {/* Recent Transactions Section */}
-      <motion.section className={styles.transactionsSection} variants={itemVariants}>
-        <ErrorBoundary>
-          <RecentTransactions limit={5} />
-        </ErrorBoundary>
-      </motion.section>
-    </div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }

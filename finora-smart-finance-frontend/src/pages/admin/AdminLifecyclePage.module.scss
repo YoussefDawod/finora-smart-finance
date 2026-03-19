@@ -1,7 +1,6 @@
 // ============================================
 // 🔄 ADMIN LIFECYCLE PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -114,7 +113,9 @@
   // <details> Marker entfernen
   > summary {
     list-style: none;
-    &::-webkit-details-marker { display: none; }
+    &::-webkit-details-marker {
+      display: none;
+    }
   }
 
   &[open] .chevron {
@@ -187,7 +188,9 @@
 
   > summary {
     list-style: none;
-    &::-webkit-details-marker { display: none; }
+    &::-webkit-details-marker {
+      display: none;
+    }
   }
 
   &[open] .chevron {
@@ -484,6 +487,10 @@
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   padding: var(--space-lg);
+
+  @include tablet-md {
+    padding: var(--space-md);
+  }
 }
 
 .sectionHeader {
@@ -522,6 +529,11 @@
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   flex-wrap: wrap;
+
+  @include tablet-md {
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+  }
 }
 
 .userInfo {
@@ -629,8 +641,12 @@
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 // ── Detail Panel (Overlay) ──────────────────
@@ -933,6 +949,21 @@
 
   .timelineWrapper {
     padding: var(--space-md);
+  }
+}
+
+// ── Container Queries (Sidebar-aware) ───────
+@container admin-content (max-width: 600px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .configGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .triggerResultGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 

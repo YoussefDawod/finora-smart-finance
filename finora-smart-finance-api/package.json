@@ -15,7 +15,8 @@
     "format:check": "prettier --check \"src/**/*.js\" \"*.js\"",
     "admin": "node admin-cli.js",
     "admin:stats": "node admin-cli.js stats",
-    "admin:list": "node admin-cli.js list"
+    "admin:list": "node admin-cli.js list",
+    "geoip:update": "node node_modules/geoip-lite/scripts/updatedb.js"
   },
   "keywords": [],
   "author": "Youssef Dawod",
@@ -28,6 +29,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
+    "geoip-lite": "^1.4.10",
     "helmet": "^8.1.0",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",

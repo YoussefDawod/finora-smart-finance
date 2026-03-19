@@ -3,6 +3,7 @@
  * Request/Response-Handling für Admin-Endpoints
  */
 
+const mongoose = require('mongoose');
 const adminService = require('../services/adminService');
 const campaignService = require('../services/campaignService');
 const auditLog = require('../services/auditLogService');
@@ -13,6 +14,13 @@ const {
   validateUpdateUser,
 } = require('../validators/adminValidation');
 const { validatePassword } = require('../validators/authValidation');
+const {
+  sanitizeUserForViewer,
+  sanitizeTransactionForViewer,
+  sanitizeSubscriberForViewer,
+  sanitizeAuditLogForViewer,
+  sanitizeTransactionUserForViewer,
+} = require('../utils/viewerSanitizer');
 
 /**
  * Extrahiert Admin-Infos aus dem Request (JWT-User oder API-Key-Fallback)
@@ -39,6 +47,12 @@ async function listUsers(req, res) {
     }
 
     const data = await adminService.listUsers(query, pagination, sort, showSensitive);
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.users) {
+      data.users = data.users.map(sanitizeUserForViewer);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: Get users', error);
@@ -48,7 +62,7 @@ async function listUsers(req, res) {
 // GET /api/admin/users/:id
 async function getUser(req, res) {
   try {
-    const data = await adminService.getUserById(req.params.id);
+    let data = await adminService.getUserById(req.params.id);
     if (!data) {
       return sendError(res, req, {
         error: 'User nicht gefunden',
@@ -56,6 +70,12 @@ async function getUser(req, res) {
         status: 404,
       });
     }
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer') {
+      data = { ...data, user: sanitizeUserForViewer(data.user || data) };
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: Get user', error);
@@ -99,14 +119,23 @@ async function createUser(req, res) {
       adminName,
       targetUserId: result.user._id,
       targetUserName: result.user.name,
-      details: { email: result.user.email || null, role: result.user.role || 'user' },
+      details: {
+        email: result.user.email || null,
+        role: result.user.role || 'user',
+        autoGeneratePassword: !!result.generatedPassword,
+        emailSent: result.emailSent,
+      },
       req,
     });
 
     res.status(201).json({
       success: true,
       message: 'User erfolgreich erstellt',
-      data: result.user,
+      data: {
+        user: result.user,
+        generatedPassword: result.generatedPassword || null,
+        emailSent: result.emailSent,
+      },
     });
   } catch (error) {
     handleServerError(res, req, 'Admin: Create user', error);
@@ -347,9 +376,9 @@ async function changeUserRole(req, res) {
   try {
     const { role } = req.body || {};
 
-    if (!role || !['user', 'admin'].includes(role)) {
+    if (!role || !['user', 'admin', 'viewer'].includes(role)) {
       return sendError(res, req, {
-        error: 'role muss "user" oder "admin" sein',
+        error: 'role muss "user", "admin" oder "viewer" sein',
         code: 'VALIDATION_ERROR',
         status: 400,
       });
@@ -397,8 +426,18 @@ async function changeUserRole(req, res) {
 // GET /api/admin/audit-log
 async function getAuditLogs(req, res) {
   try {
-    const { page, limit, action, adminId, targetUserId, startDate, endDate, search, sort } =
-      req.query || {};
+    const {
+      page,
+      limit,
+      action,
+      adminId,
+      targetUserId,
+      country,
+      startDate,
+      endDate,
+      search,
+      sort,
+    } = req.query || {};
 
     const data = await auditLog.getLogs({
       page,
@@ -406,11 +445,17 @@ async function getAuditLogs(req, res) {
       action,
       adminId,
       targetUserId,
+      country,
       startDate,
       endDate,
       search,
       sort,
     });
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.logs) {
+      data.logs = data.logs.map(sanitizeAuditLogForViewer);
+    }
 
     res.json({ success: true, data });
   } catch (error) {
@@ -428,6 +473,73 @@ async function getAuditLogStats(req, res) {
   }
 }
 
+// DELETE /api/admin/audit-log
+async function deleteAllAuditLogs(req, res) {
+  try {
+    const admin = getAdminInfo(req);
+
+    // Erst loggen, dann löschen — damit die Löschaktion selbst festgehalten wird
+    await auditLog.log({
+      action: 'AUDIT_LOG_CLEARED',
+      adminId: admin.id,
+      adminName: admin.name,
+      details: { note: 'Alle Audit-Log-Einträge manuell gelöscht' },
+      req,
+    });
+
+    const deletedCount = await auditLog.deleteAll();
+
+    res.json({
+      success: true,
+      message: `${deletedCount} Audit-Log-Einträge gelöscht`,
+      data: { deletedCount },
+    });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Delete all audit logs', error);
+  }
+}
+
+// DELETE /api/admin/audit-log/bulk
+async function deleteAuditLogsBulk(req, res) {
+  try {
+    const { ids } = req.body || {};
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return sendError(res, 400, 'ids muss ein nicht-leeres Array sein');
+    }
+
+    if (ids.length > 200) {
+      return sendError(res, 400, 'Maximal 200 Einträge pro Bulk-Löschung');
+    }
+
+    // Validate all IDs are valid ObjectIds
+    const invalidIds = ids.filter(id => !mongoose.Types.ObjectId.isValid(id));
+    if (invalidIds.length > 0) {
+      return sendError(res, 400, `Ungültige IDs: ${invalidIds.slice(0, 5).join(', ')}`);
+    }
+
+    const admin = getAdminInfo(req);
+
+    await auditLog.log({
+      action: 'AUDIT_LOG_ENTRIES_DELETED',
+      adminId: admin.id,
+      adminName: admin.name,
+      details: { count: ids.length },
+      req,
+    });
+
+    const deletedCount = await auditLog.deleteBulk(ids);
+
+    res.json({
+      success: true,
+      message: `${deletedCount} Audit-Log-Einträge gelöscht`,
+      data: { deletedCount },
+    });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Delete audit logs bulk', error);
+  }
+}
+
 // ============================================
 // TRANSACTIONS
 // ============================================
@@ -437,6 +549,12 @@ async function getTransactionUsers(req, res) {
   try {
     const { page, limit, search, sort } = req.query || {};
     const data = await adminService.getUsersWithTransactionStats({ page, limit, search, sort });
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.users) {
+      data.users = data.users.map(sanitizeTransactionUserForViewer);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: Transaction users', error);
@@ -509,6 +627,11 @@ async function listTransactions(req, res) {
       sort,
     });
 
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.transactions) {
+      data.transactions = data.transactions.map(sanitizeTransactionForViewer);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: List transactions', error);
@@ -528,7 +651,7 @@ async function getTransactionStats(req, res) {
 // GET /api/admin/transactions/:id
 async function getTransaction(req, res) {
   try {
-    const data = await adminService.getTransactionById(req.params.id);
+    let data = await adminService.getTransactionById(req.params.id);
     if (!data) {
       return sendError(res, req, {
         error: 'Transaktion nicht gefunden',
@@ -536,6 +659,12 @@ async function getTransaction(req, res) {
         status: 404,
       });
     }
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer') {
+      data = sanitizeTransactionForViewer(data);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: Get transaction', error);
@@ -597,6 +726,11 @@ async function listSubscribers(req, res) {
       sort,
     });
 
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.subscribers) {
+      data.subscribers = data.subscribers.map(sanitizeSubscriberForViewer);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: List subscribers', error);
@@ -616,7 +750,7 @@ async function getSubscriberStats(req, res) {
 // GET /api/admin/subscribers/:id
 async function getSubscriber(req, res) {
   try {
-    const data = await adminService.getSubscriberById(req.params.id);
+    let data = await adminService.getSubscriberById(req.params.id);
     if (!data) {
       return sendError(res, req, {
         error: 'Subscriber nicht gefunden',
@@ -624,6 +758,12 @@ async function getSubscriber(req, res) {
         status: 404,
       });
     }
+
+    // Viewer: sensible Daten maskieren
+    if (req.user && req.user.role === 'viewer') {
+      data = sanitizeSubscriberForViewer(data);
+    }
+
     res.json({ success: true, data });
   } catch (error) {
     handleServerError(res, req, 'Admin: Get subscriber', error);
@@ -1084,6 +1224,8 @@ module.exports = {
   changeUserRole,
   getAuditLogs,
   getAuditLogStats,
+  deleteAllAuditLogs,
+  deleteAuditLogsBulk,
   // CSV Exports
   exportUsers,
   exportTransactions,

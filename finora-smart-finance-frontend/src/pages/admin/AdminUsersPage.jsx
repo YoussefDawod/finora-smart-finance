@@ -19,7 +19,8 @@ import {
   FiDownload,
   FiChevronDown,
 } from 'react-icons/fi';
-import { useAdminUsers, useToast } from '@/hooks';
+import { useAdminUsers, useToast, useAuth } from '@/hooks';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import { AdminUserTable, AdminUserDetail, AdminCreateUser } from '@/components/admin';
 import { adminService } from '@/api/adminService';
 import { triggerBlobDownload, generatePDF } from '@/utils/exportHelpers';
@@ -29,6 +30,8 @@ import styles from './AdminUsersPage.module.scss';
 export default function AdminUsersPage() {
   const { t } = useTranslation();
   const toast = useToast();
+  const { user: authUser } = useAuth();
+  const { guard } = useViewerGuard();
   const { users, pagination, loading, error, actionLoading, filters, actions } = useAdminUsers();
 
   // ── Detail Modal State ──────────────────────────
@@ -41,7 +44,7 @@ export default function AdminUsersPage() {
 
   // Schließe Export-Dropdown bei Click außerhalb
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = e => {
       if (exportRef.current && !exportRef.current.contains(e.target)) {
         setExportMenuOpen(false);
       }
@@ -50,7 +53,7 @@ export default function AdminUsersPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [exportMenuOpen]);
 
-  const handleViewUser = useCallback((user) => {
+  const handleViewUser = useCallback(user => {
     setSelectedUser(user);
     setDetailOpen(true);
   }, []);
@@ -60,30 +63,42 @@ export default function AdminUsersPage() {
     setSelectedUser(null);
   }, []);
 
-  const handleActionSuccess = useCallback((message) => {
-    toast.success(message);
-  }, [toast]);
+  const handleActionSuccess = useCallback(
+    message => {
+      toast.success(message);
+    },
+    [toast]
+  );
 
-  const handleActionError = useCallback((message) => {
-    toast.error(message);
-  }, [toast]);
+  const handleActionError = useCallback(
+    message => {
+      toast.error(message);
+    },
+    [toast]
+  );
 
-  const handleCreateUser = useCallback(async (userData) => {
-    const result = await actions.createUser(userData);
-    if (result.success) {
-      toast.success(t('admin.users.create.success'));
-    } else {
-      toast.error(result.error || t('admin.users.create.error'));
-    }
-    return result;
-  }, [actions, toast, t]);
+  const handleCreateUser = useCallback(
+    async userData => {
+      const result = await actions.createUser(userData);
+      if (result.success) {
+        toast.success(t('admin.users.create.success'));
+      } else {
+        toast.error(result.error || t('admin.users.create.error'));
+      }
+      return result;
+    },
+    [actions, toast, t]
+  );
 
   const handleExportCSV = useCallback(async () => {
     setExporting(true);
     setExportMenuOpen(false);
     try {
       const res = await adminService.exportUsersCSV();
-      const blob = res.data instanceof Blob ? res.data : new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
+      const blob =
+        res.data instanceof Blob
+          ? res.data
+          : new Blob([res.data], { type: 'text/csv;charset=utf-8;' });
       triggerBlobDownload(blob, 'users-export.csv');
       toast.success(t('admin.users.export.success'));
     } catch {
@@ -110,7 +125,7 @@ export default function AdminUsersPage() {
         t('admin.users.joined'),
       ];
 
-      const rows = allUsers.map((u) => [
+      const rows = allUsers.map(u => [
         u.name || '—',
         u.email || '—',
         u.role || '—',
@@ -124,6 +139,7 @@ export default function AdminUsersPage() {
         headers,
         rows,
         filename: 'users-export.pdf',
+        userInfo: { name: authUser?.name, email: authUser?.email },
       });
 
       toast.success(t('admin.users.export.success'));
@@ -132,7 +148,7 @@ export default function AdminUsersPage() {
     } finally {
       setExporting(false);
     }
-  }, [toast, t]);
+  }, [toast, t, authUser]);
 
   // ── Error State ─────────────────────────────────
   if (error && !loading && users.length === 0) {
@@ -140,11 +156,7 @@ export default function AdminUsersPage() {
       <div className={styles.page}>
         <div className={styles.errorState}>
           <p className={styles.errorText}>{error}</p>
-          <button
-            className={styles.retryButton}
-            onClick={actions.refresh}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={actions.refresh} type="button">
             <FiRefreshCw size={16} />
             {t('admin.dashboard.retry')}
           </button>
@@ -167,7 +179,7 @@ export default function AdminUsersPage() {
           <div className={styles.exportDropdown} ref={exportRef}>
             <button
               className={styles.exportButton}
-              onClick={() => setExportMenuOpen((p) => !p)}
+              onClick={() => guard(() => setExportMenuOpen(p => !p))}
               disabled={exporting || loading}
               type="button"
             >
@@ -188,7 +200,7 @@ export default function AdminUsersPage() {
           </div>
           <button
             className={styles.createButton}
-            onClick={() => setCreateOpen(true)}
+            onClick={() => guard(() => setCreateOpen(true))}
             type="button"
           >
             <FiUserPlus size={16} />
@@ -215,7 +227,7 @@ export default function AdminUsersPage() {
             type="text"
             className={styles.searchInput}
             value={filters.search}
-            onChange={(e) => filters.setSearch(e.target.value)}
+            onChange={e => filters.setSearch(e.target.value)}
             placeholder={t('admin.users.searchPlaceholder')}
             aria-label={t('admin.users.searchPlaceholder')}
           />
@@ -230,6 +242,7 @@ export default function AdminUsersPage() {
             options={[
               { value: '', label: t('admin.users.allRoles') },
               { value: 'admin', label: t('admin.users.roleAdmin') },
+              { value: 'viewer', label: t('admin.users.roleViewer') },
               { value: 'user', label: t('admin.users.roleUser') },
             ]}
           />
@@ -263,9 +276,7 @@ export default function AdminUsersPage() {
       {/* ── Total Count Badge ───────────────────── */}
       <div className={styles.countBadge}>
         <FiUsers size={14} />
-        <span>
-          {t('admin.users.totalUsers', { count: pagination.total })}
-        </span>
+        <span>{t('admin.users.totalUsers', { count: pagination.total })}</span>
       </div>
 
       {/* ── Table ───────────────────────────────── */}

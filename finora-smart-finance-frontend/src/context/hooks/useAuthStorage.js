@@ -1,15 +1,13 @@
 /**
  * useAuthStorage Hook
- * Extrahierte localStorage/sessionStorage-Logik für AuthContext
- * 
- * Remember Me Logic:
- * - rememberMe = true: Tokens in localStorage (persistent)
- * - rememberMe = false: Tokens in sessionStorage (cleared on browser close)
+ * Access-Token wird als In-Memory-Variable verwaltet (XSS-sicher).
+ * Refresh-Token als httpOnly Cookie (vom Backend verwaltet).
+ * localStorage wird nur noch für Remember-Me-Präferenz genutzt.
  */
 
 import { useCallback, useMemo } from 'react';
+import { getAccessToken, setAccessToken, clearAccessToken } from '@/api/tokenRefresh';
 
-const TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const REMEMBER_ME_KEY = 'auth_remember_me';
 
@@ -17,25 +15,11 @@ const REMEMBER_ME_KEY = 'auth_remember_me';
  * Custom Hook für Auth Token Storage
  */
 export function useAuthStorage() {
-
-  /**
-   * Get the current storage based on rememberMe setting
-   * @returns {Storage} localStorage or sessionStorage
-   */
-  const getCurrentStorage = useCallback(() => {
-    try {
-      const rememberMe = globalThis.localStorage?.getItem(REMEMBER_ME_KEY);
-      return rememberMe === 'false' ? globalThis.sessionStorage : globalThis.localStorage;
-    } catch {
-      return globalThis.localStorage;
-    }
-  }, []);
-
   /**
    * Set the storage preference based on rememberMe
-   * @param {boolean} rememberMe 
+   * @param {boolean} rememberMe
    */
-  const setRememberMe = useCallback((rememberMe) => {
+  const setRememberMe = useCallback(rememberMe => {
     try {
       globalThis.localStorage?.setItem(REMEMBER_ME_KEY, String(rememberMe));
     } catch (error) {
@@ -47,56 +31,28 @@ export function useAuthStorage() {
   // ACCESS TOKEN
   // ============================================
 
-  const saveToken = useCallback((token, rememberMe) => {
-    try {
-      // If rememberMe is explicitly passed, update the preference
-      if (typeof rememberMe === 'boolean') {
-        setRememberMe(rememberMe);
+  const saveToken = useCallback(
+    (token, rememberMe) => {
+      try {
+        // If rememberMe is explicitly passed, update the preference
+        if (typeof rememberMe === 'boolean') {
+          setRememberMe(rememberMe);
+        }
+        // Access-Token im In-Memory-Speicher (XSS-sicher, nicht in localStorage)
+        setAccessToken(token);
+      } catch (error) {
+        globalThis.console?.error('Failed to save token:', error);
       }
-      getCurrentStorage()?.setItem(TOKEN_KEY, token);
-    } catch (error) {
-      globalThis.console?.error('Failed to save token:', error);
-    }
-  }, [getCurrentStorage, setRememberMe]);
+    },
+    [setRememberMe]
+  );
 
   const getToken = useCallback(() => {
-    try {
-      const localToken = globalThis.localStorage?.getItem(TOKEN_KEY);
-      const sessionToken = globalThis.sessionStorage?.getItem(TOKEN_KEY);
-      
-      // Wenn beide existieren und UNTERSCHIEDLICH sind - WARNUNG!
-      if (localToken && sessionToken && localToken !== sessionToken) {
-        globalThis.console?.error(
-          'Token mismatch between storages detected! Clearing both for security.',
-          { localToken: localToken.slice(0, 10) + '...', sessionToken: sessionToken.slice(0, 10) + '...' }
-        );
-        
-        // Beide clearen - User muss sich neu anmelden
-        globalThis.localStorage?.removeItem(TOKEN_KEY);
-        globalThis.sessionStorage?.removeItem(TOKEN_KEY);
-        
-        // Optional: Event dispatchen für Logout
-         
-        globalThis.window?.dispatchEvent(new CustomEvent('auth:token-mismatch'));
-        
-        return null;
-      }
-      
-      // Normal case: Return token from either storage
-      return localToken || sessionToken;
-    } catch (error) {
-      globalThis.console?.error('Failed to get token:', error);
-      return null;
-    }
+    return getAccessToken();
   }, []);
 
   const removeToken = useCallback(() => {
-    try {
-      globalThis.localStorage?.removeItem(TOKEN_KEY);
-      globalThis.sessionStorage?.removeItem(TOKEN_KEY);
-    } catch (error) {
-      globalThis.console?.error('Failed to remove token:', error);
-    }
+    clearAccessToken();
   }, []);
 
   // ============================================
@@ -146,25 +102,33 @@ export function useAuthStorage() {
     }
   }, [removeToken, removeRefreshToken]);
 
-  return useMemo(() => ({
-    // Access Token
-    saveToken,
-    getToken,
-    removeToken,
+  return useMemo(
+    () => ({
+      // Access Token
+      saveToken,
+      getToken,
+      removeToken,
 
-    // Refresh Token
-    saveRefreshToken,
-    getRefreshToken,
-    removeRefreshToken,
+      // Refresh Token
+      saveRefreshToken,
+      getRefreshToken,
+      removeRefreshToken,
 
-    // Clear All
-    clearAllTokens,
+      // Clear All
+      clearAllTokens,
 
-    // Remember Me
-    setRememberMe,
-  }), [
-    saveToken, getToken, removeToken,
-    saveRefreshToken, getRefreshToken, removeRefreshToken,
-    clearAllTokens, setRememberMe,
-  ]);
+      // Remember Me
+      setRememberMe,
+    }),
+    [
+      saveToken,
+      getToken,
+      removeToken,
+      saveRefreshToken,
+      getRefreshToken,
+      removeRefreshToken,
+      clearAllTokens,
+      setRememberMe,
+    ]
+  );
 }

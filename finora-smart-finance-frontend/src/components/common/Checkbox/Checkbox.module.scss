@@ -5,7 +5,6 @@
 // Nur var(--token) + color-mix(), keine hex/rgba/hsl
 // reduced-motion bindend, keine Deko-Animation
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ── LABEL WRAPPER ───────────────────────────

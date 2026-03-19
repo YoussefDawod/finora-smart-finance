@@ -1,0 +1,29 @@
+// ============================================
+// 🪟 GLASS PANEL — Base Building Block
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Variants ──
+.standard {
+  @include glass-panel('standard');
+}
+
+.hero {
+  @include glass-panel('hero');
+}
+
+.compact {
+  @include glass-panel('compact');
+}
+
+// ── Elevated hover state ──
+.elevated {
+  @include glass-hover;
+}
+
+// ── Focus ring for interactive panels ──
+.standard,
+.hero,
+.compact {
+  @include focus-ring;
+}

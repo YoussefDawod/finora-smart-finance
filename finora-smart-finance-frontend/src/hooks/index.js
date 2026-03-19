@@ -8,6 +8,7 @@ export { useToast } from './useToast';
 export { useMotion } from './useMotion';
 export { useTransactions } from './useTransactions';
 export { useCookieConsent } from './useCookieConsent';
+export { useViewerGuard } from './useViewerGuard';
 
 // ============================================
 // 🪝 UTILITY HOOKS

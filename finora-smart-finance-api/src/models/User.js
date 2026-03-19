@@ -49,10 +49,10 @@ const UserSchema = new mongoose.Schema(
     },
     isVerified: { type: Boolean, default: false },
 
-    // Rollen-System: 'user' oder 'admin'
+    // Rollen-System: 'user', 'admin' oder 'viewer'
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'admin', 'viewer'],
       default: 'user',
     },
 
@@ -107,7 +107,7 @@ const UserSchema = new mongoose.Schema(
       notificationCategories: {
         security: { type: Boolean, default: true },
         transactions: { type: Boolean, default: true },
-        reports: { type: Boolean, default: false },
+        reports: { type: Boolean, default: true },
         alerts: { type: Boolean, default: true },
       },
       // Budget-Einstellungen für Alerts

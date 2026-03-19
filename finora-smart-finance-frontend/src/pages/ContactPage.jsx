@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
-import { useNavigate, Link } from 'react-router-dom';
-import { FiSend, FiUser, FiMail, FiMessageSquare, FiArrowLeft } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiSend, FiUser, FiMail, FiMessageSquare } from 'react-icons/fi';
 import client from '@/api/client';
 import { ENDPOINTS } from '@/api/endpoints';
 import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
 import Checkbox from '@/components/common/Checkbox/Checkbox';
-import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
 import styles from './ContactPage.module.scss';
 
 const CATEGORIES = ['feedback', 'bug', 'feature', 'other'];
 
 export default function ContactPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', category: 'feedback', message: '' });
   const [honeypot, setHoneypot] = useState('');
   const [privacyConsent, setPrivacyConsent] = useState(false);
@@ -21,19 +19,11 @@ export default function ContactPage() {
   const [status, setStatus] = useState(null); // 'success' | 'error' | 'loading' | null
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
-  };
-
-  const handleChange = (e) => {
+  const handleChange = e => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     if (honeypot) return; // Bot detected
 
@@ -48,7 +38,7 @@ export default function ContactPage() {
 
     try {
       await client.post(ENDPOINTS.contact, form);
-      
+
       setStatus('success');
       setForm({ name: '', email: '', category: 'feedback', message: '' });
       setPrivacyConsent(false);
@@ -61,15 +51,6 @@ export default function ContactPage() {
   return (
     <div className={styles.contactContainer}>
       <div className={styles.contactContent}>
-        <button
-          type="button"
-          onClick={handleBack}
-          className={styles.backButton}
-          aria-label={t('common.back')}
-        >
-          <FiArrowLeft />
-        </button>
-
         <h1 className={styles.title}>{t('contact.title')}</h1>
         <p className={styles.subtitle}>{t('contact.subtitle')}</p>
 
@@ -88,7 +69,7 @@ export default function ContactPage() {
                 tabIndex={-1}
                 autoComplete="off"
                 value={honeypot}
-                onChange={(e) => setHoneypot(e.target.value)}
+                onChange={e => setHoneypot(e.target.value)}
               />
             </div>
 
@@ -135,7 +116,7 @@ export default function ContactPage() {
                   label: t(`contact.categories.${cat}`),
                 }))}
                 value={form.category}
-                onChange={(val) => setForm(prev => ({ ...prev, category: val }))}
+                onChange={val => setForm(prev => ({ ...prev, category: val }))}
                 ariaLabel={t('contact.form.category')}
                 size="md"
                 className={styles.formDropdown}
@@ -162,7 +143,7 @@ export default function ContactPage() {
             <div className={styles.consentGroup}>
               <Checkbox
                 checked={privacyConsent}
-                onChange={(e) => {
+                onChange={e => {
                   setPrivacyConsent(e.target.checked);
                   if (e.target.checked) setConsentError(false);
                 }}
@@ -179,24 +160,14 @@ export default function ContactPage() {
               )}
             </div>
 
-            {status === 'error' && (
-              <div className={styles.errorMessage}>
-                {errorMsg}
-              </div>
-            )}
+            {status === 'error' && <div className={styles.errorMessage}>{errorMsg}</div>}
 
-            <button
-              type="submit"
-              disabled={status === 'loading'}
-              className={styles.submitButton}
-            >
+            <button type="submit" disabled={status === 'loading'} className={styles.submitButton}>
               <FiSend size={18} />
               {status === 'loading' ? t('contact.form.sending') : t('contact.form.submit')}
             </button>
           </form>
         )}
-
-        <MiniFooter />
       </div>
     </div>
   );

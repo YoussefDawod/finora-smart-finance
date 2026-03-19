@@ -1,7 +1,6 @@
 // ============================================
-// MINI FOOTER — Standalone Pages Navigation
+// MINI FOOTER — AURORA FLOW GLASS (NEUBAU)
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .miniFooter {
@@ -12,7 +11,14 @@
   gap: var(--space-sm);
   margin-top: var(--space-2xl);
   padding-top: var(--space-lg);
-  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  border-top: 1px solid var(--glass-border-light);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
 }
 
 .link {
@@ -32,7 +38,7 @@
 }
 
 .divider {
-  color: var(--tx-muted);
+  color: var(--glass-border);
   user-select: none;
 }
 

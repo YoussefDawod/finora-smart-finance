@@ -1,7 +1,6 @@
 // ============================================
 // 💳 ADMIN TRANSACTION DETAIL
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .content {
@@ -22,16 +21,13 @@
   @include flex-center;
   width: var(--space-2xl);
   height: var(--space-2xl);
-  border-radius: var(--r-lg);
   flex-shrink: 0;
 
   &.income {
-    background: color-mix(in srgb, var(--success) 15%, transparent);
     color: var(--success);
   }
 
   &.expense {
-    background: color-mix(in srgb, var(--error) 15%, transparent);
     color: var(--error);
   }
 }
@@ -206,10 +202,8 @@
   @include flex-center;
   width: 3.5rem;
   height: 3.5rem;
-  border-radius: var(--r-full);
 
   &.danger {
-    background: color-mix(in srgb, var(--error) 15%, transparent);
     color: var(--error);
   }
 }

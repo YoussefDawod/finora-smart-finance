@@ -1,7 +1,6 @@
 // ============================================
 // 📋 RECENT TRANSACTIONS COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -10,17 +9,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-  padding: var(--space-lg);
-  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--primary) 2%, transparent) 100%);
-  border-radius: var(--r-lg);
-  border: 1px solid color-mix(in srgb, var(--primary) 10%, transparent);
-  box-shadow: var(--sh-sm);
-
-  @include tablet {
-    padding: var(--space-md);
-    gap: var(--space-md);
-  }
+  height: 100%;
 }
 
 // ============================================
@@ -28,30 +17,60 @@
 // ============================================
 .header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-md);
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid color-mix(in srgb, var(--tx) 15%, transparent);
+  flex-shrink: 0;
+}
 
-  @include mobile {
-    flex-wrap: wrap;
-  }
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.headerBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.subtitle {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include glass-text;
+}
+
+.headerCount {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  flex-shrink: 0;
+  @include glass-text;
 }
 
 .title {
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-b);
-  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   margin: 0;
+  @include glass-text;
 }
 
 .viewAllLink {
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   color: var(--primary);
   text-decoration: none;
   font-weight: var(--fw-m);
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--r-md);
   transition: all var(--tr);
+  flex-shrink: 0;
 
   &:hover {
     background: color-mix(in srgb, var(--primary) 10%, transparent);
@@ -67,7 +86,14 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 // ============================================
@@ -78,73 +104,29 @@
   justify-content: space-between;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md);
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
-  border-left: 4px solid transparent;
-  border-radius: var(--r-md);
+  padding: var(--space-xs) 0;
   cursor: pointer;
-  transition: all var(--tr);
-  box-shadow: var(--sh-xs);
+  transition: transform var(--tr);
+  flex-shrink: 0;
 
-  &:hover {
-    background: color-mix(in srgb, var(--primary) 3%, var(--surface));
-    border-left-color: var(--primary);
-    box-shadow: var(--sh-md);
-    transform: translateY(-1px);
+  &[data-type='income'] .amount {
+    color: var(--success);
   }
 
-  &:active {
-    transform: translateY(0);
-    box-shadow: var(--sh-sm);
-  }
-
-  @include focus-ring;
-
-  // Type variants
-  &.income {
-    border-left-color: var(--success);
-
-    .amount {
-      color: var(--success);
-      font-weight: var(--fw-b);
-    }
-  }
-
-  &.expense {
-    border-left-color: var(--error);
-
-    .amount {
-      color: var(--error);
-      font-weight: var(--fw-b);
-    }
+  &[data-type='expense'] .amount {
+    color: var(--error);
   }
 
   @include mobile {
-    flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-xs);
-    padding: var(--space-sm);
   }
 }
 
-// RTL Support für Transaction Items
+// RTL Support
 :global([dir='rtl']) .item {
-  border-left: 1px solid color-mix(in srgb, var(--primary) 10%, var(--border));
-  border-right: 4px solid transparent;
-
-  &:hover {
-    border-right-color: var(--primary);
-  }
-
-  &.income {
-    border-right-color: var(--success);
-  }
-
-  &.expense {
-    border-right-color: var(--error);
-  }
+  direction: rtl;
 }
 
 // ============================================
@@ -164,20 +146,18 @@
 }
 
 .categoryIcon {
-  font-size: var(--fs-xl);
+  font-size: var(--fs-2xl);
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-items: center;
-  border-radius: var(--r-md);
-  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
-  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  color: var(--primary);
 
   @include mobile {
-    width: 36px;
-    height: 36px;
-    font-size: var(--fs-lg);
+    width: 30px;
+    height: 30px;
+    font-size: var(--fs-xl);
   }
 }
 
@@ -235,9 +215,10 @@
 }
 
 .amount {
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-b);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
   font-variant-numeric: tabular-nums;
+  @include glass-text;
 }
 
 // ============================================

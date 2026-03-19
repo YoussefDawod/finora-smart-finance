@@ -5,17 +5,17 @@
  * - System preference auto-detection
  * - localStorage persistence
  * - Real-time CSS variable switching via data-* attributes
- * 
+ *
  * STATE SHAPE:
  * {
  *   theme: 'light' | 'dark',
  *   systemPreference: 'light' | 'dark',
  *   isInitialized: boolean
  * }
- * 
+ *
  * HTML ATTRIBUTES:
  * - data-theme="light|dark" - Theme selection
- * 
+ *
  * @module ThemeContext
  */
 
@@ -24,8 +24,6 @@ import { createContext, useState, useEffect, useCallback, useMemo, useRef } from
 // ============================================
 // 🎨 THEME CONSTANTS
 // ============================================
-
- 
 
 const THEMES = {
   LIGHT: 'light',
@@ -44,7 +42,9 @@ function getInitialTheme() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.THEME);
     if (saved && Object.values(THEMES).includes(saved)) return saved;
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   if (typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
     return THEMES.DARK;
   }
@@ -57,9 +57,7 @@ function getInitialTheme() {
  */
 function getInitialSystemPreference() {
   if (typeof window === 'undefined') return THEMES.LIGHT;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? THEMES.DARK
-    : THEMES.LIGHT;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? THEMES.DARK : THEMES.LIGHT;
 }
 
 // ============================================
@@ -75,7 +73,7 @@ const ThemeContext = createContext(undefined);
 /**
  * ThemeProvider Component
  * Manages theme state and applies data-* attributes to <html>
- * 
+ *
  * @param {Object} props
  * @param {React.ReactNode} props.children
  * @returns {React.ReactNode}
@@ -88,7 +86,7 @@ export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(getInitialTheme);
   const [systemPreference, setSystemPreference] = useState(getInitialSystemPreference);
   const isInitialized = true;
-  
+
   // for cleanup
   const mediaQueryRef = useRef(null);
 
@@ -100,7 +98,7 @@ export function ThemeProvider({ children }) {
    * Apply theme attribute to <html>
    * @param {string} themeValue - 'light' | 'dark'
    */
-  const applyThemeToDom = useCallback((themeValue) => {
+  const applyThemeToDom = useCallback(themeValue => {
     if (typeof document === 'undefined') return;
     const html = document.documentElement;
     html.setAttribute('data-theme', themeValue);
@@ -110,7 +108,7 @@ export function ThemeProvider({ children }) {
    * Save theme preference
    * @param {string} themeValue
    */
-  const savePreferences = useCallback((themeValue) => {
+  const savePreferences = useCallback(themeValue => {
     try {
       localStorage.setItem(STORAGE_KEYS.THEME, themeValue);
     } catch (error) {
@@ -128,8 +126,7 @@ export function ThemeProvider({ children }) {
    */
   useEffect(() => {
     applyThemeToDom(theme);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [theme, applyThemeToDom]);
 
   /**
    * System preference listener
@@ -138,7 +135,7 @@ export function ThemeProvider({ children }) {
     if (typeof window === 'undefined') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e) => {
+    const handleChange = e => {
       const newPreference = e.matches ? THEMES.DARK : THEMES.LIGHT;
       setSystemPreference(newPreference);
       // Don't auto-switch; let user control via ThemeSelector
@@ -160,7 +157,7 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const handleStorageChange = (e) => {
+    const handleStorageChange = e => {
       if (e.key === STORAGE_KEYS.THEME && e.newValue) {
         setThemeState(e.newValue);
         applyThemeToDom(e.newValue);
@@ -182,15 +179,18 @@ export function ThemeProvider({ children }) {
    * Set theme
    * @param {'light' | 'dark'} newTheme
    */
-  const setTheme = useCallback((newTheme) => {
-    if (!Object.values(THEMES).includes(newTheme)) {
-      console.warn(`Invalid theme: ${newTheme}. Using 'light' instead.`);
-      newTheme = THEMES.LIGHT;
-    }
-    setThemeState(newTheme);
-    applyThemeToDom(newTheme);
-    savePreferences(newTheme);
-  }, [applyThemeToDom, savePreferences]);
+  const setTheme = useCallback(
+    newTheme => {
+      if (!Object.values(THEMES).includes(newTheme)) {
+        console.warn(`Invalid theme: ${newTheme}. Using 'light' instead.`);
+        newTheme = THEMES.LIGHT;
+      }
+      setThemeState(newTheme);
+      applyThemeToDom(newTheme);
+      savePreferences(newTheme);
+    },
+    [applyThemeToDom, savePreferences]
+  );
 
   /**
    * Toggle between light and dark
@@ -200,7 +200,7 @@ export function ThemeProvider({ children }) {
     setTheme(newTheme);
   }, [theme, setTheme]);
 
-/**
+  /**
    * Reset to system preference
    */
   const resetToSystemPreference = useCallback(() => {
@@ -211,25 +211,24 @@ export function ThemeProvider({ children }) {
   // 🔌 CONTEXT VALUE
   // ============================================
 
-  const value = useMemo(() => ({
-    // State
-    theme,
-    systemPreference,
-    isDarkMode: theme === THEMES.DARK,
-    isInitialized,
+  const value = useMemo(
+    () => ({
+      // State
+      theme,
+      systemPreference,
+      isDarkMode: theme === THEMES.DARK,
+      isInitialized,
 
-    // Actions
-    setTheme,
-    toggleTheme,
-    resetToSystemPreference,
-  }), [theme, systemPreference, isInitialized, setTheme, toggleTheme, resetToSystemPreference]);
-
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
+      // Actions
+      setTheme,
+      toggleTheme,
+      resetToSystemPreference,
+    }),
+    [theme, systemPreference, isInitialized, setTheme, toggleTheme, resetToSystemPreference]
   );
+
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 // Export context for Fast Refresh compatibility
-export { ThemeContext }
+export { ThemeContext };

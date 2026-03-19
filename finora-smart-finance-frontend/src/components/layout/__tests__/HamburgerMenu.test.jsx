@@ -33,6 +33,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, fallback) => fallback || key,
     i18n: { language: 'en', dir: () => 'ltr' },
@@ -44,18 +45,37 @@ vi.mock('@/hooks/useMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(
+              ([k]) =>
+                ![
+                  'whileHover',
+                  'whileTap',
+                  'whileFocus',
+                  'whileInView',
+                  'whileDrag',
+                  'initial',
+                  'animate',
+                  'exit',
+                  'transition',
+                  'variants',
+                  'layout',
+                  'layoutId',
+                ].includes(k)
+            )
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return <Tag {...htmlProps}>{children}</Tag>;
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -64,15 +84,31 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('@/components/common', () => ({
-  Logo: ({ onClick }) => <div data-testid="logo" onClick={onClick}>Logo</div>,
+  Logo: ({ onClick }) => (
+    <div data-testid="logo" onClick={onClick}>
+      Logo
+    </div>
+  ),
   ThemeSelector: () => <div data-testid="theme-selector">ThemeSelector</div>,
 }));
 
 vi.mock('@/config/navigation', () => ({
   NAV_ITEMS: [
-    { path: '/dashboard', labelKey: 'nav.dashboard', icon: () => <span data-testid="icon-dashboard" /> },
-    { path: '/transactions', labelKey: 'nav.transactions', icon: () => <span data-testid="icon-transactions" /> },
-    { path: '/settings', labelKey: 'nav.settings', icon: () => <span data-testid="icon-settings" /> },
+    {
+      path: '/dashboard',
+      labelKey: 'nav.dashboard',
+      icon: () => <span data-testid="icon-dashboard" />,
+    },
+    {
+      path: '/transactions',
+      labelKey: 'nav.transactions',
+      icon: () => <span data-testid="icon-transactions" />,
+    },
+    {
+      path: '/settings',
+      labelKey: 'nav.settings',
+      icon: () => <span data-testid="icon-settings" />,
+    },
   ],
 }));
 
@@ -83,7 +119,7 @@ const renderMenu = (props = {}) => {
   return render(
     <MemoryRouter initialEntries={['/dashboard']}>
       <HamburgerMenu {...defaultProps} {...props} />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -105,14 +141,14 @@ describe('HamburgerMenu', () => {
   describe('Rendering', () => {
     it('rendert nichts wenn isOpen=false', () => {
       renderMenu({ isOpen: false });
-      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('rendert Navigation wenn isOpen=true', () => {
       renderMenu({ isOpen: true });
-      // motion.aside renders as <aside role="navigation">
-      const nav = document.querySelector('[role="navigation"]');
-      expect(nav).toBeInTheDocument();
+      // motion.aside renders as <aside role="dialog">
+      const menu = document.querySelector('[role="dialog"]');
+      expect(menu).toBeInTheDocument();
     });
 
     it('rendert Logo', () => {
@@ -163,7 +199,7 @@ describe('HamburgerMenu', () => {
       mockAuthState.user = { name: 'AdminUser', email: 'a@t.com', role: 'admin' };
       renderMenu();
       // admin.badge fallback is 'Admin'
-      const badges = screen.getAllByText('Admin');
+      const badges = screen.getAllByText('admin.badge');
       expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -273,8 +309,8 @@ describe('HamburgerMenu', () => {
   describe('Accessibility', () => {
     it('hat aria-modal="true"', () => {
       renderMenu();
-      const nav = document.querySelector('[role="navigation"]');
-      expect(nav).toHaveAttribute('aria-modal', 'true');
+      const menu = document.querySelector('[role="dialog"]');
+      expect(menu).toHaveAttribute('aria-modal', 'true');
     });
 
     it('hat aria-label', () => {

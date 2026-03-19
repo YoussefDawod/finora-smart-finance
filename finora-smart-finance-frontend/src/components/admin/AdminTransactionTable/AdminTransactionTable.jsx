@@ -19,8 +19,14 @@ import {
   FiTrendingDown,
 } from 'react-icons/fi';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
 import { translateCategory } from '@/utils/categoryTranslations';
-import { getSortDirection, generatePageNumbers, formatAdminCurrency } from '@/utils/adminTableHelpers';
+import {
+  getSortDirection,
+  generatePageNumbers,
+  formatAdminCurrency,
+} from '@/utils/adminTableHelpers';
 import styles from './AdminTransactionTable.module.scss';
 
 // ── Sortierbare Spalten ───────────────────────────
@@ -57,10 +63,11 @@ function AdminTransactionTable({
   actionLoading = null,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
 
   // ── Sort Handler ────────────────────────────────
   const handleSort = useCallback(
-    (field) => {
+    field => {
       if (!SORT_FIELDS[field]) return;
       const currentField = sort.replace(/^-/, '');
       const isDesc = sort.startsWith('-');
@@ -71,11 +78,11 @@ function AdminTransactionTable({
         onSortChange?.(`-${field}`);
       }
     },
-    [sort, onSortChange],
+    [sort, onSortChange]
   );
 
   const getSortIcon = useCallback(
-    (field) => {
+    field => {
       const currentField = sort.replace(/^-/, '');
       if (currentField !== field) return null;
       return sort.startsWith('-') ? (
@@ -84,28 +91,34 @@ function AdminTransactionTable({
         <FiArrowUp size={12} className={styles.sortIcon} />
       );
     },
-    [sort],
+    [sort]
   );
 
   // ── Formatierungen ──────────────────────────────
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return '—';
-    try {
-      return new Intl.DateTimeFormat(i18n.language, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }).format(new Date(dateStr));
-    } catch {
-      return '—';
-    }
-  }, [i18n.language]);
+  const formatDate = useCallback(
+    dateStr => {
+      if (!dateStr) return '—';
+      try {
+        return new Intl.DateTimeFormat(i18n.language, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }).format(new Date(dateStr));
+      } catch {
+        return '—';
+      }
+    },
+    [i18n.language]
+  );
 
-  const formatAmount = useCallback((amount, type) => {
-    if (amount == null) return '—';
-    const value = formatAdminCurrency(Math.abs(amount), i18n.language);
-    return type === 'income' ? `+${value}` : `-${value}`;
-  }, [i18n.language]);
+  const formatAmount = useCallback(
+    (amount, type) => {
+      if (amount == null) return '—';
+      const value = formatAdminCurrency(Math.abs(amount), i18n.language);
+      return type === 'income' ? `+${value}` : `-${value}`;
+    },
+    [i18n.language]
+  );
 
   // ── Loading ─────────────────────────────────────
   if (loading && transactions.length === 0) {
@@ -168,7 +181,7 @@ function AdminTransactionTable({
             </tr>
           </thead>
           <tbody>
-            {transactions.map((tx) => {
+            {transactions.map(tx => {
               const txId = tx._id || tx.id;
               return (
                 <tr key={txId}>
@@ -178,7 +191,9 @@ function AdminTransactionTable({
                   </td>
 
                   {/* Description */}
-                  <td className={styles.descCell} data-label={t('admin.transactions.description')}>{tx.description || '—'}</td>
+                  <td className={styles.descCell} data-label={t('admin.transactions.description')}>
+                    <SensitiveData active={isViewer}>{tx.description || '—'}</SensitiveData>
+                  </td>
 
                   {/* Category */}
                   <td data-label={t('admin.transactions.category')}>
@@ -191,21 +206,32 @@ function AdminTransactionTable({
                   <td data-label={t('admin.transactions.type')}>
                     <span className={`${styles.typeBadge} ${styles[tx.type]}`}>
                       {tx.type === 'income' ? (
-                        <><FiTrendingUp size={12} /> {t('admin.transactions.income')}</>
+                        <>
+                          <FiTrendingUp size={12} /> {t('admin.transactions.income')}
+                        </>
                       ) : (
-                        <><FiTrendingDown size={12} /> {t('admin.transactions.expense')}</>
+                        <>
+                          <FiTrendingDown size={12} /> {t('admin.transactions.expense')}
+                        </>
                       )}
                     </span>
                   </td>
 
                   {/* Amount */}
-                  <td className={`${styles.amountCell} ${styles[tx.type]}`} data-label={t('admin.transactions.amount')}>
-                    {formatAmount(tx.amount, tx.type)}
+                  <td
+                    className={`${styles.amountCell} ${styles[tx.type]}`}
+                    data-label={t('admin.transactions.amount')}
+                  >
+                    <SensitiveData active={isViewer}>
+                      {formatAmount(tx.amount, tx.type)}
+                    </SensitiveData>
                   </td>
 
                   {/* User */}
                   <td className={styles.userCell} data-label={t('admin.transactions.user')}>
-                    {tx.userId?.name || tx.userId?.email || '—'}
+                    <SensitiveData active={isViewer}>
+                      {tx.userId?.name || tx.userId?.email || '—'}
+                    </SensitiveData>
                   </td>
 
                   {/* Actions */}
@@ -230,7 +256,11 @@ function AdminTransactionTable({
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className={styles.pagination} role="navigation" aria-label={t('admin.transactions.pagination')}>
+        <div
+          className={styles.pagination}
+          role="navigation"
+          aria-label={t('admin.transactions.pagination')}
+        >
           <span className={styles.paginationInfo}>
             {t('admin.transactions.showing', {
               from: (page - 1) * (pagination.limit || DEFAULT_SKELETON_ROWS) + 1,
@@ -250,7 +280,9 @@ function AdminTransactionTable({
             </button>
             {generatePageNumbers(page, pages).map((p, idx) =>
               p === '...' ? (
-                <span key={`dots-${idx}`} className={styles.dots}>…</span>
+                <span key={`dots-${idx}`} className={styles.dots}>
+                  …
+                </span>
               ) : (
                 <button
                   key={p}
@@ -262,7 +294,7 @@ function AdminTransactionTable({
                 >
                   {p}
                 </button>
-              ),
+              )
             )}
             <button
               className={styles.pageButton}

@@ -1,8 +1,3 @@
-/**
- * @fileoverview Tests für LanguageSwitcher Component
- * @description Testet Sprachauswahl, aktive Sprache und ARIA-Attribute.
- */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import LanguageSwitcher from '../LanguageSwitcher';
@@ -14,17 +9,15 @@ let mockCurrentLanguage = 'de';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: {
-      get language() { return mockCurrentLanguage; },
+      get language() {
+        return mockCurrentLanguage;
+      },
       changeLanguage: mockChangeLanguage,
       dir: () => 'ltr',
     },
   }),
-}));
-
-vi.mock('@/hooks/useMotion', () => ({
-  useMotion: () => ({ shouldAnimate: false }),
 }));
 
 // ── Tests ────────────────────────────────────────────────
@@ -35,7 +28,7 @@ describe('LanguageSwitcher', () => {
     mockChangeLanguage.mockClear();
   });
 
-  it('rendert alle 4 Sprach-Buttons', () => {
+  it('rendert 4 Sprach-Buttons', () => {
     render(<LanguageSwitcher />);
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(4);
@@ -51,7 +44,9 @@ describe('LanguageSwitcher', () => {
     mockCurrentLanguage = 'en';
     render(<LanguageSwitcher />);
     const buttons = screen.getAllByRole('button');
-    const enButton = buttons.find(b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en');
+    const enButton = buttons.find(
+      b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en'
+    );
     expect(enButton).toHaveAttribute('aria-current', 'true');
   });
 
@@ -59,24 +54,40 @@ describe('LanguageSwitcher', () => {
     mockCurrentLanguage = 'de';
     render(<LanguageSwitcher />);
     const buttons = screen.getAllByRole('button');
-    const enButton = buttons.find(b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en');
+    const enButton = buttons.find(
+      b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en'
+    );
     expect(enButton).not.toHaveAttribute('aria-current');
   });
 
-  it('ruft changeLanguage auf bei Klick auf eine andere Sprache', () => {
+  it('aktive Sprache hat langPillActive-Klasse', () => {
     mockCurrentLanguage = 'de';
     render(<LanguageSwitcher />);
     const buttons = screen.getAllByRole('button');
-    const enButton = buttons.find(b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en');
+    const deButton = buttons.find(
+      b => b.getAttribute('aria-label') === 'footer.languageSwitcher.de'
+    );
+    expect(deButton.className).toContain('langPillActive');
+  });
+
+  it('ruft changeLanguage auf bei Klick auf inaktive Sprache', () => {
+    mockCurrentLanguage = 'de';
+    render(<LanguageSwitcher />);
+    const buttons = screen.getAllByRole('button');
+    const enButton = buttons.find(
+      b => b.getAttribute('aria-label') === 'footer.languageSwitcher.en'
+    );
     fireEvent.click(enButton);
     expect(mockChangeLanguage).toHaveBeenCalledWith('en');
   });
 
-  it('ruft changeLanguage NICHT auf bei Klick auf die aktuelle Sprache', () => {
+  it('ruft changeLanguage NICHT auf bei Klick auf aktive Sprache', () => {
     mockCurrentLanguage = 'de';
     render(<LanguageSwitcher />);
     const buttons = screen.getAllByRole('button');
-    const deButton = buttons.find(b => b.getAttribute('aria-label') === 'footer.languageSwitcher.de');
+    const deButton = buttons.find(
+      b => b.getAttribute('aria-label') === 'footer.languageSwitcher.de'
+    );
     fireEvent.click(deButton);
     expect(mockChangeLanguage).not.toHaveBeenCalled();
   });

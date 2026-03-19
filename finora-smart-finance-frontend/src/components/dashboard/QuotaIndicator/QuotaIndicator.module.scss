@@ -1,12 +1,10 @@
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .quotaIndicator {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
-  padding: var(--space-lg);
-  box-shadow: var(--sh-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  width: 100%;
 }
 
 // Header
@@ -14,28 +12,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-md);
-  flex-wrap: wrap;
   gap: var(--space-sm);
 }
 
 .titleRow {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 
   h3 {
     margin: 0;
-    font-size: var(--fs-md);
+    font-size: var(--fs-sm);
     font-weight: var(--fw-sb);
-    color: var(--tx);
+    color: var(--tx-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    @include glass-text;
   }
 }
 
 .icon {
   color: var(--primary);
-  width: 18px;
-  height: 18px;
+  width: 30px;
+  height: 30px;
 }
 
 // Badge
@@ -43,10 +42,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
-  padding: var(--space-2xs) var(--space-sm);
+  padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--r-full);
   font-size: var(--fs-xs);
   font-weight: var(--fw-sb);
+  line-height: var(--lh-none);
 
   svg {
     width: 12px;
@@ -54,15 +54,13 @@
   }
 
   &.warning {
-    background: color-mix(in srgb, var(--warning) 18%, transparent);
+    background: color-mix(in srgb, var(--warning) 15%, transparent);
     color: var(--warning);
-    border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
   }
 
   &.danger {
-    background: color-mix(in srgb, var(--error) 18%, transparent);
+    background: color-mix(in srgb, var(--error) 15%, transparent);
     color: var(--error);
-    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
   }
 }
 
@@ -71,28 +69,27 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
 }
 
 .progressBar {
   flex: 1;
-  height: 8px;
-  background: var(--surface-2);
+  height: 6px;
   border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--glass-border) 50%, transparent);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
   border-radius: var(--r-full);
-  transition: width var(--duration-slower, 600ms) var(--ease-out, ease-out);
+  transition: width 0.6s cubic-bezier(0.65, 0, 0.35, 1);
 
   &.success {
-    background: var(--success);
+    background: var(--aurora-3);
   }
 
   &.info {
-    background: var(--info, var(--primary));
+    background: var(--aurora-2);
   }
 
   &.warning {
@@ -100,39 +97,50 @@
   }
 
   &.danger {
-    background: var(--error);
+    background: var(--aurora-warn);
   }
 }
 
 .percentLabel {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+  @include glass-text;
+}
+
+// Stats row
+.stats {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.statLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include glass-text;
+}
+
+.statValue {
   font-size: var(--fs-sm);
   font-weight: var(--fw-sb);
   color: var(--tx);
-  min-width: 36px;
-  text-align: right;
+  font-variant-numeric: tabular-nums;
+  @include glass-text;
 }
 
-// Stats
-.stats {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-
-  @include mobile {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2xs);
+// Reduced Motion
+@include reduced-motion {
+  .progressFill {
+    transition: none;
   }
-}
-
-.used {
-  font-size: var(--fs-sm);
-  color: var(--tx);
-  font-weight: var(--fw-m);
-}
-
-.remaining {
-  font-size: var(--fs-sm);
-  color: var(--tx-muted);
 }

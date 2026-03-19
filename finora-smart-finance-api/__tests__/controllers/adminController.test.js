@@ -63,7 +63,7 @@ describe('AdminController AuditLog Integration', () => {
           adminName: 'Admin User',
           targetUserId: 'new-user-1',
           targetUserName: 'New User',
-          details: { email: null, role: 'user' },
+          details: { email: null, role: 'user', autoGeneratePassword: false, emailSent: undefined },
           req,
         })
       );

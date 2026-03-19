@@ -9,17 +9,17 @@
   // ==========================================
   // 📏 SPACING SCALE (8px base, Mobile-First)
   // ==========================================
-  --space-3xs: 0.125rem;  // 2px
-  --space-2xs: 0.25rem;   // 4px
-  --space-xs: 0.5rem;     // 8px
-  --space-sm: 0.75rem;    // 12px
-  --space-md: 1rem;       // 16px
-  --space-lg: 1.5rem;     // 24px
-  --space-xl: 2rem;       // 32px
-  --space-2xl: 3rem;      // 48px
-  --space-3xl: 4rem;      // 64px
-  --space-4xl: 6rem;      // 96px
-  
+  --space-3xs: 0.125rem; // 2px
+  --space-2xs: 0.25rem; // 4px
+  --space-xs: 0.5rem; // 8px
+  --space-sm: 0.75rem; // 12px
+  --space-md: 1rem; // 16px
+  --space-lg: 1.5rem; // 24px
+  --space-xl: 2rem; // 32px
+  --space-2xl: 3rem; // 48px
+  --space-3xl: 4rem; // 64px
+  --space-4xl: 6rem; // 96px
+
   // Legacy aliases (für Abwärtskompatibilität)
   --xs: var(--space-2xs);
   --sm: var(--space-xs);
@@ -32,35 +32,37 @@
   // ==========================================
   // 📝 TYPOGRAPHY
   // ==========================================
-  
+
   // Font Families — UPDATED with @fontsource
-  --ff-brand: 'Bebas Neue', 'Space Grotesk Variable', 'Space Grotesk', var(--ff-base);  // Logo-Brand-Schrift (Display)
-  --ff-base: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;  // UI-Body-Text
+  --ff-brand:
+    'Bebas Neue', 'Space Grotesk Variable', 'Space Grotesk', var(--ff-base); // Logo-Brand-Schrift (Display)
+  --ff-base:
+    'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; // UI-Body-Text
   --ff-heading: var(--ff-base);
   --ff-mono: 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
-  
+
   // Font Sizes (Fluid Typography)
-  --fs-2xs: 0.625rem;     // 10px
-  --fs-xs: 0.75rem;       // 12px
-  --fs-sm: 0.875rem;      // 14px
-  --fs-md: 1rem;          // 16px (base)
+  --fs-2xs: 0.625rem; // 10px
+  --fs-xs: 0.75rem; // 12px
+  --fs-sm: 0.875rem; // 14px
+  --fs-md: 1rem; // 16px (base)
   --fs-base: var(--fs-md); // Alias für Module die --fs-base referenzieren
-  --fs-lg: 1.125rem;      // 18px
-  --fs-xl: 1.25rem;       // 20px
-  --fs-2xl: 1.5rem;       // 24px
-  --fs-3xl: 1.875rem;     // 30px
-  --fs-4xl: 2.25rem;      // 36px
-  --fs-5xl: 3rem;         // 48px
-  --fs-6xl: 3.75rem;      // 60px
-  
+  --fs-lg: 1.125rem; // 18px
+  --fs-xl: 1.25rem; // 20px
+  --fs-2xl: 1.5rem; // 24px
+  --fs-3xl: 1.875rem; // 30px
+  --fs-4xl: 2.25rem; // 36px
+  --fs-5xl: 3rem; // 48px
+  --fs-6xl: 3.75rem; // 60px
+
   // Font Weights
-  --fw-l: 300;            // Light
-  --fw-n: 400;            // Normal
-  --fw-m: 500;            // Medium
-  --fw-sb: 600;           // Semibold
-  --fw-b: 700;            // Bold
-  --fw-xb: 800;           // Extra Bold
-  
+  --fw-l: 300; // Light
+  --fw-n: 400; // Normal
+  --fw-m: 500; // Medium
+  --fw-sb: 600; // Semibold
+  --fw-b: 700; // Bold
+  --fw-xb: 800; // Extra Bold
+
   // Line Heights
   --lh-none: 1;
   --lh-tight: 1.2;
@@ -68,7 +70,7 @@
   --lh-n: 1.5;
   --lh-relaxed: 1.625;
   --lh-loose: 2;
-  
+
   // Letter Spacing
   --ls-tighter: -0.05em;
   --ls-tight: -0.025em;
@@ -80,46 +82,46 @@
   // ==========================================
   // 🏷️ LOGO-SPEZIFISCHE TYPOGRAFIE (NEU)
   // ==========================================
-  --logo-ff: var(--ff-brand);                     // Logo-Brand-Schrift (Plus Jakarta Sans)
-  
+  --logo-ff: var(--ff-brand); // Logo-Brand-Schrift (Plus Jakarta Sans)
+
   // Brand-Name ("Finora") — Typografie
-  --logo-brand-fw: var(--fw-xb);                  // 800 — ExtraBold
-  --logo-brand-ls: var(--ls-tight);               // -0.025em — Tight spacing
-  
+  --logo-brand-fw: var(--fw-xb); // 800 — ExtraBold
+  --logo-brand-ls: var(--ls-tight); // -0.025em — Tight spacing
+
   // Tag-Line ("SMART FINANCE") — Typografie
-  --logo-tag-fw: var(--fw-m);                     // 500 — Medium
-  --logo-tag-ls: var(--ls-widest);                // 0.1em — Wide spacing
+  --logo-tag-fw: var(--fw-m); // 500 — Medium
+  --logo-tag-ls: var(--ls-widest); // 0.1em — Wide spacing
   --logo-tag-transform: uppercase;
-  
+
   // Brand-Name Font-Sizes (pro Variante)
-  --logo-brand-fs-sm: var(--fs-md);               // 1rem (small variant)
-  --logo-brand-fs-default: var(--fs-xl);          // 1.25rem (default variant)
-  --logo-brand-fs-lg: var(--fs-2xl);              // 1.5rem (large variant)
-  --logo-brand-fs-xl: var(--fs-4xl);              // 2.25rem (xl variant — NEU)
-  
+  --logo-brand-fs-sm: var(--fs-md); // 1rem (small variant)
+  --logo-brand-fs-default: var(--fs-xl); // 1.25rem (default variant)
+  --logo-brand-fs-lg: var(--fs-2xl); // 1.5rem (large variant)
+  --logo-brand-fs-xl: var(--fs-4xl); // 2.25rem (xl variant — NEU)
+
   // Tag-Line Font-Sizes (pro Variante)
-  --logo-tag-fs-sm: 0.55rem;                      // Kein passender Token — eigener Logo-Wert
-  --logo-tag-fs-default: 0.65rem;                 // Kein passender Token — eigener Logo-Wert
-  --logo-tag-fs-lg: var(--fs-xs);                 // 0.75rem
-  --logo-tag-fs-xl: var(--fs-sm);                 // 0.875rem (xl variant — NEU)
+  --logo-tag-fs-sm: 0.55rem; // Kein passender Token — eigener Logo-Wert
+  --logo-tag-fs-default: 0.65rem; // Kein passender Token — eigener Logo-Wert
+  --logo-tag-fs-lg: var(--fs-xs); // 0.75rem
+  --logo-tag-fs-xl: var(--fs-sm); // 0.875rem (xl variant — NEU)
 
   // ==========================================
   // 🔲 BORDER RADIUS
   // ==========================================
   --r-none: 0;
-  --r-xs: 0.125rem;       // 2px
-  --r-sm: 0.25rem;        // 4px
-  --r-md: 0.5rem;         // 8px
-  --r-lg: 0.75rem;        // 12px
-  --r-xl: 1rem;           // 16px
-  --r-2xl: 1.5rem;        // 24px
-  --r-3xl: 2rem;          // 32px
+  --r-xs: 0.125rem; // 2px
+  --r-sm: 0.25rem; // 4px
+  --r-md: 0.5rem; // 8px
+  --r-lg: 0.75rem; // 12px
+  --r-xl: 1rem; // 16px
+  --r-2xl: 1.5rem; // 24px
+  --r-3xl: 2rem; // 32px
   --r-full: 9999px;
 
   // ==========================================
   // ⏱️ TRANSITIONS & ANIMATIONS
   // ==========================================
-  
+
   // Durations
   --duration-instant: 50ms;
   --duration-fast: 150ms;
@@ -127,7 +129,7 @@
   --duration-slow: 350ms;
   --duration-slower: 500ms;
   --duration-slowest: 700ms;
-  
+
   // Easing Functions
   --ease-linear: linear;
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
@@ -138,7 +140,7 @@
   --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-elastic: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  
+
   // Transition Presets
   --tr-instant: var(--duration-instant) var(--ease-in-out);
   --tr-fast: var(--duration-fast) var(--ease-in-out);
@@ -165,7 +167,7 @@
   --mw-lg: 1024px;
   --mw-xl: 1280px;
   --mw-2xl: 1536px;
-  --mw-prose: 65ch;       // Optimal für Lesetext
+  --mw-prose: 65ch; // Optimal für Lesetext
 
   // ==========================================
   // 📚 Z-INDEX SCALE
@@ -201,33 +203,33 @@
   // ==========================================
   // 🎭 COMPONENT SPECIFIC TOKENS
   // ==========================================
-  
+
   // Buttons
-  --btn-height-sm: 2rem;      // 32px
-  --btn-height-md: 2.5rem;    // 40px
-  --btn-height-lg: 3rem;      // 48px
+  --btn-height-sm: 2rem; // 32px
+  --btn-height-md: 2.5rem; // 40px
+  --btn-height-lg: 3rem; // 48px
   --btn-padding-x: var(--space-md);
   --btn-font-size: var(--fs-sm);
-  
+
   // Inputs
   --input-height-sm: 2rem;
   --input-height-md: 2.5rem;
   --input-height-lg: 3rem;
   --input-padding-x: var(--space-sm);
   --input-border-width: 2px;
-  
+
   // Cards
   --card-padding: var(--space-lg);
   --card-radius: var(--r-lg);
   --card-backdrop: blur(10px);
-  
+
   // Modals
   --modal-width-sm: 400px;
   --modal-width-md: 600px;
   --modal-width-lg: 800px;
   --modal-width-xl: 1000px;
   --modal-padding: var(--space-xl);
-  
+
   // Header/Sidebar/Footer
   --header-height: 56px;
   --sidebar-width: 280px;
@@ -237,11 +239,11 @@
   // ==========================================
   // 🎯 ICON SIZES
   // ==========================================
-  --icon-size-xs: 1rem;       // 16px
-  --icon-size-sm: 1.25rem;    // 20px
-  --icon-size-md: 1.5rem;     // 24px
-  --icon-size-lg: 2rem;       // 32px
-  --icon-size-xl: 3rem;       // 48px
+  --icon-size-xs: 1rem; // 16px
+  --icon-size-sm: 1.25rem; // 20px
+  --icon-size-md: 1.5rem; // 24px
+  --icon-size-lg: 2rem; // 32px
+  --icon-size-xl: 3rem; // 48px
 
   // ==========================================
   // 🔲 OPACITY SCALE
@@ -261,8 +263,42 @@
   // ==========================================
   --text-on-primary: white;
   --text-on-secondary: white;
-  --text-on-accent: #0f172a;
+  --text-on-accent: #1e1b4b;
   --text-on-surface: var(--tx);
+
+  // ==========================================
+  // 🪟 GLASS SURFACE TOKENS (Aurora Flow)
+  // ==========================================
+  // Werte werden pro Theme in themes/light.scss + themes/dark.scss gesetzt.
+  // Hier nur theme-unabhängige Blur-Intensitäten.
+  // ==========================================
+
+  // Blur Intensities (progressiv reduziert für Performance)
+  --glass-blur: 28px;
+  --glass-blur-reduced: 16px;
+  --glass-blur-minimal: 10px;
+
+  // ==========================================
+  // 🌌 AURORA ACCENT TOKENS
+  // ==========================================
+  // Werte werden pro Theme in themes/light.scss + themes/dark.scss gesetzt.
+  // Keine Defaults hier — verhindert CSS-Spezifitätskonflikte
+  // bei Lazy-Loaded Chunks (Vite Code-Splitting).
+  // ==========================================
+
+  // ==========================================
+  // 🏔️ DEPTH SHADOW SYSTEM (4 Stufen)
+  // ==========================================
+  --depth-0: none;
+  --depth-1: 0 2px 8px color-mix(in srgb, var(--tx) 4%, transparent);
+  --depth-2: var(--glass-shadow);
+  --depth-3: var(--glass-shadow-elevated);
+
+  // ==========================================
+  // 🔤 DISPLAY TYPOGRAPHY (Aurora Flow)
+  // ==========================================
+  --fs-display: clamp(2.25rem, 4vw, 3.5rem); // 36px → 56px (Hero-Betrag)
+  --fs-metric-lg: clamp(1.5rem, 2.5vw, 2rem); // 24px → 32px (Panel-Metriken)
 
   // ==========================================
   // 📱 AUTH LAYOUT TOKENS
@@ -285,7 +321,7 @@
   // Glow ist NUR für Branding-Elemente erlaubt.
   // VERBOTEN auf: Finanzdaten, Inputs, Texte, Zahlen
   // ==========================================
-  
+
   // Blur Sizes
   --glow-blur-sm: 6px;
   --glow-blur-md: 12px;

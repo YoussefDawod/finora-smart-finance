@@ -1,7 +1,6 @@
 // ============================================
 // 💰 ADMIN TRANSACTION USER LIST
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ── Container ───────────────────────────────
@@ -94,7 +93,9 @@
 .chevron {
   flex-shrink: 0;
   color: var(--tx-muted);
-  transition: transform var(--duration-fast), color var(--duration-fast);
+  transition:
+    transform var(--duration-fast),
+    color var(--duration-fast);
 
   .userCard:hover & {
     color: var(--primary);

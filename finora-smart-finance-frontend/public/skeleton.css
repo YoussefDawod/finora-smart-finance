@@ -1,17 +1,18 @@
 /* 
  * Critical CSS - SOFORT geladen, vor JavaScript
  * Werte synchronisiert mit: src/styles/themes/light.scss & dark.scss
+ * LETZTE SYNC: Aurora Flow Palette
  */
 :root {
-  /* Aus light.scss: background: #f8fafc, text: #0f172a, primary: #4f46e5 */
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-2: #f1f5f9;
-  --surface-3: #e2e8f0;
-  --tx: #0f172a;
-  --tx-muted: #64748b;
-  --primary: #4f46e5;
-  --border: #e2e8f0;
+  /* Aus light.scss: background: #F5F3FF, text: #1E1B4B, primary: #6366F1 */
+  --bg: #F5F3FF;
+  --surface: #f7f5ff;
+  --surface-2: #f0edff;
+  --surface-3: #e9e5ff;
+  --tx: #1E1B4B;
+  --tx-muted: #6e6b8a;
+  --primary: #6366F1;
+  --border: rgba(30, 27, 75, 0.12);
   /* Skeleton Colors aus light.scss */
   --skeleton-from: rgba(0, 0, 0, 0.04);
   --skeleton-to: rgba(0, 0, 0, 0.08);
@@ -34,16 +35,16 @@
   --header-height: 56px;
 }
 
-/* Dark Mode - Werte aus dark.scss: background: #141717, text: #fcf3d7, primary: #f13729 */
+/* Dark Mode - Werte aus dark.scss: background: #0C0A1F, text: #EDE9FE, primary: #818CF8 */
 [data-theme="dark"] {
-  --bg: #141717;
-  --surface: #1c1f1f;
-  --surface-2: #262a2a;
-  --surface-3: #303535;
-  --tx: #fcf3d7;
-  --tx-muted: #a8a095;
-  --primary: #f13729;
-  --border: #303535;
+  --bg: #0C0A1F;
+  --surface: #13112e;
+  --surface-2: #191636;
+  --surface-3: #1f1c3e;
+  --tx: #EDE9FE;
+  --tx-muted: #b0abd4;
+  --primary: #818CF8;
+  --border: rgba(237, 233, 254, 0.12);
   /* Skeleton Colors aus dark.scss */
   --skeleton-from: rgba(255, 255, 255, 0.05);
   --skeleton-to: rgba(255, 255, 255, 0.1);
@@ -218,11 +219,10 @@ html, body, #root {
   position: relative;
   overflow: hidden;
   /*
-   * Light: leicht abgedunkeltes Blau-Violett als Placeholder
-   * Dark:  leicht aufgehelltes Dunkelblau als Placeholder
-   * Kein Gradient auf --primary, da der im Dark-Theme rot ist
+   * Light: warmes Indigo-Violet als Placeholder (Aurora Flow)
+   * Dark:  tiefes Indigo als Placeholder
    */
-  background: #3d3f8f;
+  background: #4338CA;
   display: none; /* Desktop-only, wie BrandingPanel */
 }
 
@@ -233,7 +233,7 @@ html, body, #root {
 }
 
 [data-theme="dark"] .initial-skeleton__auth-branding {
-  background: #0d1035;
+  background: #1A1145;
 }
 
 @media (max-width: 768px) {

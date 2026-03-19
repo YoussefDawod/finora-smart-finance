@@ -63,14 +63,15 @@ export const adminService = {
    * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  updateUser: (id, data, { signal } = {}) => client.patch(ENDPOINTS.admin.user(id), data, { signal }),
+  updateUser: (id, data, { signal } = {}) =>
+    client.patch(ENDPOINTS.admin.user(id), data, { signal }),
 
   /**
    * Delete user (and their transactions)
    * @param {string} id - User ID
    * @returns {Promise<AxiosResponse<{ data: { deletedUser: string, deletedTransactions: number } }>>}
    */
-  deleteUser: (id) => client.delete(ENDPOINTS.admin.user(id)),
+  deleteUser: id => client.delete(ENDPOINTS.admin.user(id)),
 
   /**
    * Delete all users and transactions
@@ -97,7 +98,7 @@ export const adminService = {
    * @param {string} id - User ID
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  unbanUser: (id) => client.patch(ENDPOINTS.admin.unbanUser(id)),
+  unbanUser: id => client.patch(ENDPOINTS.admin.unbanUser(id)),
 
   /**
    * Change user role
@@ -136,7 +137,8 @@ export const adminService = {
    * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  getTransactionStats: ({ signal } = {}) => client.get(ENDPOINTS.admin.transactionStats, { signal }),
+  getTransactionStats: ({ signal } = {}) =>
+    client.get(ENDPOINTS.admin.transactionStats, { signal }),
 
   /**
    * Get users with transaction statistics (grouped view)
@@ -162,13 +164,14 @@ export const adminService = {
    * @param {string} id - Transaction ID
    * @returns {Promise<AxiosResponse<{ data: object, message: string }>>}
    */
-  deleteTransaction: (id) => client.delete(ENDPOINTS.admin.transaction(id)),
+  deleteTransaction: id => client.delete(ENDPOINTS.admin.transaction(id)),
 
   /**
    * Export all transactions as CSV
    * @returns {Promise<AxiosResponse<string>>} CSV string
    */
-  exportTransactionsCSV: () => client.get(ENDPOINTS.admin.transactionsExport, { responseType: 'blob' }),
+  exportTransactionsCSV: () =>
+    client.get(ENDPOINTS.admin.transactionsExport, { responseType: 'blob' }),
 
   // ============================================
   // SUBSCRIBER MANAGEMENT
@@ -206,7 +209,7 @@ export const adminService = {
    * @param {string} id - Subscriber ID
    * @returns {Promise<AxiosResponse<{ data: object, message: string }>>}
    */
-  deleteSubscriber: (id) => client.delete(ENDPOINTS.admin.subscriber(id)),
+  deleteSubscriber: id => client.delete(ENDPOINTS.admin.subscriber(id)),
 
   /**
    * Update subscriber (language, isConfirmed)
@@ -221,13 +224,14 @@ export const adminService = {
    * @param {string} id - Subscriber ID
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  resendConfirmation: (id) => client.post(ENDPOINTS.admin.subscriberResend(id)),
+  resendConfirmation: id => client.post(ENDPOINTS.admin.subscriberResend(id)),
 
   /**
    * Export all subscribers as CSV
    * @returns {Promise<AxiosResponse<Blob>>} CSV blob
    */
-  exportSubscribersCSV: () => client.get(ENDPOINTS.admin.subscribersExport, { responseType: 'blob' }),
+  exportSubscribersCSV: () =>
+    client.get(ENDPOINTS.admin.subscribersExport, { responseType: 'blob' }),
 
   // ============================================
   // CAMPAIGN MANAGEMENT
@@ -262,7 +266,7 @@ export const adminService = {
    * @param {Object} data - { subject, content, language, recipientFilter }
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  createCampaign: (data) => client.post(ENDPOINTS.admin.campaigns, data),
+  createCampaign: data => client.post(ENDPOINTS.admin.campaigns, data),
 
   /**
    * Update campaign (only draft)
@@ -277,7 +281,7 @@ export const adminService = {
    * @param {string} id - Campaign ID
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  deleteCampaign: (id) => client.delete(ENDPOINTS.admin.campaign(id)),
+  deleteCampaign: id => client.delete(ENDPOINTS.admin.campaign(id)),
 
   /**
    * Delete all campaigns (admin reset)
@@ -290,14 +294,14 @@ export const adminService = {
    * @param {string} id - Campaign ID
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  sendCampaign: (id) => client.post(ENDPOINTS.admin.campaignSend(id)),
+  sendCampaign: id => client.post(ENDPOINTS.admin.campaignSend(id)),
 
   /**
    * Preview campaign email HTML
    * @param {Object} data - { subject, content, language }
    * @returns {Promise<AxiosResponse<{ data: { html: string } }>>}
    */
-  previewCampaign: (data) => client.post(ENDPOINTS.admin.campaignPreview, data),
+  previewCampaign: data => client.post(ENDPOINTS.admin.campaignPreview, data),
 
   // ============================================
   // AUDIT LOG
@@ -320,6 +324,19 @@ export const adminService = {
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
   getAuditLogStats: ({ signal } = {}) => client.get(ENDPOINTS.admin.auditLogStats, { signal }),
+
+  /**
+   * Delete all audit log entries
+   * @returns {Promise<AxiosResponse<{ data: { deletedCount: number } }>>}
+   */
+  deleteAllAuditLogs: () => client.delete(ENDPOINTS.admin.auditLog),
+
+  /**
+   * Delete specified audit log entries (bulk)
+   * @param {string[]} ids - Array of audit log IDs to delete (max 200)
+   * @returns {Promise<AxiosResponse<{ data: { deletedCount: number } }>>}
+   */
+  deleteAuditLogsBulk: ids => client.delete(ENDPOINTS.admin.auditLogBulk, { data: { ids } }),
 
   // ── Lifecycle ─────────────────────────────────────────────
 
@@ -346,15 +363,13 @@ export const adminService = {
    * @param {string} userId
    * @returns {Promise<AxiosResponse<{ success: boolean }>>}
    */
-  resetUserRetention: (userId) =>
-    client.post(ENDPOINTS.admin.lifecycleUserReset(userId)),
+  resetUserRetention: userId => client.post(ENDPOINTS.admin.lifecycleUserReset(userId)),
 
   /**
    * Manually trigger retention processing
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  triggerRetentionProcessing: () =>
-    client.post(ENDPOINTS.admin.lifecycleTrigger),
+  triggerRetentionProcessing: () => client.post(ENDPOINTS.admin.lifecycleTrigger),
 };
 
 export default adminService;

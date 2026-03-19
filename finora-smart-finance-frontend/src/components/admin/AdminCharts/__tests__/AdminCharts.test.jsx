@@ -12,7 +12,7 @@ import AdminCharts from '../AdminCharts';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'en' },
   }),
 }));
@@ -38,7 +38,7 @@ vi.mock('@/components/common/Skeleton', () => ({
   ),
 }));
 
-vi.mock('@/components/dashboard/DashboardCharts/chartConstants', () => ({
+vi.mock('../chartConstants', () => ({
   tooltipContentStyle: {},
 }));
 
@@ -107,7 +107,9 @@ describe('AdminCharts', () => {
 
   describe('Loading State', () => {
     it('zeigt 3 Skeleton-Charts im Ladezustand', () => {
-      render(<AdminCharts stats={null} transactionStats={null} subscriberStats={null} loading={true} />);
+      render(
+        <AdminCharts stats={null} transactionStats={null} subscriberStats={null} loading={true} />
+      );
 
       const skeletonsBar = screen.getAllByTestId('skeleton-chart-bar');
       const skeletonsPie = screen.getAllByTestId('skeleton-chart-pie');
@@ -120,7 +122,9 @@ describe('AdminCharts', () => {
 
   describe('Empty State', () => {
     it('zeigt Empty-Nachricht wenn keine Daten vorhanden', () => {
-      render(<AdminCharts stats={null} transactionStats={null} subscriberStats={null} loading={false} />);
+      render(
+        <AdminCharts stats={null} transactionStats={null} subscriberStats={null} loading={false} />
+      );
       expect(screen.getByText('admin.dashboard.noChartData')).toBeInTheDocument();
     });
 
@@ -131,7 +135,7 @@ describe('AdminCharts', () => {
           transactionStats={{ totalIncome: 0, totalExpense: 0, topCategories: [] }}
           subscriberStats={{ languageBreakdown: [] }}
           loading={false}
-        />,
+        />
       );
       expect(screen.getByText('admin.dashboard.noChartData')).toBeInTheDocument();
     });
@@ -147,7 +151,7 @@ describe('AdminCharts', () => {
           transactionStats={fullTransactionStats}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.incomeVsExpense')).toBeInTheDocument();
@@ -161,7 +165,7 @@ describe('AdminCharts', () => {
           transactionStats={fullTransactionStats}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.topCategories')).toBeInTheDocument();
@@ -175,7 +179,7 @@ describe('AdminCharts', () => {
           transactionStats={null}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.userLanguages')).toBeInTheDocument();
@@ -188,7 +192,7 @@ describe('AdminCharts', () => {
           transactionStats={fullTransactionStats}
           subscriberStats={fullSubscriberStats}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.incomeVsExpense')).toBeInTheDocument();
@@ -207,7 +211,7 @@ describe('AdminCharts', () => {
           transactionStats={{ totalIncome: 5000, totalExpense: 0, topCategories: [] }}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.incomeVsExpense')).toBeInTheDocument();
@@ -217,10 +221,14 @@ describe('AdminCharts', () => {
       render(
         <AdminCharts
           stats={null}
-          transactionStats={{ totalIncome: 0, totalExpense: 0, topCategories: [{ _id: 'Food', count: 5, totalAmount: 100 }] }}
+          transactionStats={{
+            totalIncome: 0,
+            totalExpense: 0,
+            topCategories: [{ _id: 'Food', count: 5, totalAmount: 100 }],
+          }}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       // topCategories vorhanden → Bar-Chart sollte da sein
@@ -242,7 +250,7 @@ describe('AdminCharts', () => {
           transactionStats={{ ...fullTransactionStats, topCategories: manyCategories }}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       const barChart = screen.getByTestId('bar-chart');
@@ -258,7 +266,7 @@ describe('AdminCharts', () => {
           transactionStats={null}
           subscriberStats={null}
           loading={false}
-        />,
+        />
       );
 
       expect(screen.getByText('admin.dashboard.userLanguages')).toBeInTheDocument();

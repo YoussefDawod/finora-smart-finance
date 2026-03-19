@@ -19,7 +19,8 @@ import {
   FiDownload,
   FiChevronDown,
 } from 'react-icons/fi';
-import { useAdminTransactions, useAdminTransactionUsers, useToast } from '@/hooks';
+import { useAdminTransactions, useAdminTransactionUsers, useToast, useAuth } from '@/hooks';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import {
   AdminTransactionTable,
   AdminTransactionDetail,
@@ -36,6 +37,8 @@ import styles from './AdminTransactionsPage.module.scss';
 export default function AdminTransactionsPage() {
   const { t } = useTranslation();
   const toast = useToast();
+  const { user: authUser } = useAuth();
+  const { guard } = useViewerGuard();
 
   // ── View State (users | transactions) ───────────
   const [view, setView] = useState('users');
@@ -59,7 +62,7 @@ export default function AdminTransactionsPage() {
   const exportRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = e => {
       if (exportRef.current && !exportRef.current.contains(e.target)) {
         setExportMenuOpen(false);
       }
@@ -69,7 +72,7 @@ export default function AdminTransactionsPage() {
   }, []);
 
   // ── Handlers ────────────────────────────────────
-  const handleSelectUser = useCallback((user) => {
+  const handleSelectUser = useCallback(user => {
     setSelectedUser(user);
     setView('transactions');
   }, []);
@@ -79,7 +82,7 @@ export default function AdminTransactionsPage() {
     setSelectedUser(null);
   }, []);
 
-  const handleViewTransaction = useCallback((tx) => {
+  const handleViewTransaction = useCallback(tx => {
     setSelectedTx(tx);
     setDetailOpen(true);
   }, []);
@@ -89,13 +92,19 @@ export default function AdminTransactionsPage() {
     setSelectedTx(null);
   }, []);
 
-  const handleActionSuccess = useCallback((message) => {
-    toast.success(message);
-  }, [toast]);
+  const handleActionSuccess = useCallback(
+    message => {
+      toast.success(message);
+    },
+    [toast]
+  );
 
-  const handleActionError = useCallback((message) => {
-    toast.error(message);
-  }, [toast]);
+  const handleActionError = useCallback(
+    message => {
+      toast.error(message);
+    },
+    [toast]
+  );
 
   const handleExportCSV = useCallback(async () => {
     setExporting(true);
@@ -126,7 +135,7 @@ export default function AdminTransactionsPage() {
         try {
           const txRes = await adminService.getUserTransactions(u._id || u.id, { limit: 5000 });
           const txList = txRes.data?.transactions || txRes.data || [];
-          txList.forEach((tx) => allTx.push({ ...tx, _userName: u.name || u.email }));
+          txList.forEach(tx => allTx.push({ ...tx, _userName: u.name || u.email }));
         } catch {
           /* skip user on error */
         }
@@ -140,7 +149,7 @@ export default function AdminTransactionsPage() {
         t('admin.transactions.table.date'),
         t('admin.transactions.table.description'),
       ];
-      const rows = allTx.map((tx) => [
+      const rows = allTx.map(tx => [
         tx._userName,
         tx.type,
         translateCategory(tx.category, t) || tx.category,
@@ -154,6 +163,7 @@ export default function AdminTransactionsPage() {
         headers,
         rows,
         filename: 'transactions-export.pdf',
+        userInfo: { name: authUser?.name, email: authUser?.email },
       });
       toast.success(t('admin.transactions.export.success'));
     } catch {
@@ -161,7 +171,7 @@ export default function AdminTransactionsPage() {
     } finally {
       setExporting(false);
     }
-  }, [toast, t]);
+  }, [toast, t, authUser]);
 
   // ═══════════════════════════════════════════════
   //  USER LIST VIEW
@@ -181,7 +191,7 @@ export default function AdminTransactionsPage() {
             <div className={styles.exportDropdown} ref={exportRef}>
               <button
                 className={styles.exportButton}
-                onClick={() => setExportMenuOpen((p) => !p)}
+                onClick={() => guard(() => setExportMenuOpen(p => !p))}
                 disabled={exporting || userList.loading}
                 type="button"
               >
@@ -191,10 +201,18 @@ export default function AdminTransactionsPage() {
               </button>
               {exportMenuOpen && (
                 <div className={styles.exportMenu}>
-                  <button className={styles.exportMenuItem} onClick={handleExportCSV} type="button">
+                  <button
+                    className={styles.exportMenuItem}
+                    onClick={() => guard(handleExportCSV)}
+                    type="button"
+                  >
                     CSV
                   </button>
-                  <button className={styles.exportMenuItem} onClick={handleExportPDF} type="button">
+                  <button
+                    className={styles.exportMenuItem}
+                    onClick={() => guard(handleExportPDF)}
+                    type="button"
+                  >
                     PDF
                   </button>
                 </div>
@@ -221,7 +239,7 @@ export default function AdminTransactionsPage() {
               type="text"
               className={styles.searchInput}
               value={userList.filters.search}
-              onChange={(e) => userList.filters.setSearch(e.target.value)}
+              onChange={e => userList.filters.setSearch(e.target.value)}
               placeholder={t('admin.transactions.searchUserPlaceholder')}
               aria-label={t('admin.transactions.searchUserPlaceholder')}
             />
@@ -250,11 +268,7 @@ export default function AdminTransactionsPage() {
       <div className={styles.page}>
         <div className={styles.errorState}>
           <p className={styles.errorText}>{error}</p>
-          <button
-            className={styles.retryButton}
-            onClick={actions.refresh}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={actions.refresh} type="button">
             <FiRefreshCw size={16} />
             {t('admin.dashboard.retry')}
           </button>
@@ -277,9 +291,7 @@ export default function AdminTransactionsPage() {
             <FiArrowLeft size={18} />
           </button>
           <div>
-            <h1 className={styles.title}>
-              {selectedUser?.name || t('admin.transactions.title')}
-            </h1>
+            <h1 className={styles.title}>{selectedUser?.name || t('admin.transactions.title')}</h1>
             <p className={styles.subtitle}>
               {t('admin.transactions.subtitle', { count: pagination.total })}
             </p>
@@ -305,7 +317,7 @@ export default function AdminTransactionsPage() {
             type="text"
             className={styles.searchInput}
             value={filters.search}
-            onChange={(e) => filters.setSearch(e.target.value)}
+            onChange={e => filters.setSearch(e.target.value)}
             placeholder={t('admin.transactions.searchPlaceholder')}
             aria-label={t('admin.transactions.searchPlaceholder')}
           />
@@ -331,7 +343,7 @@ export default function AdminTransactionsPage() {
             placeholder={t('admin.transactions.allCategories')}
             options={[
               { value: '', label: t('admin.transactions.allCategories') },
-              ...ALL_CATEGORIES.map((cat) => ({
+              ...ALL_CATEGORIES.map(cat => ({
                 value: cat,
                 label: translateCategory(cat, t),
               })),
@@ -359,9 +371,7 @@ export default function AdminTransactionsPage() {
       {/* ── Total Count Badge ───────────────────── */}
       <div className={styles.countBadge}>
         <FiDollarSign size={14} />
-        <span>
-          {t('admin.transactions.totalTransactions', { count: pagination.total })}
-        </span>
+        <span>{t('admin.transactions.totalTransactions', { count: pagination.total })}</span>
       </div>
 
       {/* ── Table ───────────────────────────────── */}

@@ -1,7 +1,6 @@
 // ============================================
 // 📊 ADMIN DASHBOARD PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -141,6 +140,27 @@
 }
 
 @include breakpoint($max: $bp-sm) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+  }
+
+  .title {
+    font-size: var(--fs-xl);
+  }
+}
+
+// ── Container Queries (Sidebar-aware) ───────
+@container admin-content (max-width: 700px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container admin-content (max-width: 420px) {
   .statsGrid {
     grid-template-columns: 1fr;
   }

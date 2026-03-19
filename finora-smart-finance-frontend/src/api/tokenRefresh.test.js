@@ -42,8 +42,12 @@ vi.mock('./endpoints', () => ({
 
 import {
   refreshAccessToken,
+  tryInitialRefresh,
   isExcludedFromRefresh,
   getStoredRefreshToken,
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
   __resetForTesting,
   __getStateForTesting,
 } from './tokenRefresh';
@@ -57,7 +61,7 @@ describe('Token Refresh Module', () => {
     dispatchedEvents = [];
 
     // Mock localStorage + sessionStorage
-    window.localStorage.getItem.mockImplementation((key) => {
+    window.localStorage.getItem.mockImplementation(key => {
       if (key === 'refresh_token') return 'stored-refresh-token';
       if (key === 'auth_remember_me') return 'true';
       return null;
@@ -70,7 +74,7 @@ describe('Token Refresh Module', () => {
 
     // Track dispatched events
     const originalDispatchEvent = window.dispatchEvent;
-    window.dispatchEvent = vi.fn((event) => {
+    window.dispatchEvent = vi.fn(event => {
       dispatchedEvents.push({ type: event.type, detail: event.detail });
       return originalDispatchEvent.call(window, event);
     });
@@ -133,7 +137,7 @@ describe('Token Refresh Module', () => {
 
     it('should fall back to sessionStorage', () => {
       window.localStorage.getItem.mockImplementation(() => null);
-      window.sessionStorage.getItem.mockImplementation((key) => {
+      window.sessionStorage.getItem.mockImplementation(key => {
         if (key === 'refresh_token') return 'session-refresh-token';
         return null;
       });
@@ -179,7 +183,7 @@ describe('Token Refresh Module', () => {
       );
     });
 
-    it('should save new access token to storage (refresh token NOT saved — httpOnly cookie)', async () => {
+    it('should save new access token in memory (refresh token NOT saved — httpOnly cookie)', async () => {
       axios.post.mockResolvedValueOnce({
         data: {
           data: {
@@ -191,9 +195,15 @@ describe('Token Refresh Module', () => {
 
       await refreshAccessToken();
 
-      expect(window.localStorage.setItem).toHaveBeenCalledWith('auth_token', 'new-access-token');
+      // Access-Token wird jetzt im In-Memory-Speicher gehalten
+      expect(getAccessToken()).toBe('new-access-token');
+      // localStorage wird NICHT mehr für Access-Token verwendet
+      expect(window.localStorage.setItem).not.toHaveBeenCalledWith('auth_token', expect.anything());
       // Refresh-Token wird NICHT mehr im Storage gespeichert — nur als httpOnly Cookie
-      expect(window.localStorage.setItem).not.toHaveBeenCalledWith('refresh_token', expect.anything());
+      expect(window.localStorage.setItem).not.toHaveBeenCalledWith(
+        'refresh_token',
+        expect.anything()
+      );
     });
 
     it('should dispatch auth:token-refreshed event', async () => {
@@ -208,7 +218,7 @@ describe('Token Refresh Module', () => {
 
       await refreshAccessToken();
 
-      const refreshEvent = dispatchedEvents.find((e) => e.type === 'auth:token-refreshed');
+      const refreshEvent = dispatchedEvents.find(e => e.type === 'auth:token-refreshed');
       expect(refreshEvent).toBeDefined();
       expect(refreshEvent.detail.accessToken).toBe('new-access-token');
       expect(refreshEvent.detail.refreshToken).toBe('new-refresh-token');
@@ -245,18 +255,24 @@ describe('Token Refresh Module', () => {
     });
 
     it('should clear tokens and dispatch auth:unauthorized on failure', async () => {
+      // Zuerst einen Token setzen, damit wir den Clear-Effekt verifizieren können
+      setAccessToken('existing-token');
+
       axios.post.mockRejectedValueOnce(new Error('Refresh failed'));
 
       await expect(refreshAccessToken()).rejects.toThrow('Refresh failed');
 
-      // Should have cleared tokens
+      // In-Memory Access-Token muss gelöscht sein
+      expect(getAccessToken()).toBeNull();
+
+      // Legacy-Einträge in localStorage/sessionStorage werden ebenfalls bereinigt
       expect(window.localStorage.removeItem).toHaveBeenCalledWith('auth_token');
       expect(window.localStorage.removeItem).toHaveBeenCalledWith('refresh_token');
       expect(window.sessionStorage.removeItem).toHaveBeenCalledWith('auth_token');
       expect(window.sessionStorage.removeItem).toHaveBeenCalledWith('refresh_token');
 
       // Should have dispatched unauthorized event
-      const unauthorizedEvent = dispatchedEvents.find((e) => e.type === 'auth:unauthorized');
+      const unauthorizedEvent = dispatchedEvents.find(e => e.type === 'auth:unauthorized');
       expect(unauthorizedEvent).toBeDefined();
     });
 
@@ -291,7 +307,7 @@ describe('Token Refresh Module', () => {
       let resolveRefresh;
       axios.post.mockImplementation(
         () =>
-          new Promise((resolve) => {
+          new Promise(resolve => {
             resolveRefresh = resolve;
           })
       );
@@ -360,6 +376,162 @@ describe('Token Refresh Module', () => {
       const result = await refreshAccessToken();
 
       expect(result).toBe('token-2');
+      expect(axios.post).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  // ============================================
+  // In-Memory Token Storage
+  // ============================================
+  describe('In-Memory Token Storage', () => {
+    it('getAccessToken should return null initially', () => {
+      expect(getAccessToken()).toBeNull();
+    });
+
+    it('setAccessToken/getAccessToken should store and retrieve token', () => {
+      setAccessToken('test-token');
+      expect(getAccessToken()).toBe('test-token');
+    });
+
+    it('clearAccessToken should remove token and legacy storage entries', () => {
+      setAccessToken('test-token');
+      clearAccessToken();
+      expect(getAccessToken()).toBeNull();
+      expect(window.localStorage.removeItem).toHaveBeenCalledWith('auth_token');
+      expect(window.sessionStorage.removeItem).toHaveBeenCalledWith('auth_token');
+    });
+
+    it('setAccessToken(null) should clear the token', () => {
+      setAccessToken('test-token');
+      setAccessToken(null);
+      expect(getAccessToken()).toBeNull();
+    });
+  });
+
+  // ============================================
+  // tryInitialRefresh (Silent Session Check)
+  // ============================================
+  describe('tryInitialRefresh', () => {
+    it('should return access token on successful refresh', async () => {
+      axios.post.mockResolvedValueOnce({
+        data: {
+          data: {
+            accessToken: 'initial-token',
+            refreshToken: 'initial-refresh',
+          },
+        },
+      });
+
+      const token = await tryInitialRefresh();
+
+      expect(token).toBe('initial-token');
+      expect(getAccessToken()).toBe('initial-token');
+      expect(axios.post).toHaveBeenCalledWith(
+        'http://localhost:5000/api/v1/auth/refresh',
+        {},
+        expect.objectContaining({
+          withCredentials: true,
+        })
+      );
+    });
+
+    it('should return null on failure without logout side-effects', async () => {
+      setAccessToken('existing-token');
+      axios.post.mockRejectedValueOnce(new Error('No cookie'));
+
+      const token = await tryInitialRefresh();
+
+      expect(token).toBeNull();
+      // Kein auth:unauthorized Event (Unterschied zu refreshAccessToken)
+      const unauthorizedEvent = dispatchedEvents.find(e => e.type === 'auth:unauthorized');
+      expect(unauthorizedEvent).toBeUndefined();
+    });
+
+    it('should return null when response contains no accessToken', async () => {
+      axios.post.mockResolvedValueOnce({
+        data: { data: {} },
+      });
+
+      const token = await tryInitialRefresh();
+      expect(token).toBeNull();
+    });
+
+    it('should dispatch auth:token-refreshed event on success', async () => {
+      axios.post.mockResolvedValueOnce({
+        data: {
+          data: {
+            accessToken: 'refreshed-token',
+            refreshToken: 'refreshed-refresh',
+          },
+        },
+      });
+
+      await tryInitialRefresh();
+
+      const refreshEvent = dispatchedEvents.find(e => e.type === 'auth:token-refreshed');
+      expect(refreshEvent).toBeDefined();
+      expect(refreshEvent.detail.accessToken).toBe('refreshed-token');
+    });
+
+    it('should NOT pass AbortSignal to axios (token rotation is not abortable)', async () => {
+      axios.post.mockResolvedValueOnce({
+        data: {
+          data: {
+            accessToken: 'token',
+            refreshToken: 'refresh',
+          },
+        },
+      });
+
+      await tryInitialRefresh();
+
+      expect(axios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        {},
+        expect.not.objectContaining({
+          signal: expect.anything(),
+        })
+      );
+    });
+
+    it('should use singleton pattern (same promise for concurrent calls)', async () => {
+      let resolvePost;
+      axios.post.mockImplementation(
+        () =>
+          new Promise(resolve => {
+            resolvePost = resolve;
+          })
+      );
+
+      // Zwei gleichzeitige Aufrufe (simuliert StrictMode mount→unmount→mount)
+      const p1 = tryInitialRefresh();
+      const p2 = tryInitialRefresh();
+
+      // Nur ein HTTP-Request
+      expect(axios.post).toHaveBeenCalledTimes(1);
+
+      resolvePost({
+        data: { data: { accessToken: 'singleton-token', refreshToken: 'sr' } },
+      });
+
+      const [t1, t2] = await Promise.all([p1, p2]);
+      expect(t1).toBe('singleton-token');
+      expect(t2).toBe('singleton-token');
+    });
+
+    it('should allow a new call after previous one completes', async () => {
+      axios.post.mockResolvedValueOnce({
+        data: { data: { accessToken: 'first', refreshToken: 'r1' } },
+      });
+
+      await tryInitialRefresh();
+
+      axios.post.mockResolvedValueOnce({
+        data: { data: { accessToken: 'second', refreshToken: 'r2' } },
+      });
+
+      const token = await tryInitialRefresh();
+      expect(token).toBe('second');
       expect(axios.post).toHaveBeenCalledTimes(2);
     });
   });

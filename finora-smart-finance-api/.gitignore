@@ -9,3 +9,5 @@ logs/
 dist/
 build/
 coverage/
+# Lokale REST-Client-Datei mit echten Keys — niemals committen
+admin-api.local.http

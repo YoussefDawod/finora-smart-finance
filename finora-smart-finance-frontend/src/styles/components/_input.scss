@@ -216,7 +216,7 @@
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 
   &:disabled {
@@ -267,7 +267,7 @@
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 
   &:disabled {
@@ -310,13 +310,13 @@
 
     &::after {
       left: calc(100% - 18px);
-      background: white;
+      background: var(--text-on-primary);
     }
   }
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 
   &:disabled {

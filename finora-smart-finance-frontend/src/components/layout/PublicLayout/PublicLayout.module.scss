@@ -1,0 +1,24 @@
+@use '@/styles/mixins' as *;
+
+.layout {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.main {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.legal {
+  /* BrandingBackground übernimmt — 
+     kein eigener Hintergrund nötig */
+}
+
+.product {
+  /* BrandingBackground greift durch — keine eigene Hintergrundfarbe */
+}

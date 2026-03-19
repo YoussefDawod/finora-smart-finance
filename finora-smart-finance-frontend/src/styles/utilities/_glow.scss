@@ -2,7 +2,7 @@
 // ✨ GLOW UTILITIES
 // ============================================
 // Glow ist BRANDING - kein Informationsträger!
-// 
+//
 // ERLAUBT:
 //   - Logo
 //   - Auth Hero / Landing Hero
@@ -10,7 +10,7 @@
 //   - Card Container (Outline only)
 //   - Toast Icon-Wrapper (success only)
 //   - Chart Container (Outline only)
-// 
+//
 // VERBOTEN:
 //   - Finanzdaten (SummaryCard, BudgetWidget, etc.)
 //   - Inputs / Selects / Textareas
@@ -61,7 +61,7 @@
     $glow-color: var(--glow-success);
   }
 
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--border),
     0 0 var(--glow-blur-sm) 0 $glow-color;
 }
@@ -97,19 +97,19 @@
 
 // Outline Glow (for containers only)
 .glow-outline {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--border),
     0 0 var(--glow-blur-sm) 0 var(--glow-primary);
 }
 
 .glow-outline-accent {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--border),
     0 0 var(--glow-blur-sm) 0 var(--glow-accent);
 }
 
 .glow-outline-success {
-  box-shadow: 
+  box-shadow:
     0 0 0 1px var(--border),
     0 0 var(--glow-blur-sm) 0 var(--glow-success);
 }
@@ -119,7 +119,8 @@
 // ============================================
 
 @keyframes glow-pulse {
-  0%, 100% {
+  0%,
+  100% {
     filter: drop-shadow(0 0 var(--glow-blur-md) var(--glow-primary));
   }
   50% {
@@ -143,7 +144,7 @@
 // ============================================
 // 🚫 GLOW RESET (for blocked elements)
 // ============================================
-// Use this to explicitly disable glow on 
+// Use this to explicitly disable glow on
 // financial components
 
 .no-glow {
@@ -157,8 +158,6 @@
 // Diese Komponenten dürfen NIEMALS Glow haben:
 //
 // ❌ SummaryCard
-// ❌ DashboardCharts (Daten)
-// ❌ BudgetWidget
 // ❌ QuotaIndicator
 // ❌ TransactionList
 // ❌ TransactionForm

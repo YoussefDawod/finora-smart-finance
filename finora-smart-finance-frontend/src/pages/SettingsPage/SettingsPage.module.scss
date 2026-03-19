@@ -1,19 +1,9 @@
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .settingsPage {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding: var(--space-xl) var(--space-lg);
-
-  @include tablet {
-    padding: var(--space-lg) var(--space-md);
-  }
-
-  @include mobile {
-    padding: var(--space-md);
-  }
 }
 
 .pageHeader {
@@ -80,8 +70,6 @@
 .sectionIcon {
   width: 48px;
   height: 48px;
-  border-radius: var(--r-lg);
-  background: linear-gradient(135deg, var(--bg-secondary), color-mix(in srgb, var(--primary) 18%, transparent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,11 +140,9 @@
 .themeIcon {
   width: 36px;
   height: 36px;
-  border-radius: var(--r-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
   color: var(--primary);
 
   svg {

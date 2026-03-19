@@ -1,0 +1,191 @@
+// ============================================
+// ⌘ COMMAND BAR (Ctrl+K Overlay)
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Overlay (full-screen backdrop) ──
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1400);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  background: var(--overlay);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--overlay);
+  }
+
+  @include mobile {
+    padding-top: 8vh;
+    padding-inline: var(--space-md);
+  }
+}
+
+// ── Glass Panel ──
+.panel {
+  width: 100%;
+  max-width: 520px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--glass-shadow-elevated);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
+
+  @include mobile {
+    max-width: 100%;
+    max-height: 70vh;
+    border-radius: var(--r-lg);
+  }
+}
+
+// ── Search Input Row ──
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  color: var(--tx-muted);
+}
+
+.input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--tx);
+  font-family: inherit;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-m);
+  caret-color: var(--primary);
+
+  &::placeholder {
+    color: var(--tx-muted);
+    font-weight: var(--fw-n);
+  }
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xs) var(--space-xs);
+  font-size: var(--fs-2xs);
+  font-family: inherit;
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  background: color-mix(in srgb, var(--tx) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tx) 12%, transparent);
+  border-radius: var(--r-sm);
+  line-height: 1;
+}
+
+// ── Results List ──
+.results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-xs);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.section {
+  & + & {
+    margin-top: var(--space-xs);
+    padding-top: var(--space-xs);
+    border-top: 1px solid color-mix(in srgb, var(--tx) 8%, transparent);
+  }
+}
+
+.sectionLabel {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: var(--space-2xs) var(--space-sm);
+  @include glass-text;
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  background: transparent;
+  border-radius: var(--r-md);
+  color: var(--tx);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-align: left;
+
+  &:hover,
+  &.active {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    color: var(--primary);
+  }
+
+  &.active {
+    outline: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    outline-offset: -2px;
+  }
+}
+
+.resultIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+.resultLabel {
+  flex: 1;
+  min-width: 0;
+  @include truncate;
+}
+
+// ── No Results ──
+.noResults {
+  padding: var(--space-xl) var(--space-md);
+  text-align: center;
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  @include glass-text;
+}
+
+// ── Reduced Motion ──
+@include reduced-motion {
+  .overlay,
+  .panel,
+  .resultItem {
+    transition: none;
+  }
+}

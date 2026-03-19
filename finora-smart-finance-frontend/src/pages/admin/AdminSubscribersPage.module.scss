@@ -1,7 +1,6 @@
 // ============================================
 // 📧 ADMIN SUBSCRIBERS PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -118,8 +117,6 @@
   flex-wrap: wrap;
 }
 
-
-
 // ── Count Badge ─────────────────────────────
 .countBadge {
   display: inline-flex;
@@ -169,6 +166,15 @@
   }
 
   @include focus-ring;
+}
+
+// ── Responsive: Tablet ──────────────────────
+@include tablet-md {
+  .searchWrapper {
+    min-width: 180px;
+    max-width: none;
+    flex: 1 1 auto;
+  }
 }
 
 // ── Responsive ──────────────────────────────

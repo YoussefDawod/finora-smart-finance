@@ -6,6 +6,7 @@ import { MEDIA_QUERIES } from '@/constants';
 import Header from '../Header/Header';
 import Sidebar from '../Sidebar/Sidebar';
 import Footer from '../Footer/Footer';
+import CommandBar from '../../common/CommandBar/CommandBar';
 import styles from './MainLayout.module.scss';
 
 /**
@@ -13,7 +14,7 @@ import styles from './MainLayout.module.scss';
  * Desktop: Fixed Header + Collapsible Sidebar + Content + Footer
  * Mobile: Sticky Header + Mobile Content + Footer
  *
- * ACHTUNG: 
+ * ACHTUNG:
  * - Desktop Sidebar ist IMMER sichtbar (nie über HamburgerMenu)
  * - Mobile Sidebar wird über Header/HamburgerMenu gesteuert
  * - Navigation schließt Sidebar NICHT erneut
@@ -25,18 +26,20 @@ export default function MainLayout({ children }) {
   });
   const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const { t } = useTranslation();
-  
+
   // Only apply sidebar state class on desktop
-  const layoutStateClass = isMobile 
-    ? '' 
-    : (isSidebarCollapsed ? styles.sidebarCollapsed : styles.sidebarExpanded);
+  const layoutStateClass = isMobile
+    ? ''
+    : isSidebarCollapsed
+      ? styles.sidebarCollapsed
+      : styles.sidebarExpanded;
 
   /**
    * Toggle sidebar collapse (Desktop only)
    * useCallback ensures stable reference
    */
   const handleToggleCollapse = useCallback(() => {
-    setIsSidebarCollapsed((prev) => {
+    setIsSidebarCollapsed(prev => {
       const newState = !prev;
       localStorage.setItem('sidebar-collapsed', JSON.stringify(newState));
       return newState;
@@ -57,20 +60,12 @@ export default function MainLayout({ children }) {
       <div className={`${styles.mainBody} ${layoutStateClass}`}>
         {/* Desktop Sidebar - Fixed Left (immer sichtbar auf Desktop) */}
         {!isMobile && (
-          <Sidebar
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={handleToggleCollapse}
-          />
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={handleToggleCollapse} />
         )}
 
         {/* Content Area - Scrollable */}
         <div className={styles.contentWrapper}>
-          <main 
-            id="main-content" 
-            className={styles.layoutContent} 
-            role="main"
-            tabIndex="-1"
-          >
+          <main id="main-content" className={styles.layoutContent} role="main" tabIndex="-1">
             {children || <Outlet />}
           </main>
         </div>
@@ -78,6 +73,9 @@ export default function MainLayout({ children }) {
 
       {/* Footer - Full width with dynamic padding for sidebar */}
       <Footer isCollapsed={isSidebarCollapsed} isMobile={isMobile} />
+
+      {/* CommandBar – Ctrl+K / ⌘K global overlay */}
+      <CommandBar />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 // ============================================
 // PRIVACY NOTICE BANNER — Einfacher Datenschutz-Hinweis
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -12,8 +11,12 @@
   inset: 0;
   background: transparent;
   z-index: var(--z-modal);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--overlay);
+  }
 }
 
 // ============================================

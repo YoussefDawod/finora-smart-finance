@@ -1,0 +1,7 @@
+.blurred {
+  filter: blur(var(--glow-blur-sm, 6px));
+  user-select: none;
+  cursor: default;
+  transition: filter 0.2s ease;
+  display: inline-block;
+}

@@ -11,7 +11,7 @@ import AdminTransactionDetail from '../AdminTransactionDetail';
 // ── Portal + Framer-Motion Mocks ──────────────────
 vi.mock('react-dom', async () => {
   const actual = await vi.importActual('react-dom');
-  return { ...actual, createPortal: (node) => node };
+  return { ...actual, createPortal: node => node };
 });
 
 vi.mock('framer-motion', () => ({
@@ -30,6 +30,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, params) => {
       if (params) return `${key} ${JSON.stringify(params)}`;
@@ -39,8 +40,16 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useViewerGuard', () => ({
+  useViewerGuard: () => ({ isViewer: false, guard: fn => fn() }),
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
 vi.mock('@/utils/categoryTranslations', () => ({
-  translateCategory: (cat) => `translated_${cat}`,
+  translateCategory: cat => `translated_${cat}`,
 }));
 
 // ── Test-Daten ────────────────────────────────────
@@ -89,9 +98,7 @@ describe('AdminTransactionDetail', () => {
 
   describe('Rendering', () => {
     it('rendert nichts ohne transaction', () => {
-      const { container } = render(
-        <AdminTransactionDetail {...defaultProps} transaction={null} />,
-      );
+      const { container } = render(<AdminTransactionDetail {...defaultProps} transaction={null} />);
       expect(container.textContent).toBeFalsy();
     });
 

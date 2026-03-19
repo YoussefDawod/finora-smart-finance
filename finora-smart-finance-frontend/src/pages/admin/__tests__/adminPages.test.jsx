@@ -16,10 +16,19 @@ import AdminAuditLogPage from '../AdminAuditLogPage';
 import AdminLifecyclePage from '../AdminLifecyclePage';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'en' },
   }),
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
+vi.mock('@/hooks/useViewerGuard', () => ({
+  useViewerGuard: () => ({ isViewer: false, guard: fn => fn() }),
 }));
 
 // ── Mock useAdminDashboard + useAdminUsers + useToast ──
@@ -123,7 +132,14 @@ const mockTxUsersFilters = {
 
 const mockTxUsersHook = {
   users: [
-    { _id: 'u1', name: 'Alice', email: 'alice@test.com', transactionCount: 5, totalIncome: 1000, totalExpense: 500 },
+    {
+      _id: 'u1',
+      name: 'Alice',
+      email: 'alice@test.com',
+      transactionCount: 5,
+      totalIncome: 1000,
+      totalExpense: 500,
+    },
   ],
   pagination: { total: 1, page: 1, pages: 1, limit: 12 },
   loading: false,
@@ -187,6 +203,12 @@ const mockAuditHook = {
   error: null,
   filters: mockAuditFilters,
   actions: mockAuditActions,
+  selection: {
+    selectedIds: new Set(),
+    handleSelectId: vi.fn(),
+    handleSelectAll: vi.fn(),
+    handleClearSelection: vi.fn(),
+  },
 };
 
 // ── Mock useAdminLifecycle ────────────────────────
@@ -218,11 +240,12 @@ vi.mock('@/hooks', () => ({
   useAdminAuditLog: () => mockAuditHook,
   useAdminLifecycle: () => mockLifecycleHook,
   useToast: () => mockToast,
+  useAuth: () => ({ user: { name: 'Test Admin', email: 'admin@test.de' }, isAuthenticated: true }),
 }));
 
 // ── Mock Kategorie-Übersetzungen ──────────────────
 vi.mock('@/utils/categoryTranslations', () => ({
-  translateCategory: (cat) => `translated_${cat}`,
+  translateCategory: cat => `translated_${cat}`,
 }));
 
 vi.mock('@/config/categoryConstants', () => ({
@@ -232,7 +255,13 @@ vi.mock('@/config/categoryConstants', () => ({
 // ── Mock Admin-Komponenten ────────────────────────
 vi.mock('@/components/admin', () => ({
   AdminStatCard: ({ label, value, isLoading }) => (
-    <div data-testid="stat-card" data-label={label} data-value={value} data-loading={isLoading} role="listitem">
+    <div
+      data-testid="stat-card"
+      data-label={label}
+      data-value={value}
+      data-loading={isLoading}
+      role="listitem"
+    >
       {label}: {value}
     </div>
   ),
@@ -242,89 +271,126 @@ vi.mock('@/components/admin', () => ({
     </div>
   ),
   AdminRecentUsers: ({ users, loading }) => (
-    <div data-testid="admin-recent-users" data-loading={loading} data-user-count={users?.length || 0}>
+    <div
+      data-testid="admin-recent-users"
+      data-loading={loading}
+      data-user-count={users?.length || 0}
+    >
       Recent Users
     </div>
   ),
   AdminUserTable: ({ users, pagination, loading, onViewUser }) => (
     <div data-testid="admin-user-table" data-loading={loading} data-user-count={users?.length || 0}>
-      {users?.map((u) => (
+      {users?.map(u => (
         <div key={u._id} data-testid={`user-row-${u._id}`}>
           {u.name}
-          <button data-testid={`view-${u._id}`} onClick={() => onViewUser?.(u)}>View</button>
+          <button data-testid={`view-${u._id}`} onClick={() => onViewUser?.(u)}>
+            View
+          </button>
         </div>
       ))}
       {pagination && <span data-testid="pagination-total">{pagination.total}</span>}
     </div>
   ),
-  AdminUserDetail: ({ user, isOpen, onClose }) => (
+  AdminUserDetail: ({ user, isOpen, onClose }) =>
     isOpen && user ? (
       <div data-testid="admin-user-detail" data-user-id={user._id}>
         {user.name}
-        <button data-testid="close-detail" onClick={onClose}>Close</button>
+        <button data-testid="close-detail" onClick={onClose}>
+          Close
+        </button>
       </div>
-    ) : null
-  ),
+    ) : null,
   AdminTransactionTable: ({ transactions, pagination, loading, onViewTransaction }) => (
-    <div data-testid="admin-tx-table" data-loading={loading} data-tx-count={transactions?.length || 0}>
-      {transactions?.map((tx) => (
+    <div
+      data-testid="admin-tx-table"
+      data-loading={loading}
+      data-tx-count={transactions?.length || 0}
+    >
+      {transactions?.map(tx => (
         <div key={tx._id} data-testid={`tx-row-${tx._id}`}>
           {tx.description}
-          <button data-testid={`view-tx-${tx._id}`} onClick={() => onViewTransaction?.(tx)}>View</button>
+          <button data-testid={`view-tx-${tx._id}`} onClick={() => onViewTransaction?.(tx)}>
+            View
+          </button>
         </div>
       ))}
       {pagination && <span data-testid="tx-pagination-total">{pagination.total}</span>}
     </div>
   ),
-  AdminTransactionDetail: ({ transaction, isOpen, onClose }) => (
+  AdminTransactionDetail: ({ transaction, isOpen, onClose }) =>
     isOpen && transaction ? (
       <div data-testid="admin-tx-detail" data-tx-id={transaction._id}>
         {transaction.description}
-        <button data-testid="close-tx-detail" onClick={onClose}>Close</button>
+        <button data-testid="close-tx-detail" onClick={onClose}>
+          Close
+        </button>
       </div>
-    ) : null
-  ),
+    ) : null,
   AdminTransactionUserList: ({ users, loading, onSelectUser }) => (
-    <div data-testid="admin-tx-user-list" data-loading={loading} data-user-count={users?.length || 0}>
-      {users?.map((u) => (
+    <div
+      data-testid="admin-tx-user-list"
+      data-loading={loading}
+      data-user-count={users?.length || 0}
+    >
+      {users?.map(u => (
         <div key={u._id} data-testid={`tx-user-${u._id}`}>
           {u.name}
-          <button data-testid={`select-user-${u._id}`} onClick={() => onSelectUser?.(u)}>Select</button>
+          <button data-testid={`select-user-${u._id}`} onClick={() => onSelectUser?.(u)}>
+            Select
+          </button>
         </div>
       ))}
     </div>
   ),
   AdminSubscriberTable: ({ subscribers, pagination, loading, onDelete, onViewSubscriber }) => (
-    <div data-testid="admin-sub-table" data-loading={loading} data-sub-count={subscribers?.length || 0}>
-      {subscribers?.map((s) => (
+    <div
+      data-testid="admin-sub-table"
+      data-loading={loading}
+      data-sub-count={subscribers?.length || 0}
+    >
+      {subscribers?.map(s => (
         <div key={s._id} data-testid={`sub-row-${s._id}`}>
           {s.email}
-          <button data-testid={`view-sub-${s._id}`} onClick={() => onViewSubscriber?.(s)}>View</button>
-          <button data-testid={`delete-sub-${s._id}`} onClick={() => onDelete?.(s._id)}>Delete</button>
+          <button data-testid={`view-sub-${s._id}`} onClick={() => onViewSubscriber?.(s)}>
+            View
+          </button>
+          <button data-testid={`delete-sub-${s._id}`} onClick={() => onDelete?.(s._id)}>
+            Delete
+          </button>
         </div>
       ))}
       {pagination && <span data-testid="sub-pagination-total">{pagination.total}</span>}
     </div>
   ),
-  AdminCreateUser: ({ isOpen, onClose, onSubmit, loading }) => (
+  AdminCreateUser: ({ isOpen, onClose, onSubmit, loading }) =>
     isOpen ? (
       <div data-testid="admin-create-user" data-loading={loading}>
-        <button data-testid="submit-create-user" onClick={() => onSubmit?.({ name: 'New', email: 'new@test.com', password: 'Abc123!x', role: 'user' })}>Submit</button>
-        <button data-testid="close-create-user" onClick={onClose}>Close</button>
+        <button
+          data-testid="submit-create-user"
+          onClick={() =>
+            onSubmit?.({ name: 'New', email: 'new@test.com', password: 'Abc123!x', role: 'user' })
+          }
+        >
+          Submit
+        </button>
+        <button data-testid="close-create-user" onClick={onClose}>
+          Close
+        </button>
       </div>
-    ) : null
-  ),
-  AdminSubscriberDetail: ({ subscriber, isOpen, onClose }) => (
+    ) : null,
+  AdminSubscriberDetail: ({ subscriber, isOpen, onClose }) =>
     isOpen && subscriber ? (
       <div data-testid="admin-sub-detail" data-sub-id={subscriber._id}>
         {subscriber.email}
-        <button data-testid="close-sub-detail" onClick={onClose}>Close</button>
+        <button data-testid="close-sub-detail" onClick={onClose}>
+          Close
+        </button>
       </div>
-    ) : null
-  ),
+    ) : null,
   AdminAuditLogTable: ({ logs, pagination, loading }) => (
     <div data-testid="admin-audit-table" data-loading={loading} data-log-count={logs?.length || 0}>
-      {logs?.map((log) => (
+      {logs?.map(log => (
         <div key={log._id} data-testid={`log-row-${log._id}`}>
           {log.action}
         </div>
@@ -339,13 +405,15 @@ vi.mock('@/components/common/FilterDropdown/FilterDropdown', () => ({
   default: ({ options, value, onChange, ariaLabel, disabled, placeholder }) => (
     <select
       value={value}
-      onChange={(e) => onChange?.(e.target.value)}
+      onChange={e => onChange?.(e.target.value)}
       aria-label={ariaLabel}
       disabled={disabled}
     >
       {placeholder && <option value="">{placeholder}</option>}
-      {options?.map((opt) => (
-        <option key={opt.value} value={opt.value}>{opt.label}</option>
+      {options?.map(opt => (
+        <option key={opt.value} value={opt.value}>
+          {opt.label}
+        </option>
       ))}
     </select>
   ),
@@ -359,7 +427,7 @@ vi.mock('@/components/common/DateInput/DateInput', () => ({
       <input
         type="date"
         value={value || ''}
-        onChange={(e) => onChange?.(e.target.value)}
+        onChange={e => onChange?.(e.target.value)}
         aria-label={ariaLabel || label}
         disabled={disabled}
       />
@@ -367,11 +435,11 @@ vi.mock('@/components/common/DateInput/DateInput', () => ({
   ),
 }));
 
-const renderPage = (Component) => {
+const renderPage = Component => {
   return render(
     <MemoryRouter>
       <Component />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -436,6 +504,12 @@ function setAuditLogState(overrides) {
     error: null,
     filters: mockAuditFilters,
     actions: mockAuditActions,
+    selection: {
+      selectedIds: new Set(),
+      handleSelectId: vi.fn(),
+      handleSelectAll: vi.fn(),
+      handleClearSelection: vi.fn(),
+    },
     ...overrides,
   });
 }
@@ -475,7 +549,9 @@ describe('Admin Pages', () => {
         setDashboardState({ loading: true });
         renderPage(AdminDashboardPage);
 
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('admin.dashboard.title');
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+          'admin.dashboard.title'
+        );
         expect(screen.getByText('admin.dashboard.subtitle')).toBeInTheDocument();
       });
 
@@ -485,7 +561,7 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(8);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-loading', 'true');
         });
       });
@@ -525,9 +601,7 @@ describe('Admin Pages', () => {
           usersLast7Days: 8,
           totalTransactions: 450,
         },
-        recentUsers: [
-          { _id: 'u1', name: 'Alice', isVerified: true, role: 'user' },
-        ],
+        recentUsers: [{ _id: 'u1', name: 'Alice', isVerified: true, role: 'user' }],
       };
       const fullTxStats = {
         totalCount: 450,
@@ -554,7 +628,7 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(8);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-loading', 'false');
         });
       });
@@ -605,9 +679,15 @@ describe('Admin Pages', () => {
       it('hat aria-labels für Sektionen', () => {
         renderPage(AdminDashboardPage);
 
-        expect(screen.getByRole('region', { name: 'admin.dashboard.statsLabel' })).toBeInTheDocument();
-        expect(screen.getByRole('region', { name: 'admin.dashboard.chartsLabel' })).toBeInTheDocument();
-        expect(screen.getByRole('region', { name: 'admin.dashboard.recentUsers' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'admin.dashboard.statsLabel' })
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'admin.dashboard.chartsLabel' })
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'admin.dashboard.recentUsers' })
+        ).toBeInTheDocument();
       });
     });
 
@@ -656,7 +736,7 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         // Prüfe dass Cards mit Fallback-Werten ("—") gerendert werden
-        const dashValues = statCards.filter((c) => c.getAttribute('data-value') === '—');
+        const dashValues = statCards.filter(c => c.getAttribute('data-value') === '—');
         expect(dashValues.length).toBeGreaterThan(0);
       });
     });
@@ -672,8 +752,24 @@ describe('Admin Pages', () => {
 
   describe('AdminUsersPage', () => {
     const mockUsersList = [
-      { _id: 'u1', name: 'Alice', email: 'a@b.com', role: 'user', isActive: true, isVerified: true, createdAt: '2024-01-15T10:00:00Z' },
-      { _id: 'u2', name: 'Bob', email: 'b@b.com', role: 'admin', isActive: true, isVerified: true, createdAt: '2024-01-14T10:00:00Z' },
+      {
+        _id: 'u1',
+        name: 'Alice',
+        email: 'a@b.com',
+        role: 'user',
+        isActive: true,
+        isVerified: true,
+        createdAt: '2024-01-15T10:00:00Z',
+      },
+      {
+        _id: 'u2',
+        name: 'Bob',
+        email: 'b@b.com',
+        role: 'admin',
+        isActive: true,
+        isVerified: true,
+        createdAt: '2024-01-14T10:00:00Z',
+      },
     ];
 
     describe('Loading State', () => {
@@ -862,7 +958,10 @@ describe('Admin Pages', () => {
         await userEvent.click(submitBtn);
 
         expect(mockUsersActions.createUser).toHaveBeenCalledWith({
-          name: 'New', email: 'new@test.com', password: 'Abc123!x', role: 'user',
+          name: 'New',
+          email: 'new@test.com',
+          password: 'Abc123!x',
+          role: 'user',
         });
         expect(mockToast.success).toHaveBeenCalledWith('admin.users.create.success');
       });
@@ -897,8 +996,24 @@ describe('Admin Pages', () => {
 
   describe('AdminTransactionsPage', () => {
     const mockTxList = [
-      { _id: 'tx1', description: 'Gehalt', amount: 3000, category: 'Gehalt', type: 'income', date: '2024-01-31', userId: { _id: 'u1', name: 'Alice' } },
-      { _id: 'tx2', description: 'Miete', amount: 800, category: 'Miete', type: 'expense', date: '2024-02-01', userId: { _id: 'u2', name: 'Bob' } },
+      {
+        _id: 'tx1',
+        description: 'Gehalt',
+        amount: 3000,
+        category: 'Gehalt',
+        type: 'income',
+        date: '2024-01-31',
+        userId: { _id: 'u1', name: 'Alice' },
+      },
+      {
+        _id: 'tx2',
+        description: 'Miete',
+        amount: 800,
+        category: 'Miete',
+        type: 'expense',
+        date: '2024-02-01',
+        userId: { _id: 'u2', name: 'Bob' },
+      },
     ];
 
     // Helper: Klick auf User um zur Transaktions-Ansicht zu gelangen
@@ -910,7 +1025,9 @@ describe('Admin Pages', () => {
     describe('User List View (default)', () => {
       it('rendert Titel', () => {
         renderPage(AdminTransactionsPage);
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('admin.transactions.title');
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+          'admin.transactions.title'
+        );
       });
 
       it('rendert Subtitle mit User-Anzahl', () => {
@@ -926,7 +1043,9 @@ describe('Admin Pages', () => {
 
       it('rendert Suchfeld für User', () => {
         renderPage(AdminTransactionsPage);
-        expect(screen.getByPlaceholderText('admin.transactions.searchUserPlaceholder')).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText('admin.transactions.searchUserPlaceholder')
+        ).toBeInTheDocument();
       });
     });
 
@@ -944,13 +1063,17 @@ describe('Admin Pages', () => {
       it('zeigt Zurück-Button', async () => {
         renderPage(AdminTransactionsPage);
         await enterTransactionsView();
-        expect(screen.getByRole('button', { name: 'admin.transactions.backToUsers' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'admin.transactions.backToUsers' })
+        ).toBeInTheDocument();
       });
 
       it('rendert Suchfeld', async () => {
         renderPage(AdminTransactionsPage);
         await enterTransactionsView();
-        expect(screen.getByPlaceholderText('admin.transactions.searchPlaceholder')).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText('admin.transactions.searchPlaceholder')
+        ).toBeInTheDocument();
       });
 
       it('rendert Type-Filter', async () => {
@@ -1083,15 +1206,29 @@ describe('Admin Pages', () => {
 
   describe('AdminSubscribersPage', () => {
     const mockSubList = [
-      { _id: 'sub1', email: 'alice@example.com', isConfirmed: true, language: 'de', subscribedAt: '2024-01-15T10:00:00Z' },
-      { _id: 'sub2', email: 'bob@example.com', isConfirmed: false, language: 'en', subscribedAt: '2024-02-20T14:30:00Z' },
+      {
+        _id: 'sub1',
+        email: 'alice@example.com',
+        isConfirmed: true,
+        language: 'de',
+        subscribedAt: '2024-01-15T10:00:00Z',
+      },
+      {
+        _id: 'sub2',
+        email: 'bob@example.com',
+        isConfirmed: false,
+        language: 'en',
+        subscribedAt: '2024-02-20T14:30:00Z',
+      },
     ];
 
     describe('Loading State', () => {
       it('rendert Titel', () => {
         setSubscribersState({ loading: true });
         renderPage(AdminSubscribersPage);
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('admin.subscribers.title');
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+          'admin.subscribers.title'
+        );
       });
 
       it('rendert Subtitle', () => {
@@ -1149,7 +1286,9 @@ describe('Admin Pages', () => {
       it('rendert Suchfeld', () => {
         setSubscribersState({ loading: false });
         renderPage(AdminSubscribersPage);
-        expect(screen.getByPlaceholderText('admin.subscribers.searchPlaceholder')).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText('admin.subscribers.searchPlaceholder')
+        ).toBeInTheDocument();
       });
 
       it('rendert Status-Filter', () => {
@@ -1209,8 +1348,20 @@ describe('Admin Pages', () => {
 
     describe('Detail Modal', () => {
       const mockSubList = [
-        { _id: 'sub1', email: 'alice@example.com', isConfirmed: true, language: 'de', subscribedAt: '2024-01-15T10:00:00Z' },
-        { _id: 'sub2', email: 'bob@example.com', isConfirmed: false, language: 'en', subscribedAt: '2024-02-20T14:30:00Z' },
+        {
+          _id: 'sub1',
+          email: 'alice@example.com',
+          isConfirmed: true,
+          language: 'de',
+          subscribedAt: '2024-01-15T10:00:00Z',
+        },
+        {
+          _id: 'sub2',
+          email: 'bob@example.com',
+          isConfirmed: false,
+          language: 'en',
+          subscribedAt: '2024-02-20T14:30:00Z',
+        },
       ];
 
       it('öffnet Detail-Modal beim Klick auf View', async () => {
@@ -1269,8 +1420,24 @@ describe('Admin Pages', () => {
 
   describe('AdminAuditLogPage', () => {
     const mockLogList = [
-      { _id: 'log1', adminName: 'Super Admin', action: 'USER_BANNED', targetUserName: 'Alice', details: {}, ipAddress: '192.168.1.1', createdAt: '2024-03-15T10:00:00Z' },
-      { _id: 'log2', adminName: 'System', action: 'USER_CREATED', targetUserName: 'Bob', details: {}, ipAddress: '10.0.0.1', createdAt: '2024-03-16T08:00:00Z' },
+      {
+        _id: 'log1',
+        adminName: 'Super Admin',
+        action: 'USER_BANNED',
+        targetUserName: 'Alice',
+        details: {},
+        ipAddress: '192.168.1.1',
+        createdAt: '2024-03-15T10:00:00Z',
+      },
+      {
+        _id: 'log2',
+        adminName: 'System',
+        action: 'USER_CREATED',
+        targetUserName: 'Bob',
+        details: {},
+        ipAddress: '10.0.0.1',
+        createdAt: '2024-03-16T08:00:00Z',
+      },
     ];
 
     describe('Loading State', () => {
@@ -1338,11 +1505,11 @@ describe('Admin Pages', () => {
         expect(screen.getByLabelText('admin.auditLog.filterAction')).toBeInTheDocument();
       });
 
-      it('rendert Date-Range-Inputs', () => {
+      it('rendert Monats-Filter', () => {
         setAuditLogState({ loading: false });
         renderPage(AdminAuditLogPage);
-        expect(screen.getByText('admin.auditLog.startDate')).toBeInTheDocument();
-        expect(screen.getByText('admin.auditLog.endDate')).toBeInTheDocument();
+        // Die Seite nutzt eine Monatsauswahl (input[type=month]) statt separater Datums-Inputs
+        expect(screen.getByLabelText('admin.auditLog.selectMonth')).toBeInTheDocument();
       });
 
       it('rendert alle Action-Optionen im Select', () => {
@@ -1400,7 +1567,10 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards[0]).toHaveAttribute('data-value', '250');
-        expect(statCards[1]).toHaveAttribute('data-value', 'admin.auditLog.actions_enum.USER_BANNED');
+        expect(statCards[1]).toHaveAttribute(
+          'data-value',
+          'admin.auditLog.actions_enum.USER_BANNED'
+        );
         expect(statCards[2]).toHaveAttribute('data-value', '3');
       });
 
@@ -1410,7 +1580,7 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(3);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-value', '—');
         });
       });
@@ -1421,7 +1591,7 @@ describe('Admin Pages', () => {
 
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(3);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-loading', 'true');
         });
       });
@@ -1433,7 +1603,9 @@ describe('Admin Pages', () => {
         });
         renderPage(AdminAuditLogPage);
 
-        expect(screen.getByRole('region', { name: 'admin.auditLog.statsLabel' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'admin.auditLog.statsLabel' })
+        ).toBeInTheDocument();
       });
 
       it('zeigt Stats-Labels korrekt', () => {
@@ -1474,7 +1646,13 @@ describe('Admin Pages', () => {
         { _id: 'u1', name: 'Alice', email: 'a@b.com', finalWarningSentAt: '2025-01-10' },
       ],
       usersInRemindingPhase: [
-        { _id: 'u3', name: 'Charlie', email: 'c@b.com', reminderStartedAt: '2025-01-01', reminderCount: 3 },
+        {
+          _id: 'u3',
+          name: 'Charlie',
+          email: 'c@b.com',
+          reminderStartedAt: '2025-01-01',
+          reminderCount: 3,
+        },
       ],
       usersWithExport: [
         { _id: 'u4', name: 'Diana', email: 'd@b.com', exportConfirmedAt: '2025-02-10' },
@@ -1504,7 +1682,9 @@ describe('Admin Pages', () => {
       it('rendert Titel und Subtitle', () => {
         setLifecycleState({ loading: true });
         renderPage(AdminLifecyclePage);
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('lifecycle.admin.title');
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+          'lifecycle.admin.title'
+        );
         expect(screen.getByText('lifecycle.admin.subtitle')).toBeInTheDocument();
       });
 
@@ -1513,7 +1693,7 @@ describe('Admin Pages', () => {
         renderPage(AdminLifecyclePage);
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(7);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-loading', 'true');
         });
       });
@@ -1528,7 +1708,9 @@ describe('Admin Pages', () => {
       it('zeigt User-Listen Sektion mit Tabs', () => {
         setLifecycleState({ loading: true });
         renderPage(AdminLifecyclePage);
-        expect(screen.getByRole('region', { name: 'lifecycle.admin.criticalLabel' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'lifecycle.admin.criticalLabel' })
+        ).toBeInTheDocument();
         expect(screen.getByRole('tablist')).toBeInTheDocument();
       });
     });
@@ -1542,7 +1724,7 @@ describe('Admin Pages', () => {
         renderPage(AdminLifecyclePage);
         const statCards = screen.getAllByTestId('stat-card');
         expect(statCards).toHaveLength(7);
-        statCards.forEach((card) => {
+        statCards.forEach(card => {
           expect(card).toHaveAttribute('data-loading', 'false');
         });
       });
@@ -1580,8 +1762,12 @@ describe('Admin Pages', () => {
 
       it('hat aria-labels für Sektionen', () => {
         renderPage(AdminLifecyclePage);
-        expect(screen.getByRole('region', { name: 'lifecycle.admin.statsLabel' })).toBeInTheDocument();
-        expect(screen.getByRole('region', { name: 'lifecycle.admin.criticalLabel' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'lifecycle.admin.statsLabel' })
+        ).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'lifecycle.admin.criticalLabel' })
+        ).toBeInTheDocument();
       });
 
       it('zeigt "keine kritischen User"-Nachricht wenn Liste leer', () => {
@@ -1680,7 +1866,9 @@ describe('Admin Pages', () => {
 
       it('rendert Such-Input', () => {
         renderPage(AdminLifecyclePage);
-        expect(screen.getByPlaceholderText('lifecycle.admin.searchPlaceholder')).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText('lifecycle.admin.searchPlaceholder')
+        ).toBeInTheDocument();
       });
 
       it('filtert User nach Name', async () => {
@@ -1730,10 +1918,19 @@ describe('Admin Pages', () => {
         setLifecycleState({
           loading: false,
           stats: mockLifecycleStats,
-          triggerResult: { processed: 10, reminders: 3, finalWarnings: 1, deletions: 0, errors: 0, skipped: 6 },
+          triggerResult: {
+            processed: 10,
+            reminders: 3,
+            finalWarnings: 1,
+            deletions: 0,
+            errors: 0,
+            skipped: 6,
+          },
         });
         renderPage(AdminLifecyclePage);
-        expect(screen.getByRole('region', { name: 'lifecycle.admin.triggerResult' })).toBeInTheDocument();
+        expect(
+          screen.getByRole('region', { name: 'lifecycle.admin.triggerResult' })
+        ).toBeInTheDocument();
         expect(screen.getByText('lifecycle.admin.triggerResult')).toBeInTheDocument();
         expect(screen.getByText('10')).toBeInTheDocument();
       });
@@ -1748,7 +1945,14 @@ describe('Admin Pages', () => {
         setLifecycleState({
           loading: false,
           stats: mockLifecycleStats,
-          triggerResult: { processed: 5, reminders: 0, finalWarnings: 0, deletions: 0, errors: 0, skipped: 5 },
+          triggerResult: {
+            processed: 5,
+            reminders: 0,
+            finalWarnings: 0,
+            deletions: 0,
+            errors: 0,
+            skipped: 5,
+          },
         });
         renderPage(AdminLifecyclePage);
         // Dismiss button inside trigger result is the one with aria-label close
@@ -1809,7 +2013,11 @@ describe('Admin Pages', () => {
           ...mockDetail,
           lifecycle: { retention: { phase: 'active' } },
         };
-        setLifecycleState({ loading: false, stats: mockLifecycleStats, userDetail: detailNoTimestamps });
+        setLifecycleState({
+          loading: false,
+          stats: mockLifecycleStats,
+          userDetail: detailNoTimestamps,
+        });
         renderPage(AdminLifecyclePage);
         expect(screen.getByText('lifecycle.admin.noTimestamps')).toBeInTheDocument();
       });

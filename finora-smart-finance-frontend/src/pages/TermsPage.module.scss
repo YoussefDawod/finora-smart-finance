@@ -1,7 +1,6 @@
 // ============================================
 // 📜 TERMS PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -9,7 +8,7 @@
 // ============================================
 .termsContainer {
   min-height: 100vh;
-  background: var(--bg);
+  min-height: 100svh;
   padding: var(--space-xl);
   display: flex;
   justify-content: center;
@@ -27,11 +26,18 @@
 .termsContent {
   max-width: 50rem; // ~800px
   width: 100%;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   padding: var(--space-3xl);
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
   margin: var(--space-xl) 0;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
 
   @include mobile {
     padding: var(--space-lg);
@@ -86,7 +92,7 @@
 
   ul {
     list-style-type: disc;
-    margin-left: var(--space-lg);
+    margin-inline-start: var(--space-lg);
     margin-bottom: var(--space-md);
 
     li {
@@ -108,7 +114,7 @@
 .footer {
   margin-top: var(--space-2xl);
   padding-top: var(--space-xl);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--glass-border-light);
 }
 
 .lastUpdated {
@@ -120,4 +126,39 @@
 
 .backButton {
   @include back-button;
+}
+
+// ============================================
+// PRIVACY NOTICE — EXTRAS
+// ============================================
+.intro {
+  font-size: var(--fs-base);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+  max-width: 55ch;
+  margin-inline: auto;
+
+  @include mobile {
+    font-size: var(--fs-sm);
+  }
+}
+
+.fullPolicyLink {
+  text-align: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--glass-border-light);
+
+  a {
+    color: var(--primary);
+    font-weight: var(--fw-m);
+    text-decoration: none;
+    transition: opacity var(--tr-fast);
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }

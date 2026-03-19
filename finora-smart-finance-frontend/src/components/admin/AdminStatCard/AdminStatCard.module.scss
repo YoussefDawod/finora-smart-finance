@@ -1,7 +1,6 @@
 // ============================================
 // 📊 ADMIN STAT CARD
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .statCard {
@@ -13,7 +12,9 @@
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   box-shadow: var(--sh-sm);
-  transition: box-shadow var(--duration-normal), transform var(--duration-normal);
+  transition:
+    box-shadow var(--duration-normal),
+    transform var(--duration-normal);
   min-width: 0;
 
   &:hover {
@@ -29,7 +30,6 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: var(--r-lg);
   flex-shrink: 0;
   font-size: var(--fs-lg);
 }
@@ -71,46 +71,49 @@
   line-height: var(--lh-none);
   margin-top: var(--space-2xs);
 
-  &.up { color: var(--success); }
-  &.down { color: var(--error); }
-  &.neutral { color: var(--tx-muted); }
+  &.up {
+    color: var(--success);
+  }
+  &.down {
+    color: var(--error);
+  }
+  &.neutral {
+    color: var(--tx-muted);
+  }
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 // ── Color Variants ──────────────────────────
 .primary {
   .iconBox {
     color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 12%, transparent);
   }
 }
 
 .success {
   .iconBox {
     color: var(--success);
-    background: color-mix(in srgb, var(--success) 12%, transparent);
   }
 }
 
 .warning {
   .iconBox {
     color: var(--warning);
-    background: color-mix(in srgb, var(--warning) 12%, transparent);
   }
 }
 
 .error {
   .iconBox {
     color: var(--error);
-    background: color-mix(in srgb, var(--error) 12%, transparent);
   }
 }
 
 .info {
   .iconBox {
     color: var(--info);
-    background: color-mix(in srgb, var(--info) 12%, transparent);
   }
 }
 
@@ -124,6 +127,8 @@
 @include reduced-motion {
   .statCard {
     transition: none;
-    &:hover { transform: none; }
+    &:hover {
+      transform: none;
+    }
   }
 }

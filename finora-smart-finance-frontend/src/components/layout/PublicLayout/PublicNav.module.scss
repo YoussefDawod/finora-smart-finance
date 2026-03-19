@@ -1,0 +1,407 @@
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PUBLIC NAV
+// ============================================
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+}
+
+// Innerer Container — trägt backdrop-filter (statt .nav direkt),
+// damit .mobileMenu NICHT im backdrop-filter Compositing-Scope liegt.
+.navBar {
+  min-height: var(--header-height, 56px);
+  display: flex;
+  align-items: center;
+  transition:
+    background var(--tr),
+    border-color var(--tr),
+    backdrop-filter var(--tr);
+  border-bottom: 1px solid transparent;
+
+  @include below-md {
+    min-height: var(--header-height, 48px);
+  }
+}
+
+.scrolled {
+  background: color-mix(in srgb, var(--glass-bg) 85%, transparent);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+}
+
+.container {
+  padding: 0 var(--space-lg);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+
+  @include mobile {
+    padding: 0 var(--space-md);
+  }
+}
+
+// ============================================
+// LOGO
+// ============================================
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  &:hover img {
+    opacity: 0.85;
+  }
+
+  @include focus-ring;
+
+  &:focus-visible {
+    border-radius: var(--r-sm);
+  }
+}
+
+.logoImg {
+  height: 2.25rem; // 36px — konsistent mit App-Header
+  width: auto;
+  transition: opacity var(--tr);
+
+  @include below-md {
+    height: 2rem; // 32px — Mobile
+  }
+}
+
+// ============================================
+// DESKTOP LINKS
+// ============================================
+.links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.link {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  text-decoration: none;
+  padding: var(--space-xs) var(--space-2xs);
+  border-radius: var(--r-md);
+  transition: color var(--tr-fast);
+
+  &:hover {
+    color: var(--tx);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.active {
+  color: var(--primary);
+  font-weight: var(--fw-sb);
+}
+
+// ============================================
+// DESKTOP ACTIONS
+// ============================================
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.loginBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  text-decoration: none;
+  background: color-mix(in srgb, var(--glass-bg) 40%, transparent);
+  border: 1px solid var(--glass-border);
+  color: var(--tx);
+  transition:
+    background var(--tr-fast),
+    border-color var(--tr-fast);
+
+  &:hover {
+    background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
+    border-color: var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+.registerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  text-decoration: none;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border: 1px solid transparent;
+  transition: opacity var(--tr-fast);
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+// Dashboard-Button (eingeloggter User)
+.dashboardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-lg);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  text-decoration: none;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  border: 1px solid transparent;
+  transition: opacity var(--tr-fast);
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+// Admin/Viewer Badges (identisch mit Header.module.scss)
+.adminBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3xs) var(--space-sm);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, var(--glass-bg));
+  border-radius: var(--r-full);
+}
+
+.viewerBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-3xs) var(--space-sm);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-b);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-n);
+  color: var(--warning);
+  background: color-mix(in srgb, var(--warning) 10%, var(--glass-bg));
+  border-radius: var(--r-full);
+}
+
+// Logout-Button im Mobile-Menu
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  cursor: pointer;
+  width: 100%;
+  transition:
+    color var(--tr-fast),
+    background var(--tr-fast),
+    border-color var(--tr-fast);
+
+  &:hover {
+    color: var(--error);
+    border-color: var(--error);
+    background: color-mix(in srgb, var(--error) 8%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+// ============================================
+// MOBILE HAMBURGER
+// ============================================
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--glass-bg) 40%, transparent);
+  color: var(--tx);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background var(--tr-fast),
+    border-color var(--tr-fast);
+
+  &:hover {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+// Mobile: rechte Seite (Avatar / Login) — margin-inline-start: auto = LTR rechts, RTL links
+.mobileRight {
+  display: flex;
+  align-items: center;
+  margin-inline-start: auto;
+}
+
+// ============================================
+// MOBILE MENU
+// ============================================
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  // Gleicher Glaseffekt wie .scrolled — konsistent mit der Nav-Leiste
+  background: color-mix(in srgb, var(--glass-bg) 85%, transparent);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: var(--space-lg) var(--space-md);
+  z-index: var(--z-dropdown);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+}
+
+// Logo oben im mobilen Menü
+.mobileLogo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.mobileLogoImg {
+  height: 2rem; // 32px Mobile
+  width: auto;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.mobileLink {
+  display: block;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--r-md);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  text-decoration: none;
+  transition:
+    color var(--tr-fast),
+    background var(--tr-fast);
+
+  &:hover {
+    color: var(--tx);
+    background: color-mix(in srgb, var(--glass-bg) 50%, transparent);
+  }
+
+  &.active {
+    color: var(--primary);
+    font-weight: var(--fw-sb);
+  }
+}
+
+.mobileActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--glass-border);
+}
+
+// ============================================
+// RTL SUPPORT
+// ============================================
+:global([dir='rtl']) {
+  .links,
+  .actions {
+    flex-direction: row-reverse;
+  }
+
+  .mobileLink {
+    text-align: right;
+  }
+
+  .mobileLogo {
+    flex-direction: row-reverse;
+  }
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .navBar {
+    transition: none;
+  }
+
+  .link,
+  .loginBtn,
+  .registerBtn,
+  .dashboardBtn,
+  .logoutBtn,
+  .hamburger,
+  .mobileLink {
+    transition: none;
+  }
+}

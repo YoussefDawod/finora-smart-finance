@@ -14,7 +14,7 @@ const {
   sendNewsletterGoodbye,
   sendNewsletterCampaign,
 } = require('./newsletterEmails');
-const { notifyAdminsNewUser } = require('./adminEmails');
+const { notifyAdminsNewUser, sendAdminCreatedCredentialsEmail } = require('./adminEmails');
 const { sendLifecycleEmail } = require('./lifecycleEmails');
 
 module.exports = {
@@ -33,6 +33,7 @@ module.exports = {
   sendNewsletterGoodbye,
   sendNewsletterCampaign,
   notifyAdminsNewUser,
+  sendAdminCreatedCredentialsEmail,
   // Lifecycle
   sendLifecycleEmail,
 };

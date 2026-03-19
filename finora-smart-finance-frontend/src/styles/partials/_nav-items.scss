@@ -1,0 +1,103 @@
+// ============================================
+// SHARED NAV-ITEM STYLES (Sidebar + HamburgerMenu)
+// ============================================
+// DRY: Gemeinsame Nav-Item Mixins für konsistentes Glass-Styling
+// Import: @use '@/styles/partials/nav-items' as *;
+// ============================================
+
+@mixin nav-item-base {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: transparent;
+  border: none;
+  border-radius: var(--r-lg);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--tr-fast);
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  overflow: hidden;
+}
+
+@mixin nav-item-indicator {
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 0;
+    background: var(--primary);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    transition: height var(--tr-fast);
+  }
+}
+
+@mixin nav-item-hover-glass {
+  &:hover {
+    background: var(--glass-bg-hover);
+    color: var(--tx);
+
+    &::before {
+      height: 50%;
+    }
+
+    .navIcon {
+      color: var(--primary);
+    }
+  }
+}
+
+@mixin nav-item-active {
+  &.active {
+    background: transparent;
+    color: var(--primary);
+    font-weight: var(--fw-sb);
+
+    &::before {
+      height: 70%;
+      width: 5px;
+      box-shadow: var(--glow-sm);
+    }
+
+    .navIcon {
+      color: var(--primary);
+    }
+  }
+}
+
+@mixin nav-item-rtl {
+  :global([dir='rtl']) & {
+    text-align: right;
+
+    &::before {
+      left: auto;
+      right: 0;
+      border-radius: var(--r-sm) 0 0 var(--r-sm);
+    }
+  }
+}
+
+@mixin nav-icon-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  color: var(--tx-muted);
+  transition: color var(--tr-fast);
+  flex-shrink: 0;
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}

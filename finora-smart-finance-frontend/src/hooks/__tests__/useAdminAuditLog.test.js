@@ -17,6 +17,11 @@ vi.mock('@/api/adminService', () => ({
   },
 }));
 
+// ── Mock useAuth ───────────────────────────────────
+vi.mock('../useAuth', () => ({
+  useAuth: () => ({ user: { name: 'Test Admin', email: 'admin@test.de' }, isAuthenticated: true }),
+}));
+
 import { adminService } from '@/api/adminService';
 
 // ── Test-Daten ─────────────────────────────────────
@@ -94,8 +99,8 @@ describe('useAdminAuditLog', () => {
 
       await waitFor(() => {
         expect(adminService.getAuditLogs).toHaveBeenCalledWith(
-          { page: 1, limit: 20, sort: '-createdAt' },
-          expect.objectContaining({}),
+          expect.objectContaining({ page: 1, limit: 20, sort: '-createdAt' }),
+          expect.objectContaining({})
         );
       });
     });
@@ -172,8 +177,7 @@ describe('useAdminAuditLog', () => {
       await waitFor(() => expect(result.current.loading).toBe(false));
 
       expect(typeof result.current.filters.setActionFilter).toBe('function');
-      expect(typeof result.current.filters.setStartDate).toBe('function');
-      expect(typeof result.current.filters.setEndDate).toBe('function');
+      expect(typeof result.current.filters.setSelectedMonth).toBe('function');
       expect(typeof result.current.filters.setSort).toBe('function');
       expect(typeof result.current.filters.setPage).toBe('function');
     });
@@ -190,53 +194,54 @@ describe('useAdminAuditLog', () => {
       await waitFor(() => {
         expect(adminService.getAuditLogs).toHaveBeenCalledWith(
           expect.objectContaining({ action: 'USER_BANNED' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
 
-    it('sendet startDate an API', async () => {
+    it('sendet startDate/endDate aus selectedMonth an API', async () => {
       const { result } = renderHook(() => useAdminAuditLog());
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
       await act(async () => {
-        result.current.filters.setStartDate('2024-01-01');
+        result.current.filters.setSelectedMonth('2024-03');
       });
 
       await waitFor(() => {
-        expect(adminService.getAuditLogs).toHaveBeenCalledWith(
-          expect.objectContaining({ startDate: '2024-01-01' }),
-          expect.objectContaining({}),
-        );
+        const call = adminService.getAuditLogs.mock.calls.at(-1)[0];
+        expect(typeof call.startDate).toBe('string');
+        expect(call.startDate.length).toBeGreaterThan(0);
+        expect(typeof call.endDate).toBe('string');
+        expect(call.endDate.length).toBeGreaterThan(0);
       });
     });
 
-    it('sendet endDate an API', async () => {
+    it('setzt selectedMonth im filters-Objekt', async () => {
       const { result } = renderHook(() => useAdminAuditLog());
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
       await act(async () => {
-        result.current.filters.setEndDate('2024-12-31');
+        result.current.filters.setSelectedMonth('2024-06');
       });
 
-      await waitFor(() => {
-        expect(adminService.getAuditLogs).toHaveBeenCalledWith(
-          expect.objectContaining({ endDate: '2024-12-31' }),
-          expect.objectContaining({}),
-        );
-      });
+      expect(result.current.filters.selectedMonth).toBe('2024-06');
     });
 
-    it('setzt leere Filter nicht in Params', async () => {
+    it('setzt leere optionale Filter nicht in Params', async () => {
       const { result } = renderHook(() => useAdminAuditLog());
 
       await waitFor(() => expect(result.current.loading).toBe(false));
 
+      // action und country sollen bei leerem Wert nicht übergeben werden
       expect(adminService.getAuditLogs).toHaveBeenCalledWith(
-        { page: 1, limit: 20, sort: '-createdAt' },
-        expect.objectContaining({}),
+        expect.not.objectContaining({ action: expect.anything() }),
+        expect.objectContaining({})
+      );
+      expect(adminService.getAuditLogs).toHaveBeenCalledWith(
+        expect.not.objectContaining({ country: expect.anything() }),
+        expect.objectContaining({})
       );
     });
   });
@@ -256,7 +261,7 @@ describe('useAdminAuditLog', () => {
       await waitFor(() => {
         expect(adminService.getAuditLogs).toHaveBeenCalledWith(
           expect.objectContaining({ sort: 'action' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -277,7 +282,7 @@ describe('useAdminAuditLog', () => {
       await waitFor(() => {
         expect(adminService.getAuditLogs).toHaveBeenCalledWith(
           expect.objectContaining({ page: 3 }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -317,7 +322,9 @@ describe('useAdminAuditLog', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolve;
       adminService.getAuditLogs.mockReturnValue(
-        new Promise((r) => { resolve = r; }),
+        new Promise(r => {
+          resolve = r;
+        })
       );
 
       const { unmount } = renderHook(() => useAdminAuditLog());

@@ -11,12 +11,17 @@ import { useTranslation } from 'react-i18next';
 import { useMotion } from '@/hooks/useMotion';
 import styles from './EmailVerificationPage.module.scss';
 
+const CONTAINER_VARIANTS = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export default function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
   const [status, setStatus] = useState('loading');
   const { t } = useTranslation();
   const { shouldAnimate } = useMotion();
-  
+
   const success = searchParams.get('success');
   const error = searchParams.get('error');
   const email = searchParams.get('email');
@@ -39,17 +44,12 @@ export default function EmailVerificationPage() {
     server_error: t('auth.verifyErrorServer'),
   };
 
-  const containerVariants = shouldAnimate ? {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  } : {};
-
   return (
-    <motion.div 
+    <motion.div
       className={styles.verifyContainer}
-      initial={shouldAnimate ? "hidden" : false}
-      animate={shouldAnimate ? "visible" : false}
-      variants={containerVariants}
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
+      variants={shouldAnimate ? CONTAINER_VARIANTS : {}}
     >
       <div className={styles.verifyCard}>
         {status === 'success' && (
@@ -61,21 +61,12 @@ export default function EmailVerificationPage() {
             >
               <FiCheckCircle className={styles.statusIconSuccess} />
             </motion.div>
-            <h1 className={styles.verifyTitle}>
-              {t('auth.verifySuccessTitle')}
-            </h1>
-            <p className={styles.verifyText}>
-              {t('auth.verifySuccessSubtitle', { email })}
-            </p>
+            <h1 className={styles.verifyTitle}>{t('auth.verifySuccessTitle')}</h1>
+            <p className={styles.verifyText}>{t('auth.verifySuccessSubtitle', { email })}</p>
             {type === 'add' && (
-              <p className={styles.verifyText}>
-                {t('auth.verifySuccessAddNote')}
-              </p>
+              <p className={styles.verifyText}>{t('auth.verifySuccessAddNote')}</p>
             )}
-            <Link 
-              to={type === 'add' ? '/profile' : '/dashboard'}
-              className={styles.actionLink}
-            >
+            <Link to={type === 'add' ? '/profile' : '/dashboard'} className={styles.actionLink}>
               {type === 'add' ? t('auth.goToProfile') : t('auth.goToDashboard')}
             </Link>
           </>
@@ -90,16 +81,11 @@ export default function EmailVerificationPage() {
             >
               <FiXCircle className={styles.statusIconError} />
             </motion.div>
-            <h1 className={styles.verifyTitle}>
-              {t('auth.verifyErrorTitle')}
-            </h1>
+            <h1 className={styles.verifyTitle}>{t('auth.verifyErrorTitle')}</h1>
             <p className={styles.verifyText}>
               {errorMessages[error] || t('auth.verifyErrorUnknown')}
             </p>
-            <Link 
-              to={type === 'add' ? '/profile' : '/login'}
-              className={styles.actionLink}
-            >
+            <Link to={type === 'add' ? '/profile' : '/login'} className={styles.actionLink}>
               {type === 'add' ? t('auth.backToProfile') : t('common.backToLogin')}
             </Link>
           </>
@@ -113,9 +99,7 @@ export default function EmailVerificationPage() {
             >
               <FiLoader className={styles.statusIconLoading} />
             </motion.div>
-            <h1 className={styles.verifyTitle}>
-              {t('auth.verifyLoadingTitle')}
-            </h1>
+            <h1 className={styles.verifyTitle}>{t('auth.verifyLoadingTitle')}</h1>
             <p className={styles.verifyText}>{t('auth.verifyLoadingSubtitle')}</p>
           </>
         )}

@@ -1,7 +1,6 @@
 // ============================================
 // 📋 SELECT COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -214,7 +213,9 @@
   color: var(--tx-muted);
   background: transparent; // Verhindert Überdeckung von border-radius
   pointer-events: none;
-  transition: color var(--tr), transform var(--tr);
+  transition:
+    color var(--tr),
+    transform var(--tr);
   font-size: var(--fs-sm);
   z-index: 1;
 }

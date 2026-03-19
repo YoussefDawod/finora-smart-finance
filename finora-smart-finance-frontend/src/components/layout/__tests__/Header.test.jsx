@@ -39,6 +39,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, fallback) => fallback || key,
     i18n: { language: 'en', dir: () => 'ltr' },
@@ -50,18 +51,37 @@ vi.mock('@/hooks/useMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(
+              ([k]) =>
+                ![
+                  'whileHover',
+                  'whileTap',
+                  'whileFocus',
+                  'whileInView',
+                  'whileDrag',
+                  'initial',
+                  'animate',
+                  'exit',
+                  'transition',
+                  'variants',
+                  'layout',
+                  'layoutId',
+                ].includes(k)
+            )
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return <Tag {...htmlProps}>{children}</Tag>;
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -70,7 +90,11 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('@/components/common', () => ({
-  Logo: ({ onClick }) => <div data-testid="logo" onClick={onClick}>Logo</div>,
+  Logo: ({ onClick }) => (
+    <div data-testid="logo" onClick={onClick}>
+      Logo
+    </div>
+  ),
   UserMenu: ({ user, onLogout }) => (
     <div data-testid="user-menu">
       <span>{user?.name}</span>
@@ -85,13 +109,14 @@ vi.mock('@/components/common/Skeleton/Skeleton', () => ({
 
 // Mock HamburgerMenu to track isOpen prop
 vi.mock('../HamburgerMenu/HamburgerMenu', () => ({
-  default: ({ isOpen, onClose }) => (
+  default: ({ isOpen, onClose }) =>
     isOpen ? (
       <div data-testid="hamburger-menu" role="navigation">
-        <button data-testid="close-menu" onClick={onClose}>Close</button>
+        <button data-testid="close-menu" onClick={onClose}>
+          Close
+        </button>
       </div>
-    ) : null
-  ),
+    ) : null,
 }));
 
 // ── Helpers ──────────────────────────────────────────────
@@ -100,7 +125,7 @@ const renderHeader = () => {
   return render(
     <MemoryRouter>
       <Header />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -214,14 +239,14 @@ describe('Header', () => {
       mockAuthState.user = { name: 'AdminUser', role: 'admin' };
       renderHeader();
       // admin.badge fallback is 'Admin'
-      const badges = screen.getAllByText('Admin');
+      const badges = screen.getAllByText('admin.badge');
       expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 
     it('zeigt kein Admin-Badge für normale Benutzer', () => {
       mockAuthState.user = { name: 'Normal User', role: 'user' };
       renderHeader();
-      expect(screen.queryByText('Admin')).not.toBeInTheDocument();
+      expect(screen.queryByText('admin.badge')).not.toBeInTheDocument();
     });
   });
 

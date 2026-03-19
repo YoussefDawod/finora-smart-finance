@@ -1,23 +1,23 @@
 /**
  * @fileoverview Motion Presets for Finora Smart-Finance
  * @description Verbindliche framer-motion Variants für alle Komponenten.
- * 
+ *
  * SYSTEM-PRINZIPIEN:
  * - Motion ist funktional – nicht dekorativ
  * - prefers-reduced-motion ist immer bindend
  * - Kein Component darf Motion direkt erzwingen
- * 
+ *
  * VERWENDUNG:
  * import { cardVariants, modalVariants } from '@/utils/motionPresets';
  * import { useMotion } from '@/hooks/useMotion';
- * 
+ *
  * const { shouldAnimate } = useMotion();
  * <motion.div
  *   variants={cardVariants}
  *   initial={shouldAnimate ? 'hidden' : false}
  *   animate={shouldAnimate ? 'visible' : false}
  * />
- * 
+ *
  * @module motionPresets
  */
 
@@ -28,20 +28,20 @@
 export const MOTION_TIMING = {
   // Durations
   entrance: 0.25, // --motion-entrance-duration (250ms)
-  exit: 0.15,     // --motion-exit-duration (150ms)
-  fast: 0.15,     // --duration-fast
-  normal: 0.25,   // --duration-normal
-  slow: 0.35,     // --duration-slow
-  
+  exit: 0.15, // --motion-exit-duration (150ms)
+  fast: 0.15, // --duration-fast
+  normal: 0.25, // --duration-normal
+  slow: 0.35, // --duration-slow
+
   // Stagger
   staggerDelay: 0.04, // --motion-stagger-delay
-  
+
   // Y-Offset limits
   entranceY: 12, // --motion-entrance-y (max ±12px)
-  exitY: 8,      // --motion-exit-y (max ±8px)
-  
+  exitY: 8, // --motion-exit-y (max ±8px)
+
   // Scale limits (micro-feedback only)
-  scaleHover: 1.02,  // --motion-scale-hover
+  scaleHover: 1.02, // --motion-scale-hover
   scaleActive: 0.98, // --motion-scale-active
 };
 
@@ -52,13 +52,13 @@ export const MOTION_TIMING = {
 export const MOTION_EASING = {
   // Standard easing
   standard: [0.2, 0, 0, 1],
-  decelerate: [0, 0, 0.2, 1],    // --ease-decelerate (entrance)
-  accelerate: [0.4, 0, 1, 1],    // --ease-accelerate (exit)
-  
+  decelerate: [0, 0, 0.2, 1], // --ease-decelerate (entrance)
+  accelerate: [0.4, 0, 1, 1], // --ease-accelerate (exit)
+
   // Spring config (Sidebar, Drawer, CategoryPicker, Menu ONLY)
   spring: {
     stiffness: 420, // --motion-spring-stiffness
-    damping: 34,    // --motion-spring-damping
+    damping: 34, // --motion-spring-damping
   },
 };
 
@@ -421,7 +421,7 @@ export const shakeVariants = {
 // 🚫 FINANCIAL COMPONENTS - NO ANIMATION
 // ============================================
 // Diese Varianten geben leere Objekte zurück
-// für: SummaryCard, DashboardCharts, BudgetWidget,
+// für: SummaryCard, QuotaIndicator,
 // QuotaIndicator, TransactionList, TransactionForm,
 // RecentTransactions, AdminStatCard, AdminTransactionTable
 
@@ -587,4 +587,3 @@ export const logoPeakDotFadeVariants = {
     transition: { duration: 0.3, ease: MOTION_EASING.decelerate },
   },
 };
-

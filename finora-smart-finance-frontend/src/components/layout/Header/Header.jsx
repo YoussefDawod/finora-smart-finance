@@ -1,19 +1,19 @@
 /**
- * @fileoverview Header Component - Vereinfachte Version
- * @description Schlanker Sticky Header nur mit Logo/Hamburger und User Menu
- * 
+ * @fileoverview Header Component — Aurora Flow Glass Neubau
+ * @description Schmale, schwebende Glass-Bar mit Sticky Positioning.
+ *
  * STRUKTUR:
- * Desktop (>768px):  Logo | [space] | Avatar
- * Mobile (≤768px):   Hamburger | [space] | Avatar
- *                    HamburgerMenu: Logo + Navigation
+ * Desktop (>768px):  Logo | [space] | [Badge] Avatar
+ * Mobile (≤768px):   Hamburger | [space] | [Badge] Avatar
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { useMotion } from '@/hooks/useMotion';
 import { MEDIA_QUERIES } from '@/constants';
 import { FiMenu } from 'react-icons/fi';
 import { UserMenu } from '@/components/common';
@@ -21,17 +21,22 @@ import Skeleton from '@/components/common/Skeleton/Skeleton';
 import HamburgerMenu from '../HamburgerMenu/HamburgerMenu';
 import styles from './Header.module.scss';
 
+// Stabile Motion-Konstanten (kein Inline-Object in JSX)
+const HAMBURGER_HOVER = { scale: 1.02 };
+const HAMBURGER_TAP = { scale: 0.98 };
+
 export default function Header() {
-  const { user, logout, isAuthenticated, isLoading } = useAuth();
+  const { user, logout, isAuthenticated, isLoading, isViewer } = useAuth();
   const navigate = useNavigate();
   const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const { t } = useTranslation();
-  
+  const { shouldAnimate } = useMotion();
+
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
 
-  // Close on Escape
+  // Close HamburgerMenu on Escape
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
       if (e.key === 'Escape') {
         setIsHamburgerOpen(false);
       }
@@ -41,54 +46,49 @@ export default function Header() {
     return () => document?.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleLogout = async () => {
+  // Stabile Logout-Referenz
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
       navigate('/dashboard');
     } catch (error) {
       console.error('Logout failed:', error);
     }
-  };
-
-  // ============================================
-  // RENDER: HEADER (STICKY)
-  // ============================================
+  }, [logout, navigate]);
 
   return (
     <>
-      {/* Header: Logo/Hamburger + Avatar (STICKY) */}
-      <header className={styles.headerTop} role="banner">
+      <header className={styles.header} role="banner">
         {/* Left Section */}
         <div className={styles.headerLeft}>
           {isMobile ? (
-            // Mobile: Hamburger Menu
             <motion.button
-              className={styles.hamburger}
-              onClick={() => setIsHamburgerOpen(!isHamburgerOpen)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className={`${styles.hamburger}${isHamburgerOpen ? ` ${styles.open}` : ''}`}
+              onClick={() => setIsHamburgerOpen(v => !v)}
+              whileHover={shouldAnimate ? HAMBURGER_HOVER : undefined}
+              whileTap={shouldAnimate ? HAMBURGER_TAP : undefined}
               aria-label={t('common.menu')}
-              aria-expanded={isHamburgerOpen}
+              aria-expanded={isHamburgerOpen ? 'true' : 'false'}
             >
               <FiMenu size={24} />
             </motion.button>
           ) : (
-            // Desktop: Logo
-            <Link to="/" onClick={() => setIsHamburgerOpen(false)}>
-              <img src="/logo-branding/finora-logo.svg" alt="Finora" className="app-logo" />
+            <Link to="/" className={styles.logo} onClick={() => setIsHamburgerOpen(false)}>
+              <img src="/logo-branding/finora-logo.svg" alt="Finora" />
             </Link>
           )}
         </div>
 
-        {/* Right Section: Avatar & User Menu */}
+        {/* Right Section */}
         <div className={styles.headerRight}>
           {isLoading ? (
-            // Loading: Skeleton für Avatar
             <Skeleton variant="circle" width="40px" height="40px" />
           ) : isAuthenticated ? (
             <>
-              {user?.role === 'admin' && (
-                <span className={styles.adminBadge}>{t('admin.badge', 'Admin')}</span>
+              {(user?.role === 'admin' || user?.role === 'viewer') && (
+                <span className={isViewer ? styles.viewerBadge : styles.adminBadge}>
+                  {isViewer ? t('admin.viewerBadge') : t('admin.badge')}
+                </span>
               )}
               <UserMenu user={user} onLogout={handleLogout} />
             </>

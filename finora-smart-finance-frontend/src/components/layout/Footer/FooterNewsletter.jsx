@@ -1,11 +1,4 @@
-/**
- * @fileoverview FooterNewsletter — Kompaktes Newsletter-Formular für die Bottom Bar
- *
- * Horizontales Layout: Input + Button inline, Privacy Hint darunter.
- * Wird im Footer Bottom-Bereich links platziert.
- */
-
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -16,6 +9,10 @@ import { useMotion } from '@/hooks/useMotion';
 import Checkbox from '@/components/common/Checkbox/Checkbox';
 import styles from './Footer.module.scss';
 
+const STATUS_INITIAL = { opacity: 0, y: -8 };
+const STATUS_ANIMATE = { opacity: 1, y: 0 };
+const STATUS_TRANSITION = { duration: 0.2 };
+
 function FooterNewsletter() {
   const { t, i18n } = useTranslation();
   const { shouldAnimate } = useMotion();
@@ -24,53 +21,62 @@ function FooterNewsletter() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [consent, setConsent] = useState(false);
 
-  const handleSubmit = useCallback(async (e) => {
-    e.preventDefault();
+  const statusConfig = useMemo(
+    () => ({
+      success: { className: styles.newsletterSuccess, key: 'footer.newsletter.success' },
+      emailRequired: { className: styles.newsletterError, key: 'footer.newsletter.emailRequired' },
+      error: { className: styles.newsletterError, key: 'footer.newsletter.error' },
+      serverError: { className: styles.newsletterError, key: 'footer.newsletter.serverError' },
+      consentRequired: {
+        className: styles.newsletterError,
+        key: 'footer.newsletter.consentRequired',
+      },
+    }),
+    []
+  );
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const handleSubmit = useCallback(
+    async e => {
+      e.preventDefault();
 
-    if (!email.trim()) {
-      setStatus('emailRequired');
-      setTimeout(() => setStatus(null), 3000);
-      return;
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!emailRegex.test(email)) {
-      setStatus('error');
-      setTimeout(() => setStatus(null), 3000);
-      return;
-    }
+      if (!email.trim()) {
+        setStatus('emailRequired');
+        setTimeout(() => setStatus(null), 3000);
+        return;
+      }
 
-    if (!consent) {
-      setStatus('consentRequired');
-      setTimeout(() => setStatus(null), 3000);
-      return;
-    }
+      if (!emailRegex.test(email)) {
+        setStatus('error');
+        setTimeout(() => setStatus(null), 3000);
+        return;
+      }
 
-    setIsSubmitting(true);
-    try {
-      await client.post(ENDPOINTS.newsletter.subscribe, {
-        email,
-        language: i18n.language,
-      });
-      setStatus('success');
-      setEmail('');
-      setConsent(false);
-    } catch {
-      setStatus('serverError');
-    } finally {
-      setIsSubmitting(false);
-      setTimeout(() => setStatus(null), 5000);
-    }
-  }, [email, i18n.language, consent]);
+      if (!consent) {
+        setStatus('consentRequired');
+        setTimeout(() => setStatus(null), 3000);
+        return;
+      }
 
-  const statusConfig = {
-    success: { className: styles.newsletterSuccess, key: 'footer.newsletter.success' },
-    emailRequired: { className: styles.newsletterError, key: 'footer.newsletter.emailRequired' },
-    error: { className: styles.newsletterError, key: 'footer.newsletter.error' },
-    serverError: { className: styles.newsletterError, key: 'footer.newsletter.serverError' },
-    consentRequired: { className: styles.newsletterError, key: 'footer.newsletter.consentRequired' },
-  };
+      setIsSubmitting(true);
+      try {
+        await client.post(ENDPOINTS.newsletter.subscribe, {
+          email,
+          language: i18n.language,
+        });
+        setStatus('success');
+        setEmail('');
+        setConsent(false);
+      } catch {
+        setStatus('serverError');
+      } finally {
+        setIsSubmitting(false);
+        setTimeout(() => setStatus(null), 5000);
+      }
+    },
+    [email, i18n.language, consent]
+  );
 
   return (
     <div className={styles.newsletterWrap}>
@@ -84,44 +90,33 @@ function FooterNewsletter() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               placeholder={t('footer.newsletter.placeholder')}
               className={styles.newsletterInput}
               aria-label={t('footer.newsletter.placeholder')}
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={styles.newsletterButton}
-          >
+          <button type="submit" disabled={isSubmitting} className={styles.newsletterButton}>
             {isSubmitting ? '...' : t('footer.newsletter.button')}
           </button>
         </div>
 
-        {/* Status-Meldung */}
         {status && statusConfig[status] && (
           <motion.p
+            role="alert"
             className={statusConfig[status].className}
-            initial={shouldAnimate ? { opacity: 0, y: -8 } : false}
-            animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
+            initial={shouldAnimate ? STATUS_INITIAL : false}
+            animate={shouldAnimate ? STATUS_ANIMATE : false}
+            transition={STATUS_TRANSITION}
           >
             {t(statusConfig[status].key)}
           </motion.p>
         )}
       </form>
 
-      {/* DSGVO Consent Checkbox */}
-      <Checkbox
-        checked={consent}
-        onChange={(e) => setConsent(e.target.checked)}
-        size="sm"
-      >
-        <Trans
-          i18nKey="footer.newsletter.consent"
-          components={{ link: <Link to="/privacy" /> }}
-        />
+      <Checkbox checked={consent} onChange={e => setConsent(e.target.checked)} size="sm">
+        <Trans i18nKey="footer.newsletter.consent" components={{ link: <Link to="/privacy" /> }} />
       </Checkbox>
     </div>
   );

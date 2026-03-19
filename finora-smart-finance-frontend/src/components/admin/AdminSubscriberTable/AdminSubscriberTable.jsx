@@ -23,6 +23,9 @@ import {
   FiEye,
 } from 'react-icons/fi';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import { getSortDirection, generatePageNumbers } from '@/utils/adminTableHelpers';
 import { LANGUAGE_LABELS } from '@/constants';
 import styles from './AdminSubscriberTable.module.scss';
@@ -63,11 +66,13 @@ function AdminSubscriberTable({
   actionLoading = null,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
+  const { guard } = useViewerGuard();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   // ── Sort Handler ────────────────────────────────
   const handleSort = useCallback(
-    (field) => {
+    field => {
       if (!SORT_FIELDS[field]) return;
       const currentField = sort.replace(/^-/, '');
       const isDesc = sort.startsWith('-');
@@ -78,11 +83,11 @@ function AdminSubscriberTable({
         onSortChange?.(`-${field}`);
       }
     },
-    [sort, onSortChange],
+    [sort, onSortChange]
   );
 
   const getSortIcon = useCallback(
-    (field) => {
+    field => {
       const currentField = sort.replace(/^-/, '');
       if (currentField !== field) return null;
       return sort.startsWith('-') ? (
@@ -91,11 +96,11 @@ function AdminSubscriberTable({
         <FiArrowUp size={12} className={styles.sortIcon} />
       );
     },
-    [sort],
+    [sort]
   );
 
   // ── Delete with confirmation ────────────────────
-  const handleDeleteClick = useCallback((sub) => {
+  const handleDeleteClick = useCallback(sub => {
     setDeleteConfirm(sub);
   }, []);
 
@@ -111,18 +116,21 @@ function AdminSubscriberTable({
   }, []);
 
   // ── Formatierungen ──────────────────────────────
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return '—';
-    try {
-      return new Intl.DateTimeFormat(i18n.language, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }).format(new Date(dateStr));
-    } catch {
-      return '—';
-    }
-  }, [i18n.language]);
+  const formatDate = useCallback(
+    dateStr => {
+      if (!dateStr) return '—';
+      try {
+        return new Intl.DateTimeFormat(i18n.language, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }).format(new Date(dateStr));
+      } catch {
+        return '—';
+      }
+    },
+    [i18n.language]
+  );
 
   // ── Loading ─────────────────────────────────────
   if (loading && subscribers.length === 0) {
@@ -151,9 +159,7 @@ function AdminSubscriberTable({
       {/* Delete Confirmation Banner */}
       {deleteConfirm && (
         <div className={styles.deleteConfirm} role="alert">
-          <span>
-            {t('admin.subscribers.confirmDeleteText', { email: deleteConfirm.email })}
-          </span>
+          <span>{t('admin.subscribers.confirmDeleteText', { email: deleteConfirm.email })}</span>
           <div className={styles.confirmButtons}>
             <button
               className={styles.cancelButton}
@@ -211,12 +217,14 @@ function AdminSubscriberTable({
             </tr>
           </thead>
           <tbody>
-            {subscribers.map((sub) => {
+            {subscribers.map(sub => {
               const subId = sub._id || sub.id;
               return (
                 <tr key={subId} className={styles.row}>
                   {/* Email */}
-                  <td className={styles.emailCell} data-label={t('admin.subscribers.email')}>{sub.email}</td>
+                  <td className={styles.emailCell} data-label={t('admin.subscribers.email')}>
+                    <SensitiveData active={isViewer}>{sub.email}</SensitiveData>
+                  </td>
 
                   {/* Status */}
                   <td data-label={t('admin.subscribers.status')}>
@@ -273,7 +281,7 @@ function AdminSubscriberTable({
                     </button>
                     <button
                       className={styles.deleteButton}
-                      onClick={() => handleDeleteClick(sub)}
+                      onClick={() => guard(() => handleDeleteClick(sub))}
                       disabled={actionLoading === subId}
                       title={t('admin.subscribers.delete')}
                       type="button"
@@ -291,7 +299,11 @@ function AdminSubscriberTable({
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className={styles.pagination} role="navigation" aria-label={t('admin.subscribers.pagination')}>
+        <div
+          className={styles.pagination}
+          role="navigation"
+          aria-label={t('admin.subscribers.pagination')}
+        >
           <span className={styles.paginationInfo}>
             {t('admin.subscribers.showing', {
               from: (page - 1) * (pagination.limit || DEFAULT_SKELETON_ROWS) + 1,
@@ -311,7 +323,9 @@ function AdminSubscriberTable({
             </button>
             {generatePageNumbers(page, pages).map((p, idx) =>
               p === '...' ? (
-                <span key={`dots-${idx}`} className={styles.dots}>…</span>
+                <span key={`dots-${idx}`} className={styles.dots}>
+                  …
+                </span>
               ) : (
                 <button
                   key={p}
@@ -323,7 +337,7 @@ function AdminSubscriberTable({
                 >
                   {p}
                 </button>
-              ),
+              )
             )}
             <button
               className={styles.pageButton}

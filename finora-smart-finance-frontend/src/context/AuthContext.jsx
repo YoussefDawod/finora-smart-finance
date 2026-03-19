@@ -5,6 +5,7 @@
 
 import { useReducer, useEffect, useMemo, createContext } from 'react';
 import authService from '@/api/authService';
+import { tryInitialRefresh } from '@/api/tokenRefresh';
 import { persistUserPreferences } from '@/utils/userPreferences';
 import { authReducer, initialState, AUTH_ACTIONS } from './reducers/authReducer';
 import { useAuthStorage } from './hooks/useAuthStorage';
@@ -27,7 +28,7 @@ function AuthProvider({ children }) {
 
   // Storage Operations
   const storage = useAuthStorage();
-  const { getToken, clearAllTokens } = storage;
+  const { clearAllTokens } = storage;
 
   // Auth Actions
   const {
@@ -47,8 +48,17 @@ function AuthProvider({ children }) {
   // AUTO-LOGIN ON MOUNT
   // ──────────────────────────────────────────────────────────────────────
   useEffect(() => {
+    let cancelled = false;
+    const abortController = new AbortController();
+
     const autoLogin = async () => {
-      const token = getToken();
+      // Nach Page-Reload ist der In-Memory-Token verloren.
+      // Zuerst stillen Refresh über httpOnly Cookie versuchen.
+      // tryInitialRefresh() ist ein Singleton — bei StrictMode (mount → unmount → mount)
+      // wird dasselbe Promise wiederverwendet, keine doppelte Token-Rotation.
+      const token = await tryInitialRefresh();
+
+      if (cancelled) return;
 
       if (!token) {
         dispatch({ type: AUTH_ACTIONS.AUTO_LOGIN_FAIL });
@@ -56,7 +66,12 @@ function AuthProvider({ children }) {
       }
 
       try {
-        const response = await authService.getCurrentUser();
+        const response = await authService.getCurrentUser({
+          signal: abortController.signal,
+        });
+
+        if (cancelled) return;
+
         const user = response.data.data?.user || response.data.data;
 
         dispatch({
@@ -64,13 +79,20 @@ function AuthProvider({ children }) {
           payload: { user, token },
         });
       } catch {
-        clearAllTokens();
-        dispatch({ type: AUTH_ACTIONS.AUTO_LOGIN_FAIL });
+        if (!cancelled) {
+          clearAllTokens();
+          dispatch({ type: AUTH_ACTIONS.AUTO_LOGIN_FAIL });
+        }
       }
     };
 
     autoLogin();
-  }, [getToken, clearAllTokens]);
+
+    return () => {
+      cancelled = true;
+      abortController.abort();
+    };
+  }, [clearAllTokens]);
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLE 401 UNAUTHORIZED EVENTS (Token Expiry)
@@ -83,7 +105,7 @@ function AuthProvider({ children }) {
     };
 
     globalThis.window?.addEventListener('auth:unauthorized', handleAuthUnauthorized);
-    
+
     return () => {
       globalThis.window?.removeEventListener('auth:unauthorized', handleAuthUnauthorized);
     };
@@ -93,7 +115,7 @@ function AuthProvider({ children }) {
   // HANDLE TOKEN REFRESH EVENTS (Silent Refresh)
   // ──────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    const handleTokenRefreshed = (event) => {
+    const handleTokenRefreshed = event => {
       const { accessToken } = event.detail || {};
       if (accessToken) {
         // Update tokens in storage (already done in tokenRefresh.js)
@@ -125,30 +147,49 @@ function AuthProvider({ children }) {
   // ──────────────────────────────────────────────────────────────────────
   // CONTEXT VALUE
   // ──────────────────────────────────────────────────────────────────────
-  const value = useMemo(() => ({
-    // State
-    user: state.user,
-    isAuthenticated: state.isAuthenticated,
-    isLoading: state.isLoading,
-    error: state.error,
-    token: state.token,
+  const value = useMemo(
+    () => ({
+      // State
+      user: state.user,
+      isAuthenticated: state.isAuthenticated,
+      isLoading: state.isLoading,
+      error: state.error,
+      token: state.token,
 
-    // Actions
-    login,
-    register,
-    logout,
-    verifyEmail,
-    clearError,
-    setIsLoading,
-    refreshUser,
-    resendVerification,
-    forgotPassword,
-    resetPassword,
-  }), [
-    state.user, state.isAuthenticated, state.isLoading, state.error, state.token,
-    login, register, logout, verifyEmail, clearError,
-    setIsLoading, refreshUser, resendVerification, forgotPassword, resetPassword,
-  ]);
+      // Derived role flags
+      isAdmin: state.user?.role === 'admin',
+      isViewer: state.user?.role === 'viewer',
+
+      // Actions
+      login,
+      register,
+      logout,
+      verifyEmail,
+      clearError,
+      setIsLoading,
+      refreshUser,
+      resendVerification,
+      forgotPassword,
+      resetPassword,
+    }),
+    [
+      state.user,
+      state.isAuthenticated,
+      state.isLoading,
+      state.error,
+      state.token,
+      login,
+      register,
+      logout,
+      verifyEmail,
+      clearError,
+      setIsLoading,
+      refreshUser,
+      resendVerification,
+      forgotPassword,
+      resetPassword,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

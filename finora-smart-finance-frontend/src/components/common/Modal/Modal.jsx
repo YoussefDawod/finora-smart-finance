@@ -3,7 +3,7 @@
  * MODAL COMPONENT
  * ============================================================================
  * @description Universelles Modal mit Blur-Effekt und Framer Motion
- * 
+ *
  * FEATURES:
  * - Backdrop mit Blur-Effekt
  * - Framer Motion Animationen
@@ -12,7 +12,7 @@
  * - Body Scroll Lock
  * - Responsive Design
  * - RTL Support
- * 
+ *
  * @example
  * <Modal isOpen={isOpen} onClose={handleClose} title="Edit Transaction">
  *   <TransactionForm />
@@ -25,6 +25,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiX } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useMotion } from '@/hooks/useMotion';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { MEDIA_QUERIES } from '@/constants';
 import { modalVariants, modalBackdropVariants } from '@/utils/motionPresets';
 import styles from './Modal.module.scss';
 
@@ -51,6 +53,7 @@ const Modal = ({
 }) => {
   const { t } = useTranslation();
   const { shouldAnimate } = useMotion();
+  const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
 
@@ -58,7 +61,7 @@ const Modal = ({
   // HANDLE ESC KEY
   // ──────────────────────────────────────────────────────────────────────
   const handleEscKey = useCallback(
-    (event) => {
+    event => {
       if (closeOnEsc && event.key === 'Escape') {
         onClose?.();
       }
@@ -86,7 +89,7 @@ const Modal = ({
     }, 50);
 
     // Focus-Trap Handler
-    const handleTabKey = (e) => {
+    const handleTabKey = e => {
       if (e.key !== 'Tab' || !modalRef.current) return;
 
       const focusableElements = modalRef.current.querySelectorAll(
@@ -166,16 +169,24 @@ const Modal = ({
         >
           <motion.div
             ref={modalRef}
-            className={`${styles.modal} ${styles[size]} ${className}`}
-            variants={modalVariants}
-            initial={shouldAnimate ? 'hidden' : false}
-            animate={shouldAnimate ? 'visible' : false}
-            exit={shouldAnimate ? 'exit' : undefined}
-            onClick={(e) => e.stopPropagation()} // Prevent overlay click
+            className={`${styles.modal} ${styles[size]} ${isMobile ? styles.mobileSheet : ''} ${className}`}
+            variants={!isMobile ? modalVariants : undefined}
+            initial={shouldAnimate ? (isMobile ? { y: '100%' } : 'hidden') : false}
+            animate={shouldAnimate ? (isMobile ? { y: 0 } : 'visible') : false}
+            exit={shouldAnimate ? (isMobile ? { y: '100%' } : 'exit') : undefined}
+            transition={isMobile ? { type: 'spring', stiffness: 300, damping: 30 } : undefined}
+            onClick={e => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
           >
+            {/* MOBILE HANDLE */}
+            {isMobile && (
+              <div className={styles.sheetHandle}>
+                <div className={styles.sheetHandleBar} />
+              </div>
+            )}
+
             {/* HEADER */}
             {(title || showCloseButton) && (
               <div className={styles.header}>

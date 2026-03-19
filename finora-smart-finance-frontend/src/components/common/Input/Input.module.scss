@@ -1,7 +1,6 @@
 // ============================================
 // 📝 INPUT COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -34,7 +33,6 @@
 
       &:focus-within {
         border-color: var(--error);
-        
       }
     }
 
@@ -82,7 +80,7 @@
   &:focus-within {
     border-color: var(--primary);
     background: color-mix(in srgb, var(--primary) 2%, transparent);
-    
+
     outline: none;
   }
 }

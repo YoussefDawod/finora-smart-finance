@@ -1,0 +1,92 @@
+// ============================================
+// 🌟 HERO METRIC PANEL — 3 Separate Cards
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Grid: 3 gleichgroße Cards ──
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  width: 100%;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+
+  // Alle motion.div Wrapper gleiche Höhe
+  > * {
+    display: flex;
+  }
+}
+
+// ── Einzelne Card — dehnt sich auf volle Grid-Zelle ──
+.heroCard {
+  flex: 1;
+  transition:
+    transform var(--tr),
+    box-shadow var(--tr),
+    border-color var(--tr);
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  // ── Info (Balance) ──
+  &.info {
+    border: 1px solid color-mix(in srgb, var(--info) 30%, transparent);
+    background: color-mix(in srgb, var(--info) 6%, var(--glass-bg));
+    box-shadow:
+      0 8px 32px color-mix(in srgb, var(--info) 12%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--info) 8%, transparent);
+
+    &:hover {
+      box-shadow:
+        0 16px 48px color-mix(in srgb, var(--info) 20%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--info) 15%, transparent);
+    }
+  }
+
+  // ── Success (Income) ──
+  &.success {
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    background: color-mix(in srgb, var(--success) 6%, var(--glass-bg));
+    box-shadow:
+      0 8px 32px color-mix(in srgb, var(--success) 12%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--success) 8%, transparent);
+
+    &:hover {
+      box-shadow:
+        0 16px 48px color-mix(in srgb, var(--success) 20%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--success) 15%, transparent);
+    }
+  }
+
+  // ── Error (Expense) ──
+  &.error {
+    border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+    background: color-mix(in srgb, var(--error) 6%, var(--glass-bg));
+    box-shadow:
+      0 8px 32px color-mix(in srgb, var(--error) 12%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--error) 8%, transparent);
+
+    &:hover {
+      box-shadow:
+        0 16px 48px color-mix(in srgb, var(--error) 20%, transparent),
+        0 0 0 1px color-mix(in srgb, var(--error) 15%, transparent);
+    }
+  }
+}
+
+// ── Skeleton Loading ──
+.skeletonContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}

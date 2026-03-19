@@ -1,16 +1,16 @@
-/**
- * @fileoverview BackToTop — Animierter Scroll-to-Top-Button
- *
- * Wird vom Footer gesteuert über `visible`-Prop (IntersectionObserver bleibt in Footer.jsx).
- */
-
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowUp } from 'react-icons/fi';
-import PropTypes from 'prop-types';
 import { useMotion } from '@/hooks/useMotion';
 import styles from './Footer.module.scss';
+
+const BTT_INITIAL = { opacity: 0, scale: 0.8 };
+const BTT_ANIMATE = { opacity: 1, scale: 1 };
+const BTT_EXIT = { opacity: 0, scale: 0.8 };
+const BTT_HOVER = { scale: 1.05 };
+const BTT_TAP = { scale: 0.95 };
+const BTT_TRANSITION = { type: 'spring', stiffness: 400, damping: 25 };
 
 function BackToTop({ visible }) {
   const { t } = useTranslation();
@@ -26,11 +26,12 @@ function BackToTop({ visible }) {
         <motion.button
           className={styles.backToTop}
           onClick={scrollToTop}
-          initial={shouldAnimate ? { opacity: 0, scale: 0.8 } : false}
-          animate={shouldAnimate ? { opacity: 1, scale: 1 } : false}
-          exit={shouldAnimate ? { opacity: 0, scale: 0.8 } : undefined}
-          whileHover={shouldAnimate ? { scale: 1.02 } : undefined}
-          whileTap={shouldAnimate ? { scale: 0.98 } : undefined}
+          initial={shouldAnimate ? BTT_INITIAL : false}
+          animate={shouldAnimate ? BTT_ANIMATE : false}
+          exit={shouldAnimate ? BTT_EXIT : undefined}
+          whileHover={shouldAnimate ? BTT_HOVER : undefined}
+          whileTap={shouldAnimate ? BTT_TAP : undefined}
+          transition={BTT_TRANSITION}
           aria-label={t('footer.backToTop')}
           title={t('footer.backToTop')}
         >
@@ -40,9 +41,5 @@ function BackToTop({ visible }) {
     </AnimatePresence>
   );
 }
-
-BackToTop.propTypes = {
-  visible: PropTypes.bool.isRequired,
-};
 
 export default memo(BackToTop);

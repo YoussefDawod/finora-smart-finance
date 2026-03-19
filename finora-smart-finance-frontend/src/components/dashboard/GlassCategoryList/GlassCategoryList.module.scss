@@ -1,0 +1,306 @@
+// ============================================
+// 📊 GLASS CATEGORY LIST
+// ============================================
+@use '@/styles/mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid color-mix(in srgb, var(--tx) 15%, transparent);
+  flex-shrink: 0;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 1.75rem;
+
+  @include mobile {
+    flex-wrap: wrap;
+    row-gap: var(--space-2xs);
+  }
+}
+
+.headerBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.headerCount {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  flex-shrink: 0;
+  @include glass-text;
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  @include glass-text;
+}
+
+.subtitle {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include glass-text;
+}
+
+// Segment Control (Expense / Income Toggle)
+.segmentControl {
+  display: flex;
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tx) 12%, transparent);
+  border-radius: var(--r-full);
+  padding: 2px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.segmentButton {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 0;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  padding: 0 var(--space-xs);
+  border-radius: var(--r-full);
+  border: none;
+  background: transparent;
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: all var(--tr);
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--tx);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+
+  @include mobile {
+    height: 1.375rem;
+    line-height: 1.375rem;
+    font-size: 0.6875rem;
+    padding: 0 var(--space-2xs);
+  }
+
+  @include focus-ring;
+}
+
+// Reduced Motion
+@include reduced-motion {
+  .categoryBarFill,
+  .segmentButton {
+    transition: none;
+  }
+}
+.listWrapper {
+  // Verhindert Höhen-Kollaps während AnimatePresence exit/enter
+  min-height: calc(5 * 3.5625rem + 4 * var(--space-xs));
+  position: relative;
+}
+
+.categoryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+// Timeline date groups
+.timelineGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  list-style: none;
+
+  & + & {
+    margin-top: var(--space-xs);
+  }
+}
+
+.timelineLabel {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: var(--space-2xs) 0;
+  @include glass-text;
+}
+
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.categoryLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  flex: 1;
+}
+
+.categoryIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--series, var(--primary));
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.categoryLabel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.categoryName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  margin: 0;
+  @include truncate;
+  @include glass-text;
+}
+
+.categoryCount {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include glass-text;
+}
+
+.categoryRight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  align-items: flex-end;
+  flex: 0 0 80px;
+}
+
+.categoryAmount {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--series, var(--tx));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  @include glass-text;
+}
+
+.categoryBar {
+  width: 100%;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: color-mix(in srgb, var(--glass-border) 40%, transparent);
+  overflow: hidden;
+}
+
+.categoryBarFill {
+  height: 100%;
+  border-radius: var(--r-full);
+  background: var(--series, var(--primary));
+}
+
+// Show More / Less button (mobile/tablet)
+.showMoreBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  width: 100%;
+  padding: var(--space-xs) 0;
+  margin-top: var(--space-2xs);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--tx) 12%, transparent);
+  border-radius: var(--r-md);
+  color: var(--primary);
+  font-family: inherit;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+
+  @include focus-ring;
+}
+
+.showMoreCount {
+  font-weight: var(--fw-n);
+  color: var(--tx-muted);
+  font-size: var(--fs-2xs);
+}
+
+// Empty state
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--tx-muted);
+  @include glass-text;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    margin: 0;
+  }
+}
+
+// Reduced Motion
+@include reduced-motion {
+  .categoryBarFill,
+  .segmentButton {
+    transition: none;
+  }
+}

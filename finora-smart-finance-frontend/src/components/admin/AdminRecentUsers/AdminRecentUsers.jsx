@@ -10,6 +10,8 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiUser, FiShield, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
 import styles from './AdminRecentUsers.module.scss';
 
 /**
@@ -48,6 +50,7 @@ function formatRelativeDate(dateStr, lang = 'de') {
  */
 function AdminRecentUsers({ users = [], loading = false }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
 
   if (loading) {
     return (
@@ -88,7 +91,9 @@ function AdminRecentUsers({ users = [], loading = false }) {
             </div>
             <div className={styles.rowContent}>
               <div className={styles.rowTop}>
-                <span className={styles.userName}>{user.name}</span>
+                <span className={styles.userName}>
+                  <SensitiveData active={isViewer}>{user.name}</SensitiveData>
+                </span>
                 {user.isVerified ? (
                   <FiCheckCircle
                     size={14}
@@ -104,6 +109,9 @@ function AdminRecentUsers({ users = [], loading = false }) {
                 )}
                 {user.role === 'admin' && (
                   <span className={styles.roleBadge}>{t('admin.badge')}</span>
+                )}
+                {user.role === 'viewer' && (
+                  <span className={styles.roleBadge}>{t('admin.viewerBadge')}</span>
                 )}
               </div>
               <span className={styles.meta}>

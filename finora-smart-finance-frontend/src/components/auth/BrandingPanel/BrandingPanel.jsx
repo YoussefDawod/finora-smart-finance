@@ -1,24 +1,24 @@
 /**
  * @fileoverview BrandingPanel Component
- * 
+ *
  * @description Animated branding panel for authentication pages
  * Built to harmonize mit Theme-Tokens (keine hart codierten Farben)
  * Fokus auf echte App-Features (Tracking, Charts, sichere Auth, Dark/Light)
- * 
+ *
  * MODES & BUTTONS:
  * - Login Mode:    Headline "New here?" + Button "Sign up now" → /register
  * - Register Mode: Headline "Welcome back!" + Button "Go to sign in" → /login
  * - Forgot Mode:   Headline "Forgot password?" + Button "Back to sign in" → /login
- * 
+ *
  * RESPONSIVE BEHAVIOR:
  * - Desktop (≥1024px): Full panel with all highlights, stats optional
  * - Tablet (768-1023px): 2-column highlights, condensed spacing
  * - Mobile (<768px): Compact essential info, 2x2 highlight grid
- * 
+ *
  * ANIMATION CONSISTENCY:
  * - All modes: Identical floating shapes animation (7-11s loop)
  * - All modes: Identical content fade transition (200ms, AnimatePresence)
- * 
+ *
  * ARROW DIRECTION (semantisch korrekt):
  * - Desktop Login:    ← (zeigt nach links, zum statischen Panel)
  * - Desktop Register: → (zeigt nach rechts, zum Form Panel)
@@ -26,7 +26,7 @@
  * - Mobile Login:     ↑ (zeigt nach oben, zum Branding)
  * - Mobile Register:  ↓ (zeigt nach unten, zum Form)
  * - Mobile Forgot:    ↓ (zeigt nach unten, zum Form, wie Register)
- * 
+ *
  * @module components/auth/BrandingPanel
  */
 
@@ -38,7 +38,7 @@ import { useMotion } from '@/hooks';
 import styles from './BrandingPanel.module.scss';
 
 // Content based on mode (login/register/forgot)
-const getContent = (mode) => {
+const getContent = mode => {
   const contentMap = {
     login: {
       kickerKey: 'auth.branding.kicker',
@@ -61,25 +61,34 @@ const getContent = (mode) => {
       ctaTextKey: 'auth.branding.forgot.cta',
       ctaPath: '/login',
     },
+    verify: {
+      kickerKey: 'auth.branding.kicker',
+      headlineKey: 'auth.branding.verify.headline',
+      sublineKey: 'auth.branding.verify.subline',
+      ctaTextKey: 'auth.branding.verify.cta',
+      ctaPath: '/login',
+    },
   };
-  
-  return contentMap[mode] || {
-    kickerKey: 'auth.branding.kicker',
-    headlineKey: 'auth.branding.default.headline',
-    sublineKey: 'auth.branding.default.subline',
-    ctaTextKey: 'auth.branding.default.cta',
-    ctaPath: '/login',
-  };
+
+  return (
+    contentMap[mode] || {
+      kickerKey: 'auth.branding.kicker',
+      headlineKey: 'auth.branding.default.headline',
+      sublineKey: 'auth.branding.default.subline',
+      ctaTextKey: 'auth.branding.default.cta',
+      ctaPath: '/login',
+    }
+  );
 };
 
 // ============================================
 // ARROW ICON
 // ============================================
 const ARROW_PATHS = {
-  left:  'M19 12H5M12 5l-7 7 7 7',
+  left: 'M19 12H5M12 5l-7 7 7 7',
   right: 'M5 12h14M12 5l7 7-7 7',
-  up:    'M12 19V5M5 12l7-7 7 7',
-  down:  'M12 5v14M5 12l7 7 7-7',
+  up: 'M12 19V5M5 12l7-7 7 7',
+  down: 'M12 5v14M5 12l7 7 7-7',
 };
 
 const ArrowIcon = ({ direction }) => (
@@ -108,10 +117,23 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
   // Desktop: Login points left (←), Register/Forgot point right (→)
   // Mobile: Login points up (↑), Register/Forgot point down (↓)
   const isLoginMode = mode === 'login';
-  
+  const isVerifyMode = mode === 'verify';
+
   const arrowDir = isDesktop
-    ? (isLoginMode ? (isRtl ? 'right' : 'left') : (isRtl ? 'left' : 'right'))
-    : (isLoginMode ? (isRtl ? 'down' : 'up') : (isRtl ? 'up' : 'down'));
+    ? isLoginMode || isVerifyMode
+      ? isRtl
+        ? 'right'
+        : 'left'
+      : isRtl
+        ? 'left'
+        : 'right'
+    : isLoginMode || isVerifyMode
+      ? isRtl
+        ? 'down'
+        : 'up'
+      : isRtl
+        ? 'up'
+        : 'down';
 
   return (
     <div className={styles.panel}>
@@ -125,13 +147,13 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
           <img
             src="/logo-branding/finora-logo.svg"
             alt="Finora"
-            className="app-logo app-logo--lg"
+            className={`app-logo app-logo--lg ${styles.logo}`}
           />
           <span className={styles.badge}>{t('auth.branding.badge')}</span>
         </div>
 
         {/* Tagline */}
-        <p className={styles.tagline}>Intelligente Finanzverwaltung für dein smartes Leben</p>
+        <p className={styles.tagline}>{t('auth.branding.tagline')}</p>
 
         {/* Copy: Headline + Subline */}
         <div className={styles.copy}>
@@ -154,10 +176,11 @@ export default function BrandingPanel({ mode = 'login', isDesktop = true }) {
         <div className={styles.actions}>
           <Link to={content.ctaPath} className={styles.ctaButton}>
             <span>{t(content.ctaTextKey)}</span>
-            <span className={styles.arrow} aria-hidden="true"><ArrowIcon direction={arrowDir} /></span>
+            <span className={styles.arrow} aria-hidden="true">
+              <ArrowIcon direction={arrowDir} />
+            </span>
           </Link>
         </div>
-
       </div>
 
       {/* Footer — pinned to bottom of panel */}

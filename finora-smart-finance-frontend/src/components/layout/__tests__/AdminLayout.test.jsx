@@ -39,6 +39,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, fallback) => fallback || key,
     i18n: { language: 'en', dir: () => 'ltr' },
@@ -50,18 +51,37 @@ vi.mock('@/hooks/useMotion', () => ({
 }));
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([k]) => !['whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag', 'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId'].includes(k))
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(
+              ([k]) =>
+                ![
+                  'whileHover',
+                  'whileTap',
+                  'whileFocus',
+                  'whileInView',
+                  'whileDrag',
+                  'initial',
+                  'animate',
+                  'exit',
+                  'transition',
+                  'variants',
+                  'layout',
+                  'layoutId',
+                ].includes(k)
+            )
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return <Tag {...htmlProps}>{children}</Tag>;
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -86,9 +106,22 @@ vi.mock('@/components/common', () => ({
 
 vi.mock('@/config/adminNavigation', () => ({
   ADMIN_NAV_ITEMS: [
-    { path: '/admin', labelKey: 'admin.nav.dashboard', icon: () => <span data-testid="icon-dashboard" />, end: true },
-    { path: '/admin/users', labelKey: 'admin.nav.users', icon: () => <span data-testid="icon-users" /> },
-    { path: '/admin/transactions', labelKey: 'admin.nav.transactions', icon: () => <span data-testid="icon-transactions" /> },
+    {
+      path: '/admin',
+      labelKey: 'admin.nav.dashboard',
+      icon: () => <span data-testid="icon-dashboard" />,
+      end: true,
+    },
+    {
+      path: '/admin/users',
+      labelKey: 'admin.nav.users',
+      icon: () => <span data-testid="icon-users" />,
+    },
+    {
+      path: '/admin/transactions',
+      labelKey: 'admin.nav.transactions',
+      icon: () => <span data-testid="icon-transactions" />,
+    },
   ],
   ADMIN_BACK_LINK: {
     path: '/dashboard',
@@ -103,7 +136,7 @@ const renderLayout = (initialEntry = '/admin') => {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <AdminLayout />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -133,7 +166,7 @@ describe('AdminLayout', () => {
 
     it('zeigt Admin Badge', () => {
       renderLayout();
-      const badges = screen.getAllByText('Admin');
+      const badges = screen.getAllByText('admin.badge');
       expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 

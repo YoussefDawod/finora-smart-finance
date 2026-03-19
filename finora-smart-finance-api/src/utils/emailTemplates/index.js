@@ -12,7 +12,7 @@ const {
   newsletterGoodbye,
   campaignTemplate,
 } = require('./newsletterTemplates');
-const { newUserRegistration } = require('./adminTemplates');
+const { newUserRegistration, adminCreatedCredentials } = require('./adminTemplates');
 const {
   retentionReminder,
   retentionFinalWarning,
@@ -37,6 +37,7 @@ module.exports = {
   newsletterGoodbye,
   campaignTemplate,
   newUserRegistration,
+  adminCreatedCredentials,
   // Lifecycle
   retentionReminder,
   retentionFinalWarning,

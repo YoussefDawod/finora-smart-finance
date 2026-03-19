@@ -1,44 +1,55 @@
 // ============================================
-// FOOTER — 3-ZONEN LAYOUT
+// FOOTER — AURORA FLOW GLASS (NEUBAU)
 // ============================================
-// Zone 1: .brand      (Full-Width Brand-Band)
-// Zone 2: .navGrid    (4 gleiche Navigation-Spalten)
+// Zone 1: .brand      (Aurora-Akzent-Gradient)
+// Zone 2: .navGrid    (4 Spalten Navigation)
 // Zone 3: .bottom     (Newsletter + Language + Copyright)
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
-// ============================================
-// FOOTER ROOT
-// ============================================
+// ── 1. FOOTER ROOT ────────────────────────────
 .footer {
   position: relative;
   width: 100%;
   display: flex;
   flex-direction: column;
   padding: var(--space-2xl) var(--space-lg) var(--space-lg);
-  border-top: 1px solid var(--border);
-  background: var(--surface);
+  // BrandingBackground (Kind-Element) liefert den Aurora-Hintergrund;
+  // backdrop-filter lässt Seiten-Content dahinter weich verschwimmen.
+  background: transparent;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: 0 -8px 48px
+    color-mix(in srgb, var(--aurora-1) 10%, color-mix(in srgb, var(--tx) 22%, transparent));
   color: var(--tx-muted);
   font-size: var(--fs-sm);
   transition: padding-left var(--tr);
 
-  &.sidebarExpanded {
-    padding-left: calc(var(--sidebar-width, 280px) + var(--space-lg));
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
   }
 
-  &.sidebarCollapsed {
-    padding-left: calc(var(--sidebar-collapsed-width, 72px) + var(--space-lg));
+  @include tablet {
+    backdrop-filter: blur(var(--glass-blur-reduced));
+    -webkit-backdrop-filter: blur(var(--glass-blur-reduced));
   }
 
   @include mobile {
     padding: var(--space-lg) var(--space-sm) var(--space-md);
+    backdrop-filter: blur(var(--glass-blur-minimal));
+    -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
   }
 }
 
-// ============================================
-// CONTAINER (max-width wrapper)
-// ============================================
+.footer.sidebarExpanded {
+  padding-left: calc(var(--sidebar-width, 280px) + var(--space-lg));
+}
+
+.footer.sidebarCollapsed {
+  padding-left: calc(var(--sidebar-collapsed-width, 72px) + var(--space-lg));
+}
+
+// ── 2. CONTAINER ──────────────────────────────
 .container {
   display: flex;
   flex-direction: column;
@@ -46,17 +57,23 @@
   max-width: var(--mw-2xl, 1536px);
   margin: 0 auto;
   gap: var(--space-xl);
+  // Über BrandingBackground (z-index: 0) positioniert
+  position: relative;
+  z-index: 1;
 }
 
-// ============================================
-// ZONE 1 — BRAND BAND (volle Breite)
-// ============================================
+// ── 3. ZONE 1: BRAND ──────────────────────────
 .brand {
   display: flex;
   align-items: center;
   gap: var(--space-lg);
   padding-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary) 5%, transparent) 0%,
+    transparent 60%
+  );
+  border-bottom: 1px solid var(--glass-border-light);
 
   @include mobile {
     flex-direction: column;
@@ -67,15 +84,16 @@
 
 .brandLogo {
   width: auto;
-  height: 2.5rem;     // war 2rem (32px) → jetzt 2.5rem (40px)
+  height: 2.5rem;
   flex-shrink: 0;
 
   @include mobile {
-    height: 2rem;     // war 1.75rem (28px) → jetzt 2rem (32px)
+    height: 2rem;
   }
 }
 
 .brandDescription {
+  @include glass-text;
   font-size: var(--fs-sm);
   line-height: var(--lh-relaxed);
   color: var(--tx-muted);
@@ -87,9 +105,7 @@
   }
 }
 
-// ============================================
-// ZONE 2 — NAVIGATION GRID (4 Spalten)
-// ============================================
+// ── 4. ZONE 2: NAVIGATION ─────────────────────
 .navGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -113,21 +129,20 @@
   flex-direction: column;
   gap: var(--space-md);
   position: relative;
-  padding-left: var(--space-xl);
+  padding-inline-start: var(--space-xl);
 
-  // Vertikale Trennlinie via Pseudo-Element (zentriert im Gap)
   &::before {
     content: '';
     position: absolute;
-    left: calc(var(--space-xl) / -2 - 1px);
+    inset-inline-start: calc(var(--space-xl) / -2 - 1px);
     top: 0;
     bottom: 0;
     width: 1px;
-    background: var(--border);
+    background: var(--glass-border-light);
   }
 
   &:first-child {
-    padding-left: 0;
+    padding-inline-start: 0;
 
     &::before {
       display: none;
@@ -135,28 +150,26 @@
   }
 
   @include tablet {
-    padding-left: var(--space-lg);
+    padding-inline-start: var(--space-lg);
 
     &::before {
-      left: calc(var(--space-lg) / -2 - 1px);
+      inset-inline-start: calc(var(--space-lg) / -2 - 1px);
     }
 
-    // Ungerade Spalten (1., 3.): kein Strich links
     &:nth-child(2n + 1) {
-      padding-left: 0;
+      padding-inline-start: 0;
 
       &::before {
         display: none;
       }
     }
 
-    // Gerade Spalten (2., 4.): Strich links
     &:nth-child(2n) {
-      padding-left: var(--space-lg);
+      padding-inline-start: var(--space-lg);
 
       &::before {
         display: block;
-        left: calc(var(--space-lg) / -2 - 1px);
+        inset-inline-start: calc(var(--space-lg) / -2 - 1px);
       }
     }
   }
@@ -164,12 +177,16 @@
   @include mobile {
     padding-left: 0;
     padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--glass-border-light);
     text-align: center;
     gap: var(--space-sm);
 
     &::before {
       display: none;
+    }
+
+    &:not(:first-child) {
+      padding-top: var(--space-md);
     }
 
     &:last-child {
@@ -183,13 +200,14 @@
   display: inline-block;
   font-size: var(--fs-xs);
   font-weight: var(--fw-sb);
-  color: var(--tx);
+  color: var(--primary);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: var(--ls-wider);
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  background: color-mix(in srgb, var(--primary) 10%, var(--glass-bg));
+  border: 1px solid var(--glass-border);
   width: fit-content;
 
   @include mobile {
@@ -234,7 +252,7 @@
   }
 }
 
-// Social Icons (im Unternehmen-Bereich, ohne Hintergrund)
+// Social Icons (Unternehmen-Bereich, Aurora Glow)
 .socialIcons {
   display: flex;
   gap: var(--space-sm);
@@ -255,12 +273,16 @@
   background: none;
   border: none;
   border-radius: var(--r-md);
-  transition: color var(--tr-fast), transform var(--tr-fast);
+  transition:
+    color var(--tr-fast),
+    filter var(--tr-fast),
+    transform var(--tr-fast);
   text-decoration: none;
 
   &:hover {
     color: var(--primary);
-    transform: translateY(-1px);
+    filter: drop-shadow(0 0 8px color-mix(in srgb, var(--primary) 60%, transparent));
+    transform: translateY(-2px);
   }
 
   &:focus-visible {
@@ -268,18 +290,17 @@
   }
 }
 
-// ============================================
-// ZONE 3 — BOTTOM BAR
-// ============================================
+// ── 5. ZONE 3: BOTTOM ─────────────────────────
 .bottom {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--border);
+  padding: var(--space-lg);
+  background: color-mix(in srgb, var(--glass-bg) 50%, transparent);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--r-lg);
 }
 
-// Zeile 1: Newsletter (links) | Language (rechts)
 .bottomRow {
   display: flex;
   align-items: flex-start;
@@ -293,7 +314,6 @@
   }
 }
 
-// Zeile 2: Copyright zentriert
 .copyrightRow {
   display: flex;
   align-items: center;
@@ -308,6 +328,7 @@
 }
 
 .copyright {
+  @include glass-text;
   font-size: var(--fs-sm);
   color: var(--tx);
   margin: 0;
@@ -345,15 +366,32 @@
   margin: 0;
 }
 
-// ============================================
-// NEWSLETTER (im Bottom-Bereich)
-// ============================================
+// ── 6. NEWSLETTER GLASS CARD ──────────────────
 .newsletterWrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
   flex: 1;
-  max-width: 28rem;
+
+  padding: var(--space-md) var(--space-lg);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.5));
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 
   @include tablet {
     max-width: 100%;
@@ -361,6 +399,7 @@
 
   @include mobile {
     max-width: 100%;
+    padding: var(--space-sm) var(--space-md);
   }
 }
 
@@ -406,23 +445,20 @@
   color: var(--tx-muted);
   pointer-events: none;
   z-index: 1;
-
-  :global([dir='rtl']) & {
-    left: auto;
-    right: var(--space-sm);
-  }
 }
 
 .newsletterInput {
   width: 100%;
   padding: var(--space-xs) var(--space-sm) var(--space-xs) calc(var(--space-sm) * 2.5);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
-  background: var(--bg);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
   color: var(--tx);
   font-size: var(--fs-sm);
   font-family: inherit;
-  transition: border-color var(--tr-fast), box-shadow var(--tr-fast);
+  transition:
+    border-color var(--tr-fast),
+    box-shadow var(--tr-fast);
 
   &::placeholder {
     color: var(--tx-muted);
@@ -435,11 +471,7 @@
   &:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent);
-  }
-
-  :global([dir='rtl']) & {
-    padding: var(--space-xs) calc(var(--space-sm) * 2.5) var(--space-xs) var(--space-sm);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
   }
 }
 
@@ -448,11 +480,12 @@
   white-space: nowrap;
   padding: var(--space-xs) var(--space-md);
   background: var(--primary);
-  color: var(--text-on-primary, #fff);
+  color: var(--on-primary);
   font-size: var(--fs-sm);
 
   &:hover:not(:disabled) {
-    filter: brightness(1.08);
+    box-shadow: var(--glow-sm);
+    transform: translateY(-1px);
   }
 
   @include mobile {
@@ -472,17 +505,7 @@
   margin: 0;
 }
 
-// Privacy Hint (DSGVO)
-.privacyHint {
-  font-size: var(--fs-xs);
-  color: var(--tx-muted);
-  line-height: var(--lh-relaxed);
-  margin: 0;
-}
-
-// ============================================
-// LANGUAGE SWITCHER
-// ============================================
+// ── 7. LANGUAGE SWITCHER ──────────────────────
 .langSwitcher {
   display: flex;
   align-items: center;
@@ -502,7 +525,7 @@
   min-width: 2.25rem;
   height: 1.75rem;
   padding: 0 var(--space-xs);
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-full);
   background: transparent;
   color: var(--tx-muted);
@@ -513,8 +536,9 @@
   transition: all var(--tr-fast);
 
   &:hover {
-    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
     border-color: var(--primary);
+    color: var(--primary);
   }
 
   &:focus-visible {
@@ -524,18 +548,17 @@
 
 .langPillActive {
   background: var(--primary);
-  color: var(--text-on-primary, #fff);
+  color: var(--on-primary);
   border-color: var(--primary);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
 
   &:hover {
-    color: var(--text-on-primary, #fff);
+    color: var(--on-primary);
     filter: brightness(1.08);
   }
 }
 
-// ============================================
-// BACK TO TOP BUTTON
-// ============================================
+// ── 8. BACK TO TOP ────────────────────────────
 .backToTop {
   position: fixed;
   bottom: var(--space-2xl);
@@ -545,13 +568,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--primary);
-  color: var(--text-on-primary, #fff);
-  border: none;
+  background: color-mix(in srgb, var(--glass-bg-hover) 90%, var(--primary) 10%);
+  border: 1px solid var(--glass-border);
+  color: var(--primary);
   border-radius: var(--r-full);
   cursor: pointer;
-  box-shadow: var(--sh-lg);
+  box-shadow: var(--glass-shadow);
   z-index: var(--z-above);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: var(--glow-md);
+    border-color: var(--primary);
+  }
 
   &:focus-visible {
     @include focus-ring;
@@ -563,20 +610,9 @@
     width: 2.5rem;
     height: 2.5rem;
   }
-
-  :global([dir='rtl']) & {
-    right: auto;
-    left: var(--space-2xl);
-
-    @include mobile {
-      left: var(--space-lg);
-    }
-  }
 }
 
-// ============================================
-// RTL SUPPORT
-// ============================================
+// ── 9. RTL OVERRIDES ──────────────────────────
 :global([dir='rtl']) .footer {
   transition: padding-right var(--tr);
   padding-left: var(--space-lg);
@@ -592,9 +628,26 @@
   }
 }
 
-// ============================================
-// REDUCED MOTION
-// ============================================
+:global([dir='rtl']) .inputIcon {
+  left: auto;
+  right: var(--space-sm);
+}
+
+:global([dir='rtl']) .newsletterInput {
+  padding-left: var(--space-sm);
+  padding-right: calc(var(--space-sm) * 2.5);
+}
+
+:global([dir='rtl']) .backToTop {
+  right: auto;
+  left: var(--space-2xl);
+
+  @include mobile {
+    left: var(--space-lg);
+  }
+}
+
+// ── 10. REDUCED MOTION ────────────────────────
 @include reduced-motion {
   .footer {
     transition: none;
@@ -608,24 +661,16 @@
     }
   }
 
-  .navLink {
+  .navLink,
+  .copyrightLink,
+  .newsletterInput,
+  .newsletterButton,
+  .langPill,
+  .backToTop {
     transition: none;
   }
 
-  .copyrightLink {
-    transition: none;
-  }
-
-  .newsletterInput {
-    transition: none;
-  }
-
-  .privacyHintLink {
-    transition: none;
-  }
-
-  .langPill {
-    transition: none;
+  .newsletterButton:hover {
+    transform: none;
   }
 }
-

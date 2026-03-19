@@ -1,13 +1,13 @@
 /**
  * @fileoverview ForgotPasswordRequestForm Component - Premium Redesign
  * @description Modern form for requesting password reset email
- * 
+ *
  * FEATURES:
  * - Email input with floating label
  * - Loading state with spinner
  * - Success state with email icon
  * - Error handling
- * 
+ *
  * @module components/auth/ForgotPasswordRequestForm
  */
 
@@ -15,11 +15,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
-import { 
-  FiMail, 
-  FiArrowRight,
-  FiArrowLeft
-} from 'react-icons/fi';
+import { parseApiError } from '@/api/errorHandler';
+import { FiMail, FiArrowRight, FiArrowLeft } from 'react-icons/fi';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import styles from './ForgotPasswordRequestForm.module.scss';
 
@@ -45,7 +42,7 @@ export default function ForgotPasswordRequestForm() {
   // VALIDATION
   // ============================================
 
-  const validateEmail = (value) => {
+  const validateEmail = value => {
     if (!value) return t('auth.forgot.validation.emailRequired');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('auth.forgot.validation.emailInvalid');
     return '';
@@ -55,7 +52,7 @@ export default function ForgotPasswordRequestForm() {
   // HANDLERS
   // ============================================
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const value = e.target.value;
     setEmail(value);
 
@@ -71,7 +68,7 @@ export default function ForgotPasswordRequestForm() {
     setError(validateEmail(email));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     setTouched(true);
@@ -89,11 +86,9 @@ export default function ForgotPasswordRequestForm() {
       setIsSuccess(true);
       toast.success(t('auth.forgot.successToast'));
     } catch (err) {
-      const errorMessage =
-        err?.response?.data?.message ||
-        t('auth.forgot.errorToast');
-      setApiError(errorMessage);
-      toast.error(errorMessage);
+      const { message } = parseApiError(err);
+      setApiError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +100,7 @@ export default function ForgotPasswordRequestForm() {
 
   if (isSuccess) {
     return (
-      <motion.div 
+      <motion.div
         className={styles.successContainer}
         initial={shouldAnimate ? { opacity: 0, scale: 0.95 } : {}}
         animate={{ opacity: 1, scale: 1 }}
@@ -115,17 +110,9 @@ export default function ForgotPasswordRequestForm() {
           <FiMail />
         </div>
         <h2 className={styles.successTitle}>{t('auth.forgot.successTitle')}</h2>
-        <p className={styles.successMessage}>
-          {t('auth.forgot.successMessage', { email })}
-        </p>
-        <p className={styles.successHint}>
-          {t('auth.forgot.successHint')}
-        </p>
-        <button
-          type="button"
-          className={styles.resendButton}
-          onClick={() => setIsSuccess(false)}
-        >
+        <p className={styles.successMessage}>{t('auth.forgot.successMessage', { email })}</p>
+        <p className={styles.successHint}>{t('auth.forgot.successHint')}</p>
+        <button type="button" className={styles.resendButton} onClick={() => setIsSuccess(false)}>
           {t('auth.forgot.useDifferentEmail')}
         </button>
       </motion.div>
@@ -196,7 +183,11 @@ export default function ForgotPasswordRequestForm() {
         ) : (
           <>
             <span>{t('auth.forgot.submit')}</span>
-            {isRtl ? <FiArrowLeft className={styles.buttonIcon} /> : <FiArrowRight className={styles.buttonIcon} />}
+            {isRtl ? (
+              <FiArrowLeft className={styles.buttonIcon} />
+            ) : (
+              <FiArrowRight className={styles.buttonIcon} />
+            )}
           </>
         )}
       </button>

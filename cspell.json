@@ -1,0 +1,49 @@
+{
+  "version": "0.2",
+  "language": "en,de,ar",
+  "words": [
+    "Finora",
+    "Youssef",
+    "Dawod",
+    "finora"
+  ],
+  "dictionaries": ["ka-custom"],
+  "dictionaryDefinitions": [
+    {
+      "name": "ka-custom",
+      "path": "./dictionaries/ka-words.txt",
+      "addWords": true,
+      "description": "Georgian words extracted from ka/translation.json"
+    }
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/logs/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.min.js",
+    "package-lock.json"
+  ],
+  "overrides": [
+    {
+      "filename": "**/public/locales/en/**/*.json",
+      "language": "en"
+    },
+    {
+      "filename": "**/public/locales/de/**/*.json",
+      "language": "en,de"
+    },
+    {
+      "filename": "**/public/locales/ar/**/*.json",
+      "language": "en,ar"
+    },
+    {
+      "filename": "**/public/locales/ka/**/*.json",
+      "language": "en",
+      "dictionaries": ["ka-custom"]
+    }
+  ]
+}

@@ -10,6 +10,7 @@
 const AuditLog = require('../models/AuditLog');
 const logger = require('../utils/logger');
 const escapeRegex = require('../utils/escapeRegex');
+const geoip = require('geoip-lite');
 
 /**
  * AuditLog-Eintrag erstellen (fire-and-forget)
@@ -36,6 +37,20 @@ async function log({
   req = null,
 }) {
   try {
+    const ip = req ? req.ip || req.connection?.remoteAddress || null : null;
+
+    // Geolocation aus IP ableiten (nur öffentliche IPs)
+    let country = null;
+    let city = null;
+    if (ip) {
+      const cleanIp = ip.replace(/^::ffff:/, '');
+      const geo = geoip.lookup(cleanIp);
+      if (geo) {
+        country = geo.country || null;
+        city = geo.city || null;
+      }
+    }
+
     const entry = new AuditLog({
       action,
       adminId: adminId || null,
@@ -44,8 +59,10 @@ async function log({
       targetUserName: targetUserName || null,
       details,
       requestId: req?.requestId || null,
-      ipAddress: req ? req.ip || req.connection?.remoteAddress || null : null,
+      ipAddress: ip,
       userAgent: req ? req.headers?.['user-agent'] || null : null,
+      country,
+      city,
     });
 
     await entry.save();
@@ -78,13 +95,21 @@ async function getLogs({
   action,
   adminId,
   targetUserId,
+  country,
   startDate,
   endDate,
   search,
   sort = '-createdAt',
 } = {}) {
   // Whitelist erlaubter Sort-Felder — verhindert Sort-Injection
-  const ALLOWED_SORT_FIELDS = new Set(['createdAt', 'action', 'adminName', 'targetUserName']);
+  const ALLOWED_SORT_FIELDS = new Set([
+    'createdAt',
+    'action',
+    'adminName',
+    'targetUserName',
+    'country',
+    'city',
+  ]);
   const sortField = sort.startsWith('-') ? sort.slice(1) : sort;
   const safeSort = ALLOWED_SORT_FIELDS.has(sortField) ? sort : '-createdAt';
 
@@ -100,6 +125,10 @@ async function getLogs({
 
   if (targetUserId) {
     query.targetUserId = targetUserId;
+  }
+
+  if (country) {
+    query.country = country;
   }
 
   // Datumsfilter
@@ -195,9 +224,38 @@ async function deleteByUserId(userId) {
   }
 }
 
+/**
+ * Alle AuditLog-Einträge löschen (Admin-Aktion)
+ * @returns {Promise<number>} Anzahl gelöschter Einträge
+ */
+async function deleteAll() {
+  const result = await AuditLog.deleteMany({});
+  logger.info(`AuditLog: Alle ${result.deletedCount} Einträge gelöscht`);
+  return result.deletedCount;
+}
+
+/**
+ * Bulk-Löschung bestimmter AuditLog-Einträge
+ * @param {string[]} ids - Array von AuditLog-IDs (max 200)
+ * @returns {Promise<number>} Anzahl gelöschter Einträge
+ */
+async function deleteBulk(ids) {
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return 0;
+  }
+  if (ids.length > 200) {
+    throw new Error('Maximal 200 Einträge pro Bulk-Löschung erlaubt');
+  }
+  const result = await AuditLog.deleteMany({ _id: { $in: ids } });
+  logger.info(`AuditLog: ${result.deletedCount} von ${ids.length} Einträgen gelöscht (Bulk)`);
+  return result.deletedCount;
+}
+
 module.exports = {
   log,
   getLogs,
   getStats,
   deleteByUserId,
+  deleteAll,
+  deleteBulk,
 };

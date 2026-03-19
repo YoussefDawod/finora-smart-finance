@@ -4,6 +4,7 @@
  */
 
 const User = require('../models/User');
+const Subscriber = require('../models/Subscriber');
 const emailService = require('../utils/emailService');
 const authService = require('./authService');
 const auditLogService = require('./auditLogService');
@@ -82,7 +83,7 @@ async function registerUser(validatedData, requestContext = {}) {
   // Create user
   const user = new User({
     name,
-    email,
+    ...(email && { email }),
     understoodNoEmailReset,
   });
   await user.setPassword(password);
@@ -98,9 +99,26 @@ async function registerUser(validatedData, requestContext = {}) {
     if (config.nodeEnv === 'development' && emailResult) {
       verificationLink = emailResult.link;
     }
+
+    // Auto-Newsletter-Abo für neue User mit Email (fire & forget)
+    Subscriber.findOne({ email: user.email })
+      .then(existingSub => {
+        if (!existingSub) {
+          const sub = new Subscriber({
+            email: user.email,
+            userId: user._id,
+            isConfirmed: true,
+            subscribedAt: new Date(),
+            confirmedAt: new Date(),
+            language: 'de',
+          });
+          sub.generateUnsubscribeToken();
+          return sub.save();
+        }
+      })
+      .catch(() => {});
   } else {
-    // No email: auto-verify user
-    user.isVerified = true;
+    // Kein Email: User bleibt unverified bis eine Email nachgetragen und bestätigt wird
     await user.save();
   }
 

@@ -1,7 +1,6 @@
 // ============================================
 // 📅 DASHBOARD FILTER (DROPDOWN)
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -16,6 +15,10 @@
   &.rtl {
     direction: rtl;
   }
+
+  @include mobile {
+    width: 100%;
+  }
 }
 
 // ============================================
@@ -29,10 +32,16 @@
   padding: 0 var(--space-sm);
   height: var(--btn-height-sm, 2rem);
   min-width: max-content;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur-reduced));
+  -webkit-backdrop-filter: blur(var(--glass-blur-reduced));
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
   color: var(--tx);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
   font-family: inherit;
   font-size: var(--fs-xs);
   font-weight: var(--fw-m);
@@ -41,9 +50,15 @@
   white-space: nowrap;
 
   &:hover {
-    background: var(--surface-2);
+    background: var(--glass-bg-hover);
     border-color: color-mix(in srgb, var(--primary) 20%, transparent);
     box-shadow: var(--sh-xs);
+  }
+
+  @include mobile {
+    width: 100%;
+    min-width: 0;
+    justify-content: space-between;
   }
 
   @include focus-ring;
@@ -83,33 +98,25 @@
   z-index: var(--z-dropdown);
   min-width: 220px;
   max-width: 280px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-lg);
   box-shadow: var(--sh-lg);
   padding: var(--space-sm);
   display: flex;
   flex-direction: column;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
   gap: var(--space-sm);
 
   // RTL: Dropdown nach rechts ausrichten
   .rtl & {
     left: auto;
     right: 0;
-  }
-
-  // Mobile: Zentriert (ohne CSS transform – kollidiert mit Framer-Motion inline transform)
-  @include mobile {
-    left: 0;
-    right: 0;
-    margin-inline: auto;
-    width: fit-content;
-    min-width: 200px;
-
-    .rtl & {
-      left: 0;
-      right: 0;
-    }
   }
 }
 
@@ -122,8 +129,8 @@
   justify-content: space-between;
   gap: var(--space-xs);
   padding: var(--space-xs);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-md);
 }
 
@@ -134,8 +141,8 @@
   width: 28px;
   height: 28px;
   padding: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: transparent;
+  border: 1px solid transparent;
   border-radius: var(--r-sm);
   color: var(--tx);
   cursor: pointer;
@@ -202,8 +209,8 @@
   }
 
   &:hover:not(.quickOptionActive) {
-    background: var(--surface-2);
-    border-color: var(--border);
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border);
   }
 
   @include focus-ring;
@@ -229,7 +236,7 @@
   flex-direction: column;
   gap: var(--space-2xs);
   padding-top: var(--space-xs);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--glass-border);
 }
 
 .dateSectionTitle {
@@ -263,8 +270,8 @@
 .dateInput {
   width: 100%;
   padding: var(--space-2xs) var(--space-xs);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  background: var(--glass-bg-hover);
+  border: 1px solid var(--glass-border);
   border-radius: var(--r-sm);
   color: var(--tx);
   font-family: inherit;
@@ -316,9 +323,110 @@
   .navBtn,
   .quickOption,
   .todayBtn,
-  .chevron {
+  .chevron,
+  .sheetBackdrop,
+  .sheetPanel {
     transition: none;
   }
+}
+
+// ============================================
+// MOBILE BOTTOM SHEET
+// ============================================
+.sheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1400);
+  background: var(--overlay);
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--overlay);
+  }
+}
+
+.sheetPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: calc(var(--z-modal, 1400) + 1);
+  max-height: 85vh;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  box-shadow: var(--sh-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
+}
+
+.sheetHandle {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-sm) 0 var(--space-2xs);
+}
+
+.sheetHandleBar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--tx) 20%, transparent);
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg) var(--space-sm);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.sheetTitle {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.sheetClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--tx) 8%, transparent);
+    color: var(--tx);
+  }
+
+  @include focus-ring;
+}
+
+.sheetBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md) var(--space-lg) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  -webkit-overflow-scrolling: touch;
 }
 
 // ============================================

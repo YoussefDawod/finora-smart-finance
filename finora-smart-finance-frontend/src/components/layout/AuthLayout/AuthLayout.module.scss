@@ -15,6 +15,8 @@
 .authLayout {
   position: fixed;
   inset: 0;
+  height: 100vh;
+  height: 100svh;
   display: flex;
   overflow: hidden;
 
@@ -34,13 +36,30 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  background: var(--bg);
+  background: color-mix(
+    in srgb,
+    var(--primary) 3%,
+    color-mix(in srgb, var(--glass-bg) 80%, transparent)
+  );
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   z-index: 1;
 
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+
   @include below-lg {
-    flex: 1;
+    flex: 1 1 0;
+    min-height: 0;
     order: 1;
     padding: var(--space-md);
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -64,10 +83,17 @@
 
   @include below-lg {
     max-width: 100%;
-    background: var(--bg);
+    background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+    backdrop-filter: blur(var(--glass-blur-minimal));
+    -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+    border: 1px solid var(--glass-border);
     border-radius: var(--r-xl);
     padding: var(--space-lg);
-    box-shadow: var(--sh-lg);
+    box-shadow: var(--glass-shadow);
+
+    @supports not (backdrop-filter: blur(1px)) {
+      background: var(--surface);
+    }
   }
 
   @include breakpoint($max: $bp-xs) {
@@ -105,17 +131,21 @@
   @include below-lg {
     display: block;
     width: 100%;
-    flex: 0 0 30%;
+    flex: 0 0 clamp(80px, 25svh, 30%);
     overflow: hidden;
   }
 }
 
 .mobileTop {
-  @include below-lg { order: 0; }
+  @include below-lg {
+    order: 0;
+  }
 }
 
 .mobileBottom {
-  @include below-lg { order: 2; }
+  @include below-lg {
+    order: 2;
+  }
 }
 
 // ============================================

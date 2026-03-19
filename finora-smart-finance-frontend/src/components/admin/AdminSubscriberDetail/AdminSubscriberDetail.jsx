@@ -21,6 +21,9 @@ import {
   FiAlertTriangle,
 } from 'react-icons/fi';
 import Modal from '@/components/common/Modal/Modal';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import { LANGUAGE_LABELS } from '@/constants';
 import styles from './AdminSubscriberDetail.module.scss';
 
@@ -54,6 +57,8 @@ function AdminSubscriberDetail({
   onError,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
+  const { guard } = useViewerGuard();
   const [view, setView] = useState(VIEW.DETAILS);
 
   const subscriberId = subscriber?._id || subscriber?.id;
@@ -79,7 +84,7 @@ function AdminSubscriberDetail({
   if (!subscriber) return null;
 
   // ── Formatierung ────────────────────────────────
-  const formatDateTime = (dateStr) => {
+  const formatDateTime = dateStr => {
     if (!dateStr) return '—';
     try {
       return new Intl.DateTimeFormat(i18n.language, {
@@ -119,11 +124,7 @@ function AdminSubscriberDetail({
           disabled={isBusy}
           type="button"
         >
-          {isBusy ? (
-            <FiRefreshCw size={14} className={styles.spinning} />
-          ) : (
-            <FiTrash2 size={14} />
-          )}
+          {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiTrash2 size={14} />}
           {t('admin.subscribers.delete')}
         </button>
       </div>
@@ -139,7 +140,9 @@ function AdminSubscriberDetail({
           <FiMail size={24} />
         </div>
         <div className={styles.headerInfo}>
-          <h3 className={styles.subscriberEmail}>{subscriber.email}</h3>
+          <h3 className={styles.subscriberEmail}>
+            <SensitiveData active={isViewer}>{subscriber.email}</SensitiveData>
+          </h3>
           <div className={styles.headerBadges}>
             {/* Status Badge */}
             {subscriber.isConfirmed ? (
@@ -174,7 +177,7 @@ function AdminSubscriberDetail({
         <InfoRow
           icon={FiMail}
           label={t('admin.subscribers.email')}
-          value={subscriber.email || '—'}
+          value={<SensitiveData active={isViewer}>{subscriber.email || '—'}</SensitiveData>}
         />
         <InfoRow
           icon={FiGlobe}
@@ -199,7 +202,7 @@ function AdminSubscriberDetail({
       <div className={styles.actionGrid}>
         <button
           className={styles.dangerOutlineButton}
-          onClick={() => setView(VIEW.DELETE)}
+          onClick={() => guard(() => setView(VIEW.DELETE))}
           disabled={isBusy}
           type="button"
         >

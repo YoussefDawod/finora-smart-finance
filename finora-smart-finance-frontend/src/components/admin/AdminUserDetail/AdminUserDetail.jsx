@@ -26,6 +26,9 @@ import {
 } from 'react-icons/fi';
 import Modal from '@/components/common/Modal/Modal';
 import Checkbox from '@/components/common/Checkbox/Checkbox';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import styles from './AdminUserDetail.module.scss';
 
 /**
@@ -62,6 +65,8 @@ function AdminUserDetail({
   onError,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
+  const { guard } = useViewerGuard();
   const [view, setView] = useState(VIEW.DETAILS);
   const [banReason, setBanReason] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -155,7 +160,13 @@ function AdminUserDetail({
     if (editForm.email.trim() && editForm.email.trim() !== user?.email) {
       data.email = editForm.email.trim();
     }
+    // Verifizierung nur erlauben wenn eine Email vorhanden ist (bestehend oder neu)
     if (editForm.isVerified !== user?.isVerified) {
+      const hasEmail = editForm.email.trim() || user?.email;
+      if (editForm.isVerified && !hasEmail) {
+        onError?.(t('admin.users.edit.verifyRequiresEmail'));
+        return;
+      }
       data.isVerified = editForm.isVerified;
     }
     if (Object.keys(data).length === 0) {
@@ -174,7 +185,7 @@ function AdminUserDetail({
   if (!user) return null;
 
   // ── Formatierung ────────────────────────────────
-  const formatDateTime = (dateStr) => {
+  const formatDateTime = dateStr => {
     if (!dateStr) return '—';
     try {
       return new Intl.DateTimeFormat(i18n.language, {
@@ -197,22 +208,25 @@ function AdminUserDetail({
         <FiSlash size={28} />
       </div>
       <h3>{t('admin.users.confirmBan')}</h3>
-      <p className={styles.confirmText}>
-        {t('admin.users.confirmBanText', { name: user.name })}
-      </p>
+      <p className={styles.confirmText}>{t('admin.users.confirmBanText', { name: user.name })}</p>
       <label className={styles.inputLabel}>
         {t('admin.users.banReason')}
         <input
           type="text"
           className={styles.input}
           value={banReason}
-          onChange={(e) => setBanReason(e.target.value)}
+          onChange={e => setBanReason(e.target.value)}
           placeholder={t('admin.users.banReasonPlaceholder')}
           disabled={isBusy}
         />
       </label>
       <div className={styles.confirmActions}>
-        <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+        <button
+          className={styles.cancelButton}
+          onClick={backToDetails}
+          disabled={isBusy}
+          type="button"
+        >
           {t('common.cancel')}
         </button>
         <button className={styles.dangerButton} onClick={handleBan} disabled={isBusy} type="button">
@@ -238,7 +252,7 @@ function AdminUserDetail({
           type="password"
           className={styles.input}
           value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
+          onChange={e => setNewPassword(e.target.value)}
           placeholder={t('admin.users.newPasswordPlaceholder')}
           minLength={8}
           disabled={isBusy}
@@ -248,7 +262,12 @@ function AdminUserDetail({
         <p className={styles.inputHint}>{t('admin.users.passwordMinLength')}</p>
       )}
       <div className={styles.confirmActions}>
-        <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+        <button
+          className={styles.cancelButton}
+          onClick={backToDetails}
+          disabled={isBusy}
+          type="button"
+        >
           {t('common.cancel')}
         </button>
         <button
@@ -274,10 +293,20 @@ function AdminUserDetail({
         {t('admin.users.confirmDeleteText', { name: user.name })}
       </p>
       <div className={styles.confirmActions}>
-        <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+        <button
+          className={styles.cancelButton}
+          onClick={backToDetails}
+          disabled={isBusy}
+          type="button"
+        >
           {t('common.cancel')}
         </button>
-        <button className={styles.dangerButton} onClick={handleDelete} disabled={isBusy} type="button">
+        <button
+          className={styles.dangerButton}
+          onClick={handleDelete}
+          disabled={isBusy}
+          type="button"
+        >
           {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiTrash2 size={14} />}
           {t('admin.users.delete')}
         </button>
@@ -300,11 +329,25 @@ function AdminUserDetail({
           })}
         </p>
         <div className={styles.confirmActions}>
-          <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+          <button
+            className={styles.cancelButton}
+            onClick={backToDetails}
+            disabled={isBusy}
+            type="button"
+          >
             {t('common.cancel')}
           </button>
-          <button className={styles.primaryButton} onClick={handleChangeRole} disabled={isBusy} type="button">
-            {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiShield size={14} />}
+          <button
+            className={styles.primaryButton}
+            onClick={handleChangeRole}
+            disabled={isBusy}
+            type="button"
+          >
+            {isBusy ? (
+              <FiRefreshCw size={14} className={styles.spinning} />
+            ) : (
+              <FiShield size={14} />
+            )}
             {t('admin.users.changeRole')}
           </button>
         </div>
@@ -318,14 +361,22 @@ function AdminUserDetail({
     <>
       {/* User Info Header */}
       <div className={styles.userHeader}>
-        <div className={`${styles.headerAvatar} ${user.role === 'admin' ? styles.adminAvatar : ''}`}>
+        <div
+          className={`${styles.headerAvatar} ${user.role === 'admin' ? styles.adminAvatar : ''}`}
+        >
           {user.role === 'admin' ? <FiShield size={24} /> : <FiUser size={24} />}
         </div>
         <div className={styles.headerInfo}>
-          <h3 className={styles.userName}>{user.name}</h3>
+          <h3 className={styles.userName}>
+            <SensitiveData active={isViewer}>{user.name}</SensitiveData>
+          </h3>
           <div className={styles.headerBadges}>
             <span className={`${styles.badge} ${styles[`role_${user.role}`]}`}>
-              {user.role === 'admin' ? t('admin.users.roleAdmin') : t('admin.users.roleUser')}
+              {user.role === 'admin'
+                ? t('admin.users.roleAdmin')
+                : user.role === 'viewer'
+                  ? t('admin.users.roleViewer')
+                  : t('admin.users.roleUser')}
             </span>
             {user.isActive === false ? (
               <span className={`${styles.badge} ${styles.banned}`}>{t('admin.users.banned')}</span>
@@ -347,9 +398,21 @@ function AdminUserDetail({
 
       {/* Info Grid */}
       <div className={styles.infoGrid}>
-        <InfoRow icon={FiMail} label={t('admin.users.email')} value={user.email || '—'} />
-        <InfoRow icon={FiCalendar} label={t('admin.users.joined')} value={formatDateTime(user.createdAt)} />
-        <InfoRow icon={FiClock} label={t('admin.users.lastLogin')} value={formatDateTime(user.lastLogin)} />
+        <InfoRow
+          icon={FiMail}
+          label={t('admin.users.email')}
+          value={<SensitiveData active={isViewer}>{user.email || '—'}</SensitiveData>}
+        />
+        <InfoRow
+          icon={FiCalendar}
+          label={t('admin.users.joined')}
+          value={formatDateTime(user.createdAt)}
+        />
+        <InfoRow
+          icon={FiClock}
+          label={t('admin.users.lastLogin')}
+          value={formatDateTime(user.lastLogin)}
+        />
         {user.isActive === false && user.banReason && (
           <InfoRow icon={FiSlash} label={t('admin.users.banReason')} value={user.banReason} />
         )}
@@ -359,24 +422,34 @@ function AdminUserDetail({
       <div className={styles.actionGrid}>
         <button
           className={styles.outlineButton}
-          onClick={handleStartEdit}
+          onClick={() => guard(handleStartEdit)}
           disabled={isBusy}
           type="button"
         >
           <FiEdit size={14} /> {t('admin.users.edit.button')}
         </button>
         {user.isActive === false ? (
-          <button className={styles.successButton} onClick={handleUnban} disabled={isBusy} type="button">
+          <button
+            className={styles.successButton}
+            onClick={() => guard(handleUnban)}
+            disabled={isBusy}
+            type="button"
+          >
             <FiUnlock size={14} /> {t('admin.users.unban')}
           </button>
         ) : (
-          <button className={styles.warningButton} onClick={() => setView(VIEW.BAN)} disabled={isBusy} type="button">
+          <button
+            className={styles.warningButton}
+            onClick={() => guard(() => setView(VIEW.BAN))}
+            disabled={isBusy}
+            type="button"
+          >
             <FiSlash size={14} /> {t('admin.users.ban')}
           </button>
         )}
         <button
           className={styles.outlineButton}
-          onClick={() => setView(VIEW.CHANGE_ROLE)}
+          onClick={() => guard(() => setView(VIEW.CHANGE_ROLE))}
           disabled={isBusy}
           type="button"
         >
@@ -384,7 +457,7 @@ function AdminUserDetail({
         </button>
         <button
           className={styles.outlineButton}
-          onClick={() => setView(VIEW.RESET_PASSWORD)}
+          onClick={() => guard(() => setView(VIEW.RESET_PASSWORD))}
           disabled={isBusy}
           type="button"
         >
@@ -392,7 +465,7 @@ function AdminUserDetail({
         </button>
         <button
           className={styles.dangerOutlineButton}
-          onClick={() => setView(VIEW.DELETE)}
+          onClick={() => guard(() => setView(VIEW.DELETE))}
           disabled={isBusy}
           type="button"
         >
@@ -418,7 +491,7 @@ function AdminUserDetail({
             type="text"
             className={styles.input}
             value={editForm.name}
-            onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+            onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
             disabled={isBusy}
           />
         </label>
@@ -429,26 +502,35 @@ function AdminUserDetail({
             type="email"
             className={styles.input}
             value={editForm.email}
-            onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+            onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
             disabled={isBusy}
           />
         </label>
 
         <Checkbox
           checked={editForm.isVerified}
-          onChange={(e) => setEditForm((f) => ({ ...f, isVerified: e.target.checked }))}
+          onChange={e => setEditForm(f => ({ ...f, isVerified: e.target.checked }))}
           disabled={isBusy}
         >
-          <FiCheckCircle size={14} />
-          {' '}{t('admin.users.verified')}
+          <FiCheckCircle size={14} /> {t('admin.users.verified')}
         </Checkbox>
       </div>
 
       <div className={styles.confirmActions}>
-        <button className={styles.cancelButton} onClick={backToDetails} disabled={isBusy} type="button">
+        <button
+          className={styles.cancelButton}
+          onClick={backToDetails}
+          disabled={isBusy}
+          type="button"
+        >
           {t('common.cancel')}
         </button>
-        <button className={styles.primaryButton} onClick={handleEditSubmit} disabled={isBusy} type="button">
+        <button
+          className={styles.primaryButton}
+          onClick={handleEditSubmit}
+          disabled={isBusy}
+          type="button"
+        >
           {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiEdit size={14} />}
           {t('admin.users.edit.save')}
         </button>
@@ -470,7 +552,13 @@ function AdminUserDetail({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={view === VIEW.DETAILS ? t('admin.users.userDetails') : view === VIEW.EDIT ? t('admin.users.edit.title') : undefined}
+      title={
+        view === VIEW.DETAILS
+          ? t('admin.users.userDetails')
+          : view === VIEW.EDIT
+            ? t('admin.users.edit.title')
+            : undefined
+      }
       size="medium"
     >
       <div className={styles.content}>{viewRenderers[view]?.()}</div>

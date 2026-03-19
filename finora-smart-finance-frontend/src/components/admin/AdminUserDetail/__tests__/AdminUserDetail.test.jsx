@@ -9,6 +9,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AdminUserDetail from '../AdminUserDetail';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: () => {} },
   useTranslation: () => ({
     t: (key, params) => {
       if (params) return `${key} ${JSON.stringify(params)}`;
@@ -18,10 +19,18 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useViewerGuard', () => ({
+  useViewerGuard: () => ({ isViewer: false, guard: fn => fn() }),
+}));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
 // Mock Modal (Portal-basiert → vereinfacht)
 vi.mock('react-dom', async () => {
   const actual = await vi.importActual('react-dom');
-  return { ...actual, createPortal: (node) => node };
+  return { ...actual, createPortal: node => node };
 });
 
 vi.mock('framer-motion', () => ({
@@ -106,9 +115,7 @@ describe('AdminUserDetail', () => {
 
   describe('Rendering', () => {
     it('rendert nichts ohne user', () => {
-      const { container } = render(
-        <AdminUserDetail {...defaultProps} user={null} />,
-      );
+      const { container } = render(<AdminUserDetail {...defaultProps} user={null} />);
       // Modal could render empty, but AdminUserDetail returns null
       expect(container.querySelector('[class*="content"]')).toBeNull();
     });

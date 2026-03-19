@@ -1,14 +1,13 @@
 /**
  * @fileoverview ExportSection Component
  * @description Export- und Archivierungsfunktionen für Transaktionen
- * 
+ *
  * FEATURES:
  * - PDF-Export aller Transaktionen
  * - CSV-Export
  * - Zeitraum-Filter für Export
  */
 
- 
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { FiDownload, FiFileText, FiDatabase } from 'react-icons/fi';
@@ -39,7 +38,7 @@ const generateCSV = (transactions, t) => {
     t('export.csv.headers.type'),
     t('export.csv.headers.amount', { currency }),
   ];
-  const rows = transactions.map((tx) => [
+  const rows = transactions.map(tx => [
     formatDate(tx.date, 'short'),
     translateCategory(tx.category, t),
     `"${(tx.description || '').replace(/"/g, '""')}"`, // Escape quotes
@@ -47,21 +46,27 @@ const generateCSV = (transactions, t) => {
     amountFormatter.format(tx.amount),
   ]);
 
-  const csv = [headers.join(';'), ...rows.map((r) => r.join(';'))].join('\n');
+  const csv = [headers.join(';'), ...rows.map(r => r.join(';'))].join('\n');
   return csv;
 };
 
 // ============================================================================
 // PDF-EXPORT HELPER (Professional HTML-to-Print approach)
 // ============================================================================
-const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null, iconDataUri = null) => {
+const generatePDFContent = (
+  transactions,
+  userInfo = {},
+  t,
+  logoDataUri = null,
+  iconDataUri = null
+) => {
   const { language } = getUserPreferences();
   const locale = getLocaleForLanguage(language);
   const totalIncome = transactions
-    .filter((t) => t.type === 'income')
+    .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + t.amount, 0);
   const totalExpense = transactions
-    .filter((t) => t.type === 'expense')
+    .filter(t => t.type === 'expense')
     .reduce((sum, t) => sum + t.amount, 0);
   const balance = totalIncome - totalExpense;
 
@@ -121,40 +126,84 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
       font-size: 0;
     }
     
-    .header img {
+    .header img.header-bg,
+    .header .header-bg {
       width: 100%;
-      height: auto;
+      height: 90px;
+      background: linear-gradient(to right, #27bbd8, #4a8ed8, #5060df);
       display: block;
     }
     
-    .header-user-info {
+    .header-overlay {
       position: absolute;
       top: 0;
-      right: 24px;
+      left: 0;
+      right: 0;
       bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      line-height: 1.4;
+      font-size: 12px;
+    }
+    
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .header-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .header-icon {
+      height: 40px;
+      width: auto;
+    }
+    
+    .header-brand-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 2px;
+    }
+    
+    .header-tagline {
+      font-size: 8px;
+      color: #f472d0;
+      margin-top: 3px;
+      letter-spacing: 2px;
+      font-weight: 600;
+    }
+    
+    .header-user-info {
       display: flex;
       flex-direction: column;
       justify-content: center;
       text-align: right;
-      line-height: 1.4;
+      line-height: 1.5;
     }
     
     .user-name {
-      font-size: 13px;
+      font-size: 16px;
       font-weight: 600;
       color: white;
     }
     
     .user-email {
-      font-size: 11px;
-      color: rgba(255,255,255,0.8);
+      font-size: 13px;
+      color: rgba(255,255,255,0.85);
     }
     
     .export-date {
-      font-size: 10px;
+      font-size: 11px;
       color: rgba(255,255,255,0.65);
-      margin-top: 4px;
-      padding-top: 4px;
+      margin-top: 5px;
+      padding-top: 5px;
       border-top: 1px solid rgba(255,255,255,0.3);
     }
     
@@ -285,27 +334,52 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
     ═══════════════════════════════════════════════════════════════════ */
     .footer {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0.5cm;
+      left: 0.5cm;
+      right: 0.5cm;
       background: #f8fafc;
       border-top: 1px solid var(--border);
-      padding: 10px 24px;
+      padding: 8px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 10px;
+      font-size: 9px;
       color: var(--text-muted);
     }
     
     .footer-brand {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+    }
+    
+    .footer-brand img {
+      height: 16px;
+      width: auto;
     }
     
     .footer-brand span {
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 9px;
+      color: #475569;
+    }
+    
+    .footer-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 8px;
+      color: #64748b;
+    }
+    
+    .footer-meta a {
+      color: #64748b;
+      text-decoration: none;
+    }
+    
+    .footer-page {
+      font-size: 8px;
+      color: #64748b;
     }
     
     /* ═══════════════════════════════════════════════════════════════════
@@ -319,7 +393,7 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
       }
       
       .header { 
-        padding: 12px 16px;
+        padding: 0;
         break-after: avoid;
       }
       
@@ -338,7 +412,7 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
       }
       
       .footer {
-        padding: 8px 16px;
+        padding: 6px 16px;
       }
       
       table { font-size: 9px; }
@@ -349,19 +423,28 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
       margin: 0.5cm;
       size: A4;
     }
+    
+    @page :first {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
   <!-- HEADER -->
   <header class="header">
-    ${headerDataUri
-      ? `<img src="${headerDataUri}" alt="Finora" />`
-      : `<div style="background:linear-gradient(to right,#27bbd8,#4a8ed8,#5060df);padding:16px 24px;"><span style="font-family:Arial,sans-serif;font-size:22px;font-weight:700;color:#fff;">Finora</span></div>`
-    }
-    <div class="header-user-info">
-      <div class="user-name">${userName}</div>
-      ${userEmail ? `<div class="user-email">${userEmail}</div>` : ''}
-      <div class="export-date">${t('export.pdf.createdLabel')}: ${exportDate}</div>
+    <div class="header-bg"></div>
+    <div class="header-overlay">
+      <div class="header-left">
+        <div class="header-brand-row">
+          ${logoDataUri ? `<img src="${logoDataUri}" class="header-icon" alt="Finora" />` : '<span class="header-brand-name">FINORA</span>'}
+        </div>
+        ${!logoDataUri ? '<div class="header-tagline">SMART FINANCE</div>' : ''}
+      </div>
+      <div class="header-user-info">
+        <div class="user-name">${userName}</div>
+        ${userEmail ? `<div class="user-email">${userEmail}</div>` : ''}
+        <div class="export-date">${t('export.pdf.createdLabel')}: ${exportDate}</div>
+      </div>
     </div>
   </header>
   
@@ -387,7 +470,9 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
       .sort(([a], [b]) => b.localeCompare(a))
       .map(([month, txs]) => {
         const monthIncome = txs.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-        const monthExpense = txs.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+        const monthExpense = txs
+          .filter(t => t.type === 'expense')
+          .reduce((s, t) => s + t.amount, 0);
         return `
     <section class="month-section">
       <div class="month-header">
@@ -406,7 +491,8 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
         <tbody>
           ${txs
             .sort((a, b) => new Date(b.date) - new Date(a.date))
-            .map(tx => `
+            .map(
+              tx => `
           <tr>
             <td>${formatDate(tx.date, 'short')}</td>
             <td>
@@ -420,21 +506,31 @@ const generatePDFContent = (transactions, userInfo = {}, t, headerDataUri = null
               ${tx.type === 'income' ? '+' : '−'}${formatCurrency(tx.amount)}
             </td>
           </tr>
-            `).join('')}
+            `
+            )
+            .join('')}
         </tbody>
       </table>
     </section>
         `;
-      }).join('')}
+      })
+      .join('')}
   </main>
   
   <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-brand">
-      ${iconDataUri ? `<img src="${iconDataUri}" alt="Finora" style="height:20px;width:auto;vertical-align:middle;">` : ''}
-      <span>Finora Smart Finance</span>
+      ${iconDataUri ? `<img src="${iconDataUri}" alt="Finora" />` : ''}
+      <span>Smart Finance</span>
     </div>
-    <div>${t('export.pdf.footer', { count: transactions.length, year: new Date().getFullYear() })}</div>
+    <div class="footer-meta">
+      <span>\u00A9 ${new Date().getFullYear()} Finora</span>
+      <span>\u00B7</span>
+      <a href="https://github.com/YoussefDawod" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span>\u00B7</span>
+      <a href="https://www.linkedin.com/in/youssef-dawod-203273215/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
+    <div class="footer-page"></div>
   </footer>
   
 </body>
@@ -481,7 +577,7 @@ export default function ExportSection() {
           );
         }
         const results = await Promise.all(additionalPages);
-        results.forEach((res) => {
+        results.forEach(res => {
           allTransactions = [...allTransactions, ...(res.data.data || [])];
         });
       }
@@ -542,25 +638,28 @@ export default function ExportSection() {
       }
 
       // User-Info für PDF-Header
-      const userInfo = user ? {
-        name: user.name || t('export.pdf.defaultUserName'),
-        email: user.email || '',
-      } : null;
+      const userInfo = user
+        ? {
+            name: user.name || t('export.pdf.defaultUserName'),
+            email: user.email || '',
+          }
+        : null;
 
-      // Branded Header-SVG als Base64 laden
-      let headerDataUri = null;
+      let logoDataUri = null;
       let iconDataUri = null;
       try {
-        const [headerResp, iconResp] = await Promise.all([
-          fetch('/logo-branding/finora-logo-branded-export.svg'),
+        const [logoResp, iconResp] = await Promise.all([
+          fetch('/logo-branding/finora-logo.svg'),
           fetch('/logo-branding/finora-logo-icon.svg'),
         ]);
-        const [headerSvg, iconSvg] = await Promise.all([headerResp.text(), iconResp.text()]);
-        headerDataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(headerSvg)));
+        const [logoSvg, iconSvg] = await Promise.all([logoResp.text(), iconResp.text()]);
+        logoDataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(logoSvg)));
         iconDataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(iconSvg)));
-      } catch { /* Fallback: keine Bilder */ }
+      } catch {
+        /* Fallback: kein Logo */
+      }
 
-      const htmlContent = generatePDFContent(transactions, userInfo, t, headerDataUri, iconDataUri);
+      const htmlContent = generatePDFContent(transactions, userInfo, t, logoDataUri, iconDataUri);
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const blobUrl = URL.createObjectURL(blob);
       const printWindow = window.open(blobUrl, '_blank');
@@ -621,9 +720,7 @@ export default function ExportSection() {
           </div>
           <div className={styles.exportInfo}>
             <h3>{t('export.csv.title')}</h3>
-            <p>
-              {t('export.csv.description')}
-            </p>
+            <p>{t('export.csv.description')}</p>
           </div>
           <Button
             variant="secondary"
@@ -644,9 +741,7 @@ export default function ExportSection() {
           </div>
           <div className={styles.exportInfo}>
             <h3>{t('export.pdf.title')}</h3>
-            <p>
-              {t('export.pdf.description')}
-            </p>
+            <p>{t('export.pdf.description')}</p>
           </div>
           <Button
             variant="secondary"

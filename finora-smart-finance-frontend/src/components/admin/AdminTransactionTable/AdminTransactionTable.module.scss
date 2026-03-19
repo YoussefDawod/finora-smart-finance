@@ -1,7 +1,6 @@
 // ============================================
 // 💳 ADMIN TRANSACTION TABLE – Responsive Table/Card
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ── Container ───────────────────────────────
@@ -63,7 +62,7 @@
     @include below-lg {
       display: grid;
       gap: var(--space-md);
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     }
   }
 
@@ -84,11 +83,13 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
-      padding: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
       box-shadow: var(--sh-sm);
+      overflow: hidden;
+      word-break: break-word;
       transition:
         box-shadow var(--duration-fast),
         transform var(--duration-fast);
@@ -106,6 +107,7 @@
 
     @include mobile {
       grid-template-columns: 1fr;
+      padding: var(--space-md);
     }
   }
 
@@ -119,7 +121,7 @@
       display: flex;
       align-items: center;
       gap: var(--space-sm);
-      padding: var(--space-xs) 0;
+      padding: var(--space-sm) 0;
       border-bottom: 1px solid var(--border-light);
 
       &:last-child {
@@ -137,7 +139,7 @@
         content: attr(data-label);
         font-size: var(--fs-2xs);
         font-weight: var(--fw-sb);
-        color: var(--tx-muted);
+        color: var(--primary);
         text-transform: uppercase;
         letter-spacing: var(--ls-n);
         flex-shrink: 0;

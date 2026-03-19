@@ -16,8 +16,6 @@ import axios from 'axios';
 import { API_CONFIG } from './config';
 import { ENDPOINTS } from './endpoints';
 
- 
-
 // ============================================
 // STATE
 // ============================================
@@ -29,22 +27,44 @@ let isRefreshing = false;
 let refreshQueue = [];
 
 // ============================================
-// STORAGE HELPERS (standalone, ohne React-Hooks)
+// IN-MEMORY TOKEN STORAGE (XSS-sicher)
 // ============================================
 
-const TOKEN_KEY = 'auth_token';
-const REMEMBER_ME_KEY = 'auth_remember_me';
+/**
+ * Access-Token wird ausschließlich als JavaScript-Variable im Speicher gehalten.
+ * → Kein Zugriff über XSS möglich (im Gegensatz zu localStorage).
+ * → Token geht bei Seiten-Reload verloren — wird per httpOnly Refresh-Cookie erneuert.
+ * @type {string|null}
+ */
+let inMemoryAccessToken = null;
 
 /**
- * Bestimmt den aktiven Storage basierend auf Remember-Me-Setting
- * @returns {Storage}
+ * Gibt den aktuellen Access-Token aus dem Speicher zurück
+ * @returns {string|null}
  */
-function getActiveStorage() {
+export function getAccessToken() {
+  return inMemoryAccessToken;
+}
+
+/**
+ * Setzt den Access-Token im Speicher
+ * @param {string|null} token
+ */
+export function setAccessToken(token) {
+  inMemoryAccessToken = token;
+}
+
+/**
+ * Löscht den Access-Token aus dem Speicher und entfernt Legacy-Einträge
+ */
+export function clearAccessToken() {
+  inMemoryAccessToken = null;
+  // Legacy-Einträge aus localStorage/sessionStorage entfernen (Migration)
   try {
-    const rememberMe = globalThis.localStorage?.getItem(REMEMBER_ME_KEY);
-    return rememberMe === 'false' ? globalThis.sessionStorage : globalThis.localStorage;
+    globalThis.localStorage?.removeItem('auth_token');
+    globalThis.sessionStorage?.removeItem('auth_token');
   } catch {
-    return globalThis.localStorage;
+    /* ignore */
   }
 }
 
@@ -66,31 +86,23 @@ export function getStoredRefreshToken() {
 }
 
 /**
- * Speichert neue Tokens im aktiven Storage
- * Refresh-Token wird NICHT mehr in Storage gespeichert — er kommt als httpOnly Cookie
+ * Speichert neuen Access-Token im In-Memory-Speicher
+ * Refresh-Token wird NICHT gespeichert — er kommt als httpOnly Cookie
  * @param {string} accessToken
  * @param {string} _refreshToken — ignoriert (wird per Cookie verwaltet)
  */
 // eslint-disable-next-line no-unused-vars
 function saveTokens(accessToken, _refreshToken) {
-  try {
-    const storage = getActiveStorage();
-    storage?.setItem(TOKEN_KEY, accessToken);
-    // Refresh-Token wird NICHT mehr in localStorage/sessionStorage gespeichert.
-    // Er wird vom Backend als httpOnly Cookie gesetzt und automatisch mitgesendet.
-  } catch (error) {
-    globalThis.console?.error('[TokenRefresh] Failed to save tokens:', error);
-  }
+  inMemoryAccessToken = accessToken;
 }
 
 /**
  * Entfernt alle Auth-Tokens und dispatched Logout-Event
  */
 function clearTokensAndLogout() {
+  clearAccessToken();
   try {
-    globalThis.localStorage?.removeItem(TOKEN_KEY);
-    globalThis.sessionStorage?.removeItem(TOKEN_KEY);
-    // Refresh-Token aus Storage entfernen (Legacy-Migration)
+    // Legacy: Refresh-Token aus Storage entfernen
     globalThis.localStorage?.removeItem('refresh_token');
     globalThis.sessionStorage?.removeItem('refresh_token');
     globalThis.window?.dispatchEvent(new CustomEvent('auth:unauthorized'));
@@ -123,7 +135,7 @@ const EXCLUDED_ENDPOINTS = [
  */
 export function isExcludedFromRefresh(config) {
   const url = config?.url || '';
-  return EXCLUDED_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+  return EXCLUDED_ENDPOINTS.some(endpoint => url.includes(endpoint));
 }
 
 // ============================================
@@ -207,11 +219,11 @@ export function refreshAccessToken() {
   isRefreshing = true;
 
   return executeTokenRefresh()
-    .then((newAccessToken) => {
+    .then(newAccessToken => {
       processQueue(newAccessToken, null);
       return newAccessToken;
     })
-    .catch((error) => {
+    .catch(error => {
       processQueue(null, error);
       clearTokensAndLogout();
       throw error;
@@ -219,6 +231,64 @@ export function refreshAccessToken() {
     .finally(() => {
       isRefreshing = false;
     });
+}
+
+// ============================================
+// INITIAL SESSION CHECK
+// ============================================
+
+/** @type {Promise<string|null>|null} Laufender Initial-Refresh (Singleton) */
+let initialRefreshPromise = null;
+
+/**
+ * Versucht beim App-Start einen Token-Refresh über das httpOnly Cookie.
+ * Im Gegensatz zu refreshAccessToken() löst ein Fehler **kein** Logout-Event aus
+ * und zeigt keine Toast-Meldung — rein passiver Session-Check.
+ *
+ * WICHTIG: Kein AbortSignal! Token-Rotation auf dem Server ist nicht rückgängig
+ * zu machen. Ein Abort würde den neuen Token verwerfen, während der alte auf dem
+ * Server bereits invalidiert wurde → permanenter Logout.
+ *
+ * Bei React StrictMode wird derselbe Request wiederverwendet (Singleton-Pattern),
+ * damit nicht zwei konkurrierende Rotationen stattfinden.
+ *
+ * @returns {Promise<string|null>} Access Token bei Erfolg, null bei Fehler
+ */
+export function tryInitialRefresh() {
+  // Singleton: Falls bereits ein Refresh läuft, dasselbe Promise zurückgeben.
+  // Verhindert doppelte Token-Rotation bei StrictMode (mount → unmount → mount).
+  if (initialRefreshPromise) return initialRefreshPromise;
+
+  initialRefreshPromise = axios
+    .post(
+      `${API_CONFIG.BASE_URL}${ENDPOINTS.auth.refresh}`,
+      {},
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: API_CONFIG.TIMEOUT,
+        withCredentials: true,
+      }
+    )
+    .then(response => {
+      const { accessToken, refreshToken: newRefreshToken } = response.data?.data || {};
+      if (!accessToken) return null;
+
+      saveTokens(accessToken, newRefreshToken);
+
+      globalThis.window?.dispatchEvent(
+        new CustomEvent('auth:token-refreshed', {
+          detail: { accessToken, refreshToken: newRefreshToken },
+        })
+      );
+
+      return accessToken;
+    })
+    .catch(() => null)
+    .finally(() => {
+      initialRefreshPromise = null;
+    });
+
+  return initialRefreshPromise;
 }
 
 // ============================================
@@ -231,6 +301,7 @@ export function refreshAccessToken() {
 export function __resetForTesting() {
   isRefreshing = false;
   refreshQueue = [];
+  inMemoryAccessToken = null;
 }
 
 /**

@@ -1,7 +1,6 @@
 // ============================================
 // 💰 ADMIN TRANSACTIONS PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -224,8 +223,6 @@
   flex-wrap: wrap;
 }
 
-
-
 // ── Date Range ──────────────────────────────
 .dateRange {
   display: flex;
@@ -323,6 +320,19 @@
 
   &:focus-visible {
     @include focus-ring;
+  }
+}
+
+// ── Responsive: Tablet ──────────────────────
+@include tablet-md {
+  .searchWrapper {
+    min-width: 180px;
+    max-width: none;
+    flex: 1 1 auto;
+  }
+
+  .dateRange {
+    gap: var(--space-sm);
   }
 }
 

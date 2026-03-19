@@ -55,13 +55,17 @@ vi.mock('../Footer/Footer', () => ({
   ),
 }));
 
+vi.mock('@/components/common/CommandBar/CommandBar', () => ({
+  default: () => null,
+}));
+
 // ── Helpers ──────────────────────────────────────────────
 
 const renderLayout = () => {
   return render(
     <MemoryRouter>
       <MainLayout />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 
@@ -200,7 +204,7 @@ describe('MainLayout', () => {
           <MainLayout>
             <div data-testid="custom-content">Custom Content</div>
           </MainLayout>
-        </MemoryRouter>,
+        </MemoryRouter>
       );
 
       expect(screen.getByTestId('custom-content')).toBeInTheDocument();

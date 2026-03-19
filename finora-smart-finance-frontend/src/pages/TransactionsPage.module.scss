@@ -1,7 +1,6 @@
 // ============================================
 // 💳 TRANSACTIONS PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -12,19 +11,9 @@
   flex-direction: column;
   gap: var(--space-lg);
   width: 100%;
-  padding: var(--space-lg);
-  min-height: 100vh;
-  min-height: 100dvh; // Dynamic viewport height für bessere Mobile-Kompatibilität
 
   @include tablet {
-    padding: var(--space-md);
     gap: var(--space-md);
-  }
-
-  @include mobile {
-    padding: var(--space-sm);
-    min-height: 100vh;
-    min-height: 100dvh;
   }
 }
 

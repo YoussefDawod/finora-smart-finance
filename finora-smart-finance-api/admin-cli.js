@@ -316,6 +316,7 @@ Beispiele:
       rl.question('Tippen Sie "JA LÖSCHEN" ein um fortzufahren: ', resolve);
     });
     rl.close();
+    process.stdin.unref(); // Verhindert TTYWRAP-Handle nach Interaktion
 
     if (answer !== 'JA LÖSCHEN') {
       console.log('Abgebrochen.');

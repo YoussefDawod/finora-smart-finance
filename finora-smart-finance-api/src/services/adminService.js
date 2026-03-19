@@ -3,11 +3,13 @@
  * Reine Business-Logik für Admin-Operationen (kein Express req/res)
  */
 
+const crypto = require('crypto');
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Subscriber = require('../models/Subscriber');
 const lifecycleService = require('./transactionLifecycleService');
 const { sanitizeUser, sanitizeUsers } = require('../utils/userSanitizer');
+const { sendAdminCreatedCredentialsEmail } = require('../utils/emailService/adminEmails');
 const escapeRegex = require('../utils/escapeRegex');
 const logger = require('../utils/logger');
 
@@ -260,8 +262,44 @@ async function triggerRetentionProcessing() {
 }
 
 /**
+ * Generiert ein sicheres Passwort, das alle Anforderungen erfüllt:
+ * Groß- und Kleinbuchstaben, Zahlen, Sonderzeichen, min. 12 Zeichen.
+ */
+function generateSecurePassword() {
+  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lower = 'abcdefghijklmnopqrstuvwxyz';
+  const digits = '0123456789';
+  const special = '!@#$%^&*()-_=+[]{}|;:,.<>?';
+  const all = upper + lower + digits + special;
+
+  // Garantiert je ein Zeichen aus jeder Gruppe
+  const pick = charset => charset[crypto.randomInt(0, charset.length)];
+  const required = [
+    pick(upper),
+    pick(upper),
+    pick(lower),
+    pick(lower),
+    pick(digits),
+    pick(digits),
+    pick(special),
+    pick(special),
+  ];
+
+  // Restliche Zeichen zufällig aus dem Gesamtpool (auf 16 Zeichen auffüllen)
+  const extra = Array.from({ length: 8 }, () => pick(all));
+
+  // Mischen via Fisher-Yates auf Basis von crypto.randomInt
+  const chars = [...required, ...extra];
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = crypto.randomInt(0, i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}
+
+/**
  * Neuen User anlegen
- * @returns {{ user, error? }} - user bei Erfolg, error-Objekt bei Duplikat
+ * @returns {{ user, generatedPassword, emailSent, error? }}
  */
 async function createUser(data) {
   const existsByName = await User.findOne({ name: data.name });
@@ -276,10 +314,13 @@ async function createUser(data) {
     }
   }
 
+  // Passwort: automatisch generieren oder vom Admin übernehmen
+  const plainPassword = data.autoGeneratePassword ? generateSecurePassword() : data.password;
+
   const user = new User({
     name: data.name,
-    email: data.email,
-    passwordHash: data.password,
+    ...(data.email && { email: data.email }),
+    passwordHash: plainPassword,
     isVerified: data.isVerified ?? false,
     role: data.role || 'user',
     lastName: data.lastName || '',
@@ -287,7 +328,57 @@ async function createUser(data) {
   });
 
   await user.save();
-  return { user: sanitizeUser(user) };
+
+  // Auto-Newsletter-Abo (fire & forget, nicht-kritisch)
+  if (user.email) {
+    Subscriber.findOne({ email: user.email })
+      .then(existingSub => {
+        if (!existingSub) {
+          const sub = new Subscriber({
+            email: user.email,
+            userId: user._id,
+            isConfirmed: true,
+            subscribedAt: new Date(),
+            confirmedAt: new Date(),
+            language: data.emailLanguage || 'de',
+          });
+          sub.generateUnsubscribeToken();
+          return sub.save();
+        }
+      })
+      .catch(() => {});
+  }
+
+  // Email-Versand wenn eine Email-Adresse angegeben wurde
+  let emailSent = false;
+  let activationLink = null;
+
+  if (data.email) {
+    let activationToken = null;
+
+    // Wenn noch nicht verifiziert: Aktivierungstoken generieren
+    if (!user.isVerified) {
+      activationToken = user.generateVerification();
+      await user.save();
+    }
+
+    const emailResult = await sendAdminCreatedCredentialsEmail(
+      user,
+      plainPassword,
+      activationToken,
+      data.emailLanguage
+    );
+    emailSent = !!emailResult?.sent;
+    activationLink = emailResult?.activationLink || null;
+    logger.info(`Admin: Credentials email sent=${emailSent} for user ${user.name}`);
+  }
+
+  return {
+    user: sanitizeUser(user),
+    generatedPassword: data.autoGeneratePassword ? plainPassword : null,
+    emailSent,
+    activationLink,
+  };
 }
 
 /**
@@ -304,9 +395,38 @@ async function updateUser(userId, updates) {
     }
   }
 
+  // Verifizierung erfordert eine E-Mail-Adresse
+  if (updates.isVerified === true && !user.email && !updates.email) {
+    return {
+      error: 'Eine E-Mail-Adresse ist erforderlich, um das Konto zu verifizieren',
+      code: 'VERIFY_REQUIRES_EMAIL',
+    };
+  }
+
   Object.assign(user, updates);
   await user.save();
   logger.info(`Admin: User ${user._id} updated`);
+
+  // Newsletter-Abo wenn User durch Admin verifiziert wird und Email vorhanden
+  const emailForSub = updates.email || user.email;
+  if (updates.isVerified === true && emailForSub) {
+    Subscriber.findOne({ email: emailForSub })
+      .then(existingSub => {
+        if (!existingSub) {
+          const sub = new Subscriber({
+            email: emailForSub,
+            userId: user._id,
+            isConfirmed: true,
+            subscribedAt: new Date(),
+            confirmedAt: new Date(),
+            language: 'de',
+          });
+          sub.generateUnsubscribeToken();
+          return sub.save();
+        }
+      })
+      .catch(() => {});
+  }
 
   return { user: sanitizeUser(user) };
 }
@@ -435,8 +555,8 @@ async function unbanUser(userId) {
  * @returns {{ user, error? }}
  */
 async function changeUserRole(userId, newRole, adminId) {
-  if (!['user', 'admin'].includes(newRole)) {
-    return { error: 'Ungültige Rolle. Erlaubt: user, admin', code: 'INVALID_ROLE' };
+  if (!['user', 'admin', 'viewer'].includes(newRole)) {
+    return { error: 'Ungültige Rolle. Erlaubt: user, admin, viewer', code: 'INVALID_ROLE' };
   }
 
   const user = await User.findById(userId);
@@ -448,7 +568,7 @@ async function changeUserRole(userId, newRole, adminId) {
   }
 
   // Letzter-Admin-Schutz: Letzter Admin kann nicht degradiert werden
-  if (user.role === 'admin' && newRole === 'user') {
+  if (user.role === 'admin' && newRole !== 'admin') {
     const adminCount = await User.countDocuments({ role: 'admin' });
     if (adminCount <= 1) {
       return { error: 'Der letzte Admin kann nicht degradiert werden', code: 'LAST_ADMIN' };

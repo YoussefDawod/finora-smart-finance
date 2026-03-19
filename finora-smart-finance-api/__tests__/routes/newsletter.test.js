@@ -4,6 +4,7 @@
  */
 
 const express = require('express');
+const http = require('http');
 const request = require('supertest');
 const crypto = require('crypto');
 
@@ -25,7 +26,7 @@ jest.mock('../../src/config/env', () => ({
   apiUrl: 'http://localhost:3000',
 }));
 jest.mock('../../src/utils/emailTemplates/newsletterStatusPage', () => ({
-  newsletterStatusPage: jest.fn((status) => `<html>${status}</html>`),
+  newsletterStatusPage: jest.fn(status => `<html>${status}</html>`),
 }));
 // Mock authMiddleware
 jest.mock('../../src/middleware/authMiddleware', () => {
@@ -34,22 +35,19 @@ jest.mock('../../src/middleware/authMiddleware', () => {
     next();
   };
 });
+// Rate-Limiter deaktivieren damit Tests nicht blockiert werden
+jest.mock('express-rate-limit', () => () => (_req, _res, next) => next());
 
 const Subscriber = require('../../src/models/Subscriber');
 const emailService = require('../../src/utils/emailService');
 const { newsletterStatusPage } = require('../../src/utils/emailTemplates/newsletterStatusPage');
+const newsletterRouter = require('../../src/routes/newsletter');
 
 // Build test app
-let app;
+let server;
 
-beforeAll(() => {
-  // Rate limiter darf Tests nicht blockieren — wir patchen ihn weg
-  jest.mock('express-rate-limit', () => {
-    return () => (_req, _res, next) => next();
-  });
-
-  const newsletterRouter = require('../../src/routes/newsletter');
-  app = express();
+beforeAll(done => {
+  const app = express();
   app.use(express.json());
   // Middleware um MockUser zu injizieren
   app.use((req, _res, next) => {
@@ -59,6 +57,13 @@ beforeAll(() => {
     next();
   });
   app.use('/api/newsletter', newsletterRouter);
+  server = http.createServer(app);
+  server.listen(0, done);
+});
+
+afterAll(done => {
+  server.closeAllConnections();
+  server.close(done);
 });
 
 beforeEach(() => {
@@ -73,16 +78,14 @@ describe('Newsletter Routes', () => {
   // ============================================
   describe('POST /subscribe', () => {
     it('should return 400 if email is missing', async () => {
-      const res = await request(app)
-        .post('/api/newsletter/subscribe')
-        .send({});
+      const res = await request(server).post('/api/newsletter/subscribe').send({});
 
       expect(res.status).toBe(400);
       expect(res.body.code).toBe('VALIDATION_ERROR');
     });
 
     it('should return 400 for invalid email format', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'not-an-email' });
 
@@ -97,7 +100,7 @@ describe('Newsletter Routes', () => {
         isConfirmed: true,
       });
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'exists@example.com' });
 
@@ -110,7 +113,7 @@ describe('Newsletter Routes', () => {
     it('should silently succeed when DB-level rate limit reached (L-6)', async () => {
       Subscriber.countDocuments = jest.fn().mockResolvedValue(50);
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'new@example.com' });
 
@@ -139,7 +142,7 @@ describe('Newsletter Routes', () => {
       // optionalAuth: kein Token => User.findById wird nicht aufgerufen
       emailService.sendNewsletterConfirmation = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'new@example.com', language: 'de' });
 
@@ -166,7 +169,7 @@ describe('Newsletter Routes', () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(mockExisting);
       emailService.sendNewsletterConfirmation = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'pending@example.com', language: 'en' });
 
@@ -183,7 +186,7 @@ describe('Newsletter Routes', () => {
         save: jest.fn().mockRejectedValue({ code: 11000 }),
       }));
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'race@example.com' });
 
@@ -194,7 +197,7 @@ describe('Newsletter Routes', () => {
     it('should return 500 on unexpected error', async () => {
       Subscriber.findOne = jest.fn().mockRejectedValue(new Error('DB down'));
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'error@example.com' });
 
@@ -211,9 +214,11 @@ describe('Newsletter Routes', () => {
         generateUnsubscribeToken: jest.fn().mockReturnValue('ut'),
         save: jest.fn().mockResolvedValue(true),
       }));
-      emailService.sendNewsletterConfirmation = jest.fn().mockRejectedValue(new Error('SMTP error'));
+      emailService.sendNewsletterConfirmation = jest
+        .fn()
+        .mockRejectedValue(new Error('SMTP error'));
 
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/subscribe')
         .send({ email: 'test@example.com' });
 
@@ -228,7 +233,7 @@ describe('Newsletter Routes', () => {
   // ============================================
   describe('GET /confirm', () => {
     it('should return 400 if no token provided', async () => {
-      const res = await request(app).get('/api/newsletter/confirm');
+      const res = await request(server).get('/api/newsletter/confirm');
 
       expect(res.status).toBe(400);
       expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
@@ -249,7 +254,7 @@ describe('Newsletter Routes', () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(mockSubscriber);
       emailService.sendNewsletterWelcome = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app).get(`/api/newsletter/confirm?token=${rawToken}`);
+      const res = await request(server).get(`/api/newsletter/confirm?token=${rawToken}`);
 
       expect(res.status).toBe(200);
       expect(Subscriber.findOne).toHaveBeenCalledWith({
@@ -270,7 +275,7 @@ describe('Newsletter Routes', () => {
     it('should return 400 for invalid/expired token', async () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(null);
 
-      const res = await request(app).get('/api/newsletter/confirm?token=bad-token');
+      const res = await request(server).get('/api/newsletter/confirm?token=bad-token');
 
       expect(res.status).toBe(400);
       expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
@@ -279,7 +284,7 @@ describe('Newsletter Routes', () => {
     it('should return 500 on server error', async () => {
       Subscriber.findOne = jest.fn().mockRejectedValue(new Error('DB error'));
 
-      const res = await request(app).get('/api/newsletter/confirm?token=some-token');
+      const res = await request(server).get('/api/newsletter/confirm?token=some-token');
 
       expect(res.status).toBe(500);
       expect(newsletterStatusPage).toHaveBeenCalledWith('error', 'de', expect.any(String));
@@ -291,7 +296,7 @@ describe('Newsletter Routes', () => {
   // ============================================
   describe('GET /unsubscribe', () => {
     it('should return 400 if no token provided', async () => {
-      const res = await request(app).get('/api/newsletter/unsubscribe');
+      const res = await request(server).get('/api/newsletter/unsubscribe');
 
       expect(res.status).toBe(400);
       expect(newsletterStatusPage).toHaveBeenCalledWith('invalid', 'de', expect.any(String));
@@ -311,7 +316,7 @@ describe('Newsletter Routes', () => {
       Subscriber.deleteOne = jest.fn().mockResolvedValue({ deletedCount: 1 });
       emailService.sendNewsletterGoodbye = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app).get(`/api/newsletter/unsubscribe?token=${rawToken}`);
+      const res = await request(server).get(`/api/newsletter/unsubscribe?token=${rawToken}`);
 
       expect(res.status).toBe(200);
       expect(Subscriber.findOne).toHaveBeenCalledWith({ unsubscribeToken: tokenHash });
@@ -323,7 +328,7 @@ describe('Newsletter Routes', () => {
     it('should return 400 for invalid unsubscribe token', async () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(null);
 
-      const res = await request(app).get('/api/newsletter/unsubscribe?token=invalid');
+      const res = await request(server).get('/api/newsletter/unsubscribe?token=invalid');
 
       expect(res.status).toBe(400);
     });
@@ -331,7 +336,7 @@ describe('Newsletter Routes', () => {
     it('should return 500 on server error', async () => {
       Subscriber.findOne = jest.fn().mockRejectedValue(new Error('DB error'));
 
-      const res = await request(app).get('/api/newsletter/unsubscribe?token=some-token');
+      const res = await request(server).get('/api/newsletter/unsubscribe?token=some-token');
 
       expect(res.status).toBe(500);
     });
@@ -347,7 +352,7 @@ describe('Newsletter Routes', () => {
         isConfirmed: true,
       });
 
-      const res = await request(app).get('/api/newsletter/status');
+      const res = await request(server).get('/api/newsletter/status');
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true, subscribed: true });
@@ -360,14 +365,14 @@ describe('Newsletter Routes', () => {
     it('should return subscribed:false for non-subscriber', async () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(null);
 
-      const res = await request(app).get('/api/newsletter/status');
+      const res = await request(server).get('/api/newsletter/status');
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true, subscribed: false });
     });
 
     it('should return subscribed:false if user has no email', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .get('/api/newsletter/status')
         .set('x-mock-user', JSON.stringify({ _id: 'u1', email: '' }));
 
@@ -378,7 +383,7 @@ describe('Newsletter Routes', () => {
     it('should return 500 on server error', async () => {
       Subscriber.findOne = jest.fn().mockRejectedValue(new Error('DB error'));
 
-      const res = await request(app).get('/api/newsletter/status');
+      const res = await request(server).get('/api/newsletter/status');
 
       expect(res.status).toBe(500);
       expect(res.body.code).toBe('SERVER_ERROR');
@@ -390,7 +395,7 @@ describe('Newsletter Routes', () => {
   // ============================================
   describe('POST /toggle', () => {
     it('should return 400 if user has no email', async () => {
-      const res = await request(app)
+      const res = await request(server)
         .post('/api/newsletter/toggle')
         .set('x-mock-user', JSON.stringify({ _id: 'u1', email: '' }));
 
@@ -410,7 +415,7 @@ describe('Newsletter Routes', () => {
       Subscriber.deleteOne = jest.fn().mockResolvedValue({ deletedCount: 1 });
       emailService.sendNewsletterGoodbye = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app).post('/api/newsletter/toggle');
+      const res = await request(server).post('/api/newsletter/toggle');
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
@@ -438,7 +443,7 @@ describe('Newsletter Routes', () => {
 
       emailService.sendNewsletterWelcome = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app).post('/api/newsletter/toggle');
+      const res = await request(server).post('/api/newsletter/toggle');
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({
@@ -462,7 +467,7 @@ describe('Newsletter Routes', () => {
       Subscriber.findOne = jest.fn().mockResolvedValue(mockExisting);
       emailService.sendNewsletterWelcome = jest.fn().mockResolvedValue(true);
 
-      const res = await request(app).post('/api/newsletter/toggle');
+      const res = await request(server).post('/api/newsletter/toggle');
 
       expect(res.status).toBe(200);
       expect(res.body.subscribed).toBe(true);
@@ -478,7 +483,7 @@ describe('Newsletter Routes', () => {
         save: jest.fn().mockRejectedValue({ code: 11000 }),
       }));
 
-      const res = await request(app).post('/api/newsletter/toggle');
+      const res = await request(server).post('/api/newsletter/toggle');
 
       expect(res.status).toBe(200);
       expect(res.body.subscribed).toBe(true);
@@ -487,7 +492,7 @@ describe('Newsletter Routes', () => {
     it('should return 500 on unexpected error', async () => {
       Subscriber.findOne = jest.fn().mockRejectedValue(new Error('DB error'));
 
-      const res = await request(app).post('/api/newsletter/toggle');
+      const res = await request(server).post('/api/newsletter/toggle');
 
       expect(res.status).toBe(500);
       expect(res.body.code).toBe('SERVER_ERROR');

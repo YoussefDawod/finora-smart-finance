@@ -13,7 +13,7 @@ const { sendError } = require('../utils/responseHelper');
 const { adminLimiter } = require('../middleware/rateLimiter');
 const adminController = require('../controllers/adminController');
 const authMiddleware = require('../middleware/authMiddleware');
-const { requireAdmin } = require('../middleware/authMiddleware');
+const { requireAdmin, requireAdminOrViewer } = require('../middleware/authMiddleware');
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
@@ -27,7 +27,9 @@ router.use(async (req, res, next) => {
   if (auth.startsWith('Bearer ')) {
     return authMiddleware(req, res, err => {
       if (err) return next(err);
-      return requireAdmin(req, res, next);
+      // Viewer + Admin dürfen den Admin-Bereich betreten (Read-only vs. Full)
+      // Write-Routen prüfen zusätzlich requireAdmin
+      return requireAdminOrViewer(req, res, next);
     });
   }
 
@@ -576,53 +578,55 @@ router.use(adminLimiter);
  */
 router.get('/stats', adminController.getStats);
 router.get('/users', adminController.listUsers);
-router.get('/users/export', adminController.exportUsers);
+router.get('/users/export', requireAdmin, adminController.exportUsers);
 router.get('/users/:id', adminController.getUser);
-router.post('/users', adminController.createUser);
-router.patch('/users/:id', adminController.updateUser);
-router.delete('/users/:id', adminController.deleteUser);
-router.post('/users/:id/reset-password', adminController.resetPassword);
-router.patch('/users/:id/ban', adminController.banUser);
-router.patch('/users/:id/unban', adminController.unbanUser);
-router.patch('/users/:id/role', adminController.changeUserRole);
-router.delete('/users', adminController.deleteAllUsers);
+router.post('/users', requireAdmin, adminController.createUser);
+router.patch('/users/:id', requireAdmin, adminController.updateUser);
+router.delete('/users/:id', requireAdmin, adminController.deleteUser);
+router.post('/users/:id/reset-password', requireAdmin, adminController.resetPassword);
+router.patch('/users/:id/ban', requireAdmin, adminController.banUser);
+router.patch('/users/:id/unban', requireAdmin, adminController.unbanUser);
+router.patch('/users/:id/role', requireAdmin, adminController.changeUserRole);
+router.delete('/users', requireAdmin, adminController.deleteAllUsers);
 
 // AuditLog-Routen
 router.get('/audit-log', adminController.getAuditLogs);
 router.get('/audit-log/stats', adminController.getAuditLogStats);
+router.delete('/audit-log', requireAdmin, adminController.deleteAllAuditLogs);
+router.delete('/audit-log/bulk', requireAdmin, adminController.deleteAuditLogsBulk);
 
 // Transaction-Routen
 router.get('/transactions/users', adminController.getTransactionUsers);
 router.get('/transactions', adminController.listTransactions);
-router.get('/transactions/export', adminController.exportTransactions);
+router.get('/transactions/export', requireAdmin, adminController.exportTransactions);
 router.get('/transactions/stats', adminController.getTransactionStats);
 router.get('/transactions/:id', adminController.getTransaction);
-router.delete('/transactions/:id', adminController.deleteTransactionAdmin);
+router.delete('/transactions/:id', requireAdmin, adminController.deleteTransactionAdmin);
 
 // Subscriber-Routen
 router.get('/subscribers', adminController.listSubscribers);
 router.get('/subscribers/stats', adminController.getSubscriberStats);
-router.get('/subscribers/export', adminController.exportSubscribersCSV);
+router.get('/subscribers/export', requireAdmin, adminController.exportSubscribersCSV);
 router.get('/subscribers/:id', adminController.getSubscriber);
-router.put('/subscribers/:id', adminController.updateSubscriber);
-router.delete('/subscribers/:id', adminController.deleteSubscriberAdmin);
-router.post('/subscribers/:id/resend', adminController.resendConfirmation);
+router.put('/subscribers/:id', requireAdmin, adminController.updateSubscriber);
+router.delete('/subscribers/:id', requireAdmin, adminController.deleteSubscriberAdmin);
+router.post('/subscribers/:id/resend', requireAdmin, adminController.resendConfirmation);
 
 // Campaign-Routen (Newsletter-Versand)
 router.get('/campaigns', adminController.listCampaigns);
 router.get('/campaigns/stats', adminController.getCampaignStats);
-router.post('/campaigns', adminController.createCampaign);
-router.post('/campaigns/preview', adminController.previewCampaign);
+router.post('/campaigns', requireAdmin, adminController.createCampaign);
+router.post('/campaigns/preview', requireAdmin, adminController.previewCampaign);
 router.get('/campaigns/:id', adminController.getCampaign);
-router.put('/campaigns/:id', adminController.updateCampaign);
-router.delete('/campaigns/:id', adminController.deleteCampaign);
-router.delete('/campaigns', adminController.deleteAllCampaigns);
-router.post('/campaigns/:id/send', adminController.sendCampaign);
+router.put('/campaigns/:id', requireAdmin, adminController.updateCampaign);
+router.delete('/campaigns/:id', requireAdmin, adminController.deleteCampaign);
+router.delete('/campaigns', requireAdmin, adminController.deleteAllCampaigns);
+router.post('/campaigns/:id/send', requireAdmin, adminController.sendCampaign);
 
 // Lifecycle-Routen
 router.get('/lifecycle/stats', adminController.getLifecycleStats);
 router.get('/lifecycle/users/:id', adminController.getUserLifecycleDetail);
-router.post('/lifecycle/users/:id/reset', adminController.resetUserRetention);
-router.post('/lifecycle/trigger', adminController.triggerRetentionProcessing);
+router.post('/lifecycle/users/:id/reset', requireAdmin, adminController.resetUserRetention);
+router.post('/lifecycle/trigger', requireAdmin, adminController.triggerRetentionProcessing);
 
 module.exports = router;

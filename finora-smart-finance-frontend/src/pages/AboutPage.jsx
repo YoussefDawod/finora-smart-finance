@@ -1,29 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { FiArrowLeft, FiCheck } from 'react-icons/fi';
-import MiniFooter from '@/components/common/MiniFooter/MiniFooter';
-import styles from './InfoPage.module.scss';
+import { FiCheck } from 'react-icons/fi';
+import styles from './about/AboutPage.module.scss';
 
 export default function AboutPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const values = t('about.values.items', { returnObjects: true });
-
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/');
-    }
-  };
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.pageContent}>
-        <button type="button" onClick={handleBack} className={styles.backButton} aria-label={t('common.back')}>
-          <FiArrowLeft />
-        </button>
-
         <div className={styles.pageHeader}>
           <h1 className={styles.title}>{t('about.title')}</h1>
           <p className={styles.subtitle}>{t('about.subtitle')}</p>
@@ -74,8 +59,6 @@ export default function AboutPage() {
           <h2 className={styles.aboutSectionTitle}>{t('about.tech.title')}</h2>
           <p className={styles.aboutSectionText}>{t('about.tech.description')}</p>
         </div>
-
-        <MiniFooter />
       </div>
     </div>
   );

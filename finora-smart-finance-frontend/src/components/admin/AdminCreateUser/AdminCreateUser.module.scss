@@ -1,13 +1,12 @@
 // ============================================
 // ➕ ADMIN CREATE USER MODAL
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   padding: var(--space-xs) 0;
 }
 
@@ -75,6 +74,18 @@
   align-items: flex-end;
 }
 
+// ── 2-column form row (Name + Email) ─────────
+.formRow {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+
+  > .field {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 // ── Actions ─────────────────────────────────
 .actions {
   display: flex;
@@ -128,12 +139,275 @@
 // ── Spinning ────────────────────────────────
 @include spin-keyframes;
 
+// ── Password Mode Toggle ─────────────────────
+.passwordModeToggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-bottom: var(--space-xs);
+}
+
+.toggleOption {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  background: var(--surface);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:not(:last-child) {
+    border-right: 1px solid var(--border);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    color: var(--tx);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.toggleOptionActive {
+  background: var(--primary);
+  color: var(--on-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--primary);
+    opacity: 0.92;
+    color: var(--on-primary);
+  }
+}
+
+// ── Optional Tag ────────────────────────────
+.optionalTag {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-r);
+  color: var(--tx-subtle);
+  margin-left: var(--space-2xs);
+}
+
+// ── Field Hint (below inputs) ────────────────
+.fieldHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+}
+
+// ── No-Email Hint (in createdResult) ────────
+.noEmailHint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--warning) 30%, transparent);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+// ── Security Hint (in createdResult) ────────
+.securityHint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+}
+
+// ── Password Input with Eye Toggle ──────────
+.passwordInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eyeButton {
+  position: absolute;
+  right: var(--space-xs);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xs);
+  background: none;
+  border: none;
+  color: var(--tx-muted);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: color var(--duration-fast);
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    color: var(--tx);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.regenerateButton {
+  position: absolute;
+  right: 2.15rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xs);
+  background: none;
+  border: none;
+  color: var(--tx-muted);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: color var(--duration-fast);
+  line-height: 1;
+
+  &:hover:not(:disabled) {
+    color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Generated Password Box ───────────────────
+.generatedPasswordBox {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--surface-2);
+}
+
+.generatedPasswordInput {
+  flex: 1;
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-sm);
+  font-family: monospace;
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  background: transparent;
+  border: none;
+  outline: none;
+  letter-spacing: 0.04em;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  border: none;
+  border-left: 1px solid var(--border);
+  background: var(--surface-3);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--primary);
+    color: var(--on-primary);
+    border-color: var(--primary);
+  }
+}
+
+.copyButtonSuccess {
+  background: var(--success);
+  color: var(--on-success);
+  border-color: var(--success);
+
+  &:hover {
+    background: var(--success);
+    color: var(--on-success);
+    border-color: var(--success);
+  }
+}
+
+.generatedPasswordHint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+}
+
+// ── Credentials Sent Banner ──────────────────
+.credentialsBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--success) 35%, transparent);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  color: var(--success);
+}
+
+// ── Created View (Passwort-Anzeige nach Erstellung) ──
+.createdView {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+}
+
+.createdHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  text-align: center;
+  padding: var(--space-sm) 0;
+
+  p {
+    font-size: var(--fs-sm);
+    color: var(--tx-muted);
+    margin: 0;
+  }
+}
+
+.createdIcon {
+  color: var(--success);
+}
+
 .spinning {
   animation: spin 0.8s linear infinite;
 }
 
 // ── Responsive ──────────────────────────────
 @include breakpoint($max: $bp-xs) {
+  .formRow,
   .rowFields {
     flex-direction: column;
     align-items: stretch;

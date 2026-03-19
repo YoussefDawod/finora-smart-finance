@@ -1,7 +1,6 @@
 // ============================================
 // 📨 ADMIN CAMPAIGN DETAIL
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .content {
@@ -282,11 +281,9 @@
   justify-content: center;
   width: 56px;
   height: 56px;
-  border-radius: var(--r-full);
 }
 
 .danger {
-  background: color-mix(in srgb, var(--error) 12%, transparent);
   color: var(--error);
 }
 

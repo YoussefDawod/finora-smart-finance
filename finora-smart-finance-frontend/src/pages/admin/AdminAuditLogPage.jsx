@@ -1,14 +1,15 @@
 /**
  * @fileoverview Admin Audit Log Page
- * @description Audit-Log-Übersicht mit Filterfunktion (Aktion, Zeitraum),
- *              sortierbarer Tabelle und Pagination – ausschließlich read-only.
+ * @description Audit-Log-Übersicht mit Monatbasierter Ansicht, erweiterter
+ *              Filterung (Aktion, Land), Selektion, Löschen und Export (CSV/PDF).
  *
  * Komponente:  AdminAuditLogTable
- * Hook:        useAdminAuditLog (Laden, Filter, Sortierung)
+ * Hook:        useAdminAuditLog
  *
  * @module pages/admin/AdminAuditLogPage
  */
 
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FiRefreshCw,
@@ -16,11 +17,16 @@ import {
   FiActivity,
   FiUser,
   FiSearch,
+  FiChevronLeft,
+  FiChevronRight,
+  FiDownload,
+  FiTrash2,
 } from 'react-icons/fi';
 import { useAdminAuditLog } from '@/hooks';
+import { useViewerGuard } from '@/hooks/useViewerGuard';
 import { AdminAuditLogTable, AdminStatCard } from '@/components/admin';
 import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
-import DateInput from '@/components/common/DateInput/DateInput';
+import Modal from '@/components/common/Modal/Modal';
 import styles from './AdminAuditLogPage.module.scss';
 
 const AUDIT_ACTIONS = [
@@ -53,11 +59,30 @@ const AUDIT_ACTIONS = [
   'PASSWORD_RESET_REQUESTED',
   'PASSWORD_RESET_COMPLETED',
   'EMAIL_CHANGED',
+  'AUDIT_LOG_CLEARED',
+  'AUDIT_LOG_ENTRIES_DELETED',
 ];
 
 export default function AdminAuditLogPage() {
   const { t } = useTranslation();
-  const { logs, stats, pagination, loading, error, filters, actions } = useAdminAuditLog();
+  const { logs, stats, pagination, loading, isDeleting, error, filters, actions, selection } =
+    useAdminAuditLog();
+  const { guard } = useViewerGuard();
+
+  // Bestätigungs-Modals
+  const [showDeleteSelectedModal, setShowDeleteSelectedModal] = useState(false);
+  const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+
+  // ── Delete Handlers ─────────────────────────────
+  const handleConfirmDeleteSelected = async () => {
+    await actions.deleteSelected();
+    setShowDeleteSelectedModal(false);
+  };
+
+  const handleConfirmDeleteAll = async () => {
+    await actions.deleteAll();
+    setShowDeleteAllModal(false);
+  };
 
   // ── Error State ─────────────────────────────────
   if (error && !loading && logs.length === 0) {
@@ -65,11 +90,7 @@ export default function AdminAuditLogPage() {
       <div className={styles.page}>
         <div className={styles.errorState}>
           <p className={styles.errorText}>{error}</p>
-          <button
-            className={styles.retryButton}
-            onClick={actions.refresh}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={actions.refresh} type="button">
             <FiRefreshCw size={16} />
             {t('admin.dashboard.retry')}
           </button>
@@ -87,17 +108,40 @@ export default function AdminAuditLogPage() {
           <p className={styles.subtitle}>
             {t('admin.auditLog.subtitle', { count: pagination.total })}
           </p>
+          <p className={styles.retentionInfo}>{t('admin.auditLog.retentionInfo')}</p>
         </div>
-        <button
-          className={styles.refreshButton}
-          onClick={actions.refresh}
-          disabled={loading}
-          type="button"
-          aria-label={t('admin.auditLog.refresh')}
-        >
-          <FiRefreshCw size={16} className={loading ? styles.spinning : ''} />
-          {t('admin.auditLog.refresh')}
-        </button>
+        <div className={styles.headerActions}>
+          {/* Export Buttons */}
+          <button
+            className={styles.exportButton}
+            onClick={() => guard(actions.exportCSV)}
+            disabled={loading || logs.length === 0}
+            type="button"
+          >
+            <FiDownload size={14} />
+            {t('admin.auditLog.exportCSV')}
+          </button>
+          <button
+            className={styles.exportButton}
+            onClick={() => guard(actions.exportPDF)}
+            disabled={loading || logs.length === 0}
+            type="button"
+          >
+            <FiDownload size={14} />
+            {t('admin.auditLog.exportPDF')}
+          </button>
+          {/* Refresh */}
+          <button
+            className={styles.refreshButton}
+            onClick={actions.refresh}
+            disabled={loading}
+            type="button"
+            aria-label={t('admin.auditLog.refresh')}
+          >
+            <FiRefreshCw size={16} className={loading ? styles.spinning : ''} />
+            {t('admin.auditLog.refresh')}
+          </button>
+        </div>
       </div>
 
       {/* ── Stats Grid ──────────────────────────── */}
@@ -111,9 +155,11 @@ export default function AdminAuditLogPage() {
         />
         <AdminStatCard
           label={t('admin.auditLog.statMostCommon')}
-          value={stats?.mostCommonAction
-            ? t(`admin.auditLog.actions_enum.${stats.mostCommonAction}`, stats.mostCommonAction)
-            : '—'}
+          value={
+            stats?.mostCommonAction
+              ? t(`admin.auditLog.actions_enum.${stats.mostCommonAction}`, stats.mostCommonAction)
+              : '—'
+          }
           icon={FiActivity}
           color="info"
           isLoading={loading && !stats}
@@ -127,8 +173,9 @@ export default function AdminAuditLogPage() {
         />
       </section>
 
-      {/* ── Filters ─────────────────────────────── */}
+      {/* ── Toolbar ─────────────────────────────── */}
       <div className={styles.toolbar}>
+        {/* Suche */}
         <div className={styles.searchWrapper}>
           <FiSearch className={styles.searchIcon} size={16} />
           <input
@@ -136,11 +183,39 @@ export default function AdminAuditLogPage() {
             type="text"
             placeholder={t('admin.auditLog.searchPlaceholder')}
             value={filters.search}
-            onChange={(e) => filters.setSearch(e.target.value)}
+            onChange={e => filters.setSearch(e.target.value)}
             aria-label={t('admin.auditLog.searchPlaceholder')}
           />
         </div>
 
+        {/* Monatsnavigation */}
+        <div className={styles.monthFilter}>
+          <button
+            className={styles.monthArrow}
+            onClick={actions.goToPrevMonth}
+            type="button"
+            aria-label={t('admin.auditLog.prevMonth')}
+          >
+            <FiChevronLeft size={16} />
+          </button>
+          <input
+            type="month"
+            className={styles.monthInput}
+            value={filters.selectedMonth}
+            onChange={e => filters.setSelectedMonth(e.target.value)}
+            aria-label={t('admin.auditLog.selectMonth')}
+          />
+          <button
+            className={styles.monthArrow}
+            onClick={actions.goToNextMonth}
+            type="button"
+            aria-label={t('admin.auditLog.nextMonth')}
+          >
+            <FiChevronRight size={16} />
+          </button>
+        </div>
+
+        {/* Filter-Gruppe */}
         <div className={styles.filterGroup}>
           <FilterDropdown
             value={filters.actionFilter}
@@ -149,29 +224,63 @@ export default function AdminAuditLogPage() {
             placeholder={t('admin.auditLog.allActions')}
             options={[
               { value: '', label: t('admin.auditLog.allActions') },
-              ...AUDIT_ACTIONS.map((action) => ({
+              ...AUDIT_ACTIONS.map(action => ({
                 value: action,
                 label: t(`admin.auditLog.actions_enum.${action}`, action),
               })),
             ]}
           />
-        </div>
-
-        <div className={styles.dateRange}>
-          <DateInput
-            label={t('admin.auditLog.startDate')}
-            value={filters.startDate}
-            onChange={filters.setStartDate}
-            ariaLabel={t('admin.auditLog.startDate')}
-          />
-          <DateInput
-            label={t('admin.auditLog.endDate')}
-            value={filters.endDate}
-            onChange={filters.setEndDate}
-            ariaLabel={t('admin.auditLog.endDate')}
+          <FilterDropdown
+            value={filters.countryFilter}
+            onChange={filters.setCountryFilter}
+            ariaLabel={t('admin.auditLog.filterCountry')}
+            placeholder={t('admin.auditLog.allCountries')}
+            options={[{ value: '', label: t('admin.auditLog.allCountries') }]}
           />
         </div>
       </div>
+
+      {/* ── Bulk Action Bar ─────────────────────── */}
+      {selection.selectedIds.size > 0 && (
+        <div className={styles.bulkBar}>
+          <span className={styles.bulkInfo}>
+            {t('admin.auditLog.selectedCount', { count: selection.selectedIds.size })}
+          </span>
+          <div className={styles.bulkActions}>
+            <button
+              className={styles.bulkClearButton}
+              onClick={selection.handleClearSelection}
+              type="button"
+            >
+              {t('admin.auditLog.deselectAll')}
+            </button>
+            <button
+              className={styles.bulkDeleteButton}
+              onClick={() => guard(() => setShowDeleteSelectedModal(true))}
+              disabled={isDeleting}
+              type="button"
+            >
+              <FiTrash2 size={14} />
+              {t('admin.auditLog.deleteSelected')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete All Button ───────────────────── */}
+      {logs.length > 0 && selection.selectedIds.size === 0 && (
+        <div className={styles.deleteAllWrapper}>
+          <button
+            className={styles.deleteAllButton}
+            onClick={() => guard(() => setShowDeleteAllModal(true))}
+            disabled={isDeleting}
+            type="button"
+          >
+            <FiTrash2 size={14} />
+            {t('admin.auditLog.deleteAll')}
+          </button>
+        </div>
+      )}
 
       {/* ── Table ───────────────────────────────── */}
       <AdminAuditLogTable
@@ -181,7 +290,70 @@ export default function AdminAuditLogPage() {
         sort={filters.sort}
         onSortChange={filters.setSort}
         onPageChange={filters.setPage}
+        selectedIds={selection.selectedIds}
+        onSelectId={selection.handleSelectId}
+        onSelectAll={selection.handleSelectAll}
       />
+
+      {/* ── Delete Selected Modal ───────────────── */}
+      <Modal
+        isOpen={showDeleteSelectedModal}
+        onClose={() => setShowDeleteSelectedModal(false)}
+        title={t('admin.auditLog.deleteConfirmTitle')}
+        size="small"
+        footer={
+          <div className={styles.modalFooter}>
+            <button
+              className={styles.modalCancelButton}
+              onClick={() => setShowDeleteSelectedModal(false)}
+              type="button"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              className={styles.modalDeleteButton}
+              onClick={handleConfirmDeleteSelected}
+              disabled={isDeleting}
+              type="button"
+            >
+              <FiTrash2 size={14} />
+              {isDeleting ? t('common.loading') : t('admin.auditLog.deleteSelected')}
+            </button>
+          </div>
+        }
+      >
+        <p>{t('admin.auditLog.deleteConfirmSelected', { count: selection.selectedIds.size })}</p>
+      </Modal>
+
+      {/* ── Delete All Modal ────────────────────── */}
+      <Modal
+        isOpen={showDeleteAllModal}
+        onClose={() => setShowDeleteAllModal(false)}
+        title={t('admin.auditLog.deleteConfirmTitle')}
+        size="small"
+        footer={
+          <div className={styles.modalFooter}>
+            <button
+              className={styles.modalCancelButton}
+              onClick={() => setShowDeleteAllModal(false)}
+              type="button"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              className={styles.modalDeleteButton}
+              onClick={handleConfirmDeleteAll}
+              disabled={isDeleting}
+              type="button"
+            >
+              <FiTrash2 size={14} />
+              {isDeleting ? t('common.loading') : t('admin.auditLog.deleteAll')}
+            </button>
+          </div>
+        }
+      >
+        <p>{t('admin.auditLog.deleteConfirmAll')}</p>
+      </Modal>
     </div>
   );
 }

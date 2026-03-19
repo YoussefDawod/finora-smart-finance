@@ -7,6 +7,8 @@
 
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
 import {
   FiUser,
   FiMail,
@@ -26,7 +28,9 @@ const DEFAULT_SKELETON_ROWS = 6;
 function formatDate(dateStr, locale = 'de') {
   if (!dateStr) return '—';
   return new Date(dateStr).toLocaleDateString(locale, {
-    day: '2-digit', month: '2-digit', year: 'numeric',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
 }
 
@@ -48,10 +52,14 @@ function AdminTransactionUserList({
   onPageChange,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
 
-  const handleUserClick = useCallback((user) => {
-    onSelectUser?.(user);
-  }, [onSelectUser]);
+  const handleUserClick = useCallback(
+    user => {
+      onSelectUser?.(user);
+    },
+    [onSelectUser]
+  );
 
   // ── Loading ─────────────────────────────────────
   if (loading && users.length === 0) {
@@ -78,7 +86,7 @@ function AdminTransactionUserList({
     <div className={styles.container}>
       {/* User Cards Grid */}
       <div className={styles.userGrid}>
-        {users.map((user) => {
+        {users.map(user => {
           const userId = user._id || user.id;
           const netBalance = (user.totalIncome || 0) - (user.totalExpense || 0);
           return (
@@ -94,17 +102,19 @@ function AdminTransactionUserList({
                 <div className={styles.userAvatar}>
                   {user.name
                     ?.split(' ')
-                    .map((p) => p[0])
+                    .map(p => p[0])
                     .join('')
                     .toUpperCase()
                     .slice(0, 2) || 'U'}
                 </div>
                 <div className={styles.userInfo}>
-                  <span className={styles.userName}>{user.name}</span>
+                  <span className={styles.userName}>
+                    <SensitiveData active={isViewer}>{user.name}</SensitiveData>
+                  </span>
                   {user.email && (
                     <span className={styles.userEmail}>
                       <FiMail size={12} />
-                      {user.email}
+                      <SensitiveData active={isViewer}>{user.email}</SensitiveData>
                     </span>
                   )}
                 </div>
@@ -120,11 +130,15 @@ function AdminTransactionUserList({
                 </div>
                 <div className={`${styles.stat} ${styles.income}`}>
                   <FiArrowUpCircle size={14} />
-                  <span className={styles.statValue}>{formatAdminCurrency(user.totalIncome, i18n.language)}</span>
+                  <span className={styles.statValue}>
+                    {formatAdminCurrency(user.totalIncome, i18n.language)}
+                  </span>
                 </div>
                 <div className={`${styles.stat} ${styles.expense}`}>
                   <FiArrowDownCircle size={14} />
-                  <span className={styles.statValue}>{formatAdminCurrency(user.totalExpense, i18n.language)}</span>
+                  <span className={styles.statValue}>
+                    {formatAdminCurrency(user.totalExpense, i18n.language)}
+                  </span>
                 </div>
               </div>
 
@@ -133,11 +147,15 @@ function AdminTransactionUserList({
                 {user.lastTransactionDate && (
                   <span className={styles.lastTx}>
                     <FiCalendar size={12} />
-                    {t('admin.transactions.lastTransaction')}: {formatDate(user.lastTransactionDate, i18n.language)}
+                    {t('admin.transactions.lastTransaction')}:{' '}
+                    {formatDate(user.lastTransactionDate, i18n.language)}
                   </span>
                 )}
-                <span className={`${styles.balance} ${netBalance >= 0 ? styles.positive : styles.negative}`}>
-                  {netBalance >= 0 ? '+' : ''}{formatAdminCurrency(netBalance, i18n.language)}
+                <span
+                  className={`${styles.balance} ${netBalance >= 0 ? styles.positive : styles.negative}`}
+                >
+                  {netBalance >= 0 ? '+' : ''}
+                  {formatAdminCurrency(netBalance, i18n.language)}
                 </span>
               </div>
             </button>
@@ -147,7 +165,11 @@ function AdminTransactionUserList({
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className={styles.pagination} role="navigation" aria-label={t('admin.transactions.pagination')}>
+        <div
+          className={styles.pagination}
+          role="navigation"
+          aria-label={t('admin.transactions.pagination')}
+        >
           <span className={styles.paginationInfo}>
             {t('admin.transactions.showing', {
               from: (page - 1) * (pagination.limit || DEFAULT_SKELETON_ROWS) + 1,
@@ -167,7 +189,9 @@ function AdminTransactionUserList({
             </button>
             {generatePageNumbers(page, pages).map((p, idx) =>
               p === '...' ? (
-                <span key={`dots-${idx}`} className={styles.dots}>…</span>
+                <span key={`dots-${idx}`} className={styles.dots}>
+                  …
+                </span>
               ) : (
                 <button
                   key={p}
@@ -179,7 +203,7 @@ function AdminTransactionUserList({
                 >
                   {p}
                 </button>
-              ),
+              )
             )}
             <button
               className={styles.pageButton}

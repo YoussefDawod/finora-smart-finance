@@ -7,7 +7,11 @@
     <!-- Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
-                   script-src 'self' 'sha256-6+R6kpyvXiKspmuUkyBJIlZEaVZK8tTwLwzv/l10dnc=' 'sha256-43OT4FOuXCthLN597VvUfDHJCtOJ22A3EzBtSuCfan8=';
+                   script-src 'self'
+                     'sha256-6+BFZy9OL3ITrfP7I1V6iUpdd4sRyiuyLjWImVLDIDU='
+                     'sha256-qkChuvS5IjPzogTv1aGtimYgLPkQ5yvmcOFytTTxY7Q='
+                     'sha256-43OT4FOuXCthLN597VvUfDHJCtOJ22A3EzBtSuCfan8='
+                     'sha256-uKkMV8/Wxx0DWiaEzSed+C+pqZWHyeDFrj1q7sKz3Aw=';
                    style-src 'self' 'unsafe-inline';
                    img-src 'self' data:;
                    font-src 'self';
@@ -96,10 +100,16 @@
     <meta name="apple-mobile-web-app-title" content="Finora" />
     
     <!-- ============================================
-         Fonts are now self-hosted via @fontsource
-         (Previously: verwaiste Preconnects zu Google Fonts)
-         Removed preconnect links — not needed anymore
+         Font Preloads — kritische Schriften früh laden
+         Fonts liegen in /public/fonts/ (statische Pfade, kein Content-Hash)
+         @fontsource Imports für Inter/Bebas entfernt → kein doppeltes Laden
          ============================================ -->
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2"
+          as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin-wght-italic.woff2"
+          as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/bebas-neue-latin-400-normal.woff2"
+          as="font" type="font/woff2" crossorigin />
     
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">

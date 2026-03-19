@@ -1,7 +1,6 @@
 // ============================================
 // 🔽 FILTER COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -38,6 +37,14 @@
   @include below-sm {
     width: 100%;
     justify-content: center;
+
+    span {
+      display: none;
+    }
+
+    .chevron {
+      display: none;
+    }
   }
 
   &:hover {
@@ -316,4 +323,95 @@
   .dateInput {
     transition: none;
   }
+}
+
+// ============================================
+// MOBILE BOTTOM SHEET
+// ============================================
+.sheetBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1400);
+  background: var(--overlay);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+.sheetPanel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: calc(var(--z-modal, 1400) + 1);
+  max-height: 85vh;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  box-shadow: var(--sh-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sheetHandle {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-sm) 0 var(--space-2xs);
+  flex-shrink: 0;
+}
+
+.sheetHandleBar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--tx) 20%, transparent);
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg) var(--space-sm);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sheetTitle {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.sheetClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  color: var(--tx-muted);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition:
+    color var(--tr),
+    background var(--tr);
+
+  &:hover {
+    color: var(--tx);
+    background: var(--surface-2);
+  }
+
+  @include focus-ring;
+}
+
+.sheetBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-sm) var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
 }

@@ -4,6 +4,10 @@
 # VS Code Extension: REST Client (humao.rest-client)
 # Oder importiere diese Datei in Postman/Insomnia
 #
+# ⚠️  DEVELOPMENT ONLY — enthält keine echten Credentials
+# Kopiere diese Datei zu admin-api.local.http und trage dort deinen Key ein.
+# admin-api.local.http ist in .gitignore und wird NICHT committed.
+#
 # Hinweis: Ersetze <userId> mit echter User-ID aus der Liste
 # Hinweis: DELETE /users benötigt confirm + reason
 ###############################################################################
@@ -14,7 +18,13 @@
 ### Variables
 @userId = 60d5ec49f1b2c72b8c8e4f1a
 
-# Authentifizierung ist in allen Umgebungen erforderlich (JWT oder x-admin-key)
+# ─── Authentifizierung ────────────────────────────────────────────────────────
+# Admin-Key aus .env (ADMIN_KEY) in admin-api.local.http eintragen:
+# @adminKey = <dein-admin-key-hier>
+#
+# Dann jeden Request mit folgendem Header absichern:
+# x-admin-key: {{adminKey}}
+# ─────────────────────────────────────────────────────────────────────────────
 
 
 ###############################################################################

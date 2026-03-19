@@ -1,0 +1,197 @@
+// ============================================
+// 📄 ABOUT PAGE
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+// ============================================
+// HEADER
+// ============================================
+.pageContent {
+  max-width: 50rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+
+  @include mobile {
+    margin-bottom: var(--space-2xl);
+  }
+}
+
+.title {
+  font-size: clamp(var(--fs-2xl), 5vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  background: linear-gradient(
+    135deg,
+    var(--aurora-1) 0%,
+    var(--primary) 45%,
+    var(--secondary) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-sm);
+}
+
+.subtitle {
+  font-size: clamp(var(--fs-sm), 2vw, var(--fs-lg));
+  color: var(--tx-muted);
+  max-width: 60ch;
+  margin: 0 auto;
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// ABOUT SECTIONS
+// ============================================
+.aboutSection {
+  margin-bottom: var(--space-2xl);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.aboutSectionTitle {
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin-bottom: var(--space-md);
+  // Aurora-Akzent als inline-start Rahmen (RTL-aware)
+  padding-inline-start: var(--space-sm);
+  border-inline-start: 2px solid var(--aurora-1);
+
+  @include mobile {
+    font-size: var(--fs-lg);
+  }
+}
+
+.aboutSectionText {
+  font-size: var(--fs-base);
+  color: var(--tx-muted);
+  line-height: 1.7;
+
+  @include mobile {
+    font-size: var(--fs-sm);
+  }
+}
+
+// ============================================
+// DEVELOPER CARD — Glass
+// ============================================
+.developerCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  padding: var(--space-xl);
+  margin-top: var(--space-md);
+  backdrop-filter: blur(var(--glass-blur-reduced));
+  -webkit-backdrop-filter: blur(var(--glass-blur-reduced));
+  box-shadow: var(--glass-shadow);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
+
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+    padding: var(--space-lg);
+  }
+}
+
+.developerAvatar {
+  width: 5rem;
+  height: 5rem;
+  border-radius: var(--r-full);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--aurora-1) 18%, var(--glass-bg)),
+    color-mix(in srgb, var(--primary) 22%, var(--glass-bg))
+  );
+  border: 1px solid color-mix(in srgb, var(--aurora-1) 35%, transparent);
+  color: var(--aurora-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-b);
+  flex-shrink: 0;
+}
+
+.developerInfo {
+  flex: 1;
+}
+
+.developerName {
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin-bottom: var(--space-3xs);
+}
+
+.developerRole {
+  font-size: var(--fs-sm);
+  color: var(--aurora-1);
+  font-weight: var(--fw-m);
+  margin-bottom: var(--space-sm);
+}
+
+.developerDesc {
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+}
+
+// ============================================
+// VALUES LIST
+// ============================================
+.aboutValuesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.aboutValueItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  font-size: var(--fs-sm);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+
+  svg {
+    color: var(--aurora-3);
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin-top: 2px;
+  }
+}

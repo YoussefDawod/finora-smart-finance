@@ -33,13 +33,28 @@ describe('AuditLogService', () => {
       expect(AUDIT_ACTIONS).toContain('SUBSCRIBER_DELETED');
     });
 
+    it('should include AUDIT_LOG_CLEARED', () => {
+      expect(AUDIT_ACTIONS).toContain('AUDIT_LOG_CLEARED');
+    });
+
+    it('should include AUDIT_LOG_ENTRIES_DELETED', () => {
+      expect(AUDIT_ACTIONS).toContain('AUDIT_LOG_ENTRIES_DELETED');
+    });
+
     it('should include all core admin actions', () => {
       const coreActions = [
-        'USER_CREATED', 'USER_UPDATED', 'USER_DELETED',
-        'USER_BANNED', 'USER_UNBANNED', 'USER_ROLE_CHANGED',
-        'USER_PASSWORD_RESET', 'ALL_USERS_DELETED',
-        'TRANSACTION_DELETED', 'SUBSCRIBER_DELETED',
-        'ADMIN_LOGIN', 'SETTINGS_CHANGED',
+        'USER_CREATED',
+        'USER_UPDATED',
+        'USER_DELETED',
+        'USER_BANNED',
+        'USER_UNBANNED',
+        'USER_ROLE_CHANGED',
+        'USER_PASSWORD_RESET',
+        'ALL_USERS_DELETED',
+        'TRANSACTION_DELETED',
+        'SUBSCRIBER_DELETED',
+        'ADMIN_LOGIN',
+        'SETTINGS_CHANGED',
       ];
       for (const action of coreActions) {
         expect(AUDIT_ACTIONS).toContain(action);
@@ -92,6 +107,8 @@ describe('AuditLogService', () => {
           details: { reason: 'Spam' },
           ipAddress: '127.0.0.1',
           userAgent: 'CLI/1.0',
+          country: null,
+          city: null,
         })
       );
     });
@@ -114,7 +131,7 @@ describe('AuditLogService', () => {
       );
     });
 
-    it('should handle null req gracefully (no IP/UserAgent)', async () => {
+    it('should handle null req gracefully (no IP/UserAgent/Geo)', async () => {
       const mockEntry = { save: jest.fn().mockResolvedValue(true) };
       AuditLog.mockImplementation(() => mockEntry);
 
@@ -127,11 +144,13 @@ describe('AuditLogService', () => {
         expect.objectContaining({
           ipAddress: null,
           userAgent: null,
+          country: null,
+          city: null,
         })
       );
     });
 
-    it('should handle missing req (undefined)', async () => {
+    it('should handle missing req (undefined) with null geo', async () => {
       const mockEntry = { save: jest.fn().mockResolvedValue(true) };
       AuditLog.mockImplementation(() => mockEntry);
 
@@ -143,6 +162,8 @@ describe('AuditLogService', () => {
         expect.objectContaining({
           ipAddress: null,
           userAgent: null,
+          country: null,
+          city: null,
         })
       );
     });
@@ -186,10 +207,7 @@ describe('AuditLogService', () => {
 
       await auditLogService.log({ action: 'USER_BANNED' });
 
-      expect(logger.error).toHaveBeenCalledWith(
-        'AuditLog write failed:',
-        expect.any(Error)
-      );
+      expect(logger.error).toHaveBeenCalledWith('AuditLog write failed:', expect.any(Error));
     });
 
     it('should pass empty details object by default', async () => {
@@ -292,9 +310,15 @@ describe('AuditLogService', () => {
 
       await auditLogService.getLogs({ adminId: 'admin-1' });
 
-      expect(AuditLog.find).toHaveBeenCalledWith(
-        expect.objectContaining({ adminId: 'admin-1' })
-      );
+      expect(AuditLog.find).toHaveBeenCalledWith(expect.objectContaining({ adminId: 'admin-1' }));
+    });
+
+    it('should filter by country', async () => {
+      setupFindMock([], 0);
+
+      await auditLogService.getLogs({ country: 'DE' });
+
+      expect(AuditLog.find).toHaveBeenCalledWith(expect.objectContaining({ country: 'DE' }));
     });
 
     it('should filter by targetUserId', async () => {
@@ -469,6 +493,60 @@ describe('AuditLogService', () => {
 
       expect(count).toBe(0);
       expect(logger.error).toHaveBeenCalled();
+    });
+  });
+
+  // ============================================
+  // deleteAll() Tests
+  // ============================================
+  describe('deleteAll', () => {
+    it('should delete all audit log entries', async () => {
+      AuditLog.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 42 });
+
+      const count = await auditLogService.deleteAll();
+
+      expect(AuditLog.deleteMany).toHaveBeenCalledWith({});
+      expect(count).toBe(42);
+    });
+
+    it('should return 0 when no entries exist', async () => {
+      AuditLog.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 0 });
+
+      const count = await auditLogService.deleteAll();
+
+      expect(count).toBe(0);
+    });
+  });
+
+  // ============================================
+  // deleteBulk() Tests
+  // ============================================
+  describe('deleteBulk', () => {
+    it('should delete specified audit log entries', async () => {
+      AuditLog.deleteMany = jest.fn().mockResolvedValue({ deletedCount: 3 });
+
+      const count = await auditLogService.deleteBulk(['id1', 'id2', 'id3']);
+
+      expect(AuditLog.deleteMany).toHaveBeenCalledWith({ _id: { $in: ['id1', 'id2', 'id3'] } });
+      expect(count).toBe(3);
+    });
+
+    it('should return 0 for empty array', async () => {
+      const count = await auditLogService.deleteBulk([]);
+
+      expect(count).toBe(0);
+    });
+
+    it('should return 0 for non-array input', async () => {
+      const count = await auditLogService.deleteBulk(null);
+
+      expect(count).toBe(0);
+    });
+
+    it('should throw for more than 200 IDs', async () => {
+      const ids = Array.from({ length: 201 }, (_, i) => `id-${i}`);
+
+      await expect(auditLogService.deleteBulk(ids)).rejects.toThrow('Maximal 200');
     });
   });
 });

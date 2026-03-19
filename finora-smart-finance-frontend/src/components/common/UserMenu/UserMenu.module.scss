@@ -1,18 +1,17 @@
 // ============================================
-// 👤 USER MENU COMPONENT
+// USER MENU — AURORA FLOW GLASS
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
-// BASE
+// 1. BASE
 // ============================================
 .userMenu {
   position: relative;
 }
 
 // ============================================
-// AVATAR BUTTON
+// 2. AVATAR BUTTON
 // ============================================
 .avatarBtn {
   display: inline-flex;
@@ -21,23 +20,23 @@
   width: var(--space-2xl);
   height: var(--space-2xl);
   border-radius: var(--r-full);
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--tx);
   cursor: pointer;
   transition: all var(--tr);
 
+  // Glass Border
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-hover);
+
   &:hover {
     border-color: var(--primary);
-    color: var(--primary);
-    background: var(--surface);
+    background: color-mix(in srgb, var(--primary) 8%, var(--glass-bg));
   }
 
   @include focus-ring;
 }
 
 // ============================================
-// AVATAR CIRCLE
+// 3. AVATAR CIRCLE
 // ============================================
 .avatarCircle {
   display: inline-flex;
@@ -53,41 +52,65 @@
 }
 
 // ============================================
-// DROPDOWN MENU
+// 4. DROPDOWN MENU
 // ============================================
 .dropdownMenu {
   position: absolute;
   right: 0;
   top: calc(100% + var(--space-xs));
   min-width: 220px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: var(--sh-lg);
-  border-radius: var(--r-lg);
-  overflow: hidden;
   z-index: var(--z-dropdown);
-}
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--glass-shadow-elevated);
 
-:global([dir='rtl']) .dropdownMenu {
-  right: auto;
-  left: 0;
+  // Elevated glass background — primary-tinted, clearly elevated from page bg.
+  // 74% bg opacity = semi-transparent so blur is visible; 6% primary gives aurora tint.
+  background: color-mix(in srgb, var(--primary) 6%, color-mix(in srgb, var(--bg) 74%, transparent));
+
+  // backdrop-filter on ::before to decouple from Framer Motion stacking context.
+  // Framer Motion transforms create a stacking context that confines backdrop-filter
+  // to the compositor layer — using ::before avoids this limitation.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // All direct children must stack above the ::before blur layer
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+    box-shadow: var(--sh-lg);
+  }
+
+  @include below-md {
+    min-width: 200px;
+  }
 }
 
 // ============================================
-// DROPDOWN HEADER
+// 5. DROPDOWN HEADER
 // ============================================
 .dropdownHeader {
   padding: var(--space-sm) var(--space-md);
-  border-bottom: 1px solid var(--border);
-}
-
-:global([dir='rtl']) .dropdownHeader {
-  text-align: right;
+  border-bottom: 1px solid var(--glass-border-light);
 }
 
 .dropdownName {
   font-weight: var(--fw-b);
   color: var(--tx);
+  @include glass-text;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -101,7 +124,7 @@
 }
 
 // ============================================
-// DROPDOWN ITEMS
+// 6. DROPDOWN ITEMS
 // ============================================
 .dropdownItem {
   display: flex;
@@ -118,11 +141,23 @@
   transition: all var(--tr-fast);
 
   &:hover {
-    background: var(--surface-2);
+    background: var(--glass-bg-hover);
     color: var(--primary);
   }
 
   @include focus-ring-inset;
+}
+
+// ============================================
+// 7. RTL OVERRIDES
+// ============================================
+:global([dir='rtl']) .dropdownMenu {
+  right: auto;
+  left: 0;
+}
+
+:global([dir='rtl']) .dropdownHeader {
+  text-align: right;
 }
 
 :global([dir='rtl']) .dropdownItem {
@@ -131,10 +166,13 @@
 }
 
 // ============================================
-// ============================================
-// REDUCED MOTION
+// 8. REDUCED MOTION
 // ============================================
 @include reduced-motion {
+  .avatarBtn,
+  .dropdownItem {
+    transition: none;
+  }
   .dropdownMenu {
     animation: none;
   }

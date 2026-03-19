@@ -1,0 +1,165 @@
+// ============================================
+// 📈 FLOW AREA CHART
+// ============================================
+@use '@/styles/mixins' as *;
+
+.chartContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--space-md);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  @include glass-text;
+}
+
+.subtitle {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include glass-text;
+}
+
+.meta {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include glass-text;
+}
+
+.chartBody {
+  flex: 1;
+  width: 100%;
+  min-height: 180px;
+
+  @include mobile {
+    min-height: 150px;
+  }
+}
+
+// Footer — Gesamteinnahmen / Gesamtausgaben
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding-top: var(--space-sm);
+  border-top: 1px solid color-mix(in srgb, var(--tx) 15%, transparent);
+  flex-shrink: 0;
+}
+
+.footerStat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footerText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.footerLabel {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  @include glass-text;
+}
+
+.footerValue {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+  @include glass-text;
+
+  &[data-variant='income'] {
+    color: var(--success);
+  }
+  &[data-variant='expense'] {
+    color: var(--error);
+  }
+}
+
+// Custom tooltip als Mini-Glass
+.tooltip {
+  @include glass-panel('compact');
+  padding: var(--space-sm) var(--space-md);
+  min-width: 140px;
+}
+
+.tooltipLabel {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0 0 var(--space-2xs) 0;
+  @include glass-text;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-3xs) 0;
+}
+
+.tooltipDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tooltipName {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  flex: 1;
+}
+
+.tooltipValue {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+}
+
+// Empty state
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl);
+  color: var(--tx-muted);
+  text-align: center;
+  @include glass-text;
+
+  svg {
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: var(--fs-sm);
+    margin: 0;
+  }
+}

@@ -62,6 +62,9 @@ const AUDIT_ACTIONS = [
   'PASSWORD_RESET_REQUESTED',
   'PASSWORD_RESET_COMPLETED',
   'EMAIL_CHANGED',
+  // Audit-Log Management
+  'AUDIT_LOG_CLEARED',
+  'AUDIT_LOG_ENTRIES_DELETED',
 ];
 
 const auditLogSchema = new mongoose.Schema(
@@ -119,6 +122,18 @@ const auditLogSchema = new mongoose.Schema(
       default: null,
       maxlength: 500,
     },
+
+    // Geolocation (aus IP abgeleitet)
+    country: {
+      type: String,
+      default: null,
+      maxlength: 100,
+    },
+    city: {
+      type: String,
+      default: null,
+      maxlength: 100,
+    },
   },
   {
     timestamps: true, // createdAt + updatedAt
@@ -134,6 +149,7 @@ auditLogSchema.index({ createdAt: -1 }); // Neueste zuerst
 auditLogSchema.index({ adminId: 1, createdAt: -1 }); // Logs eines Admins
 auditLogSchema.index({ targetUserId: 1, createdAt: -1 }); // Logs für einen User
 auditLogSchema.index({ action: 1, createdAt: -1 }); // Logs nach Aktion
+auditLogSchema.index({ country: 1, createdAt: -1 }); // Logs nach Land
 
 // TTL-Index: Logs nach 365 Tagen automatisch löschen (DSGVO-konform)
 auditLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 365 * 24 * 60 * 60 });

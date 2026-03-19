@@ -58,9 +58,7 @@ function getWeekdayNames(language) {
     const short = new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d);
     // Arabisch: Kurzform beginnt mit "ال" (Artikel) → narrow verwenden statt abschneiden
     if (language === 'ar') {
-      names.push(
-        new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(d),
-      );
+      names.push(new Intl.DateTimeFormat(locale, { weekday: 'narrow' }).format(d));
     } else {
       names.push(short.slice(0, 2));
     }
@@ -72,7 +70,7 @@ function getWeekdayNames(language) {
 function getMonthName(year, month, language) {
   const locale = getLocale(language);
   return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(
-    new Date(year, month),
+    new Date(year, month)
   );
 }
 
@@ -178,8 +176,12 @@ export default function DateInput({
 
   // Calendar view state
   const selectedDate = useMemo(() => parseISO(value), [value]);
-  const [viewYear, setViewYear] = useState(() => selectedDate?.getFullYear() || new Date().getFullYear());
-  const [viewMonth, setViewMonth] = useState(() => selectedDate?.getMonth() ?? new Date().getMonth());
+  const [viewYear, setViewYear] = useState(
+    () => selectedDate?.getFullYear() || new Date().getFullYear()
+  );
+  const [viewMonth, setViewMonth] = useState(
+    () => selectedDate?.getMonth() ?? new Date().getMonth()
+  );
 
   // RTL-aware chevron icons
   const PrevIcon = isRTL ? FiChevronRight : FiChevronLeft;
@@ -207,14 +209,11 @@ export default function DateInput({
   const weekdays = useMemo(() => getWeekdayNames(i18n.language), [i18n.language]);
   const monthLabel = useMemo(
     () => getMonthName(viewYear, viewMonth, i18n.language),
-    [viewYear, viewMonth, i18n.language],
+    [viewYear, viewMonth, i18n.language]
   );
 
   // Calendar days grid
-  const calendarDays = useMemo(
-    () => buildCalendarDays(viewYear, viewMonth),
-    [viewYear, viewMonth],
-  );
+  const calendarDays = useMemo(() => buildCalendarDays(viewYear, viewMonth), [viewYear, viewMonth]);
 
   // Today
   const today = new Date();
@@ -232,18 +231,21 @@ export default function DateInput({
     const margin = 8;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const isMobile = vw < 640;   // $bp-sm
+    const isMobile = vw < 640; // $bp-sm
 
     // ── Vertical ──
-    // Mobile: immer unter dem Button (kein Flip), max-height anpassen
+    // Mobile: immer über dem Button (Platz für Bottom-Sheet-Content)
     // Desktop/Tablet: unter dem Button, Flip nach oben wenn kein Platz
     let top;
     let maxH = null;
     if (isMobile) {
-      top = rect.bottom + gap;
-      // Verfügbaren Platz unter dem Button berechnen, Panel schrumpft wenn nötig
-      const available = vh - top - margin;
-      if (available < panelH) maxH = Math.max(200, available);
+      top = rect.top - panelH - gap;
+      // Verfügbaren Platz über dem Button berechnen, Panel schrumpft wenn nötig
+      const available = rect.top - gap - margin;
+      if (available < panelH) {
+        maxH = Math.max(200, available);
+        top = margin;
+      }
     } else {
       const spaceBelow = vh - rect.bottom - gap;
       const spaceAbove = rect.top - gap;
@@ -296,7 +298,7 @@ export default function DateInput({
   // ── Click Outside ─────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => {
+    const handler = e => {
       const inWrapper = wrapperRef.current?.contains(e.target);
       const inPanel = panelRef.current?.contains(e.target);
       if (!inWrapper && !inPanel) {
@@ -314,14 +316,14 @@ export default function DateInput({
   // ── Toggle ────────────────────────────────────
   const toggle = useCallback(() => {
     if (disabled) return;
-    setIsOpen((prev) => !prev);
+    setIsOpen(prev => !prev);
   }, [disabled]);
 
   // ── Month navigation ──────────────────────────
   const prevMonth = useCallback(() => {
-    setViewMonth((m) => {
+    setViewMonth(m => {
       if (m === 0) {
-        setViewYear((y) => y - 1);
+        setViewYear(y => y - 1);
         return 11;
       }
       return m - 1;
@@ -329,9 +331,9 @@ export default function DateInput({
   }, []);
 
   const nextMonth = useCallback(() => {
-    setViewMonth((m) => {
+    setViewMonth(m => {
       if (m === 11) {
-        setViewYear((y) => y + 1);
+        setViewYear(y => y + 1);
         return 0;
       }
       return m + 1;
@@ -340,13 +342,13 @@ export default function DateInput({
 
   // ── Day selection ─────────────────────────────
   const handleDayClick = useCallback(
-    (dayObj) => {
+    dayObj => {
       if (!dayObj.isCurrentMonth) return;
       if (!isDateInRange(dayObj.date, min, max)) return;
       onChange?.(toISODate(dayObj.date));
       setIsOpen(false);
     },
-    [onChange, min, max],
+    [onChange, min, max]
   );
 
   // ── Go to today ───────────────────────────────
@@ -362,7 +364,7 @@ export default function DateInput({
   const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
   if (isOpen !== prevIsOpen) {
     setPrevIsOpen(isOpen);
-    setFocusedDate(isOpen ? (selectedDate || new Date()) : null);
+    setFocusedDate(isOpen ? selectedDate || new Date() : null);
   }
 
   // Focus the active day cell when focusedDate changes
@@ -374,13 +376,13 @@ export default function DateInput({
   }, [isOpen, focusedDate]);
 
   const handleKeyDown = useCallback(
-    (e) => {
+    e => {
       if (!isOpen) return;
 
       // Helper to move focusedDate by N days
-      const moveDay = (days) => {
+      const moveDay = days => {
         e.preventDefault();
-        setFocusedDate((prev) => {
+        setFocusedDate(prev => {
           const d = new Date(prev || new Date());
           d.setDate(d.getDate() + days);
           // Auto-navigate month if crossing boundary
@@ -431,7 +433,7 @@ export default function DateInput({
           break;
       }
     },
-    [isOpen, isRTL, viewMonth, viewYear, focusedDate, min, max, onChange],
+    [isOpen, isRTL, viewMonth, viewYear, focusedDate, min, max, onChange]
   );
 
   return (
@@ -561,17 +563,13 @@ export default function DateInput({
               </div>
 
               {/* ── Today Button ──────────────────── */}
-              <button
-                type="button"
-                className={styles.todayBtn}
-                onClick={goToToday}
-              >
+              <button type="button" className={styles.todayBtn} onClick={goToToday}>
                 {t('common.today', 'Heute')}
               </button>
             </motion.div>
           )}
         </AnimatePresence>,
-        document.body,
+        document.body
       )}
     </>
   );

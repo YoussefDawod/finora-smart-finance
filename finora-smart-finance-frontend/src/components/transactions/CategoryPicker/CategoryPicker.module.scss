@@ -1,7 +1,6 @@
 // ============================================
 // 🎯 CATEGORY PICKER COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -150,7 +149,9 @@
   flex-shrink: 0;
   font-size: var(--fs-md);
   color: var(--tx-muted);
-  transition: transform var(--tr), color var(--tr);
+  transition:
+    transform var(--tr),
+    color var(--tr);
 }
 
 // ============================================

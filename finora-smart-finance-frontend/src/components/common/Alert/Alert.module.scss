@@ -1,7 +1,6 @@
 // ============================================
 // 🚨 ALERT COMPONENT
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .alert {
@@ -20,7 +19,6 @@
 .iconWrapper {
   width: 36px;
   height: 36px;
-  border-radius: var(--r-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -55,7 +53,9 @@
   cursor: pointer;
   padding: var(--space-2xs);
   border-radius: var(--r-sm);
-  transition: color var(--tr), background var(--tr);
+  transition:
+    color var(--tr),
+    background var(--tr);
 
   &:hover {
     color: var(--tx);
@@ -70,7 +70,6 @@
   border-color: color-mix(in srgb, var(--primary) 25%, var(--border));
 
   .iconWrapper {
-    background: color-mix(in srgb, var(--primary) 15%, transparent);
     color: var(--primary);
   }
 }
@@ -79,7 +78,6 @@
   border-color: color-mix(in srgb, var(--success) 30%, var(--border));
 
   .iconWrapper {
-    background: color-mix(in srgb, var(--success) 15%, transparent);
     color: var(--success);
   }
 }
@@ -88,7 +86,6 @@
   border-color: color-mix(in srgb, var(--warning) 30%, var(--border));
 
   .iconWrapper {
-    background: color-mix(in srgb, var(--warning) 15%, transparent);
     color: var(--warning);
   }
 }
@@ -97,7 +94,6 @@
   border-color: color-mix(in srgb, var(--error) 30%, var(--border));
 
   .iconWrapper {
-    background: color-mix(in srgb, var(--error) 15%, transparent);
     color: var(--error);
   }
 }

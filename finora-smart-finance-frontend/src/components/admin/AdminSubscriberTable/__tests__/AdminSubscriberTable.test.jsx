@@ -20,6 +20,14 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
+vi.mock('@/hooks/useViewerGuard', () => ({
+  useViewerGuard: () => ({ isViewer: false, guard: fn => fn() }),
+}));
+
 // ── Test-Daten ────────────────────────────────────
 
 const mockSubscribers = [
@@ -79,8 +87,12 @@ describe('AdminSubscriberTable', () => {
 
   describe('Loading State', () => {
     it('zeigt Skeleton-Platzhalter beim Laden', () => {
-      const { container } = render(<AdminSubscriberTable {...defaultProps} loading={true} subscribers={[]} />);
-      expect(container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')).toBeInTheDocument();
+      const { container } = render(
+        <AdminSubscriberTable {...defaultProps} loading={true} subscribers={[]} />
+      );
+      expect(
+        container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')
+      ).toBeInTheDocument();
     });
 
     it('zeigt keine Tabelle im Loading-State', () => {
@@ -161,7 +173,7 @@ describe('AdminSubscriberTable', () => {
       // Click the confirm-delete button
       const confirmBtn = screen.getAllByText('admin.subscribers.delete');
       // The confirm button is in the banner, find it
-      const dangerBtn = confirmBtn.find((el) => el.closest('button')?.closest('[role="alert"]'));
+      const dangerBtn = confirmBtn.find(el => el.closest('button')?.closest('[role="alert"]'));
       if (dangerBtn) {
         await userEvent.click(dangerBtn.closest('button'));
       }
@@ -200,7 +212,9 @@ describe('AdminSubscriberTable', () => {
 
     it('setzt desc-Sort bei Klick auf inaktive Spalte', () => {
       const onSortChange = vi.fn();
-      render(<AdminSubscriberTable {...defaultProps} sort="-createdAt" onSortChange={onSortChange} />);
+      render(
+        <AdminSubscriberTable {...defaultProps} sort="-createdAt" onSortChange={onSortChange} />
+      );
 
       const emailHeaders = screen.getAllByText(/admin\.subscribers\.email/);
       fireEvent.click(emailHeaders[0]);
@@ -260,7 +274,7 @@ describe('AdminSubscriberTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByText('3'));
@@ -288,7 +302,7 @@ describe('AdminSubscriberTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const prevBtn = screen.getByLabelText('admin.subscribers.prevPage');
@@ -303,7 +317,7 @@ describe('AdminSubscriberTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       const nextBtn = screen.getByLabelText('admin.subscribers.nextPage');

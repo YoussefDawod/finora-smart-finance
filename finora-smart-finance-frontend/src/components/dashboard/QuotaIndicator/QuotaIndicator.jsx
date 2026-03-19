@@ -93,7 +93,11 @@ function QuotaIndicator({ quota, isLoading = false }) {
           <motion.div
             className={`${styles.progressFill} ${styles[statusInfo.color]}`}
             initial={shouldAnimate ? { width: 0 } : false}
-            animate={shouldAnimate ? { width: `${Math.min(percentUsed, 100)}%` } : { width: `${Math.min(percentUsed, 100)}%` }}
+            animate={
+              shouldAnimate
+                ? { width: `${Math.min(percentUsed, 100)}%` }
+                : { width: `${Math.min(percentUsed, 100)}%` }
+            }
             transition={{ duration: 0.6, ease: 'easeOut' }}
           />
         </div>
@@ -101,12 +105,16 @@ function QuotaIndicator({ quota, isLoading = false }) {
       </div>
 
       <div className={styles.stats}>
-        <span className={styles.used}>
-          {t('lifecycle.quota.used', { used: quota.used, limit: quota.limit })}
-        </span>
-        <span className={styles.remaining}>
-          {t('lifecycle.quota.remaining', { remaining: quota.remaining })}
-        </span>
+        <div className={styles.stat}>
+          <span className={styles.statLabel}>{t('lifecycle.quota.thisMonth')}</span>
+          <span className={styles.statValue}>
+            {quota.used} / {quota.limit}
+          </span>
+        </div>
+        <div className={styles.stat}>
+          <span className={styles.statLabel}>{t('lifecycle.quota.remainingLabel')}</span>
+          <span className={styles.statValue}>{quota.remaining}</span>
+        </div>
       </div>
     </motion.div>
   );

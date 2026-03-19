@@ -44,10 +44,10 @@ const DEFAULT_PREFERENCES = {
   emailNotifications: true,
   // Option C: Category-based notifications
   notificationCategories: {
-    security: true,      // Login alerts, password changes
-    transactions: true,  // New transactions
-    reports: false,      // Weekly/monthly reports
-    alerts: true,        // Budget warnings, unusual activity
+    security: true, // Login alerts, password changes
+    transactions: true, // New transactions
+    reports: true, // Weekly/monthly reports
+    alerts: true, // Budget warnings, unusual activity
   },
 };
 
@@ -69,35 +69,40 @@ const DATE_FORMAT_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { theme, setTheme, resetToSystemPreference } = useTheme();
+  const { setTheme, resetToSystemPreference } = useTheme();
   const { user, refreshUser, isAuthenticated } = useAuth();
   const { success, error: showError } = useToast();
   const { t, i18n } = useTranslation();
   const {
-    lifecycleStatus, isLoading: lifecycleLoading,
-    fetchLifecycleStatus, confirmExport,
+    lifecycleStatus,
+    isLoading: lifecycleLoading,
+    fetchLifecycleStatus,
+    confirmExport,
   } = useLifecycle();
   const { shouldAnimate } = useMotion();
-  const themeOptions = useMemo(() => ([
-    {
-      value: 'light',
-      label: t('settings.appearance.themeLight'),
-      description: t('settings.appearance.themeLightDesc'),
-      icon: FiSun,
-    },
-    {
-      value: 'dark',
-      label: t('settings.appearance.themeDark'),
-      description: t('settings.appearance.themeDarkDesc'),
-      icon: FiMoon,
-    },
-    {
-      value: 'system',
-      label: t('settings.appearance.themeSystem'),
-      description: t('settings.appearance.themeSystemDesc'),
-      icon: FiMonitor,
-    },
-  ]), [t]);
+  const themeOptions = useMemo(
+    () => [
+      {
+        value: 'light',
+        label: t('settings.appearance.themeLight'),
+        description: t('settings.appearance.themeLightDesc'),
+        icon: FiSun,
+      },
+      {
+        value: 'dark',
+        label: t('settings.appearance.themeDark'),
+        description: t('settings.appearance.themeDarkDesc'),
+        icon: FiMoon,
+      },
+      {
+        value: 'system',
+        label: t('settings.appearance.themeSystem'),
+        description: t('settings.appearance.themeSystemDesc'),
+        icon: FiMonitor,
+      },
+    ],
+    [t]
+  );
 
   const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
   const [initialPreferences, setInitialPreferences] = useState(DEFAULT_PREFERENCES);
@@ -105,7 +110,7 @@ export default function SettingsPage() {
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
   const [newsletterLoading, setNewsletterLoading] = useState(false);
 
-  const getDatePreview = (format) => {
+  const getDatePreview = format => {
     const now = new Date();
     const day = String(now.getDate()).padStart(2, '0');
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -145,7 +150,9 @@ export default function SettingsPage() {
       }
     })();
     fetchLifecycleStatus();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, fetchLifecycleStatus]);
 
   const handleNewsletterToggle = async () => {
@@ -172,17 +179,37 @@ export default function SettingsPage() {
   useEffect(() => {
     const storedPreferences = getUserPreferences();
     const nextPreferences = {
-      themePreference: user?.preferences?.theme ?? storedPreferences.theme ?? DEFAULT_PREFERENCES.themePreference,
-      language: user?.preferences?.language ?? storedPreferences.language ?? DEFAULT_PREFERENCES.language,
-      currency: user?.preferences?.currency ?? storedPreferences.currency ?? DEFAULT_PREFERENCES.currency,
-      dateFormat: user?.preferences?.dateFormat ?? storedPreferences.dateFormat ?? DEFAULT_PREFERENCES.dateFormat,
+      themePreference:
+        user?.preferences?.theme ?? storedPreferences.theme ?? DEFAULT_PREFERENCES.themePreference,
+      language:
+        user?.preferences?.language ?? storedPreferences.language ?? DEFAULT_PREFERENCES.language,
+      currency:
+        user?.preferences?.currency ?? storedPreferences.currency ?? DEFAULT_PREFERENCES.currency,
+      dateFormat:
+        user?.preferences?.dateFormat ??
+        storedPreferences.dateFormat ??
+        DEFAULT_PREFERENCES.dateFormat,
       emailNotifications:
-        user?.preferences?.emailNotifications ?? storedPreferences.emailNotifications ?? DEFAULT_PREFERENCES.emailNotifications,
+        user?.preferences?.emailNotifications ??
+        storedPreferences.emailNotifications ??
+        DEFAULT_PREFERENCES.emailNotifications,
       notificationCategories: {
-        security: user?.preferences?.notificationCategories?.security ?? storedPreferences.notificationCategories?.security ?? DEFAULT_PREFERENCES.notificationCategories.security,
-        transactions: user?.preferences?.notificationCategories?.transactions ?? storedPreferences.notificationCategories?.transactions ?? DEFAULT_PREFERENCES.notificationCategories.transactions,
-        reports: user?.preferences?.notificationCategories?.reports ?? storedPreferences.notificationCategories?.reports ?? DEFAULT_PREFERENCES.notificationCategories.reports,
-        alerts: user?.preferences?.notificationCategories?.alerts ?? storedPreferences.notificationCategories?.alerts ?? DEFAULT_PREFERENCES.notificationCategories.alerts,
+        security:
+          user?.preferences?.notificationCategories?.security ??
+          storedPreferences.notificationCategories?.security ??
+          DEFAULT_PREFERENCES.notificationCategories.security,
+        transactions:
+          user?.preferences?.notificationCategories?.transactions ??
+          storedPreferences.notificationCategories?.transactions ??
+          DEFAULT_PREFERENCES.notificationCategories.transactions,
+        reports:
+          user?.preferences?.notificationCategories?.reports ??
+          storedPreferences.notificationCategories?.reports ??
+          DEFAULT_PREFERENCES.notificationCategories.reports,
+        alerts:
+          user?.preferences?.notificationCategories?.alerts ??
+          storedPreferences.notificationCategories?.alerts ??
+          DEFAULT_PREFERENCES.notificationCategories.alerts,
       },
     };
 
@@ -194,35 +221,35 @@ export default function SettingsPage() {
     setInitialPreferences(nextPreferences);
   }, [user, i18n.language]);
 
-  useEffect(() => {
-    const preferredTheme = user?.preferences?.theme;
-    if (!preferredTheme) return;
-
-    if (preferredTheme === 'system') {
-      resetToSystemPreference();
-      return;
-    }
-
-    if (preferredTheme !== theme) {
-      setTheme(preferredTheme);
-    }
-  }, [user?.preferences?.theme, resetToSystemPreference, setTheme, theme]);
-
   const isDirty = useMemo(
     () => JSON.stringify(preferences) !== JSON.stringify(initialPreferences),
     [preferences, initialPreferences]
   );
 
-  const handlePreferenceChange = (key) => (value) => {
-    setPreferences((prev) => ({ ...prev, [key]: value }));
+  const handlePreferenceChange = key => value => {
+    setPreferences(prev => ({ ...prev, [key]: value }));
   };
 
-  const handleToggle = (key) => () => {
-    setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
+  const handleToggle = key => () => {
+    setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleCategoryToggle = (category) => () => {
-    setPreferences((prev) => ({
+  const hasEmail = !!user?.email;
+
+  const handleNotificationToggle = () => {
+    if (!hasEmail) {
+      showError(t('settings.notifications.noEmailRequired'));
+      return;
+    }
+    handleToggle('emailNotifications')();
+  };
+
+  const handleCategoryToggle = category => () => {
+    if (!hasEmail) {
+      showError(t('settings.notifications.noEmailRequired'));
+      return;
+    }
+    setPreferences(prev => ({
       ...prev,
       notificationCategories: {
         ...prev.notificationCategories,
@@ -231,16 +258,14 @@ export default function SettingsPage() {
     }));
   };
 
-  const handleThemeSelect = (value) => {
-    setPreferences((prev) => ({ ...prev, themePreference: value }));
+  const handleThemeSelect = value => {
+    setPreferences(prev => ({ ...prev, themePreference: value }));
     if (value === 'system') {
       resetToSystemPreference();
     } else {
       setTheme(value);
     }
   };
-
-
 
   const handleSavePreferences = async () => {
     setIsSaving(true);
@@ -268,10 +293,7 @@ export default function SettingsPage() {
       await i18n.changeLanguage(preferences.language);
       success(t('settings.saved'));
     } catch (error) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        t('settings.saveError');
+      const message = error?.response?.data?.message || error?.message || t('settings.saveError');
       showError(message);
     } finally {
       setIsSaving(false);
@@ -319,7 +341,7 @@ export default function SettingsPage() {
               <FilterDropdown
                 id="currency"
                 label={t('settings.general.currency')}
-                options={CURRENCY_OPTIONS.map((option) => ({
+                options={CURRENCY_OPTIONS.map(option => ({
                   value: option.value,
                   label: t(option.labelKey),
                 }))}
@@ -332,14 +354,16 @@ export default function SettingsPage() {
               <FilterDropdown
                 id="dateFormat"
                 label={t('settings.general.dateFormat')}
-                options={DATE_FORMAT_OPTIONS.map((option) => ({
+                options={DATE_FORMAT_OPTIONS.map(option => ({
                   value: option.value,
                   label: t(option.labelKey),
                 }))}
                 value={preferences.dateFormat}
                 onChange={handlePreferenceChange('dateFormat')}
                 placeholder={t('settings.general.datePlaceholder')}
-                hint={t('settings.general.dateExample', { value: getDatePreview(preferences.dateFormat) })}
+                hint={t('settings.general.dateExample', {
+                  value: getDatePreview(preferences.dateFormat),
+                })}
                 size="md"
               />
             </div>
@@ -371,7 +395,7 @@ export default function SettingsPage() {
 
           <div className={styles.sectionBody}>
             <div className={styles.themeOptions}>
-              {themeOptions.map((option) => {
+              {themeOptions.map(option => {
                 const Icon = option.icon;
                 const isActive = preferences.themePreference === option.value;
                 return (
@@ -410,7 +434,9 @@ export default function SettingsPage() {
               <div className={styles.sectionBody}>
                 <div className={styles.switchRow}>
                   <div className={styles.switchInfo}>
-                    <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
+                    <div className={styles.switchTitle}>
+                      {t('settings.notifications.emailTitle')}
+                    </div>
                     <p>{t('settings.notifications.emailDescription')}</p>
                   </div>
                 </div>
@@ -432,15 +458,21 @@ export default function SettingsPage() {
                 {/* Master Toggle */}
                 <div className={styles.switchRow}>
                   <div className={styles.switchInfo}>
-                    <div className={styles.switchTitle}>{t('settings.notifications.emailTitle')}</div>
-                    <p>{t('settings.notifications.emailDescription')}</p>
+                    <div className={styles.switchTitle}>
+                      {t('settings.notifications.emailTitle')}
+                    </div>
+                    <p>
+                      {hasEmail
+                        ? t('settings.notifications.emailDescription')
+                        : t('settings.notifications.noEmailHint')}
+                    </p>
                   </div>
                   <button
                     type="button"
-                    className={`${styles.switch} ${preferences.emailNotifications ? styles.switchOn : ''}`}
-                    onClick={handleToggle('emailNotifications')}
+                    className={`${styles.switch} ${hasEmail && preferences.emailNotifications ? styles.switchOn : ''}`}
+                    onClick={handleNotificationToggle}
                     role="switch"
-                    aria-checked={preferences.emailNotifications}
+                    aria-checked={hasEmail && preferences.emailNotifications}
                     aria-label={t('settings.notifications.emailAria')}
                   >
                     <span className={styles.switchThumb} />
@@ -448,7 +480,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Category Toggles - Only visible when master toggle is on */}
-                {preferences.emailNotifications && (
+                {hasEmail && preferences.emailNotifications && (
                   <div className={styles.categoryToggles}>
                     {[
                       { key: 'security', icon: FiShield },
@@ -559,16 +591,26 @@ export default function SettingsPage() {
           {!isAuthenticated ? (
             <AuthRequiredOverlay>
               <div className={styles.sectionHeader}>
-                <div className={styles.sectionIcon} aria-hidden="true"><FiClock /></div>
-                <div><h2>{t('lifecycle.retention.title')}</h2><p>{t('lifecycle.retention.exportReminder')}</p></div>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiClock />
+                </div>
+                <div>
+                  <h2>{t('lifecycle.retention.title')}</h2>
+                  <p>{t('lifecycle.retention.exportReminder')}</p>
+                </div>
               </div>
               <div className={styles.sectionBody} />
             </AuthRequiredOverlay>
           ) : (
             <>
               <div className={styles.sectionHeader}>
-                <div className={styles.sectionIcon} aria-hidden="true"><FiClock /></div>
-                <div><h2>{t('lifecycle.retention.title')}</h2><p>{t('lifecycle.retention.exportReminder')}</p></div>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiClock />
+                </div>
+                <div>
+                  <h2>{t('lifecycle.retention.title')}</h2>
+                  <p>{t('lifecycle.retention.exportReminder')}</p>
+                </div>
               </div>
               <div className={styles.sectionBody}>
                 <RetentionBanner

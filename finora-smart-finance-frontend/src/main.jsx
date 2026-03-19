@@ -3,12 +3,11 @@ import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 
 // ============================================
-// Fonts — self-hosted via @fontsource
+// Fonts — Inter/Bebas via @font-face in globals.scss (public/fonts/)
+// Fira Code weiterhin über @fontsource (kein Preload benötigt)
 // ============================================
-import '@fontsource/bebas-neue';                    // Logo-Wortmarke & Brand-Font (Display)
-import '@fontsource-variable/inter';                // UI-Body-Text (Variable Font)
-import '@fontsource/fira-code/400.css';             // Code-Mono (Regular)
-import '@fontsource/fira-code/500.css';             // Code-Mono (Medium)
+import '@fontsource/fira-code/400.css'; // Code-Mono (Regular)
+import '@fontsource/fira-code/500.css'; // Code-Mono (Medium)
 
 import App from './App';
 import '@styles/index.scss';
@@ -20,36 +19,53 @@ initAccessibility();
 
 // Loading-Fallback für i18n - Skeleton statt Spinner
 const I18nLoadingFallback = () => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    gap: '24px',
-    background: 'var(--background, #f5f5f5)',
-    padding: '48px',
-  }}>
-    <div style={{ width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      gap: '24px',
+      background: 'var(--background, #f5f5f5)',
+      padding: '48px',
+    }}
+  >
+    <div
+      style={{
+        width: '100%',
+        maxWidth: '400px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
       {/* Logo Skeleton */}
-      <div style={{
-        width: '120px',
-        height: '40px',
-        background: 'linear-gradient(90deg, var(--surface-2, #e0e0e0) 0%, var(--surface, #f0f0f0) 50%, var(--surface-2, #e0e0e0) 100%)',
-        backgroundSize: '200% 100%',
-        animation: 'shimmer 1.5s infinite',
-        borderRadius: '12px',
-      }} />
-      {/* Content Skeleton */}
-      {[1, 2, 3].map((i) => (
-        <div key={i} style={{
-          width: '100%',
-          height: '48px',
-          background: 'linear-gradient(90deg, var(--surface-2, #e0e0e0) 0%, var(--surface, #f0f0f0) 50%, var(--surface-2, #e0e0e0) 100%)',
+      <div
+        style={{
+          width: '120px',
+          height: '40px',
+          background:
+            'linear-gradient(90deg, var(--surface-2, #e0e0e0) 0%, var(--surface, #f0f0f0) 50%, var(--surface-2, #e0e0e0) 100%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite',
           borderRadius: '12px',
-        }} />
+        }}
+      />
+      {/* Content Skeleton */}
+      {[1, 2, 3].map(i => (
+        <div
+          key={i}
+          style={{
+            width: '100%',
+            height: '48px',
+            background:
+              'linear-gradient(90deg, var(--surface-2, #e0e0e0) 0%, var(--surface, #f0f0f0) 50%, var(--surface-2, #e0e0e0) 100%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer 1.5s infinite',
+            borderRadius: '12px',
+          }}
+        />
       ))}
     </div>
     <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>

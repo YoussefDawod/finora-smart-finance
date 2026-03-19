@@ -27,7 +27,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCssVariables, useIsMobile } from '@/hooks';
 import { SkeletonChart } from '@/components/common/Skeleton';
-import { tooltipContentStyle } from '@/components/dashboard/DashboardCharts/chartConstants';
+import { tooltipContentStyle } from './chartConstants';
 import styles from './AdminCharts.module.scss';
 
 /**
@@ -101,16 +101,14 @@ function AdminCharts({ stats, transactionStats, loading = false }) {
   const pieColors = [cssColors.success, cssColors.error];
 
   // 2) Top-Kategorien Bar
-  const categoryData = (transactionStats?.topCategories || [])
-    .slice(0, 6)
-    .map((cat) => ({
-      name: cat._id || 'Other',
-      count: cat.count,
-      amount: Math.round(cat.totalAmount),
-    }));
+  const categoryData = (transactionStats?.topCategories || []).slice(0, 6).map(cat => ({
+    name: cat._id || 'Other',
+    count: cat.count,
+    amount: Math.round(cat.totalAmount),
+  }));
 
   // 3) User-Sprachen Pie (basierend auf User.preferences.language)
-  const langData = (stats?.userLanguageBreakdown || []).map((item) => ({
+  const langData = (stats?.userLanguageBreakdown || []).map(item => ({
     name: LANG_LABELS[item._id] || item._id,
     value: item.count,
   }));
@@ -159,7 +157,7 @@ function AdminCharts({ stats, transactionStats, loading = false }) {
               <Legend
                 verticalAlign="bottom"
                 height={36}
-                formatter={(value) => <span className={styles.legendLabel}>{value}</span>}
+                formatter={value => <span className={styles.legendLabel}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -181,12 +179,7 @@ function AdminCharts({ stats, transactionStats, loading = false }) {
                 tick={{ fontSize: 11, fill: cssColors.txMuted }}
               />
               <Tooltip content={<AdminTooltip />} />
-              <Bar
-                dataKey="count"
-                fill={cssColors.primary}
-                radius={[0, 4, 4, 0]}
-                maxBarSize={24}
-              />
+              <Bar dataKey="count" fill={cssColors.primary} radius={[0, 4, 4, 0]} maxBarSize={24} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -216,7 +209,7 @@ function AdminCharts({ stats, transactionStats, loading = false }) {
               <Legend
                 verticalAlign="bottom"
                 height={36}
-                formatter={(value) => <span className={styles.legendLabel}>{value}</span>}
+                formatter={value => <span className={styles.legendLabel}>{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>

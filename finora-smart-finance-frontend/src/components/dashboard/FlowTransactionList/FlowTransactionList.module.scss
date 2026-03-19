@@ -1,0 +1,244 @@
+// ============================================
+// 🔄 FLOW TRANSACTION LIST
+// ============================================
+@use '@/styles/mixins' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid color-mix(in srgb, var(--tx) 15%, transparent);
+  flex-shrink: 0;
+}
+
+.headerTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 1.75rem;
+}
+
+.headerBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.subtitle {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include glass-text;
+}
+
+.headerCount {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  flex-shrink: 0;
+  @include glass-text;
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0;
+  @include glass-text;
+}
+
+.viewAllLink {
+  font-size: var(--fs-xs);
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: var(--fw-m);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--r-md);
+  transition: all var(--tr);
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    transform: translateX(4px);
+  }
+
+  @include focus-ring;
+}
+
+// Timeline date groups
+.timelineGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  & + & {
+    margin-top: var(--space-xs);
+  }
+}
+
+.timelineLabel {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: var(--space-2xs) 0;
+  @include glass-text;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  cursor: default;
+}
+
+.category {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  flex: 1;
+}
+
+.categoryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Type-based icon colors
+.income .categoryIcon {
+  color: var(--success);
+}
+
+.expense .categoryIcon {
+  color: var(--error);
+}
+
+.categoryInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.categoryName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  margin: 0;
+  @include truncate;
+  @include glass-text;
+}
+
+.description {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: 0;
+  @include truncate;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3xs);
+  flex-shrink: 0;
+}
+
+.amount {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  @include glass-text;
+}
+
+.income .amount {
+  color: var(--success);
+}
+
+.expense .amount {
+  color: var(--error);
+}
+
+.date {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+}
+
+// Empty state
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--tx-muted);
+  @include glass-text;
+
+  svg {
+    width: 28px;
+    height: 28px;
+    opacity: 0.5;
+  }
+}
+
+.emptyText {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  margin: 0;
+}
+
+.emptySubtext {
+  font-size: var(--fs-xs);
+  margin: 0;
+}
+
+// Reduced Motion
+@include reduced-motion {
+  .item {
+    transition: none;
+  }
+
+  .viewAllLink {
+    transition: none;
+  }
+}

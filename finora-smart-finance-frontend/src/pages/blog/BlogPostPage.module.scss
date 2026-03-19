@@ -1,0 +1,189 @@
+// ============================================
+// 📄 BLOG POST PAGE — Full Article Layout
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.pageContainer {
+  max-width: var(--mw-xl);
+  margin: 0 auto;
+  padding: var(--space-3xl) var(--space-xl);
+
+  @include tablet {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include mobile {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+.pageContent {
+  max-width: 52rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+// ============================================
+// BACK LINK
+// ============================================
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: var(--tx-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  text-decoration: none;
+  width: fit-content;
+  transition:
+    color var(--tr),
+    gap var(--tr);
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  :global([dir='rtl']) & {
+    svg {
+      transform: scaleX(-1);
+    }
+  }
+
+  &:hover {
+    color: var(--primary);
+    gap: var(--space-xs);
+  }
+}
+
+// ============================================
+// POST HEADER
+// ============================================
+.postHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  padding-bottom: var(--space-2xl);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.postMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+}
+
+.postTitle {
+  font-size: clamp(var(--fs-xl), 4vw, var(--fs-3xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-b);
+  line-height: var(--lh-snug);
+  color: var(--tx);
+  // Subtile Aurora-Linie unter dem Titel als visuellen Kontrast-Anker
+  padding-bottom: var(--space-xs);
+  border-bottom: 2px solid color-mix(in srgb, var(--aurora-1) 50%, transparent);
+}
+
+.postExcerpt {
+  font-size: var(--fs-lg);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--fs-base);
+  }
+}
+
+.postTags {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.postTag {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  color: var(--primary);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-m);
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--r-full);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// ============================================
+// ARTICLE BODY
+// ============================================
+.postBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.postSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-inline-start: var(--space-lg);
+  border-inline-start: 2px solid color-mix(in srgb, var(--aurora-1) 45%, transparent);
+  transition: border-color var(--tr);
+
+  &:hover {
+    border-inline-start-color: var(--aurora-1);
+  }
+
+  @include mobile {
+    padding-inline-start: var(--space-md);
+  }
+}
+
+.sectionTitle {
+  font-size: clamp(var(--fs-base), 2.5vw, var(--fs-xl));
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  line-height: var(--lh-snug);
+}
+
+.sectionText {
+  font-size: var(--fs-base);
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+  margin: 0;
+
+  @include mobile {
+    font-size: var(--fs-sm);
+  }
+}
+
+// ============================================
+// POST FOOTER
+// ============================================
+.postFooter {
+  padding-top: var(--space-xl);
+  border-top: 1px solid var(--glass-border);
+}
+
+// ============================================
+// REDUCED MOTION
+// ============================================
+@include reduced-motion {
+  .backLink,
+  .postSection {
+    transition: none;
+  }
+}

@@ -1,0 +1,122 @@
+// ============================================
+// 🔮 FLOATING METRIC
+// ============================================
+@use '@/styles/mixins' as *;
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  color: var(--tx-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  @include glass-text;
+}
+
+.value {
+  font-size: var(--fs-metric-lg);
+  font-weight: var(--fw-b);
+  color: var(--tx);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-tight);
+  @include glass-text;
+
+  @include mobile {
+    font-size: var(--fs-xl);
+  }
+}
+
+.valueRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.trendIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.75;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  @include mobile {
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Hero-Variante (für Balance)
+.hero {
+  .value {
+    font-size: var(--fs-display);
+    font-weight: 800;
+
+    @include mobile {
+      font-size: var(--fs-2xl);
+    }
+  }
+}
+
+.trendBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px var(--space-xs);
+  border-radius: var(--r-md);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  line-height: var(--lh-none);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  width: fit-content;
+  backdrop-filter: blur(var(--glass-blur-minimal));
+  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--glass-bg-fallback, rgba(15, 18, 35, 0.85));
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &.up {
+    background: color-mix(in srgb, var(--aurora-3) 12%, transparent);
+    color: var(--aurora-3);
+    border: 1px solid color-mix(in srgb, var(--aurora-3) 22%, transparent);
+  }
+
+  &.down {
+    background: color-mix(in srgb, var(--aurora-warn) 12%, transparent);
+    color: var(--aurora-warn);
+    border: 1px solid color-mix(in srgb, var(--aurora-warn) 22%, transparent);
+  }
+
+  &.neutral {
+    background: var(--glass-bg-hover);
+    color: var(--tx-muted);
+    border: 1px solid var(--glass-border);
+  }
+}
+
+.trendText {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  font-weight: var(--fw-n);
+
+  @include mobile {
+    display: none;
+  }
+}

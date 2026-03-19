@@ -19,6 +19,10 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'admin' }, isViewer: false }),
+}));
+
 // ── Test-Daten ────────────────────────────────────
 
 const mockUsers = [
@@ -85,7 +89,9 @@ describe('AdminUserTable', () => {
   describe('Loading State', () => {
     it('zeigt Skeleton-Platzhalter beim Laden', () => {
       const { container } = render(<AdminUserTable {...defaultProps} loading={true} users={[]} />);
-      expect(container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')).toBeInTheDocument();
+      expect(
+        container.querySelector('[class*="SkeletonTableRow"], [class*="container"]')
+      ).toBeInTheDocument();
     });
 
     it('zeigt keine Tabelle im Loading-State', () => {
@@ -153,7 +159,15 @@ describe('AdminUserTable', () => {
 
     it('zeigt — für fehlendes Datum', () => {
       const users = [
-        { _id: 'u99', name: 'NoDate', email: 'n@d.com', role: 'user', isActive: true, isVerified: true, createdAt: null },
+        {
+          _id: 'u99',
+          name: 'NoDate',
+          email: 'n@d.com',
+          role: 'user',
+          isActive: true,
+          isVerified: true,
+          createdAt: null,
+        },
       ];
       render(<AdminUserTable {...defaultProps} users={users} />);
       expect(screen.getByText('—')).toBeInTheDocument();
@@ -241,7 +255,7 @@ describe('AdminUserTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByText('3'));
@@ -269,7 +283,7 @@ describe('AdminUserTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByLabelText('admin.users.prevPage'));
@@ -283,7 +297,7 @@ describe('AdminUserTable', () => {
           {...defaultProps}
           pagination={multiPagePagination}
           onPageChange={onPageChange}
-        />,
+        />
       );
 
       fireEvent.click(screen.getByLabelText('admin.users.nextPage'));

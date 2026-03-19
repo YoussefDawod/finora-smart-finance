@@ -5,8 +5,9 @@
 
 const User = require('../../models/User');
 const logger = require('../logger');
-const { sendEmail } = require('./emailTransport');
+const { sendEmail, buildLink, backendBaseUrl } = require('./emailTransport');
 const templates = require('../emailTemplates');
+const config = require('../../config/env');
 
 /**
  * Benachrichtigt alle Admins (mit E-Mail) über eine neue Registrierung
@@ -47,6 +48,56 @@ async function notifyAdminsNewUser(newUser) {
   }
 }
 
+/**
+ * Zugangsdaten-Email an einen vom Admin erstellten User senden
+ * @param {Object} user            - Der neue User (muss user.email gesetzt haben)
+ * @param {string} plainPassword   - Klartextpasswort (nur einmalig verfügbar, vor dem Hashing)
+ * @param {string|null} activationToken - Rohes Token für Aktivierungslink (null wenn isVerified=true)
+ * @param {string} [language='de'] - Sprache der Email (de, en, ar, ka)
+ * @returns {Promise<Object>}
+ */
+async function sendAdminCreatedCredentialsEmail(
+  user,
+  plainPassword,
+  activationToken,
+  language = 'de'
+) {
+  if (!user?.email) {
+    return { sent: false, reason: 'NO_EMAIL' };
+  }
+
+  let activationLink = null;
+  if (activationToken) {
+    activationLink = buildLink(backendBaseUrl, '/api/v1/auth/verify-email', activationToken);
+  }
+
+  const html = templates.adminCreatedCredentials({
+    name: user.name,
+    username: user.name,
+    password: plainPassword,
+    activationLink,
+    loginLink: activationLink ? null : `${config.frontendUrl}/login`,
+    language,
+  });
+
+  try {
+    const subjects = {
+      de: 'Deine Zugangsdaten – Finora',
+      en: 'Your Login Credentials – Finora',
+      ar: 'بيانات تسجيل الدخول الخاصة بك – Finora',
+      ka: 'თქვენი შესვლის მონაცემები – Finora',
+    };
+
+    await sendEmail(user.email, subjects[language] || subjects.de, html);
+    logger.info(`Admin-Credentials Email gesendet an: ${user.email}`);
+    return { sent: true, activationLink };
+  } catch (error) {
+    logger.error(`Admin-Credentials Email fehlgeschlagen: ${error.message}`);
+    return { sent: false, error: error.message };
+  }
+}
+
 module.exports = {
   notifyAdminsNewUser,
+  sendAdminCreatedCredentialsEmail,
 };

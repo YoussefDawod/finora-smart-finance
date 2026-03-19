@@ -1,7 +1,6 @@
 // ============================================
 // 📧 EMAIL VERIFICATION PAGE (Link-basiert)
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 // ============================================
@@ -9,6 +8,7 @@
 // ============================================
 .verifyContainer {
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,13 +24,20 @@
 // CARD
 // ============================================
 .verifyCard {
-  background: var(--surface);
+  background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur-reduced));
+  -webkit-backdrop-filter: blur(var(--glass-blur-reduced));
+  box-shadow: var(--glass-shadow);
   border-radius: var(--r-xl);
   padding: var(--space-3xl);
   text-align: center;
   max-width: 400px;
   width: 100%;
-  box-shadow: var(--sh-lg);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background: var(--surface);
+  }
 
   @include mobile {
     padding: var(--space-xl);
@@ -90,7 +97,9 @@
   border-radius: var(--r-md);
   text-decoration: none;
   font-weight: var(--fw-m);
-  transition: filter var(--tr-fast), opacity var(--tr-fast);
+  transition:
+    filter var(--tr-fast),
+    opacity var(--tr-fast);
 
   &:hover {
     filter: brightness(1.08);

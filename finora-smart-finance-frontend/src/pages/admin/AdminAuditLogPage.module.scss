@@ -1,7 +1,6 @@
 // ============================================
 // 📋 ADMIN AUDIT LOG PAGE
 // ============================================
-@use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
 .page {
@@ -33,6 +32,21 @@
   margin: var(--space-2xs) 0 0;
 }
 
+.retentionInfo {
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  margin: var(--space-2xs) 0 0;
+  font-style: italic;
+}
+
+// ── Header Actions ──────────────────────────
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
 // ── Stats Grid ──────────────────────────────
 .statsGrid {
   display: grid;
@@ -44,6 +58,19 @@
   }
 
   @include breakpoint($max: $bp-xs) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Container Queries (Sidebar-aware) ───────
+@container admin-content (max-width: 650px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container admin-content (max-width: 380px) {
+  .statsGrid {
     grid-template-columns: 1fr;
   }
 }
@@ -81,6 +108,251 @@
 }
 
 @include spin-keyframes;
+
+// ── Export Button ───────────────────────────
+.exportButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--info);
+    color: var(--info);
+  }
+
+  @include focus-ring;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ── Month Filter ────────────────────────────
+.monthFilter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.monthArrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--btn-height-sm, 2rem);
+  height: var(--btn-height-sm, 2rem);
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--tx);
+    border-color: var(--primary);
+  }
+
+  @include focus-ring;
+}
+
+.monthInput {
+  padding: 0 var(--space-sm);
+  height: var(--btn-height-sm, 2rem);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  color: var(--tx);
+  background: var(--surface);
+  outline: none;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  color-scheme: light dark;
+
+  &:hover {
+    background: var(--surface-2);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+  }
+
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+}
+
+// ── Bulk Action Bar ─────────────────────────
+.bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+  border-radius: var(--r-lg);
+  flex-wrap: wrap;
+}
+
+.bulkInfo {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--primary);
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.bulkClearButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--tx-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--tx);
+  }
+
+  @include focus-ring;
+}
+
+.bulkDeleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  border-radius: var(--r-md);
+  color: var(--error);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--error) 20%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include focus-ring;
+}
+
+// ── Delete All ──────────────────────────────
+.deleteAllWrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.deleteAllButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--error) 30%, transparent);
+  border-radius: var(--r-md);
+  color: var(--error);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--error) 8%, transparent);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include focus-ring;
+}
+
+// ── Modal Footer ────────────────────────────
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+.modalCancelButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  color: var(--tx);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-m);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+
+  &:hover {
+    background: var(--surface-2);
+  }
+
+  @include focus-ring;
+}
+
+.modalDeleteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--error);
+  color: var(--on-error, #fff);
+  border: none;
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  transition: opacity var(--duration-fast);
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @include focus-ring;
+}
 
 // ── Toolbar (Filters + Date Range) ──────────
 .toolbar {
@@ -236,6 +508,23 @@
   @include focus-ring;
 }
 
+// ── Responsive: Tablet ──────────────────────
+@include tablet-md {
+  .searchWrapper {
+    min-width: 180px;
+    max-width: none;
+    flex: 1 1 auto;
+  }
+
+  .headerActions {
+    gap: var(--space-xs);
+  }
+
+  .monthFilter {
+    gap: var(--space-2xs);
+  }
+}
+
 // ── Responsive ──────────────────────────────
 @include below-md {
   .page {
@@ -245,6 +534,11 @@
 
   .header {
     flex-direction: column;
+  }
+
+  .headerActions {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .title {
@@ -265,9 +559,36 @@
     flex-direction: column;
   }
 
+  .monthFilter {
+    justify-content: center;
+  }
+
   .dateRange {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .bulkBar {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .bulkActions {
+    justify-content: center;
+  }
+
+  .deleteAllWrapper {
+    justify-content: center;
+  }
+
+  .modalFooter {
+    flex-direction: column;
+  }
+
+  .exportButton {
+    flex: 1;
+    justify-content: center;
   }
 }
 
@@ -280,7 +601,15 @@
   .refreshButton,
   .retryButton,
   .dateInput,
-  .searchInput {
+  .searchInput,
+  .exportButton,
+  .monthArrow,
+  .monthInput,
+  .bulkClearButton,
+  .bulkDeleteButton,
+  .deleteAllButton,
+  .modalCancelButton,
+  .modalDeleteButton {
     transition: none;
   }
 }

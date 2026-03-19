@@ -108,9 +108,7 @@ describe('AuthController Integration Tests', () => {
       await authController.register(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true })
-      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
     });
 
     it('should handle validation error in registration', async () => {
@@ -147,7 +145,11 @@ describe('AuthController Integration Tests', () => {
 
       registrationService.validateRegistrationInput.mockResolvedValue({
         valid: true,
-        data: { name: 'Max Mustermann', email: 'existing@example.com', password: 'SecurePassword123!' },
+        data: {
+          name: 'Max Mustermann',
+          email: 'existing@example.com',
+          password: 'SecurePassword123!',
+        },
       });
 
       const duplicateErr = new Error('Duplicate key');
@@ -205,14 +207,8 @@ describe('AuthController Integration Tests', () => {
       await authController.login(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ success: true })
-      );
-      expect(res.cookie).toHaveBeenCalledWith(
-        'refreshToken',
-        'refresh-token',
-        expect.any(Object)
-      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+      expect(res.cookie).toHaveBeenCalledWith('refreshToken', 'refresh-token', expect.any(Object));
     });
 
     it('should include notification when lifecycle requires toast', async () => {
@@ -231,7 +227,12 @@ describe('AuthController Integration Tests', () => {
       authService.buildAuthResponse.mockReturnValue({ accessToken: 'at', user: {} });
       lifecycleService.getLoginNotification.mockResolvedValue({
         showToast: true,
-        notification: { type: 'retention_reminder', severity: 'warning', transactionCount: 15, action: 'export' },
+        notification: {
+          type: 'retention_reminder',
+          severity: 'warning',
+          transactionCount: 15,
+          action: 'export',
+        },
       });
 
       await authController.login(req, res, next);
@@ -386,9 +387,7 @@ describe('AuthController Integration Tests', () => {
 
       await authController.verifyEmail(req, res, next);
 
-      expect(res.redirect).toHaveBeenCalledWith(
-        expect.stringContaining('error=invalid_token')
-      );
+      expect(res.redirect).toHaveBeenCalledWith(expect.stringContaining('error=invalid_token'));
     });
   });
 
@@ -410,9 +409,7 @@ describe('AuthController Integration Tests', () => {
       await authController.changePassword(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ changed: true })
-      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ changed: true }));
     });
 
     it('should reject invalid current password', async () => {
@@ -474,9 +471,7 @@ describe('AuthController Integration Tests', () => {
       await authController.resetPassword(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({ changed: true })
-      );
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ changed: true }));
     });
 
     it('should reject invalid reset token', async () => {
@@ -510,7 +505,7 @@ describe('AuthController Integration Tests', () => {
       expect(res.clearCookie).toHaveBeenCalledWith('refreshToken', {
         httpOnly: true,
         secure: false,
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/api/v1/auth',
       });
       expect(res.status).toHaveBeenCalledWith(200);

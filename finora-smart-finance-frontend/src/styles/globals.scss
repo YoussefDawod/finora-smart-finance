@@ -8,6 +8,50 @@
 @use './variables' as *;
 
 // ============================================
+// 🔤 SELF-HOSTED FONTS (public/fonts/)
+// Stable static paths → passend zu <link rel="preload"> in index.html
+// @fontsource npm-Importe für Inter/Bebas entfernt → kein doppeltes Laden
+// ============================================
+
+/* inter-latin-wght-normal */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* inter-latin-wght-italic */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/inter-latin-wght-italic.woff2') format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* bebas-neue-latin-400-normal */
+@font-face {
+  font-family: 'Bebas Neue';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src:
+    url('/fonts/bebas-neue-latin-400-normal.woff2') format('woff2'),
+    url('/fonts/bebas-neue-latin-400-normal.woff') format('woff');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+// ============================================
 // 🔄 MODERN CSS RESET
 // ============================================
 
@@ -30,8 +74,6 @@ html {
   scroll-behavior: smooth;
 }
 
-
-
 // Body defaults
 body {
   min-height: 100vh;
@@ -42,10 +84,50 @@ body {
   line-height: var(--lh-n);
   color: var(--text, var(--tx));
   background: var(--bg, var(--background));
-  transition: 
+  transition:
     background var(--tr),
     color var(--tr);
   overflow-x: hidden;
+}
+
+// ============================================
+// 🌌 AURORA DASHBOARD PAGE BACKGROUND
+// ============================================
+// Wenn DashboardPage aktiv ist, wird der Aurora-Gradient
+// auf <html> gelegt und Layout-Backgrounds transparent gemacht.
+// JS setzt .page-dashboard + --aurora-angle beim Scrollen.
+// ============================================
+html.page-dashboard {
+  --layout-bg: transparent;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--aurora-gradient);
+  background-attachment: fixed;
+  transition: background 0.4s ease;
+
+  // Body + #root müssen transparent sein, damit der html-Gradient durchscheint.
+  // #root hat background: var(--bg) aus skeleton.css — muss überschrieben werden.
+  body,
+  #root {
+    background: transparent;
+  }
+}
+
+// ============================================
+// 🌌 AURORA PUBLIC PRODUCT PAGE BACKGROUND
+// ============================================
+// Equivalent zu page-dashboard — alle PublicLayout variant="product" Seiten
+// bekommen den Aurora-Gradient als echten html-Hintergrund.
+// JS (PublicLayout.jsx useEffect) setzt/entfernt die Klasse.
+// ============================================
+html.page-public-product {
+  background: var(--aurora-gradient);
+  background-attachment: fixed;
+
+  body,
+  #root {
+    background: transparent;
+  }
 }
 
 // ============================================
@@ -77,7 +159,12 @@ body {
 // ============================================
 
 // Headings
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--ff-heading, var(--ff-base));
   font-weight: var(--fw-b);
   line-height: var(--lh-tight);
@@ -85,12 +172,24 @@ h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
 }
 
-h1 { font-size: clamp(var(--fs-3xl), 5vw, var(--fs-5xl)); }
-h2 { font-size: clamp(var(--fs-2xl), 4vw, var(--fs-4xl)); }
-h3 { font-size: clamp(var(--fs-xl), 3vw, var(--fs-3xl)); }
-h4 { font-size: clamp(var(--fs-lg), 2.5vw, var(--fs-2xl)); }
-h5 { font-size: var(--fs-lg); }
-h6 { font-size: var(--fs-md); }
+h1 {
+  font-size: clamp(var(--fs-3xl), 5vw, var(--fs-5xl));
+}
+h2 {
+  font-size: clamp(var(--fs-2xl), 4vw, var(--fs-4xl));
+}
+h3 {
+  font-size: clamp(var(--fs-xl), 3vw, var(--fs-3xl));
+}
+h4 {
+  font-size: clamp(var(--fs-lg), 2.5vw, var(--fs-2xl));
+}
+h5 {
+  font-size: var(--fs-lg);
+}
+h6 {
+  font-size: var(--fs-md);
+}
 
 // Paragraphs & Text
 p {
@@ -104,17 +203,22 @@ small {
 }
 
 // Strong & Bold
-strong, b {
+strong,
+b {
   font-weight: var(--fw-sb);
 }
 
 // Emphasis
-em, i {
+em,
+i {
   font-style: italic;
 }
 
 // Code & Pre
-code, kbd, samp, pre {
+code,
+kbd,
+samp,
+pre {
   font-family: var(--ff-mono);
   font-size: 0.9em;
 }
@@ -130,7 +234,7 @@ pre {
   padding: var(--space-md);
   border-radius: var(--r-md);
   overflow-x: auto;
-  
+
   code {
     background: none;
     padding: 0;
@@ -162,7 +266,11 @@ a {
 // 🖼️ MEDIA ELEMENTS
 // ============================================
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
   height: auto;
@@ -177,7 +285,8 @@ iframe {
 // 📋 LISTS
 // ============================================
 
-ul, ol {
+ul,
+ol {
   padding-left: var(--space-lg);
 }
 
@@ -186,8 +295,8 @@ li {
 }
 
 // Remove list styles when role="list" is set
-ul[role="list"],
-ol[role="list"] {
+ul[role='list'],
+ol[role='list'] {
   list-style: none;
   padding: 0;
 }
@@ -202,7 +311,8 @@ table {
   width: 100%;
 }
 
-th, td {
+th,
+td {
   padding: var(--space-sm) var(--space-md);
   text-align: left;
   border-bottom: 1px solid var(--border);
@@ -224,6 +334,7 @@ button {
   border: none;
   cursor: pointer;
   border-radius: var(--r-sm);
+  min-height: 0;
 
   &:focus {
     outline: none;
@@ -231,31 +342,33 @@ button {
 
   &:focus-visible {
     outline: none;
-    box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font: inherit;
   color: inherit;
 }
 
 // Remove default appearance
-input[type="search"]::-webkit-search-decoration,
-input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-results-button,
-input[type="search"]::-webkit-search-results-decoration {
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
   display: none;
 }
 
 // Number input spinners
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
@@ -304,11 +417,11 @@ hr {
 // ⏳ LOADING STATES
 // ============================================
 
-[aria-busy="true"] {
+[aria-busy='true'] {
   cursor: progress;
 }
 
-[aria-disabled="true"],
+[aria-disabled='true'],
 [disabled] {
   cursor: not-allowed;
   opacity: 0.6;
@@ -369,7 +482,7 @@ hr {
 .app-logo {
   display: block;
   width: auto;
-  height: 50px;          // Bumped up: war 32px
+  height: 50px; // Bumped up: war 32px
   object-fit: contain;
   flex-shrink: 0;
   user-select: none;
@@ -392,7 +505,8 @@ hr {
     }
   }
 
-  // Small variant — AdminLayout Sidebar, HamburgerMenu (war 28px)
+  // @deprecated — .app-logo--sm ist unverwendet (AdminLayout nutzt jetzt .adminLogoImg)
+  // Beibehalten für Rückwärtskompatibilität mit VerifyEmailPage und HamburgerMenu
   &--sm {
     height: 50px;
   }
@@ -402,7 +516,11 @@ hr {
     height: 50px;
 
     @media (max-width: 900px) {
-      height: 50px;
+      height: 32px;
+    }
+
+    @media (max-width: 640px) {
+      height: 28px;
     }
   }
 }
@@ -425,11 +543,9 @@ hr {
   pointer-events: none;
   // Allow overflow to be visible
   overflow: visible;
-  
+
   // Children can have pointer events
   > * {
     pointer-events: auto;
   }
 }
-
-

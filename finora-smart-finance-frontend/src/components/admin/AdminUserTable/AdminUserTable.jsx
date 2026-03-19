@@ -20,6 +20,8 @@ import {
   FiArrowDown,
 } from 'react-icons/fi';
 import { SkeletonTableRow } from '@/components/common/Skeleton';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
+import { useAuth } from '@/hooks/useAuth';
 import { getSortDirection, generatePageNumbers } from '@/utils/adminTableHelpers';
 import styles from './AdminUserTable.module.scss';
 
@@ -55,10 +57,11 @@ function AdminUserTable({
   actionLoading = null,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
 
   // ── Sort Handler ────────────────────────────────
   const handleSort = useCallback(
-    (field) => {
+    field => {
       if (!SORT_FIELDS[field]) return;
       const currentField = sort.replace(/^-/, '');
       const isDesc = sort.startsWith('-');
@@ -69,11 +72,11 @@ function AdminUserTable({
         onSortChange?.(`-${field}`);
       }
     },
-    [sort, onSortChange],
+    [sort, onSortChange]
   );
 
   const getSortIcon = useCallback(
-    (field) => {
+    field => {
       const currentField = sort.replace(/^-/, '');
       if (currentField !== field) return null;
       return sort.startsWith('-') ? (
@@ -82,22 +85,25 @@ function AdminUserTable({
         <FiArrowUp size={12} className={styles.sortIcon} />
       );
     },
-    [sort],
+    [sort]
   );
 
   // ── Formatierungen ──────────────────────────────
-  const formatDate = useCallback((dateStr) => {
-    if (!dateStr) return '—';
-    try {
-      return new Intl.DateTimeFormat(i18n.language, {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }).format(new Date(dateStr));
-    } catch {
-      return '—';
-    }
-  }, [i18n.language]);
+  const formatDate = useCallback(
+    dateStr => {
+      if (!dateStr) return '—';
+      try {
+        return new Intl.DateTimeFormat(i18n.language, {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        }).format(new Date(dateStr));
+      } catch {
+        return '—';
+      }
+    },
+    [i18n.language]
+  );
 
   // ── Loading ─────────────────────────────────────
   if (loading && users.length === 0) {
@@ -154,7 +160,7 @@ function AdminUserTable({
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {users.map(user => (
               <tr
                 key={user._id || user.id}
                 className={!user.isActive ? styles.bannedRow : undefined}
@@ -165,23 +171,27 @@ function AdminUserTable({
                     <span
                       className={`${styles.avatar} ${user.role === 'admin' ? styles.adminAvatar : ''}`}
                     >
-                      {user.role === 'admin' ? (
-                        <FiShield size={14} />
-                      ) : (
-                        <FiUser size={14} />
-                      )}
+                      {user.role === 'admin' ? <FiShield size={14} /> : <FiUser size={14} />}
                     </span>
-                    <span className={styles.nameText}>{user.name}</span>
+                    <span className={styles.nameText}>
+                      <SensitiveData active={isViewer}>{user.name}</SensitiveData>
+                    </span>
                   </div>
                 </td>
 
                 {/* Email */}
-                <td className={styles.emailCell} data-label={t('admin.users.email')}>{user.email || '—'}</td>
+                <td className={styles.emailCell} data-label={t('admin.users.email')}>
+                  <SensitiveData active={isViewer}>{user.email || '—'}</SensitiveData>
+                </td>
 
                 {/* Role Badge */}
                 <td data-label={t('admin.users.role')}>
                   <span className={`${styles.badge} ${styles[`role_${user.role}`]}`}>
-                    {user.role === 'admin' ? t('admin.users.roleAdmin') : t('admin.users.roleUser')}
+                    {user.role === 'admin'
+                      ? t('admin.users.roleAdmin')
+                      : user.role === 'viewer'
+                        ? t('admin.users.roleViewer')
+                        : t('admin.users.roleUser')}
                   </span>
                 </td>
 
@@ -233,7 +243,11 @@ function AdminUserTable({
 
       {/* Pagination */}
       {pages > 1 && (
-        <div className={styles.pagination} role="navigation" aria-label={t('admin.users.pagination')}>
+        <div
+          className={styles.pagination}
+          role="navigation"
+          aria-label={t('admin.users.pagination')}
+        >
           <span className={styles.paginationInfo}>
             {t('admin.users.showing', {
               from: (page - 1) * (pagination.limit || DEFAULT_SKELETON_ROWS) + 1,
@@ -267,7 +281,7 @@ function AdminUserTable({
                 >
                   {p}
                 </button>
-              ),
+              )
             )}
             <button
               className={styles.pageButton}

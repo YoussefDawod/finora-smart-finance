@@ -8,6 +8,8 @@
 
 import { useState, useCallback, memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/hooks/useAuth';
+import SensitiveData from '@/components/ui/SensitiveData/SensitiveData';
 import {
   FiSend,
   FiGlobe,
@@ -53,6 +55,7 @@ function AdminCampaignDetail({
   onError,
 }) {
   const { t, i18n } = useTranslation();
+  const { isViewer } = useAuth();
   const [view, setView] = useState(VIEW.DETAILS);
 
   const campaignId = campaign?._id || campaign?.id;
@@ -95,12 +98,15 @@ function AdminCampaignDetail({
 
   if (!campaign) return null;
 
-  const formatDateTime = (dateStr) => {
+  const formatDateTime = dateStr => {
     if (!dateStr) return '—';
     try {
       return new Intl.DateTimeFormat(i18n.language, {
-        day: '2-digit', month: '2-digit', year: 'numeric',
-        hour: '2-digit', minute: '2-digit',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
       }).format(new Date(dateStr));
     } catch {
       return '—';
@@ -135,11 +141,7 @@ function AdminCampaignDetail({
           disabled={isBusy}
           type="button"
         >
-          {isBusy ? (
-            <FiRefreshCw size={14} className={styles.spinning} />
-          ) : (
-            <FiTrash2 size={14} />
-          )}
+          {isBusy ? <FiRefreshCw size={14} className={styles.spinning} /> : <FiTrash2 size={14} />}
           {t('admin.campaigns.delete')}
         </button>
       </div>
@@ -187,7 +189,11 @@ function AdminCampaignDetail({
           <InfoRow
             icon={FiUser}
             label={t('admin.campaigns.detail.sentBy')}
-            value={campaign.sentBy.name || campaign.sentBy.email || '—'}
+            value={
+              <SensitiveData active={isViewer}>
+                {campaign.sentBy.name || campaign.sentBy.email || '—'}
+              </SensitiveData>
+            }
           />
         )}
       </div>
@@ -195,9 +201,7 @@ function AdminCampaignDetail({
       {/* Recipient Stats (if sent) */}
       {isSent && (
         <div className={styles.statsSection}>
-          <h4 className={styles.sectionTitle}>
-            {t('admin.campaigns.detail.recipientStats')}
-          </h4>
+          <h4 className={styles.sectionTitle}>{t('admin.campaigns.detail.recipientStats')}</h4>
           <div className={styles.statsGrid}>
             <div className={styles.statItem}>
               <FiUsers size={16} className={styles.statIcon} />
@@ -220,12 +224,8 @@ function AdminCampaignDetail({
 
       {/* Content Preview */}
       <div className={styles.contentSection}>
-        <h4 className={styles.sectionTitle}>
-          {t('admin.campaigns.detail.contentPreview')}
-        </h4>
-        <div className={styles.contentPreview}>
-          {campaign.content}
-        </div>
+        <h4 className={styles.sectionTitle}>{t('admin.campaigns.detail.contentPreview')}</h4>
+        <div className={styles.contentPreview}>{campaign.content}</div>
       </div>
 
       {/* Action Buttons */}
