@@ -629,4 +629,11 @@ router.get('/lifecycle/users/:id', adminController.getUserLifecycleDetail);
 router.post('/lifecycle/users/:id/reset', requireAdmin, adminController.resetUserRetention);
 router.post('/lifecycle/trigger', requireAdmin, adminController.triggerRetentionProcessing);
 
+// Feedback-Routen
+router.get('/feedbacks', adminController.listFeedbacks);
+router.get('/feedbacks/stats', adminController.getFeedbackStats);
+router.patch('/feedbacks/:id/publish', requireAdmin, adminController.publishFeedback);
+router.patch('/feedbacks/:id/unpublish', requireAdmin, adminController.unpublishFeedback);
+router.delete('/feedbacks/:id', requireAdmin, adminController.deleteFeedbackAdmin);
+
 module.exports = router;

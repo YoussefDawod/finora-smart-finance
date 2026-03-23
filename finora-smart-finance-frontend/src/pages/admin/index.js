@@ -9,3 +9,4 @@ export { default as AdminCampaignsPage } from './AdminCampaignsPage';
 export { default as AdminCampaignComposer } from './AdminCampaignComposer';
 export { default as AdminAuditLogPage } from './AdminAuditLogPage';
 export { default as AdminLifecyclePage } from './AdminLifecyclePage';
+export { default as AdminFeedbacksPage } from './AdminFeedbacksPage';

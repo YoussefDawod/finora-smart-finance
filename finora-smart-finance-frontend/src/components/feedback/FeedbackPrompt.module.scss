@@ -1,0 +1,104 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--glass-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border-inline-start: 3px solid var(--primary);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font-size: var(--fs-base);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-sb);
+  color: var(--tx);
+  margin: 0;
+}
+
+.description {
+  font-size: 0.8125rem;
+  color: var(--tx-muted);
+  margin: 0.125rem 0 0;
+  line-height: 1.4;
+}
+
+.ctaBtn {
+  flex-shrink: 0;
+  background: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--r-md);
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: var(--fw-sb);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    opacity var(--tr-fast),
+    transform var(--tr-fast);
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+}
+
+.closeBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--tx-muted);
+  font-size: var(--fs-base);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition:
+    color var(--tr-fast),
+    background var(--tr-fast);
+
+  &:hover {
+    color: var(--tx);
+    background: var(--glass-bg);
+  }
+}
+
+// Stack vertically on small screens
+@include below-sm {
+  .prompt {
+    flex-wrap: wrap;
+  }
+
+  .content {
+    flex-basis: calc(100% - 3.5rem);
+  }
+
+  .ctaBtn {
+    margin-inline-start: 3rem;
+  }
+}

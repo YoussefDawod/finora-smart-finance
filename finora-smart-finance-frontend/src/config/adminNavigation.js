@@ -7,6 +7,7 @@ import {
   FiFileText,
   FiArrowLeft,
   FiClock,
+  FiMessageSquare,
 } from 'react-icons/fi';
 
 /**
@@ -19,6 +20,7 @@ export const ADMIN_NAV_ITEMS = [
   { path: '/admin/transactions', labelKey: 'admin.nav.transactions', icon: FiCreditCard },
   { path: '/admin/subscribers', labelKey: 'admin.nav.subscribers', icon: FiMail },
   { path: '/admin/campaigns', labelKey: 'admin.nav.campaigns', icon: FiSend },
+  { path: '/admin/feedbacks', labelKey: 'admin.nav.feedbacks', icon: FiMessageSquare },
   { path: '/admin/audit-log', labelKey: 'admin.nav.auditLog', icon: FiFileText },
   { path: '/admin/lifecycle', labelKey: 'admin.nav.lifecycle', icon: FiClock },
 ];

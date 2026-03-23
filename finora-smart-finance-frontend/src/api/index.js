@@ -1,10 +1,10 @@
 /**
  * @fileoverview API Barrel Exports
  * @description Centralized API exports
- * 
+ *
  * USAGE:
  * import { authService, transactionService } from '@/api'
- * 
+ *
  * @module api
  */
 
@@ -13,6 +13,7 @@ export * from './authService';
 export * from './transactionService';
 export * from './userService';
 export * from './adminService';
+export * from './feedbackService';
 export * from './errorHandler';
 export { ENDPOINTS } from './endpoints';
 export { API_BASE_URL, API_TIMEOUT, API_CONFIG } from './config';

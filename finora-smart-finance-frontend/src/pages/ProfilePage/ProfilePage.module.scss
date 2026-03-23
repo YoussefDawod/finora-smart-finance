@@ -1109,7 +1109,7 @@
 .sheetHandleBar {
   width: 36px;
   height: 4px;
-  border-radius: 2px;
+  border-radius: var(--r-xs);
   background: color-mix(in srgb, var(--tx) 20%, transparent);
 }
 

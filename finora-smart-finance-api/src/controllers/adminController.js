@@ -6,6 +6,7 @@
 const mongoose = require('mongoose');
 const adminService = require('../services/adminService');
 const campaignService = require('../services/campaignService');
+const feedbackService = require('../services/feedbackService');
 const auditLog = require('../services/auditLogService');
 const { sendError, handleServerError } = require('../utils/responseHelper');
 const {
@@ -20,6 +21,7 @@ const {
   sanitizeSubscriberForViewer,
   sanitizeAuditLogForViewer,
   sanitizeTransactionUserForViewer,
+  sanitizeFeedbackForViewer,
 } = require('../utils/viewerSanitizer');
 
 /**
@@ -1210,6 +1212,121 @@ async function triggerRetentionProcessing(req, res) {
   }
 }
 
+// ============================================
+// FEEDBACK MANAGEMENT (Admin)
+// ============================================
+
+// GET /api/admin/feedbacks
+async function listFeedbacks(req, res) {
+  try {
+    const { page, limit, sort, search, ratingFilter, consentFilter, publishedFilter } =
+      req.query || {};
+
+    const data = await feedbackService.listFeedbacks({
+      page,
+      limit,
+      sort,
+      search,
+      ratingFilter,
+      consentFilter,
+      publishedFilter,
+    });
+
+    // Viewer: sensible User-Daten maskieren
+    if (req.user && req.user.role === 'viewer' && data.feedbacks) {
+      data.feedbacks = data.feedbacks.map(sanitizeFeedbackForViewer);
+    }
+
+    res.json({ success: true, data });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: List feedbacks', error);
+  }
+}
+
+// GET /api/admin/feedbacks/stats
+async function getFeedbackStats(req, res) {
+  try {
+    const data = await feedbackService.getFeedbackStats();
+    res.json({ success: true, data });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Feedback stats', error);
+  }
+}
+
+// PATCH /api/admin/feedbacks/:id/publish
+async function publishFeedback(req, res) {
+  try {
+    const result = await feedbackService.publishFeedback(req.params.id);
+    if (result.error) {
+      const status = result.code === 'FEEDBACK_NOT_FOUND' ? 404 : 400;
+      return sendError(res, req, { error: result.error, code: result.code, status });
+    }
+
+    const { adminId, adminName } = getAdminInfo(req);
+    auditLog.log({
+      action: 'FEEDBACK_PUBLISHED',
+      adminId,
+      adminName,
+      details: { feedbackId: req.params.id, rating: result.feedback.rating },
+      req,
+    });
+
+    res.json({ success: true, message: 'Feedback veröffentlicht', data: result.feedback });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Publish feedback', error);
+  }
+}
+
+// PATCH /api/admin/feedbacks/:id/unpublish
+async function unpublishFeedback(req, res) {
+  try {
+    const result = await feedbackService.unpublishFeedback(req.params.id);
+    if (result.error) {
+      return sendError(res, req, { error: result.error, code: result.code, status: 404 });
+    }
+
+    const { adminId, adminName } = getAdminInfo(req);
+    auditLog.log({
+      action: 'FEEDBACK_UNPUBLISHED',
+      adminId,
+      adminName,
+      details: { feedbackId: req.params.id },
+      req,
+    });
+
+    res.json({ success: true, message: 'Feedback zurückgezogen', data: result.feedback });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Unpublish feedback', error);
+  }
+}
+
+// DELETE /api/admin/feedbacks/:id
+async function deleteFeedbackAdmin(req, res) {
+  try {
+    const result = await feedbackService.deleteFeedback(req.params.id);
+    if (result.error) {
+      return sendError(res, req, { error: result.error, code: result.code, status: 404 });
+    }
+
+    const { adminId, adminName } = getAdminInfo(req);
+    auditLog.log({
+      action: 'FEEDBACK_DELETED',
+      adminId,
+      adminName,
+      details: {
+        feedbackId: req.params.id,
+        rating: result.deleted.rating,
+        wasPublished: result.deleted.published,
+      },
+      req,
+    });
+
+    res.json({ success: true, message: 'Feedback gelöscht', data: result.deleted });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: Delete feedback', error);
+  }
+}
+
 module.exports = {
   listUsers,
   getUser,
@@ -1258,4 +1375,10 @@ module.exports = {
   getUserLifecycleDetail,
   resetUserRetention,
   triggerRetentionProcessing,
+  // Feedbacks
+  listFeedbacks,
+  getFeedbackStats,
+  publishFeedback,
+  unpublishFeedback,
+  deleteFeedbackAdmin,
 };

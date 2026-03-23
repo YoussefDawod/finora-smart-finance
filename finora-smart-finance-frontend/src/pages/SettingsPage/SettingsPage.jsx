@@ -20,9 +20,12 @@ import {
   FiTarget,
   FiMail,
   FiClock,
+  FiMessageSquare,
 } from 'react-icons/fi';
 import { ExportSection, BudgetSettings } from '@/components/settings';
 import { RetentionBanner } from '@/components/dashboard';
+import { FeedbackForm } from '@/components/feedback';
+import { useFeedback } from '@/hooks/useFeedback';
 import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
 import Button from '@/components/common/Button/Button';
 import AuthRequiredOverlay from '@/components/common/AuthRequiredOverlay/AuthRequiredOverlay';
@@ -67,6 +70,34 @@ const DATE_FORMAT_OPTIONS = [
   { value: 'iso', labelKey: 'settings.general.dateFormatIso' },
   { value: 'dmy', labelKey: 'settings.general.dateFormatDmy' },
 ];
+
+/**
+ * Wrapper-Komponente für den Feedback-Bereich in den Einstellungen.
+ * Kapselt useFeedback, damit der Hook nur bei authentifizierten Nutzern läuft.
+ */
+function FeedbackSection() {
+  const {
+    feedback,
+    feedbackCount,
+    loading,
+    actionLoading,
+    submitFeedback,
+    updateConsent,
+    deleteFeedback,
+  } = useFeedback();
+
+  return (
+    <FeedbackForm
+      feedback={feedback}
+      feedbackCount={feedbackCount}
+      loading={loading}
+      actionLoading={actionLoading}
+      onSubmit={submitFeedback}
+      onUpdateConsent={updateConsent}
+      onDelete={deleteFeedback}
+    />
+  );
+}
 
 export default function SettingsPage() {
   const { setTheme, resetToSystemPreference } = useTheme();
@@ -618,6 +649,39 @@ export default function SettingsPage() {
                   onConfirmExport={confirmExport}
                   isLoading={lifecycleLoading}
                 />
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Feedback Section - Auth required */}
+        <motion.div className={styles.sectionCard} variants={itemVariants} id="feedback">
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiMessageSquare />
+                </div>
+                <div>
+                  <h2>{t('feedback.settings.title')}</h2>
+                  <p>{t('feedback.settings.description')}</p>
+                </div>
+              </div>
+              <div className={styles.sectionBody} />
+            </AuthRequiredOverlay>
+          ) : (
+            <>
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionIcon} aria-hidden="true">
+                  <FiMessageSquare />
+                </div>
+                <div>
+                  <h2>{t('feedback.settings.title')}</h2>
+                  <p>{t('feedback.settings.description')}</p>
+                </div>
+              </div>
+              <div className={styles.sectionBody}>
+                <FeedbackSection />
               </div>
             </>
           )}

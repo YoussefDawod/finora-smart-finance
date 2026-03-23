@@ -89,8 +89,22 @@ export const ENDPOINTS = {
     lifecycleUserDetail: id => `${P}/admin/lifecycle/users/${id}`,
     lifecycleUserReset: id => `${P}/admin/lifecycle/users/${id}/reset`,
     lifecycleTrigger: `${P}/admin/lifecycle/trigger`,
+    // Feedbacks
+    feedbacks: `${P}/admin/feedbacks`,
+    feedbackStats: `${P}/admin/feedbacks/stats`,
+    feedback: id => `${P}/admin/feedbacks/${id}`,
+    feedbackPublish: id => `${P}/admin/feedbacks/${id}/publish`,
+    feedbackUnpublish: id => `${P}/admin/feedbacks/${id}/unpublish`,
   },
   contact: `${P}/contact`,
+  feedback: {
+    create: `${P}/feedback`,
+    mine: `${P}/feedback/mine`,
+    consent: `${P}/feedback/mine/consent`,
+    delete: `${P}/feedback/mine`,
+    public: `${P}/feedback/public`,
+    count: `${P}/feedback/count`,
+  },
   newsletter: {
     subscribe: `${P}/newsletter/subscribe`,
     status: `${P}/newsletter/status`,

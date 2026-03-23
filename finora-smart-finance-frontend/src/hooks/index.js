@@ -20,6 +20,7 @@ export { useOnlineStatus } from './useOnlineStatus';
 export { useProfile } from './useProfile';
 export { useBudget } from './useBudget';
 export { useLifecycle } from './useLifecycle';
+export { useFeedback } from './useFeedback';
 
 // ============================================
 // 📦 EXISTING HOOKS
@@ -48,6 +49,7 @@ export { useAdminSubscribers } from './useAdminSubscribers';
 export { useAdminCampaigns } from './useAdminCampaigns';
 export { useAdminAuditLog } from './useAdminAuditLog';
 export { useAdminLifecycle } from './useAdminLifecycle';
+export { useAdminFeedbacks } from './useAdminFeedbacks';
 
 // ============================================
 // 🎨 CSS/THEME HOOKS

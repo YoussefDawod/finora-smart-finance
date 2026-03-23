@@ -25,6 +25,8 @@ function PublicNav() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const isLandingPage = location.pathname === '/';
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -58,16 +60,29 @@ function PublicNav() {
         <div className={styles.container}>
           {isMobile ? (
             <>
-              {/* Mobile LEFT: Hamburger */}
-              <button
-                type="button"
-                className={styles.hamburger}
-                onClick={toggleMenu}
-                aria-expanded={isMenuOpen}
-                aria-label={isMenuOpen ? t('nav.menuClose') : t('nav.menuOpen')}
-              >
-                {isMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
-              </button>
+              {/* Mobile LEFT: Hamburger (hidden on landing page) */}
+              {!isLandingPage && (
+                <button
+                  type="button"
+                  className={styles.hamburger}
+                  onClick={toggleMenu}
+                  aria-expanded={isMenuOpen}
+                  aria-label={isMenuOpen ? t('nav.menuClose') : t('nav.menuOpen')}
+                >
+                  {isMenuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+                </button>
+              )}
+
+              {/* Mobile: Logo on landing page */}
+              {isLandingPage && (
+                <Link to="/" className={styles.logo} aria-label="Finora Home">
+                  <img
+                    src="/logo-branding/finora-logo.svg"
+                    alt="Finora"
+                    className={styles.logoImg}
+                  />
+                </Link>
+              )}
 
               {/* Mobile RIGHT: Avatar oder Login */}
               <div className={styles.mobileRight}>
@@ -89,18 +104,20 @@ function PublicNav() {
                 <img src="/logo-branding/finora-logo.svg" alt="Finora" className={styles.logoImg} />
               </Link>
 
-              {/* Desktop CENTER: Nav Links */}
-              <div className={styles.links}>
-                {NAV_LINKS.map(({ labelKey, path }) => (
-                  <Link
-                    key={path}
-                    to={path}
-                    className={`${styles.link} ${location.pathname === path ? styles.active : ''}`}
-                  >
-                    {t(labelKey)}
-                  </Link>
-                ))}
-              </div>
+              {/* Desktop CENTER: Nav Links (hidden on landing page) */}
+              {!isLandingPage && (
+                <div className={styles.links}>
+                  {NAV_LINKS.map(({ labelKey, path }) => (
+                    <Link
+                      key={path}
+                      to={path}
+                      className={`${styles.link} ${location.pathname === path ? styles.active : ''}`}
+                    >
+                      {t(labelKey)}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
               {/* Desktop RIGHT: Auth-State */}
               <div className={styles.actions}>
@@ -131,9 +148,8 @@ function PublicNav() {
         </div>
       </div>
 
-      {/* Mobile Menu — Geschwister von navBar (NICHT Kind),
-          damit es nicht im backdrop-filter Compositing-Scope liegt */}
-      {isMobile && isMenuOpen && (
+      {/* Mobile Menu — only on non-landing pages */}
+      {isMobile && !isLandingPage && isMenuOpen && (
         <div className={styles.mobileMenu}>
           {/* Logo oben im Menü */}
           <Link to={logoTo} className={styles.mobileLogo} onClick={closeMenu}>

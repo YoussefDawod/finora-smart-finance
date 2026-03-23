@@ -1,0 +1,30 @@
+// ============================================
+// 📄 LANDING PAGE — Hauptcontainer
+// ============================================
+@use '@/styles/mixins' as *;
+
+.landing {
+  width: 100%;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.section {
+  scroll-margin-top: 80px; // Offset für fixierten Header
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionHidden {
+  display: none;
+}

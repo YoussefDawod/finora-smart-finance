@@ -1,0 +1,141 @@
+// ============================================
+// 🚀 CTA SECTION — Finaler Call to Action
+// ============================================
+@use '@/styles/mixins' as *;
+
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.cta {
+  padding: var(--space-4xl) var(--space-xl);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto 0;
+  width: 100%;
+
+  @include below-md {
+    padding: var(--space-2xl) var(--space-md);
+  }
+}
+
+.inner {
+  max-width: var(--mw-lg);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  @include glass-panel('hero');
+  border: none;
+  position: relative;
+  isolation: isolate;
+
+  // Aurora-Gradient-Border via Pseudo-Element
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(
+      from var(--border-angle),
+      var(--aurora-1),
+      var(--aurora-2),
+      var(--aurora-3),
+      var(--primary),
+      var(--aurora-1)
+    );
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: xor;
+    z-index: -1;
+    --border-angle: 0deg;
+    transition: opacity var(--tr);
+  }
+
+  &:hover::before {
+    animation: borderRotate 3s linear infinite;
+  }
+}
+
+@keyframes borderRotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.headline {
+  font-size: clamp(var(--fs-2xl), 4vw, var(--fs-4xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-xb);
+  background: linear-gradient(135deg, var(--tx) 20%, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-xs);
+}
+
+.subheadline {
+  font-size: clamp(var(--fs-md), 2vw, var(--fs-xl));
+  color: var(--tx-muted);
+  margin-bottom: var(--space-xl);
+  line-height: var(--lh-relaxed);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border-radius: var(--r-full);
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-md);
+  text-decoration: none;
+  transition:
+    box-shadow var(--tr),
+    transform var(--tr);
+
+  &:hover {
+    box-shadow: 0 0 28px color-mix(in srgb, var(--primary) 50%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-sm) var(--space-xl);
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--r-full);
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-md);
+  text-decoration: none;
+  transition:
+    background var(--tr),
+    transform var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    transform: translateY(-2px);
+  }
+}

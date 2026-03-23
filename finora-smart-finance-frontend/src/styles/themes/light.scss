@@ -50,8 +50,8 @@ $light-palette: (
   // ── Glass Surface Tokens (Light) ──
   --glass-bg: rgba(255, 255, 255, 0.4);
   --glass-bg-hover: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-light: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(30, 27, 75, 0.12);
+  --glass-border-light: rgba(30, 27, 75, 0.06);
   // Aurora-getönte Schatten — Basis: Indigo-950 (#1E1B4B) statt Schwarz
   // Layer 1: Primär (Indigo) für warme Tiefe  |  Layer 2: feiner Randschatten
   --glass-shadow:
@@ -66,6 +66,9 @@ $light-palette: (
   --aurora-2: rgb(96, 165, 250); // Blue-400 — Charts/Trends
   --aurora-3: #34d399; // Emerald-400 — Einnahmen/Positive
   --aurora-warn: #f87171; // Red-400 — Ausgaben/Negative
+
+  // ── Device Frame Token (Light) ──
+  --device-frame-color: #c8c8d0;
 
   // ── Aurora Gradient Background (Light) ──
   // Violet-200 / Blue-200 / Sky-200 / Fuchsia-200 — kräftiger als 50/100-Pastelltöne

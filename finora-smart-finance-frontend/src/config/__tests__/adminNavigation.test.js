@@ -8,51 +8,53 @@ import { ADMIN_NAV_ITEMS, ADMIN_BACK_LINK } from '../adminNavigation';
 
 describe('adminNavigation', () => {
   describe('ADMIN_NAV_ITEMS', () => {
-    it('enthält genau 7 Nav-Items', () => {
-      expect(ADMIN_NAV_ITEMS).toHaveLength(7);
+    it('enthält genau 8 Nav-Items', () => {
+      expect(ADMIN_NAV_ITEMS).toHaveLength(8);
     });
 
     it('hat korrekte Pfade', () => {
-      const paths = ADMIN_NAV_ITEMS.map((item) => item.path);
+      const paths = ADMIN_NAV_ITEMS.map(item => item.path);
       expect(paths).toEqual([
         '/admin',
         '/admin/users',
         '/admin/transactions',
         '/admin/subscribers',
         '/admin/campaigns',
+        '/admin/feedbacks',
         '/admin/audit-log',
         '/admin/lifecycle',
       ]);
     });
 
     it('hat korrekte i18n labelKeys', () => {
-      const keys = ADMIN_NAV_ITEMS.map((item) => item.labelKey);
+      const keys = ADMIN_NAV_ITEMS.map(item => item.labelKey);
       expect(keys).toEqual([
         'admin.nav.dashboard',
         'admin.nav.users',
         'admin.nav.transactions',
         'admin.nav.subscribers',
         'admin.nav.campaigns',
+        'admin.nav.feedbacks',
         'admin.nav.auditLog',
         'admin.nav.lifecycle',
       ]);
     });
 
     it('hat Icons für alle Items', () => {
-      ADMIN_NAV_ITEMS.forEach((item) => {
+      ADMIN_NAV_ITEMS.forEach(item => {
         expect(typeof item.icon).toBe('function');
       });
     });
 
     it('hat end:true nur auf Dashboard', () => {
       expect(ADMIN_NAV_ITEMS[0].end).toBe(true);
-      ADMIN_NAV_ITEMS.slice(1).forEach((item) => {
+      ADMIN_NAV_ITEMS.slice(1).forEach(item => {
         expect(item.end).toBeUndefined();
       });
     });
 
     it('alle Pfade beginnen mit /admin', () => {
-      ADMIN_NAV_ITEMS.forEach((item) => {
+      ADMIN_NAV_ITEMS.forEach(item => {
         expect(item.path.startsWith('/admin')).toBe(true);
       });
     });

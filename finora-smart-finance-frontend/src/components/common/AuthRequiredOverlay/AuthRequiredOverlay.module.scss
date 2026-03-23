@@ -4,6 +4,7 @@
   position: relative;
   border-radius: var(--r-lg);
   overflow: hidden;
+  min-height: var(--auth-required-min-height, 11rem);
 }
 
 .content {
@@ -24,6 +25,12 @@
   padding: var(--space-lg);
   text-align: center;
   z-index: 2;
+}
+
+@include mobile {
+  .wrapper {
+    min-height: var(--auth-required-min-height, 10rem);
+  }
 }
 
 .icon {

@@ -42,7 +42,7 @@
   font-family: 'Bebas Neue';
   font-style: normal;
   font-display: swap;
-  font-weight: 400;
+  font-weight: var(--fw-n);
   src:
     url('/fonts/bebas-neue-latin-400-normal.woff2') format('woff2'),
     url('/fonts/bebas-neue-latin-400-normal.woff') format('woff');
@@ -103,7 +103,7 @@ html.page-dashboard {
   min-height: 100dvh;
   background: var(--aurora-gradient);
   background-attachment: fixed;
-  transition: background 0.4s ease;
+  transition: background var(--tr-slow);
 
   // Body + #root müssen transparent sein, damit der html-Gradient durchscheint.
   // #root hat background: var(--bg) aus skeleton.css — muss überschrieben werden.

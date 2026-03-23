@@ -1,0 +1,226 @@
+// ============================================
+// HERO SECTION
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Section ──
+
+.hero {
+  max-width: var(--mw-xl);
+  margin: auto;
+  padding: var(--space-xl);
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  @include below-lg {
+    padding: var(--space-2xl) var(--space-lg);
+  }
+
+  @include below-md {
+    padding: var(--space-xl) var(--space-md);
+  }
+}
+
+// ── Grid: Links Text, Rechts Mockups ──
+
+.content {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: var(--space-3xl);
+  align-items: center;
+  width: 100%;
+
+  @include below-lg {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+    text-align: center;
+  }
+}
+
+// ── Text-Spalte (links) ──
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+
+  @include below-lg {
+    align-items: center;
+  }
+}
+
+.headline {
+  font-size: clamp(var(--fs-3xl), 5vw, var(--fs-6xl));
+  font-family: var(--ff-brand);
+  font-weight: var(--fw-xb);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--ls-tight);
+  background: linear-gradient(135deg, var(--tx) 30%, var(--primary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subheadline {
+  font-size: clamp(var(--fs-md), 2vw, var(--fs-xl));
+  color: var(--tx-muted);
+  line-height: var(--lh-relaxed);
+  max-width: 50ch;
+
+  @include below-lg {
+    max-width: 40ch;
+  }
+}
+
+// ── CTA Buttons ──
+
+.actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+
+  @include below-lg {
+    justify-content: center;
+  }
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--primary);
+  color: var(--primary-contrast);
+  border-radius: var(--r-full);
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-md);
+  text-decoration: none;
+  transition:
+    box-shadow var(--tr),
+    transform var(--tr);
+
+  &:hover {
+    box-shadow: 0 0 24px color-mix(in srgb, var(--primary) 45%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-xl);
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+  border-radius: var(--r-full);
+  font-weight: var(--fw-sb);
+  font-size: var(--fs-md);
+  text-decoration: none;
+  transition:
+    background var(--tr),
+    transform var(--tr);
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    transform: translateY(-2px);
+  }
+}
+
+// ── Trust Badges ──
+
+.trustBadges {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+
+  @include below-lg {
+    justify-content: center;
+  }
+}
+
+.badge {
+  padding: var(--space-2xs) var(--space-sm);
+  background: color-mix(in srgb, var(--glass-bg) 50%, transparent);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-full);
+  font-size: var(--fs-xs);
+  color: var(--tx-muted);
+  white-space: nowrap;
+}
+
+// ============================================
+// MOCKUP-SPALTE (rechts)
+// ============================================
+// Struktur:
+//   .mockupCol
+//     .deviceLaptop      ← volle Breite
+//     .smallDevices       ← Tablet (links) + Mobile (rechts), überlappt Laptop
+//       .deviceTablet
+//       .deviceMobile
+// ============================================
+
+.mockupCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// ── Laptop — MacBook Pro ──
+// Volle Breite im Mockup-Bereich, leichte Perspektive
+
+.deviceLaptop {
+  zoom: 0.5;
+  perspective: 900px;
+  filter: drop-shadow(0 12px 40px rgba(0, 0, 0, 0.08));
+
+  > :first-child {
+    transform: rotateY(-2deg) rotateX(1.5deg);
+  }
+
+  @include below-md {
+    zoom: 0.36;
+  }
+
+  @include below-sm {
+    zoom: 0.28;
+  }
+}
+
+// ── Tablet + Mobile — davor, links/rechts ──
+// Breite = gleich wie Laptop (weil .mockupCol = fit-content)
+
+.smallDevices {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 95%;
+  margin-top: -150px;
+  position: relative;
+  z-index: 2;
+}
+
+// ── Tablet — iPad Mini ──
+
+.deviceTablet {
+  zoom: 0.3;
+  filter: drop-shadow(0 10px 32px rgba(0, 0, 0, 0.1));
+}
+
+// ── Mobile — iPhone X ──
+
+.deviceMobile {
+  zoom: 0.28;
+  filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.12));
+}
+
+// ── Screenshot Bilder ──
+
+.screenshot {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+  pointer-events: none;
+}

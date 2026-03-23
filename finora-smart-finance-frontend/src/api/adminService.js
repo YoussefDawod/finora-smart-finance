@@ -370,6 +370,47 @@ export const adminService = {
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
   triggerRetentionProcessing: () => client.post(ENDPOINTS.admin.lifecycleTrigger),
+
+  // ── Feedbacks ─────────────────────────────────────────────
+
+  /**
+   * List all feedbacks (paginated, filterable)
+   * @param {Object} [params] - Query parameters
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
+   * @returns {Promise<AxiosResponse<{ data: { feedbacks: object[], pagination: object } }>>}
+   */
+  getFeedbacks: (params = {}, { signal } = {}) =>
+    client.get(ENDPOINTS.admin.feedbacks, { params, signal }),
+
+  /**
+   * Get feedback statistics
+   * @param {Object} [options] - Axios request options
+   * @param {AbortSignal} [options.signal] - AbortController signal
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
+   */
+  getFeedbackStats: ({ signal } = {}) => client.get(ENDPOINTS.admin.feedbackStats, { signal }),
+
+  /**
+   * Publish feedback (make visible on landing page)
+   * @param {string} id - Feedback ID
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
+   */
+  publishFeedback: id => client.patch(ENDPOINTS.admin.feedbackPublish(id)),
+
+  /**
+   * Unpublish feedback
+   * @param {string} id - Feedback ID
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
+   */
+  unpublishFeedback: id => client.patch(ENDPOINTS.admin.feedbackUnpublish(id)),
+
+  /**
+   * Delete feedback
+   * @param {string} id - Feedback ID
+   * @returns {Promise<AxiosResponse<{ data: object }>>}
+   */
+  deleteFeedback: id => client.delete(ENDPOINTS.admin.feedback(id)),
 };
 
 export default adminService;

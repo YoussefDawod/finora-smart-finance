@@ -1,0 +1,99 @@
+// ============================================
+// 📍 SECTION TIMELINE — Fixed Navigator
+// ============================================
+@use '@/styles/mixins' as *;
+
+// ── Shared ──
+
+.timeline {
+  position: fixed;
+  z-index: var(--z-sticky);
+  pointer-events: auto;
+}
+
+.track {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+// ── Vertical (Desktop / Tablet) ──
+
+.vertical {
+  right: var(--space-lg);
+  top: 50%;
+  transform: translateY(-50%);
+
+  .track {
+    flex-direction: column;
+  }
+
+  [dir='rtl'] & {
+    right: auto;
+    left: var(--space-lg);
+  }
+}
+
+// ── Horizontal (Mobile) ──
+
+.horizontal {
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+
+  .track {
+    flex-direction: row;
+    background: color-mix(in srgb, var(--glass-bg) 70%, transparent);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur-minimal, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-minimal, 10px));
+    border-radius: var(--r-full);
+    padding: var(--space-2xs) var(--space-sm);
+  }
+}
+
+// ── Dot Button ──
+
+.dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--r-full);
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--glass-bg) 60%, transparent);
+  color: var(--tx-muted);
+  cursor: pointer;
+  transition:
+    background var(--tr),
+    border-color var(--tr),
+    color var(--tr),
+    box-shadow var(--tr),
+    transform var(--tr);
+  padding: 0;
+  outline: none;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: scale(1.1);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--focus-ring-width)
+      color-mix(in srgb, var(--primary) var(--focus-ring-opacity), transparent);
+    border-color: var(--primary);
+  }
+}
+
+.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-contrast);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--primary) 40%, transparent);
+
+  &:hover {
+    color: var(--primary-contrast);
+  }
+}

@@ -19,6 +19,8 @@
     "saveChanges": "Save changes",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
     "close": "Close",
     "closeModal": "Close dialog",
     "closeNotification": "Close notification",
@@ -44,6 +46,7 @@
     "loadingComplete": "Submitting...",
     "stepErrorsTitle": "Errors in this step:",
     "retry": "Try again",
+    "anonymous": "Anonymous",
     "offline": "You are offline – some features are limited",
     "appName": "Finora - Smart Finance",
     "errors": {
@@ -1065,7 +1068,8 @@
           "Privacy notice status (whether the notice has been acknowledged)",
           "IP address, user agent, and geographic origin (country, city – derived offline from IP address, no third party) on admin actions (security audit log)",
           "Contact form data (name, email, category, message)",
-          "Newsletter subscription (email, double opt-in status)"
+          "Newsletter subscription (email, double opt-in status)",
+          "Feedback data (star rating, optional free text, username as display name) when voluntarily submitting feedback"
         ]
       },
       {
@@ -1074,7 +1078,7 @@
           "We process personal data based on the following legal grounds:"
         ],
         "list": [
-          "Art. 6(1)(a) GDPR (Consent): Newsletter subscription, contact form consent",
+          "Art. 6(1)(a) GDPR (Consent): Newsletter subscription, contact form consent, public display of user reviews on the website (username is shown in full; consent can be revoked at any time in account settings)",
           "Art. 6(1)(b) GDPR (Contract performance): Registration, login, transaction management, budget management — to fulfill the usage agreement",
           "Art. 6(1)(c) GDPR (Legal obligation): Retention of consent records pursuant to Art. 7 GDPR",
           "Art. 6(1)(f) GDPR (Legitimate interests): Security logging (login attempts, account lockouts), abuse prevention, technical troubleshooting"
@@ -1699,6 +1703,7 @@
       "campaigns": "Campaigns",
       "auditLog": "Audit Log",
       "lifecycle": "Lifecycle",
+      "feedbacks": "Feedbacks",
       "backToApp": "Back to App"
     },
     "dashboard": {
@@ -2142,6 +2147,57 @@
       "message": "An error occurred while loading this page. Please try again.",
       "retry": "Try again",
       "details": "Technical details"
+    },
+    "feedbacks": {
+      "title": "Feedback Management",
+      "subtitle": "Manage user feedback and publish to the website.",
+      "refresh": "Refresh",
+      "statTotal": "Total",
+      "statPublished": "Published",
+      "statAvgRating": "Avg. Rating",
+      "statPublishRate": "Publish Rate",
+      "searchPlaceholder": "Search users or text…",
+      "filterRating": "Rating",
+      "allRatings": "All Ratings",
+      "highRating": "High (4-5)",
+      "lowRating": "Low (1-3)",
+      "filterPublished": "Status",
+      "allStatuses": "All Statuses",
+      "published": "Published",
+      "unpublished": "Unpublished",
+      "filterConsent": "Consent",
+      "allConsent": "All",
+      "consentGiven": "Consent Given",
+      "consentNotGiven": "No Consent",
+      "totalFeedbacks": "{{count}} total feedbacks",
+      "noResults": "No feedbacks found.",
+      "noText": "No text",
+      "colUser": "User",
+      "colRating": "Rating",
+      "colText": "Text",
+      "colConsent": "Consent",
+      "colStatus": "Status",
+      "colDate": "Date",
+      "colActions": "Actions",
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "delete": "Delete",
+      "publishSuccess": "Feedback published successfully.",
+      "publishError": "Error publishing feedback.",
+      "unpublishSuccess": "Feedback unpublished successfully.",
+      "unpublishError": "Error unpublishing feedback.",
+      "deleteSuccess": "Feedback deleted successfully.",
+      "deleteError": "Error deleting feedback.",
+      "noConsentHint": "No consent – cannot be published",
+      "lowRatingHint": "Rating too low – cannot be published",
+      "confirmDelete": "Delete Feedback",
+      "confirmDeleteText": "Are you sure you want to delete this feedback? This action cannot be undone.",
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "prevPage": "Previous Page",
+      "nextPage": "Next Page",
+      "viewDetails": "View Details",
+      "detailTitle": "Feedback Details",
+      "starsLabel": "{{rating}} of 5 stars"
     }
   },
   "lifecycle": {
@@ -2297,5 +2353,125 @@
         ]
       }
     ]
+  },
+  "feedback": {
+    "form": {
+      "ratingLabel": "How do you rate Finora?",
+      "textLabel": "Your feedback (optional)",
+      "textPlaceholder": "What do you like? What can we improve?",
+      "checkHonest": "My feedback is honest and based on my actual usage.",
+      "checkPrivacy": "I agree to the processing of my feedback in accordance with the privacy policy.",
+      "consentHint": "After submitting, you will be asked if your feedback may be displayed publicly.",
+      "submit": "Submit feedback",
+      "submitSuccess": "Thank you for your feedback!",
+      "submitError": "Feedback could not be submitted.",
+      "thankYou": "Thank you for your feedback!",
+      "delete": "Delete feedback",
+      "deleteSuccess": "Feedback has been deleted.",
+      "deleteError": "Feedback could not be deleted.",
+      "confirmDelete": "Really delete?",
+      "stars": "stars"
+    },
+    "consent": {
+      "title": "May your feedback be displayed publicly?",
+      "description": "Your feedback could be shown on our website as a review.",
+      "anonymized": "Your username will be displayed in full.",
+      "accept": "Yes, sure",
+      "decline": "No, thanks",
+      "allowPublic": "Allow public display",
+      "published": "Published",
+      "granted": "Consent granted — your feedback may be published.",
+      "revoked": "Consent revoked — your feedback is now private.",
+      "error": "Consent could not be updated."
+    },
+    "motivation": {
+      "first": "Be the first to leave a review!",
+      "topThree": "Be one of the first 3 reviewers!",
+      "topTen": "Be one of the first 10 reviewers!"
+    },
+    "prompt": {
+      "title": "How do you like Finora so far?",
+      "description": "Your feedback helps us make Finora better.",
+      "cta": "Give feedback"
+    },
+    "settings": {
+      "title": "Feedback",
+      "description": "Rate Finora and help us improve the app."
+    }
+  },
+  "landing": {
+    "hero": {
+      "headline": "Your Finances. Clear. Simple. Finora.",
+      "subheadline": "The smart app for your income & expenses — free, multilingual, and no sign-up required.",
+      "ctaPrimary": "Try it now",
+      "ctaSecondary": "Sign up free",
+      "trustFree": "Free",
+      "trustNoSignup": "No sign-up required",
+      "trustLanguages": "4 Languages",
+      "trustDarkMode": "Dark Mode"
+    },
+    "features": {
+      "title": "Everything you need",
+      "subtitle": "Financial management doesn't have to be complicated.",
+      "transactions": {
+        "title": "Transactions",
+        "description": "Record, categorize, and filter — quick and easy."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "Income and expenses at a glance."
+      },
+      "languages": {
+        "title": "4 Languages",
+        "description": "DE, EN, AR, KA — automatic detection."
+      },
+      "importExport": {
+        "title": "Import & Export",
+        "description": "CSV import and export for your data."
+      },
+      "guestMode": {
+        "title": "No sign-up needed",
+        "description": "Full guest mode — your data stays local."
+      },
+      "darkMode": {
+        "title": "Light & Dark Mode",
+        "description": "Automatically adapts to your browser settings."
+      },
+      "allFeatures": "Discover all features"
+    },
+    "howItWorks": {
+      "title": "Get started in 3 steps",
+      "subtitle": "It's that easy with Finora.",
+      "step1": {
+        "title": "Record",
+        "description": "Enter transactions — manually or via import. Quick and simple."
+      },
+      "step2": {
+        "title": "Analyze",
+        "description": "Income, expenses, categories, and trends — automatically prepared."
+      },
+      "step3": {
+        "title": "Decide",
+        "description": "Make better decisions with clear numbers. You stay in control."
+      }
+    },
+    "testimonials": {
+      "title": "What users say",
+      "subtitle": "Real reviews from real users."
+    },
+    "cta": {
+      "headline": "Ready to get started?",
+      "subheadline": "Your finances are waiting.",
+      "ctaPrimary": "Try it now",
+      "ctaSecondary": "Sign up free",
+      "trustHint": "Free · No credit card needed"
+    },
+    "timeline": {
+      "hero": "Start",
+      "features": "Features",
+      "howItWorks": "How it works",
+      "testimonials": "Reviews",
+      "cta": "Get started"
+    }
   }
 }

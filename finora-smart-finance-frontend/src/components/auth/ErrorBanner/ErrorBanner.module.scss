@@ -21,7 +21,7 @@
 
 .errorIcon {
   flex-shrink: 0;
-  font-size: 1.125rem;
+  font-size: var(--fs-lg);
   color: var(--error);
 }
 

@@ -49,7 +49,7 @@
 .errorTitle {
   margin: 0;
   font-size: var(--fs-xl);
-  font-weight: 600;
+  font-weight: var(--fw-sb);
   color: var(--tx);
 
   @include below-md {
@@ -70,13 +70,13 @@
   gap: var(--space-xs);
   padding: var(--space-sm) var(--space-lg);
   font-size: var(--fs-sm);
-  font-weight: 500;
+  font-weight: var(--fw-m);
   color: var(--on-primary);
   background: var(--primary);
   border: none;
   border-radius: var(--r-md);
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--tr-fast);
 
   &:hover {
     opacity: 0.9;

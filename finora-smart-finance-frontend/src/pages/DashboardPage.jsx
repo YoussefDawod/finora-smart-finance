@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth, useMotion } from '@/hooks';
 import { useTransactions } from '@/hooks/useTransactions';
 import { useDashboardChartData } from '@/hooks/useDashboardChartData';
+import { useFeedback } from '@/hooks/useFeedback';
 import { DashboardFilter } from '@/components/dashboard';
 import AuroraCanvas from '@/components/dashboard/AuroraCanvas/AuroraCanvas';
 import HeroMetricPanel from '@/components/dashboard/HeroMetricPanel/HeroMetricPanel';
@@ -26,6 +27,7 @@ import FlowAreaChart from '@/components/dashboard/FlowAreaChart/FlowAreaChart';
 import GlassCategoryList from '@/components/dashboard/GlassCategoryList/GlassCategoryList';
 import FlowTransactionList from '@/components/dashboard/FlowTransactionList/FlowTransactionList';
 import CompactWidgetRow from '@/components/dashboard/CompactWidgetRow/CompactWidgetRow';
+import { FeedbackPrompt } from '@/components/feedback';
 import GlassPanel from '@/components/dashboard/GlassPanel/GlassPanel';
 import Button from '@/components/common/Button/Button';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
@@ -84,6 +86,7 @@ function DashboardContent() {
     fetchQuota,
     confirmExport,
   } = useLifecycle();
+  const { feedback } = useFeedback();
 
   // Lifecycle-Daten und Quota einmalig laden (nur wenn authentifiziert)
   useEffect(() => {
@@ -446,6 +449,17 @@ function DashboardContent() {
             lifecycleStatus={lifecycleStatus}
             lifecycleLoading={lifecycleLoading}
             confirmExport={confirmExport}
+          />
+        </motion.div>
+      )}
+
+      {/* Feedback Prompt (§8.2) — einmalige Benachrichtigung */}
+      {isAuthenticated && (
+        <motion.div variants={fadeUp}>
+          <FeedbackPrompt
+            userCreatedAt={user?.createdAt}
+            transactionCount={dashboardData?.summary?.totalTransactions ?? 0}
+            hasFeedback={!!feedback}
           />
         </motion.div>
       )}

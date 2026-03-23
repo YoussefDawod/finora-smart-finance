@@ -19,6 +19,8 @@
     "saveChanges": "Änderungen speichern",
     "saving": "Speichern...",
     "cancel": "Abbrechen",
+    "yes": "Ja",
+    "no": "Nein",
     "close": "Schließen",
     "closeModal": "Dialog schließen",
     "closeNotification": "Benachrichtigung schließen",
@@ -1065,7 +1067,8 @@
           "Datenschutz-Hinweis-Status (ob der Hinweis zur Kenntnis genommen wurde)",
           "IP-Adresse, User-Agent sowie geografische Herkunft (Land, Stadt – offline aus IP-Adresse abgeleitet, kein Drittanbieter) bei Admin-Aktionen (Sicherheitsprotokoll)",
           "Kontaktformulardaten (Name, E-Mail, Kategorie, Nachricht)",
-          "Newsletter-Abonnement (E-Mail, Double-Opt-In-Status)"
+          "Newsletter-Abonnement (E-Mail, Double-Opt-In-Status)",
+          "Feedback-Daten (Sterne-Bewertung, optionaler Freitext, Benutzername als Anzeigename) bei freiwilliger Abgabe eines Feedbacks"
         ]
       },
       {
@@ -1074,7 +1077,7 @@
           "Wir verarbeiten personenbezogene Daten auf folgenden Rechtsgrundlagen:"
         ],
         "list": [
-          "Art. 6 Abs. 1 lit. a DSGVO (Einwilligung): Newsletter-Abonnement, Kontaktformular-Einwilligung",
+          "Art. 6 Abs. 1 lit. a DSGVO (Einwilligung): Newsletter-Abonnement, Kontaktformular-Einwilligung, öffentliche Anzeige von Nutzerbewertungen auf der Webseite (Benutzername wird vollständig angezeigt; Einwilligung kann jederzeit in den Kontoeinstellungen widerrufen werden)",
           "Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung): Registrierung, Anmeldung, Transaktionsverwaltung, Budgetverwaltung — zur Erfüllung des Nutzungsvertrags",
           "Art. 6 Abs. 1 lit. c DSGVO (Rechtliche Verpflichtung): Aufbewahrung von Einwilligungsnachweisen nach Art. 7 DSGVO",
           "Art. 6 Abs. 1 lit. f DSGVO (Berechtigte Interessen): Sicherheitsprotokollierung (Login-Versuche, Account-Sperrungen), Missbrauchsprävention, technische Fehlerbehebung"
@@ -1699,6 +1702,7 @@
       "campaigns": "Kampagnen",
       "auditLog": "Audit-Protokoll",
       "lifecycle": "Lifecycle",
+      "feedbacks": "Feedbacks",
       "backToApp": "Zurück zur App"
     },
     "dashboard": {
@@ -2142,6 +2146,57 @@
       "message": "Beim Laden dieser Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       "retry": "Erneut versuchen",
       "details": "Technische Details"
+    },
+    "feedbacks": {
+      "title": "Feedback-Verwaltung",
+      "subtitle": "Nutzerfeedback verwalten und für die Webseite freigeben.",
+      "refresh": "Aktualisieren",
+      "statTotal": "Gesamt",
+      "statPublished": "Veröffentlicht",
+      "statAvgRating": "Ø Bewertung",
+      "statPublishRate": "Veröffentlichungsrate",
+      "searchPlaceholder": "Benutzer oder Text suchen…",
+      "filterRating": "Bewertung",
+      "allRatings": "Alle Bewertungen",
+      "highRating": "Hoch (4-5)",
+      "lowRating": "Niedrig (1-3)",
+      "filterPublished": "Status",
+      "allStatuses": "Alle Status",
+      "published": "Veröffentlicht",
+      "unpublished": "Unveröffentlicht",
+      "filterConsent": "Zustimmung",
+      "allConsent": "Alle",
+      "consentGiven": "Zugestimmt",
+      "consentNotGiven": "Nicht zugestimmt",
+      "totalFeedbacks": "{{count}} Feedbacks gesamt",
+      "noResults": "Keine Feedbacks gefunden.",
+      "noText": "Kein Text",
+      "colUser": "Benutzer",
+      "colRating": "Bewertung",
+      "colText": "Text",
+      "colConsent": "Zustimmung",
+      "colStatus": "Status",
+      "colDate": "Datum",
+      "colActions": "Aktionen",
+      "publish": "Veröffentlichen",
+      "unpublish": "Zurückziehen",
+      "delete": "Löschen",
+      "publishSuccess": "Feedback erfolgreich veröffentlicht.",
+      "publishError": "Fehler beim Veröffentlichen des Feedbacks.",
+      "unpublishSuccess": "Feedback erfolgreich zurückgezogen.",
+      "unpublishError": "Fehler beim Zurückziehen des Feedbacks.",
+      "deleteSuccess": "Feedback erfolgreich gelöscht.",
+      "deleteError": "Fehler beim Löschen des Feedbacks.",
+      "noConsentHint": "Keine Zustimmung – kann nicht veröffentlicht werden",
+      "lowRatingHint": "Bewertung zu niedrig – kann nicht veröffentlicht werden",
+      "confirmDelete": "Feedback löschen",
+      "confirmDeleteText": "Möchtest du dieses Feedback wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "showing": "Zeige {{from}}–{{to}} von {{total}}",
+      "prevPage": "Vorherige Seite",
+      "nextPage": "Nächste Seite",
+      "viewDetails": "Details anzeigen",
+      "detailTitle": "Feedback-Details",
+      "starsLabel": "{{rating}} von 5 Sternen"
     }
   },
   "lifecycle": {
@@ -2297,5 +2352,125 @@
         ]
       }
     ]
+  },
+  "feedback": {
+    "form": {
+      "ratingLabel": "Wie bewertest du Finora?",
+      "textLabel": "Dein Feedback (optional)",
+      "textPlaceholder": "Was gefällt dir? Was können wir verbessern?",
+      "checkHonest": "Mein Feedback ist ehrlich und basiert auf meiner tatsächlichen Nutzung.",
+      "checkPrivacy": "Ich stimme der Verarbeitung meines Feedbacks gemäß der Datenschutzerklärung zu.",
+      "consentHint": "Nach dem Absenden wirst du gefragt, ob dein Feedback öffentlich erscheinen darf.",
+      "submit": "Feedback absenden",
+      "submitSuccess": "Vielen Dank für dein Feedback!",
+      "submitError": "Feedback konnte nicht gesendet werden.",
+      "thankYou": "Danke für dein Feedback!",
+      "delete": "Feedback löschen",
+      "deleteSuccess": "Feedback wurde gelöscht.",
+      "deleteError": "Feedback konnte nicht gelöscht werden.",
+      "confirmDelete": "Wirklich löschen?",
+      "stars": "Sterne"
+    },
+    "consent": {
+      "title": "Darf dein Feedback öffentlich erscheinen?",
+      "description": "Dein Feedback könnte auf unserer Webseite als Bewertung angezeigt werden.",
+      "anonymized": "Dein Benutzername wird vollständig angezeigt.",
+      "accept": "Ja, gerne",
+      "decline": "Nein, danke",
+      "allowPublic": "Feedback öffentlich freigeben",
+      "published": "Veröffentlicht",
+      "granted": "Consent erteilt — dein Feedback kann veröffentlicht werden.",
+      "revoked": "Consent widerrufen — dein Feedback ist jetzt privat.",
+      "error": "Consent konnte nicht aktualisiert werden."
+    },
+    "motivation": {
+      "first": "Sei der Erste, der eine Bewertung hinterlässt!",
+      "topThree": "Sei einer der ersten 3 Bewerter!",
+      "topTen": "Sei einer der ersten 10 Bewerter!"
+    },
+    "prompt": {
+      "title": "Wie findest du Finora bisher?",
+      "description": "Dein Feedback hilft uns, Finora besser zu machen.",
+      "cta": "Feedback geben"
+    },
+    "settings": {
+      "title": "Feedback",
+      "description": "Bewerte Finora und hilf uns, die App zu verbessern."
+    }
+  },
+  "landing": {
+    "hero": {
+      "headline": "Deine Finanzen. Klar. Einfach. Finora.",
+      "subheadline": "Die smarte App für deine Einnahmen & Ausgaben — kostenlos, mehrsprachig und ohne Registrierung nutzbar.",
+      "ctaPrimary": "Jetzt ausprobieren",
+      "ctaSecondary": "Kostenlos registrieren",
+      "trustFree": "Kostenlos",
+      "trustNoSignup": "Keine Registrierung nötig",
+      "trustLanguages": "4 Sprachen",
+      "trustDarkMode": "Dark Mode"
+    },
+    "features": {
+      "title": "Alles, was du brauchst",
+      "subtitle": "Finanzmanagement muss nicht kompliziert sein.",
+      "transactions": {
+        "title": "Transaktionen",
+        "description": "Erfassen, kategorisieren und filtern — einfach und schnell."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "description": "Einnahmen und Ausgaben auf einen Blick."
+      },
+      "languages": {
+        "title": "4 Sprachen",
+        "description": "DE, EN, AR, KA — automatische Erkennung."
+      },
+      "importExport": {
+        "title": "Import & Export",
+        "description": "CSV Import und Export für deine Daten."
+      },
+      "guestMode": {
+        "title": "Ohne Anmeldung nutzbar",
+        "description": "Voller Guest-Mode — deine Daten bleiben lokal."
+      },
+      "darkMode": {
+        "title": "Light & Dark Mode",
+        "description": "Passt sich automatisch deinem Browser an."
+      },
+      "allFeatures": "Alle Features entdecken"
+    },
+    "howItWorks": {
+      "title": "In 3 Schritten zum Überblick",
+      "subtitle": "So einfach geht's mit Finora.",
+      "step1": {
+        "title": "Erfassen",
+        "description": "Transaktionen eintragen — manuell oder per Import. Einfach und schnell."
+      },
+      "step2": {
+        "title": "Analysieren",
+        "description": "Einnahmen, Ausgaben, Kategorien und Verläufe — automatisch aufbereitet."
+      },
+      "step3": {
+        "title": "Entscheiden",
+        "description": "Mit klaren Zahlen bessere Entscheidungen treffen. Du behältst die Kontrolle."
+      }
+    },
+    "testimonials": {
+      "title": "Was Nutzer sagen",
+      "subtitle": "Echte Bewertungen von echten Nutzern."
+    },
+    "cta": {
+      "headline": "Bereit loszulegen?",
+      "subheadline": "Deine Finanzen warten.",
+      "ctaPrimary": "Jetzt ausprobieren",
+      "ctaSecondary": "Kostenlos registrieren",
+      "trustHint": "Kostenlos · Keine Kreditkarte nötig"
+    },
+    "timeline": {
+      "hero": "Start",
+      "features": "Features",
+      "howItWorks": "So gehts",
+      "testimonials": "Bewertungen",
+      "cta": "Loslegen"
+    }
   }
 }

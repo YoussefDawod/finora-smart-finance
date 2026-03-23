@@ -131,6 +131,23 @@ function sanitizeTransactionUserForViewer(userWithStats) {
   return obj;
 }
 
+/**
+ * Sanitize ein einzelnes Feedback-Objekt für Viewer-Zugriff
+ */
+function sanitizeFeedbackForViewer(fb) {
+  if (!fb) return fb;
+  const obj = typeof fb.toObject === 'function' ? fb.toObject() : { ...fb };
+
+  if (obj.user) {
+    if (typeof obj.user === 'object') {
+      if (obj.user.name) obj.user.name = maskName(obj.user.name);
+      if (obj.user.email) obj.user.email = maskEmail(obj.user.email);
+    }
+  }
+
+  return obj;
+}
+
 module.exports = {
   maskEmail,
   maskName,
@@ -141,4 +158,5 @@ module.exports = {
   sanitizeSubscriberForViewer,
   sanitizeAuditLogForViewer,
   sanitizeTransactionUserForViewer,
+  sanitizeFeedbackForViewer,
 };

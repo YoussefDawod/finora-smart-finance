@@ -21,6 +21,9 @@ import NotFoundPage from '@/pages/NotFoundPage';
 // Lazy-Loaded Pages — on-demand importiert
 // ============================================
 
+// Landing Page
+const LandingPage = lazy(() => import('@/pages/LandingPage/LandingPage'));
+
 // Public Content Pages
 const TermsPage = lazy(() => import('@/pages/TermsPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
@@ -50,6 +53,7 @@ const AdminCampaignsPage = lazy(() => import('@/pages/admin/AdminCampaignsPage')
 const AdminCampaignComposer = lazy(() => import('@/pages/admin/AdminCampaignComposer'));
 const AdminAuditLogPage = lazy(() => import('@/pages/admin/AdminAuditLogPage'));
 const AdminLifecyclePage = lazy(() => import('@/pages/admin/AdminLifecyclePage'));
+const AdminFeedbacksPage = lazy(() => import('@/pages/admin/AdminFeedbacksPage'));
 
 const PageTransition = ({ children }) => {
   const { shouldAnimate } = useMotion();
@@ -187,12 +191,25 @@ const NewsletterToastHandler = () => {
 };
 
 /**
- * Redirects "/" to "/dashboard" while preserving any query parameters.
- * Ensures e.g. /?newsletter=confirmed → /dashboard?newsletter=confirmed.
+ * Landing Page für Gäste, Dashboard-Redirect für eingeloggte User.
+ * Preserviert Query-Parameter (z.B. /?newsletter=confirmed → /dashboard?newsletter=confirmed).
  */
 const RootRedirect = () => {
   const location = useLocation();
-  return <Navigate to={`/dashboard${location.search}`} replace />;
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) return <AuthLoadingScreen />;
+  if (isAuthenticated) return <Navigate to={`/dashboard${location.search}`} replace />;
+
+  return (
+    <PublicLayout variant="product">
+      <PageTransition>
+        <Suspense fallback={<PageFallback variant="content" />}>
+          <LandingPage />
+        </Suspense>
+      </PageTransition>
+    </PublicLayout>
+  );
 };
 
 function AnimatedRoutes() {
@@ -487,6 +504,16 @@ function AnimatedRoutes() {
               <PageTransition>
                 <Suspense fallback={<PageFallback variant="dashboard" />}>
                   <AdminCampaignComposer />
+                </Suspense>
+              </PageTransition>
+            }
+          />
+          <Route
+            path="feedbacks"
+            element={
+              <PageTransition>
+                <Suspense fallback={<PageFallback variant="dashboard" />}>
+                  <AdminFeedbacksPage />
                 </Suspense>
               </PageTransition>
             }
