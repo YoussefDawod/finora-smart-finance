@@ -30,7 +30,12 @@ vi.mock('react-i18next', () => ({
 vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, role, ...props }) => (
-      <div className={className} role={role} aria-label={props['aria-label']} data-testid={props['data-testid']}>
+      <div
+        className={className}
+        role={role}
+        aria-label={props['aria-label']}
+        data-testid={props['data-testid']}
+      >
         {children}
       </div>
     ),
@@ -76,9 +81,7 @@ describe('TransactionQuota', () => {
   // ──────────────────────────────────────────────────────────
   describe('Guest Mode — ohne Limit', () => {
     it('should show count without limit and progress bar', () => {
-      const { container } = render(
-        <TransactionQuota quota={null} totalItems={7} isGuest={true} />
-      );
+      const { container } = render(<TransactionQuota quota={null} totalItems={7} isGuest={true} />);
 
       expect(screen.getByTestId('quota-count')).toHaveTextContent('7');
       // Kein Separator und kein Limit sichtbar
@@ -135,9 +138,7 @@ describe('TransactionQuota', () => {
     });
 
     it('should apply neutral level for guest mode', () => {
-      const { container } = render(
-        <TransactionQuota quota={null} totalItems={5} isGuest={true} />
-      );
+      const { container } = render(<TransactionQuota quota={null} totalItems={5} isGuest={true} />);
       const counter = container.querySelector('[class*="counter"]');
       expect(counter.className).toMatch(/neutral/);
     });
@@ -155,24 +156,18 @@ describe('TransactionQuota', () => {
     });
 
     it('should show "exceeded" warning at 100%', () => {
-      render(
-        <TransactionQuota quota={{ used: 150, limit: 150, remaining: 0 }} totalItems={150} />
-      );
+      render(<TransactionQuota quota={{ used: 150, limit: 150, remaining: 0 }} totalItems={150} />);
       expect(screen.getByText('lifecycle.quota.exceeded')).toBeInTheDocument();
     });
 
     it('should not show warning below 80%', () => {
-      render(
-        <TransactionQuota quota={{ used: 60, limit: 150, remaining: 90 }} totalItems={60} />
-      );
+      render(<TransactionQuota quota={{ used: 60, limit: 150, remaining: 90 }} totalItems={60} />);
       expect(screen.queryByText('transactions.quota.nearLimit')).not.toBeInTheDocument();
       expect(screen.queryByText('lifecycle.quota.exceeded')).not.toBeInTheDocument();
     });
 
     it('should not show warning in guest mode', () => {
-      render(
-        <TransactionQuota quota={null} totalItems={999} isGuest={true} />
-      );
+      render(<TransactionQuota quota={null} totalItems={999} isGuest={true} />);
       expect(screen.queryByText('transactions.quota.nearLimit')).not.toBeInTheDocument();
     });
   });

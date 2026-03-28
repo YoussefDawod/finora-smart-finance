@@ -15,7 +15,7 @@ import { ACTIONS, initialState } from '../reducers/transactionReducer';
  * @param {Object} state - Current state
  */
 export function useTransactionFetch(dispatch, state) {
-  const shouldRetry = useCallback((error) => {
+  const shouldRetry = useCallback(error => {
     const status = error?.response?.status;
     return !status || status >= 500 || status === 429;
   }, []);
@@ -28,10 +28,11 @@ export function useTransactionFetch(dispatch, state) {
     dispatch({ type: ACTIONS.FETCH_DASHBOARD_START });
     try {
       const response = await retryAsync(
-        () => transactionService.getDashboardData({
-          month: state.dashboardMonth,
-          year: state.dashboardYear,
-        }),
+        () =>
+          transactionService.getDashboardData({
+            month: state.dashboardMonth,
+            year: state.dashboardYear,
+          }),
         {
           retries: 2,
           delay: 400,
@@ -70,7 +71,7 @@ export function useTransactionFetch(dispatch, state) {
         };
 
         // Entferne undefined-Werte
-        Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
+        Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
 
         const response = await retryAsync(() => transactionService.getTransactions(params), {
           retries: 2,

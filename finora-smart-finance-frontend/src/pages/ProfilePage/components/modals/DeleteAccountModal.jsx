@@ -54,7 +54,7 @@ export function DeleteAccountModal({ isOpen, onClose, onSubmit, isLoading }) {
             initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
             animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
             exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
               <h3>
@@ -76,22 +76,26 @@ export function DeleteAccountModal({ isOpen, onClose, onSubmit, isLoading }) {
                   id="delete-password"
                   name="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   className={styles.input}
                   placeholder={t('profile.modals.deleteAccount.passwordPlaceholder')}
                   autoComplete="current-password"
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>{t('profile.modals.deleteAccount.confirmLabel', { value: deleteConfirmValue })}</label>
+                <label>
+                  {t('profile.modals.deleteAccount.confirmLabel', { value: deleteConfirmValue })}
+                </label>
                 <input
                   type="text"
                   id="delete-confirm"
                   name="confirmText"
                   value={confirmText}
-                  onChange={(e) => setConfirmText(e.target.value)}
+                  onChange={e => setConfirmText(e.target.value)}
                   className={styles.input}
-                  placeholder={t('profile.modals.deleteAccount.placeholder', { value: deleteConfirmValue })}
+                  placeholder={t('profile.modals.deleteAccount.placeholder', {
+                    value: deleteConfirmValue,
+                  })}
                   autoComplete="off"
                 />
               </div>

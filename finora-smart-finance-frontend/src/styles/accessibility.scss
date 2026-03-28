@@ -125,7 +125,7 @@ select:focus-visible {
   }
 
   button,
-  [role="button"] {
+  [role='button'] {
     border: 2px solid ButtonText;
   }
 
@@ -150,7 +150,9 @@ select:focus-visible {
 
   // Preserve essential focus transitions for accessibility
   *:focus-visible {
-    transition: outline 150ms, box-shadow 150ms !important;
+    transition:
+      outline 150ms,
+      box-shadow 150ms !important;
   }
 
   // Disable scroll animations
@@ -198,7 +200,7 @@ p a:focus-visible,
 // Icon buttons
 button[aria-label]:focus-visible,
 a[aria-label]:focus-visible,
-[role="button"]:focus-visible {
+[role='button']:focus-visible {
   outline: none;
   box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
@@ -206,8 +208,8 @@ a[aria-label]:focus-visible,
 // Navigation items
 nav a:focus-visible,
 nav button:focus-visible,
-[role="navigation"] a:focus-visible,
-[role="navigation"] button:focus-visible {
+[role='navigation'] a:focus-visible,
+[role='navigation'] button:focus-visible {
   background: rgba(var(--primary-rgb), 0.1);
   outline: none;
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--primary) 12%, transparent);
@@ -215,10 +217,10 @@ nav button:focus-visible,
 
 // Interactive cards
 .card-interactive:focus-visible,
-[role="button"]:focus-visible {
+[role='button']:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 
-    0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset)) 
+  box-shadow:
+    0 0 0 calc(var(--focus-ring-width) + var(--focus-ring-offset))
       rgba(var(--primary-rgb), var(--focus-ring-opacity)),
     var(--sh-lg);
 }
@@ -264,13 +266,13 @@ body:not(.keyboard-user) *:focus:not(:focus-visible) {
 }
 
 // Modal-specific focus handling
-[role="dialog"]:focus,
-[role="alertdialog"]:focus {
+[role='dialog']:focus,
+[role='alertdialog']:focus {
   outline: none;
 }
 
-[role="dialog"] *:focus-visible,
-[role="alertdialog"] *:focus-visible {
+[role='dialog'] *:focus-visible,
+[role='alertdialog'] *:focus-visible {
   outline: none;
   box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
@@ -279,10 +281,10 @@ body:not(.keyboard-user) *:focus:not(:focus-visible) {
 // 📢 ARIA LIVE REGIONS
 // ============================================
 
-[aria-live="polite"],
-[aria-live="assertive"],
-[role="status"],
-[role="alert"] {
+[aria-live='polite'],
+[aria-live='assertive'],
+[role='status'],
+[role='alert'] {
   // Prevent layout shift
   position: relative;
 }
@@ -302,7 +304,7 @@ body:not(.keyboard-user) *:focus:not(:focus-visible) {
   z-index: 10;
 }
 
-[data-dev-mode] [aria-live="assertive"]::before {
+[data-dev-mode] [aria-live='assertive']::before {
   color: var(--error);
   content: '🚨 assertive';
 }
@@ -320,10 +322,10 @@ label[data-required]::after,
 }
 
 // Error state
-[aria-invalid="true"],
+[aria-invalid='true'],
 .input-error {
   border-color: var(--error) !important;
-  
+
   &:focus-visible {
     outline: none;
     box-shadow: none; // Avoid double red border on error focus
@@ -332,7 +334,7 @@ label[data-required]::after,
 }
 
 // Disabled state
-[aria-disabled="true"],
+[aria-disabled='true'],
 :disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -340,8 +342,8 @@ label[data-required]::after,
 }
 
 // Checkbox & Radio focus
-input[type="checkbox"]:focus-visible,
-input[type="radio"]:focus-visible {
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
   outline: none;
   box-shadow: 0 0 0.5px 2px color-mix(in srgb, var(--primary) 12%, transparent);
 }
@@ -353,7 +355,7 @@ input[type="radio"]:focus-visible {
 // Touch-friendly tap targets (minimum 44x44px)
 @media (pointer: coarse) {
   button,
-  [role="button"],
+  [role='button'],
   a,
   select {
     min-height: 44px;
@@ -362,8 +364,8 @@ input[type="radio"]:focus-visible {
 
   // Checkbox/radio: touch target via label wrapper, nicht via input
   // (hidden inputs dürfen nicht aufgeblasen werden)
-  input[type="checkbox"]:not([class]),
-  input[type="radio"]:not([class]) {
+  input[type='checkbox']:not([class]),
+  input[type='radio']:not([class]) {
     min-height: 44px;
     min-width: 44px;
   }

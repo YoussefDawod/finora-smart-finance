@@ -10,21 +10,13 @@ import { Input } from '../Input';
 /* eslint-disable no-unused-vars */
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, initial, animate, transition, ...props }) => (
-      <div {...props}>{children}</div>
-    ),
-    label: ({ children, initial, animate, ...props }) => (
-      <label {...props}>{children}</label>
-    ),
-    input: ({ children, initial, animate, transition, ...props }) => (
-      <input {...props} />
-    ),
+    div: ({ children, initial, animate, transition, ...props }) => <div {...props}>{children}</div>,
+    label: ({ children, initial, animate, ...props }) => <label {...props}>{children}</label>,
+    input: ({ children, initial, animate, transition, ...props }) => <input {...props} />,
     span: ({ children, initial, animate, transition, ...props }) => (
       <span {...props}>{children}</span>
     ),
-    p: ({ children, initial, animate, transition, ...props }) => (
-      <p {...props}>{children}</p>
-    ),
+    p: ({ children, initial, animate, transition, ...props }) => <p {...props}>{children}</p>,
   },
 }));
 /* eslint-enable no-unused-vars */
@@ -79,7 +71,7 @@ describe('Input', () => {
   });
 
   // ─── Sizes ────────────────────────────────────────────────────────
-  it.each(['small', 'medium', 'large'])('applies "%s" size class', (size) => {
+  it.each(['small', 'medium', 'large'])('applies "%s" size class', size => {
     const { container } = render(<Input size={size} />);
     expect(container.firstChild.className).toContain(size);
   });

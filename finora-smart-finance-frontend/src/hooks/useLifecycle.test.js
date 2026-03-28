@@ -101,7 +101,7 @@ describe('useLifecycle', () => {
     it('should set isLoading during fetch', async () => {
       let resolve;
       mockGetLifecycleStatus.mockReturnValue(
-        new Promise((r) => {
+        new Promise(r => {
           resolve = r;
         })
       );

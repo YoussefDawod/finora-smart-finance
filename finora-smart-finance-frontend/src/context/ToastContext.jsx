@@ -2,7 +2,7 @@
  * @fileoverview Toast Notification Context Provider
  * @description Manages global toast notifications with auto-dismiss,
  * queue management, and accessibility support.
- * 
+ *
  * STATE SHAPE:
  * {
  *   toasts: [
@@ -15,13 +15,13 @@
  *     }
  *   ]
  * }
- * 
+ *
  * QUEUE RULES:
  * - Max 3 toasts visible
  * - Newest on top (last added)
  * - Auto-dismiss by duration
  * - Manual dismiss via removeToast(id)
- * 
+ *
  * @module ToastContext
  */
 
@@ -47,7 +47,6 @@ import { createContext, useReducer, useCallback, useMemo, useEffect } from 'reac
  * @property {Toast[]} toasts
  */
 
- 
 const TOAST_TYPES = {
   SUCCESS: 'success',
   ERROR: 'error',
@@ -97,12 +96,12 @@ function toastReducer(state, action) {
     case TOAST_ACTIONS.ADD_TOAST: {
       // Add new toast at the beginning (newest on top)
       let newToasts = [action.payload, ...state.toasts];
-      
+
       // Keep only last 3 toasts (remove oldest)
       if (newToasts.length > MAX_TOASTS) {
         newToasts = newToasts.slice(0, MAX_TOASTS);
       }
-      
+
       return {
         ...state,
         toasts: newToasts,
@@ -112,7 +111,7 @@ function toastReducer(state, action) {
     case TOAST_ACTIONS.REMOVE_TOAST:
       return {
         ...state,
-        toasts: state.toasts.filter((toast) => toast.id !== action.payload),
+        toasts: state.toasts.filter(toast => toast.id !== action.payload),
       };
 
     case TOAST_ACTIONS.CLEAR_ALL:
@@ -154,7 +153,7 @@ export function ToastProvider({ children }) {
    * which calls this after its exit animation completes.
    * @param {string} id - Toast ID
    */
-  const removeToastInternal = useCallback((id) => {
+  const removeToastInternal = useCallback(id => {
     dispatch({ type: TOAST_ACTIONS.REMOVE_TOAST, payload: id });
   }, []);
 
@@ -167,21 +166,14 @@ export function ToastProvider({ children }) {
    * @returns {string} - Toast ID for manual removal
    */
   const addToast = useCallback(
-    (
-      message,
-      type = TOAST_TYPES.INFO,
-      duration = DEFAULT_DURATION,
-      action = null,
-    ) => {
+    (message, type = TOAST_TYPES.INFO, duration = DEFAULT_DURATION, action = null) => {
       if (!message) {
         globalThis.console?.warn('Toast message is required');
         return null;
       }
 
       if (!Object.values(TOAST_TYPES).includes(type)) {
-        globalThis.console?.warn(
-          `Invalid toast type: ${type}. Using 'info' instead.`
-        );
+        globalThis.console?.warn(`Invalid toast type: ${type}. Using 'info' instead.`);
         type = TOAST_TYPES.INFO;
       }
 
@@ -211,7 +203,7 @@ export function ToastProvider({ children }) {
   // ============================================
 
   useEffect(() => {
-    const handleToastAdd = (event) => {
+    const handleToastAdd = event => {
       const detail = event?.detail || {};
       const message = detail.message;
       const type = detail.type || TOAST_TYPES.INFO;
@@ -232,9 +224,12 @@ export function ToastProvider({ children }) {
    * Remove a toast by ID
    * @param {string} id - Toast ID
    */
-  const removeToast = useCallback((id) => {
-    removeToastInternal(id);
-  }, [removeToastInternal]);
+  const removeToast = useCallback(
+    id => {
+      removeToastInternal(id);
+    },
+    [removeToastInternal]
+  );
 
   /**
    * Clear all toasts
@@ -249,9 +244,12 @@ export function ToastProvider({ children }) {
    * @param {number} [duration=5000]
    * @returns {string} - Toast ID
    */
-  const success = useCallback((message, duration = DEFAULT_DURATION) => {
-    return addToast(message, TOAST_TYPES.SUCCESS, duration);
-  }, [addToast]);
+  const success = useCallback(
+    (message, duration = DEFAULT_DURATION) => {
+      return addToast(message, TOAST_TYPES.SUCCESS, duration);
+    },
+    [addToast]
+  );
 
   /**
    * Helper: Add error toast
@@ -259,9 +257,12 @@ export function ToastProvider({ children }) {
    * @param {number} [duration=5000]
    * @returns {string} - Toast ID
    */
-  const error = useCallback((message, duration = DEFAULT_DURATION) => {
-    return addToast(message, TOAST_TYPES.ERROR, duration);
-  }, [addToast]);
+  const error = useCallback(
+    (message, duration = DEFAULT_DURATION) => {
+      return addToast(message, TOAST_TYPES.ERROR, duration);
+    },
+    [addToast]
+  );
 
   /**
    * Helper: Add warning toast
@@ -269,9 +270,12 @@ export function ToastProvider({ children }) {
    * @param {number} [duration=5000]
    * @returns {string} - Toast ID
    */
-  const warning = useCallback((message, duration = DEFAULT_DURATION) => {
-    return addToast(message, TOAST_TYPES.WARNING, duration);
-  }, [addToast]);
+  const warning = useCallback(
+    (message, duration = DEFAULT_DURATION) => {
+      return addToast(message, TOAST_TYPES.WARNING, duration);
+    },
+    [addToast]
+  );
 
   /**
    * Helper: Add info toast
@@ -279,35 +283,37 @@ export function ToastProvider({ children }) {
    * @param {number} [duration=5000]
    * @returns {string} - Toast ID
    */
-  const info = useCallback((message, duration = DEFAULT_DURATION) => {
-    return addToast(message, TOAST_TYPES.INFO, duration);
-  }, [addToast]);
+  const info = useCallback(
+    (message, duration = DEFAULT_DURATION) => {
+      return addToast(message, TOAST_TYPES.INFO, duration);
+    },
+    [addToast]
+  );
 
   // ============================================
   // 📤 CONTEXT VALUE
   // ============================================
 
-  const value = useMemo(() => ({
-    // State
-    toasts: state.toasts,
-    
-    // Actions
-    addToast,
-    removeToast,
-    clearAllToasts,
-    
-    // Shortcuts
-    success,
-    error,
-    warning,
-    info,
-  }), [state.toasts, addToast, removeToast, clearAllToasts, success, error, warning, info]);
+  const value = useMemo(
+    () => ({
+      // State
+      toasts: state.toasts,
 
-  return (
-    <ToastContext.Provider value={value}>
-      {children}
-    </ToastContext.Provider>
+      // Actions
+      addToast,
+      removeToast,
+      clearAllToasts,
+
+      // Shortcuts
+      success,
+      error,
+      warning,
+      info,
+    }),
+    [state.toasts, addToast, removeToast, clearAllToasts, success, error, warning, info]
   );
+
+  return <ToastContext.Provider value={value}>{children}</ToastContext.Provider>;
 }
 
 // Export context separately for Fast Refresh compatibility

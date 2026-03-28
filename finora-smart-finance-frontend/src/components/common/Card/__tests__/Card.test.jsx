@@ -10,7 +10,11 @@ import Card from '../Card';
 
 describe('Card', () => {
   it('renders children', () => {
-    render(<Card><p>Content</p></Card>);
+    render(
+      <Card>
+        <p>Content</p>
+      </Card>
+    );
     expect(screen.getByText('Content')).toBeInTheDocument();
   });
 
@@ -50,7 +54,11 @@ describe('Card', () => {
   });
 
   it('forwards aria attributes', () => {
-    const { container } = render(<Card role="region" aria-label="Test">X</Card>);
+    const { container } = render(
+      <Card role="region" aria-label="Test">
+        X
+      </Card>
+    );
     expect(container.firstChild).toHaveAttribute('role', 'region');
     expect(container.firstChild).toHaveAttribute('aria-label', 'Test');
   });

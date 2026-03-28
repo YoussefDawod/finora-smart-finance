@@ -62,17 +62,13 @@ describe('PasswordInput', () => {
   // ─── Error State ─────────────────────────────────────────────────
 
   it('appends wrapperErrorClass to wrapper', () => {
-    const { container } = render(
-      <PasswordInput {...baseProps} wrapperErrorClass="error" />
-    );
+    const { container } = render(<PasswordInput {...baseProps} wrapperErrorClass="error" />);
     expect(container.firstChild).toHaveClass('inputWrapper');
     expect(container.firstChild).toHaveClass('error');
   });
 
   it('does not add extra class when wrapperErrorClass is empty', () => {
-    const { container } = render(
-      <PasswordInput {...baseProps} wrapperErrorClass="" />
-    );
+    const { container } = render(<PasswordInput {...baseProps} wrapperErrorClass="" />);
     expect(container.firstChild.className.trim()).toBe('inputWrapper');
   });
 
@@ -123,7 +119,10 @@ describe('PasswordInput', () => {
 
   it('forwards autoComplete to the input', () => {
     render(<PasswordInput {...baseProps} autoComplete="new-password" />);
-    expect(screen.getByPlaceholderText('Enter password')).toHaveAttribute('autoComplete', 'new-password');
+    expect(screen.getByPlaceholderText('Enter password')).toHaveAttribute(
+      'autoComplete',
+      'new-password'
+    );
   });
 
   it('forwards autoFocus to the input', () => {

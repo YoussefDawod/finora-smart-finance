@@ -33,7 +33,15 @@ export default function BudgetSettings() {
     const prefs = getUserPreferences();
     const currency = prefs.currency || 'EUR';
     try {
-      return (0).toLocaleString(undefined, { style: 'currency', currency, minimumFractionDigits: 0, maximumFractionDigits: 0 }).replace(/\d/g, '').trim();
+      return (0)
+        .toLocaleString(undefined, {
+          style: 'currency',
+          currency,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        })
+        .replace(/\d/g, '')
+        .trim();
     } catch {
       return currency;
     }
@@ -60,7 +68,7 @@ export default function BudgetSettings() {
     );
   }, [monthlyLimit, alertThreshold, budgetStatus]);
 
-  const handleLimitChange = (e) => {
+  const handleLimitChange = e => {
     const value = e.target.value;
     // Allow only numbers and decimal point
     if (/^\d*\.?\d*$/.test(value)) {
@@ -68,7 +76,7 @@ export default function BudgetSettings() {
     }
   };
 
-  const handleThresholdChange = (value) => {
+  const handleThresholdChange = value => {
     setAlertThreshold(value);
   };
 
@@ -143,7 +151,8 @@ export default function BudgetSettings() {
             </div>
             <div className={styles.progressLabels}>
               <span>
-                {formatCurrency(budgetStatus.totalSpent)} / {formatCurrency(budgetStatus.monthlyLimit)}
+                {formatCurrency(budgetStatus.totalSpent)} /{' '}
+                {formatCurrency(budgetStatus.monthlyLimit)}
               </span>
               <span className={styles.percentLabel} style={{ color: getProgressColor() }}>
                 {progressPercent}%
@@ -173,7 +182,9 @@ export default function BudgetSettings() {
               id="monthlyLimit"
               value={monthlyLimit}
               onChange={handleLimitChange}
-              placeholder={new Intl.NumberFormat(i18n.language, { minimumFractionDigits: 2 }).format(0)}
+              placeholder={new Intl.NumberFormat(i18n.language, {
+                minimumFractionDigits: 2,
+              }).format(0)}
               className={styles.input}
             />
             <span className={styles.inputSuffix}>{currencySymbol}</span>
@@ -184,7 +195,7 @@ export default function BudgetSettings() {
         <div className={styles.inputGroup}>
           <label>{t('settings.budget.alertThreshold')}</label>
           <div className={styles.thresholdOptions}>
-            {THRESHOLD_OPTIONS.map((value) => (
+            {THRESHOLD_OPTIONS.map(value => (
               <button
                 key={value}
                 type="button"

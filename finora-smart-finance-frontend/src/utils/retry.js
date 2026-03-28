@@ -33,7 +33,7 @@ export async function retryAsync(
         onRetry({ attempt: attempt + 1, delay: wait, error });
       }
 
-      await new Promise((resolve) => setTimeout(resolve, wait));
+      await new Promise(resolve => setTimeout(resolve, wait));
       attempt += 1;
     }
   }

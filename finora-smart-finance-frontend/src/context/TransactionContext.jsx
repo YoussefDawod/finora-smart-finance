@@ -4,7 +4,16 @@
  * Unterstützt sowohl API-Modus (angemeldet) als auch localStorage-Modus (nicht angemeldet)
  */
 
-import { createContext, useReducer, useEffect, useContext, useRef, useMemo, useCallback, useState } from 'react';
+import {
+  createContext,
+  useReducer,
+  useEffect,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback,
+  useState,
+} from 'react';
 import { AuthContext } from './AuthContext';
 import { transactionReducer, initialState } from './reducers/transactionReducer';
 import { useTransactionFetch } from './hooks/useTransactionFetch';
@@ -40,7 +49,7 @@ function TransactionProvider({ children }) {
 
   // Local-mode refresh counter (triggers re-render when localStorage changes)
   const [localRefresh, setLocalRefresh] = useState(0);
-  const triggerLocalRefresh = useCallback(() => setLocalRefresh((c) => c + 1), []);
+  const triggerLocalRefresh = useCallback(() => setLocalRefresh(c => c + 1), []);
 
   // Session-Check: Bei neuer Tab-Session lokale Transaktionen löschen
   useEffect(() => {
@@ -70,13 +79,21 @@ function TransactionProvider({ children }) {
   const { fetchDashboardData, fetchTransactions } = useTransactionFetch(dispatch, state);
 
   // Pagination
-  const { setPage, setLimit, nextPage, prevPage } = useTransactionPagination(dispatch, state.pagination);
+  const { setPage, setLimit, nextPage, prevPage } = useTransactionPagination(
+    dispatch,
+    state.pagination
+  );
 
   // Filter & Sort
-  const { setDashboardMonth, setFilter, setSort, clearFilter, clearError } = useTransactionFilters(dispatch);
+  const { setDashboardMonth, setFilter, setSort, clearFilter, clearError } =
+    useTransactionFilters(dispatch);
 
   // CRUD Actions (API mode)
-  const { createTransaction: apiCreate, updateTransaction: apiUpdate, deleteTransaction: apiDelete } = useTransactionActions(dispatch, state, {
+  const {
+    createTransaction: apiCreate,
+    updateTransaction: apiUpdate,
+    deleteTransaction: apiDelete,
+  } = useTransactionActions(dispatch, state, {
     isAuthenticated,
     fetchDashboardData,
     fetchTransactions,
@@ -86,22 +103,31 @@ function TransactionProvider({ children }) {
   // ──────────────────────────────────────────────────────────────────────
   // LOCAL MODE: localStorage-basierte CRUD
   // ──────────────────────────────────────────────────────────────────────
-  const localCreate = useCallback(async (data) => {
-    const tx = createLocalTransaction(data);
-    triggerLocalRefresh();
-    return tx;
-  }, [triggerLocalRefresh]);
+  const localCreate = useCallback(
+    async data => {
+      const tx = createLocalTransaction(data);
+      triggerLocalRefresh();
+      return tx;
+    },
+    [triggerLocalRefresh]
+  );
 
-  const localUpdate = useCallback(async (id, data) => {
-    const tx = updateLocalTransaction(id, data);
-    triggerLocalRefresh();
-    return tx;
-  }, [triggerLocalRefresh]);
+  const localUpdate = useCallback(
+    async (id, data) => {
+      const tx = updateLocalTransaction(id, data);
+      triggerLocalRefresh();
+      return tx;
+    },
+    [triggerLocalRefresh]
+  );
 
-  const localDelete = useCallback(async (id) => {
-    deleteLocalTransaction(id);
-    triggerLocalRefresh();
-  }, [triggerLocalRefresh]);
+  const localDelete = useCallback(
+    async id => {
+      deleteLocalTransaction(id);
+      triggerLocalRefresh();
+    },
+    [triggerLocalRefresh]
+  );
 
   // ──────────────────────────────────────────────────────────────────────
   // LOCAL MODE: Dashboard + Transaktionsdaten aus localStorage
@@ -119,7 +145,17 @@ function TransactionProvider({ children }) {
       limit: state.pagination.limit,
     });
     return { dashboard, transactions: data, pagination };
-  }, [isAuthenticated, localRefresh, state.dashboardMonth, state.dashboardYear, state.filter, state.sortBy, state.sortOrder, state.pagination.page, state.pagination.limit]);
+  }, [
+    isAuthenticated,
+    localRefresh,
+    state.dashboardMonth,
+    state.dashboardYear,
+    state.filter,
+    state.sortBy,
+    state.sortOrder,
+    state.pagination.page,
+    state.pagination.limit,
+  ]);
 
   // ──────────────────────────────────────────────────────────────────────
   // EFFECTS (API mode only)
@@ -131,7 +167,7 @@ function TransactionProvider({ children }) {
       fetchDashboardData();
       fetchTransactions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user]);
 
   // 2. Bei Dashboard-Monat Änderung: Dashboard-Daten neu laden
@@ -139,7 +175,7 @@ function TransactionProvider({ children }) {
     if (!isAuthenticated || !user) return;
     if (isInitialMount.current) return;
     fetchDashboardData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.dashboardMonth, state.dashboardYear, isAuthenticated, user]);
 
   // 3. Bei Filter/Sort/Page-Änderung: Transaktionen neu laden
@@ -150,7 +186,7 @@ function TransactionProvider({ children }) {
       return;
     }
     fetchTransactions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAuthenticated,
     user,
@@ -166,72 +202,91 @@ function TransactionProvider({ children }) {
   // ──────────────────────────────────────────────────────────────────────
   const isLocal = !isAuthenticated;
 
-  const value = useMemo(() => ({
-    // State
-    state,
-    isLocal,
+  const value = useMemo(
+    () => ({
+      // State
+      state,
+      isLocal,
 
-    // Dashboard-Daten (aggregiert)
-    dashboardData: isLocal ? localData?.dashboard : state.dashboardData,
-    dashboardLoading: isLocal ? false : state.dashboardLoading,
-    dashboardMonth: state.dashboardMonth,
-    dashboardYear: state.dashboardYear,
+      // Dashboard-Daten (aggregiert)
+      dashboardData: isLocal ? localData?.dashboard : state.dashboardData,
+      dashboardLoading: isLocal ? false : state.dashboardLoading,
+      dashboardMonth: state.dashboardMonth,
+      dashboardYear: state.dashboardYear,
 
-    // Transaktionsliste (paginiert)
-    transactions: isLocal ? (localData?.transactions || []) : state.transactions,
+      // Transaktionsliste (paginiert)
+      transactions: isLocal ? localData?.transactions || [] : state.transactions,
 
-    // Pagination
-    pagination: isLocal ? (localData?.pagination || initialState.pagination) : state.pagination,
-    currentPage: isLocal ? (localData?.pagination?.page || 1) : state.pagination.page,
-    totalPages: isLocal ? (localData?.pagination?.pages || 1) : state.pagination.pages,
-    totalItems: isLocal ? (localData?.pagination?.total || 0) : state.pagination.total,
-    pageSize: isLocal ? (localData?.pagination?.limit || 20) : state.pagination.limit,
+      // Pagination
+      pagination: isLocal ? localData?.pagination || initialState.pagination : state.pagination,
+      currentPage: isLocal ? localData?.pagination?.page || 1 : state.pagination.page,
+      totalPages: isLocal ? localData?.pagination?.pages || 1 : state.pagination.pages,
+      totalItems: isLocal ? localData?.pagination?.total || 0 : state.pagination.total,
+      pageSize: isLocal ? localData?.pagination?.limit || 20 : state.pagination.limit,
 
-    // Loading & Error
-    loading: isLocal ? false : state.loading,
-    error: isLocal ? null : state.error,
+      // Loading & Error
+      loading: isLocal ? false : state.loading,
+      error: isLocal ? null : state.error,
 
-    // Filter & Sort
-    filter: state.filter,
-    sortBy: state.sortBy,
-    sortOrder: state.sortOrder,
+      // Filter & Sort
+      filter: state.filter,
+      sortBy: state.sortBy,
+      sortOrder: state.sortOrder,
 
-    // Fetch Methods
-    fetchDashboardData: isLocal ? triggerLocalRefresh : fetchDashboardData,
-    fetchTransactions: isLocal ? triggerLocalRefresh : fetchTransactions,
+      // Fetch Methods
+      fetchDashboardData: isLocal ? triggerLocalRefresh : fetchDashboardData,
+      fetchTransactions: isLocal ? triggerLocalRefresh : fetchTransactions,
 
-    // CRUD Methods
-    createTransaction: isLocal ? localCreate : apiCreate,
-    updateTransaction: isLocal ? localUpdate : apiUpdate,
-    deleteTransaction: isLocal ? localDelete : apiDelete,
+      // CRUD Methods
+      createTransaction: isLocal ? localCreate : apiCreate,
+      updateTransaction: isLocal ? localUpdate : apiUpdate,
+      deleteTransaction: isLocal ? localDelete : apiDelete,
 
-    // Pagination Controls
-    setPage,
-    setLimit,
-    nextPage,
-    prevPage,
+      // Pagination Controls
+      setPage,
+      setLimit,
+      nextPage,
+      prevPage,
 
-    // Dashboard Month Controls
-    setDashboardMonth,
+      // Dashboard Month Controls
+      setDashboardMonth,
 
-    // Filter & Sort Controls
-    setFilter,
-    setSort,
-    clearFilter,
-    clearError,
+      // Filter & Sort Controls
+      setFilter,
+      setSort,
+      clearFilter,
+      clearError,
 
-    // Legacy compatibility
-    filteredTransactions: isLocal ? (localData?.transactions || []) : state.transactions,
-    allTransactions: isLocal
-      ? (localData?.dashboard?.recentTransactions || [])
-      : (state.dashboardData?.recentTransactions || []),
-  }), [
-    state, isLocal, localData,
-    fetchDashboardData, fetchTransactions, triggerLocalRefresh,
-    apiCreate, apiUpdate, apiDelete, localCreate, localUpdate, localDelete,
-    setPage, setLimit, nextPage, prevPage, setDashboardMonth,
-    setFilter, setSort, clearFilter, clearError,
-  ]);
+      // Legacy compatibility
+      filteredTransactions: isLocal ? localData?.transactions || [] : state.transactions,
+      allTransactions: isLocal
+        ? localData?.dashboard?.recentTransactions || []
+        : state.dashboardData?.recentTransactions || [],
+    }),
+    [
+      state,
+      isLocal,
+      localData,
+      fetchDashboardData,
+      fetchTransactions,
+      triggerLocalRefresh,
+      apiCreate,
+      apiUpdate,
+      apiDelete,
+      localCreate,
+      localUpdate,
+      localDelete,
+      setPage,
+      setLimit,
+      nextPage,
+      prevPage,
+      setDashboardMonth,
+      setFilter,
+      setSort,
+      clearFilter,
+      clearError,
+    ]
+  );
 
   return <TransactionContext.Provider value={value}>{children}</TransactionContext.Provider>;
 }

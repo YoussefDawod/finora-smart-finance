@@ -1,7 +1,7 @@
 /**
  * @fileoverview Transaction API Service
  * @description All transaction-related API calls with server-side pagination
- * 
+ *
  * @module api/transactionService
  */
 
@@ -43,7 +43,7 @@ export const transactionService = {
    */
   getTransactions: (params = {}, { signal } = {}) => {
     const { page = 1, limit = 20, ...filters } = params;
-    return client.get(ENDPOINTS.transactions.list, { 
+    return client.get(ENDPOINTS.transactions.list, {
       params: { page, limit, ...filters },
       signal,
     });

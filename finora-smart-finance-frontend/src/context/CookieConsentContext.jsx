@@ -53,17 +53,16 @@ export function CookieConsentProvider({ children }) {
     setShowNotice(false);
   }, []);
 
-  const value = useMemo(() => ({
-    noticeSeen,
-    showNotice,
-    dismissNotice,
-    reopenNotice,
-    closeNotice,
-  }), [noticeSeen, showNotice, dismissNotice, reopenNotice, closeNotice]);
-
-  return (
-    <CookieConsentContext.Provider value={value}>
-      {children}
-    </CookieConsentContext.Provider>
+  const value = useMemo(
+    () => ({
+      noticeSeen,
+      showNotice,
+      dismissNotice,
+      reopenNotice,
+      closeNotice,
+    }),
+    [noticeSeen, showNotice, dismissNotice, reopenNotice, closeNotice]
   );
+
+  return <CookieConsentContext.Provider value={value}>{children}</CookieConsentContext.Provider>;
 }

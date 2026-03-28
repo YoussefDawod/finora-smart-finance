@@ -25,7 +25,12 @@ const DEFAULT_SORT = '-createdAt';
 export function useAdminUsers(initialParams = {}) {
   // ── State ───────────────────────────────────────
   const [users, setUsers] = useState([]);
-  const [pagination, setPagination] = useState({ total: 0, page: DEFAULT_PAGE, pages: 1, limit: DEFAULT_LIMIT });
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: DEFAULT_PAGE,
+    pages: 1,
+    limit: DEFAULT_LIMIT,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null); // userId der laufenden Aktion
@@ -81,7 +86,9 @@ export function useAdminUsers(initialParams = {}) {
   useEffect(() => {
     mountedRef.current = true;
     fetchUsers();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchUsers]);
 
   // ── Aktionen ────────────────────────────────────
@@ -103,86 +110,116 @@ export function useAdminUsers(initialParams = {}) {
     }
   }, []);
 
-  const banUser = useCallback(async (userId, reason = '') => {
-    const result = await executeAction(() => adminService.banUser(userId, reason), userId);
-    if (result.success) await fetchUsers();
-    return result;
-  }, [executeAction, fetchUsers]);
+  const banUser = useCallback(
+    async (userId, reason = '') => {
+      const result = await executeAction(() => adminService.banUser(userId, reason), userId);
+      if (result.success) await fetchUsers();
+      return result;
+    },
+    [executeAction, fetchUsers]
+  );
 
-  const unbanUser = useCallback(async (userId) => {
-    const result = await executeAction(() => adminService.unbanUser(userId), userId);
-    if (result.success) await fetchUsers();
-    return result;
-  }, [executeAction, fetchUsers]);
+  const unbanUser = useCallback(
+    async userId => {
+      const result = await executeAction(() => adminService.unbanUser(userId), userId);
+      if (result.success) await fetchUsers();
+      return result;
+    },
+    [executeAction, fetchUsers]
+  );
 
-  const changeRole = useCallback(async (userId, role) => {
-    const result = await executeAction(() => adminService.changeUserRole(userId, role), userId);
-    if (result.success) await fetchUsers();
-    return result;
-  }, [executeAction, fetchUsers]);
+  const changeRole = useCallback(
+    async (userId, role) => {
+      const result = await executeAction(() => adminService.changeUserRole(userId, role), userId);
+      if (result.success) await fetchUsers();
+      return result;
+    },
+    [executeAction, fetchUsers]
+  );
 
-  const deleteUser = useCallback(async (userId) => {
-    const result = await executeAction(() => adminService.deleteUser(userId), userId);
-    if (result.success) await fetchUsers();
-    return result;
-  }, [executeAction, fetchUsers]);
+  const deleteUser = useCallback(
+    async userId => {
+      const result = await executeAction(() => adminService.deleteUser(userId), userId);
+      if (result.success) await fetchUsers();
+      return result;
+    },
+    [executeAction, fetchUsers]
+  );
 
-  const resetPassword = useCallback(async (userId, newPassword) => {
-    const result = await executeAction(
-      () => adminService.resetPassword(userId, newPassword),
-      userId,
-    );
-    return result;
-  }, [executeAction]);
+  const resetPassword = useCallback(
+    async (userId, newPassword) => {
+      const result = await executeAction(
+        () => adminService.resetPassword(userId, newPassword),
+        userId
+      );
+      return result;
+    },
+    [executeAction]
+  );
 
-  const createUser = useCallback(async (userData) => {
-    setActionLoading('create');
-    try {
-      const result = await adminService.createUser(userData);
-      if (!mountedRef.current) return { success: false };
-      await fetchUsers();
-      return { success: true, data: result.data?.data || result.data };
-    } catch (err) {
-      if (!mountedRef.current) return { success: false };
-      return {
-        success: false,
-        error: err.response?.data?.message || err.message || 'Create failed',
-      };
-    } finally {
-      if (mountedRef.current) setActionLoading(null);
-    }
-  }, [fetchUsers]);
+  const createUser = useCallback(
+    async userData => {
+      setActionLoading('create');
+      try {
+        const result = await adminService.createUser(userData);
+        if (!mountedRef.current) return { success: false };
+        await fetchUsers();
+        return { success: true, data: result.data?.data || result.data };
+      } catch (err) {
+        if (!mountedRef.current) return { success: false };
+        return {
+          success: false,
+          error: err.response?.data?.message || err.message || 'Create failed',
+        };
+      } finally {
+        if (mountedRef.current) setActionLoading(null);
+      }
+    },
+    [fetchUsers]
+  );
 
-  const updateUser = useCallback(async (userId, data) => {
-    const result = await executeAction(
-      () => adminService.updateUser(userId, data),
-      userId,
-    );
-    if (result.success) await fetchUsers();
-    return result;
-  }, [executeAction, fetchUsers]);
+  const updateUser = useCallback(
+    async (userId, data) => {
+      const result = await executeAction(() => adminService.updateUser(userId, data), userId);
+      if (result.success) await fetchUsers();
+      return result;
+    },
+    [executeAction, fetchUsers]
+  );
 
   // ── Memoized Actions Objekt ─────────────────────
 
-  const actions = useMemo(() => ({
-    banUser,
-    unbanUser,
-    changeRole,
-    deleteUser,
-    resetPassword,
-    createUser,
-    updateUser,
-    refresh: fetchUsers,
-  }), [banUser, unbanUser, changeRole, deleteUser, resetPassword, createUser, updateUser, fetchUsers]);
+  const actions = useMemo(
+    () => ({
+      banUser,
+      unbanUser,
+      changeRole,
+      deleteUser,
+      resetPassword,
+      createUser,
+      updateUser,
+      refresh: fetchUsers,
+    }),
+    [banUser, unbanUser, changeRole, deleteUser, resetPassword, createUser, updateUser, fetchUsers]
+  );
 
-  const filters = useMemo(() => ({
-    search, setSearch,
-    roleFilter, setRoleFilter,
-    statusFilter, setStatusFilter,
-    verifiedFilter, setVerifiedFilter,
-    sort, setSort,
-    page, setPage,
-  }), [search, roleFilter, statusFilter, verifiedFilter, sort, page]);
+  const filters = useMemo(
+    () => ({
+      search,
+      setSearch,
+      roleFilter,
+      setRoleFilter,
+      statusFilter,
+      setStatusFilter,
+      verifiedFilter,
+      setVerifiedFilter,
+      sort,
+      setSort,
+      page,
+      setPage,
+    }),
+    [search, roleFilter, statusFilter, verifiedFilter, sort, page]
+  );
 
   return {
     users,

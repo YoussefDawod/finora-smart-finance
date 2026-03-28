@@ -11,7 +11,7 @@ import AdminStatCard from '../AdminStatCard';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'en' },
   }),
 }));
@@ -40,9 +40,7 @@ describe('AdminStatCard', () => {
     });
 
     it('rendert ohne Icon wenn keins angegeben', () => {
-      const { container } = render(
-        <AdminStatCard label="Test" value="5" color="primary" />,
-      );
+      const { container } = render(<AdminStatCard label="Test" value="5" color="primary" />);
       // Kein iconBox → kein SVG erwartet
       expect(container.querySelector('svg')).toBeNull();
     });
@@ -58,11 +56,9 @@ describe('AdminStatCard', () => {
   describe('Farb-Varianten', () => {
     const colors = ['primary', 'success', 'warning', 'error', 'info'];
 
-    colors.forEach((color) => {
+    colors.forEach(color => {
       it(`rendert mit Farbe "${color}"`, () => {
-        const { container } = render(
-          <AdminStatCard {...defaultProps} color={color} />,
-        );
+        const { container } = render(<AdminStatCard {...defaultProps} color={color} />);
         const card = container.firstChild;
         expect(card).toBeInTheDocument();
         // CSS-Module generieren mangled Klassen, prüfe nur dass kein Fehler auftritt
@@ -74,46 +70,22 @@ describe('AdminStatCard', () => {
 
   describe('Trend-Anzeige', () => {
     it('zeigt aufsteigenden Trend bei positivem Wert', () => {
-      render(
-        <AdminStatCard
-          {...defaultProps}
-          trendLabel="+8 this week"
-          trendValue={8}
-        />,
-      );
+      render(<AdminStatCard {...defaultProps} trendLabel="+8 this week" trendValue={8} />);
       expect(screen.getByText('+8 this week')).toBeInTheDocument();
     });
 
     it('zeigt absteigenden Trend bei negativem Wert', () => {
-      render(
-        <AdminStatCard
-          {...defaultProps}
-          trendLabel="-3 this week"
-          trendValue={-3}
-        />,
-      );
+      render(<AdminStatCard {...defaultProps} trendLabel="-3 this week" trendValue={-3} />);
       expect(screen.getByText('-3 this week')).toBeInTheDocument();
     });
 
     it('zeigt neutralen Trend bei Wert 0', () => {
-      render(
-        <AdminStatCard
-          {...defaultProps}
-          trendLabel="0 change"
-          trendValue={0}
-        />,
-      );
+      render(<AdminStatCard {...defaultProps} trendLabel="0 change" trendValue={0} />);
       expect(screen.getByText('0 change')).toBeInTheDocument();
     });
 
     it('zeigt keinen Trend wenn trendLabel null ist', () => {
-      render(
-        <AdminStatCard
-          {...defaultProps}
-          trendLabel={null}
-          trendValue={5}
-        />,
-      );
+      render(<AdminStatCard {...defaultProps} trendLabel={null} trendValue={5} />);
       // Kein Trend-Text auf dem Screen
       expect(screen.queryByText(/this week/)).not.toBeInTheDocument();
     });
@@ -123,9 +95,7 @@ describe('AdminStatCard', () => {
 
   describe('Loading State', () => {
     it('zeigt Skeleton-Platzhalter im Loading-Zustand', () => {
-      const { container } = render(
-        <AdminStatCard {...defaultProps} isLoading={true} />,
-      );
+      const { container } = render(<AdminStatCard {...defaultProps} isLoading={true} />);
       const card = container.firstChild;
       expect(card).toHaveAttribute('aria-busy', 'true');
     });
@@ -136,9 +106,7 @@ describe('AdminStatCard', () => {
     });
 
     it('hat aria-label für Barrierefreiheit im Loading-Zustand', () => {
-      const { container } = render(
-        <AdminStatCard {...defaultProps} isLoading={true} />,
-      );
+      const { container } = render(<AdminStatCard {...defaultProps} isLoading={true} />);
       const card = container.firstChild;
       expect(card).toHaveAttribute('aria-label', 'common.loading');
     });
@@ -160,7 +128,7 @@ describe('AdminStatCard', () => {
 
     it('rendert mit verschiedenen Icon-Typen', () => {
       const { rerender, container } = render(
-        <AdminStatCard {...defaultProps} icon={FiCheckCircle} />,
+        <AdminStatCard {...defaultProps} icon={FiCheckCircle} />
       );
       expect(container.querySelector('svg')).toBeInTheDocument();
 

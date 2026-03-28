@@ -10,7 +10,6 @@
 const config = require('../../config/env');
 const colors = require('./colors');
 
-
 /**
  * Rendert eine eigenständige HTML-Statusseite für Newsletter-Aktionen
  * @param {'confirmed'|'unsubscribed'|'invalid'|'error'} status - Ergebnis

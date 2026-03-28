@@ -1,7 +1,7 @@
 /**
  * @fileoverview Skeleton Component Exports
  * @description Zentrale Exports für alle Skeleton-Varianten
- * 
+ *
  * @module components/common/Skeleton
  */
 
@@ -15,4 +15,9 @@ export { default as SkeletonTableRow } from './SkeletonTableRow';
 export { default as SkeletonChart } from './SkeletonChart';
 export { default as AuthPageSkeleton } from './AuthPageSkeleton';
 export { default as PageFallback } from './PageFallback';
-export { ContentPageFallback, DashboardFallback, TransactionsFallback, SettingsFallback } from './PageFallback';
+export {
+  ContentPageFallback,
+  DashboardFallback,
+  TransactionsFallback,
+  SettingsFallback,
+} from './PageFallback';

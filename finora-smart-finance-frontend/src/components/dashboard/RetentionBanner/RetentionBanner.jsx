@@ -14,13 +14,7 @@
 
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FiClock,
-  FiAlertTriangle,
-  FiAlertCircle,
-  FiCheckCircle,
-  FiDownload,
-} from 'react-icons/fi';
+import { FiClock, FiAlertTriangle, FiAlertCircle, FiCheckCircle, FiDownload } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useMotion } from '@/hooks/useMotion';
 import styles from './RetentionBanner.module.scss';
@@ -117,11 +111,7 @@ export default function RetentionBanner({
           {!hasExported && phase !== 'deleted' && (
             <div className={styles.actions}>
               {onExport && (
-                <button
-                  type="button"
-                  className={styles.exportBtn}
-                  onClick={onExport}
-                >
+                <button type="button" className={styles.exportBtn} onClick={onExport}>
                   <FiDownload />
                   {t('lifecycle.retention.exportButton')}
                 </button>

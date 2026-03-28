@@ -1,7 +1,7 @@
 /**
  * @fileoverview SummaryCard Component
  * @description Moderne Card-Komponente für Dashboard Summary (Einkommen, Ausgaben, Balance)
- * 
+ *
  * FEATURES:
  * - Icon + Title + Value
  * - Trend Indicator mit Vergleichswert
@@ -35,13 +35,14 @@ function SummaryCard({
 }) {
   const { t } = useTranslation();
   const { shouldAnimate } = useMotion();
-  
+
   // Determine trend direction and styling
   const computedVariant = isLoading ? 'neutral' : (trendVariant ?? 'neutral');
-  
+
   // Trend Icon based on direction
-  const TrendIcon = computedVariant === 'up' ? FiArrowUp : computedVariant === 'down' ? FiArrowDown : FiMinus;
-  
+  const TrendIcon =
+    computedVariant === 'up' ? FiArrowUp : computedVariant === 'down' ? FiArrowDown : FiMinus;
+
   // Show trend only if there's a label (null = no comparison possible)
   const showTrend = isLoading || (trendLabel !== null && trendLabel !== undefined);
 
@@ -57,7 +58,7 @@ function SummaryCard({
         aria-label={t('common.loading')}
       >
         <div className={styles.gradient} />
-        
+
         <div className={styles.header}>
           {IconComponent && (
             <div className={styles.iconWrapper}>
@@ -76,7 +77,7 @@ function SummaryCard({
             <Skeleton variant="rect" width={60} height={20} borderRadius="1rem" />
           </div>
         )}
-        
+
         <div className={styles.shimmer} />
       </motion.div>
     );
@@ -115,7 +116,7 @@ function SummaryCard({
       {/* Trend Section - Separate and clearer */}
       {showTrend && (
         <div className={styles.trendSection}>
-          <div 
+          <div
             className={`${styles.trendBadge} ${styles[computedVariant]}`}
             title={trendTooltip || undefined}
             aria-label={trendTooltip || undefined}
@@ -123,9 +124,7 @@ function SummaryCard({
             <TrendIcon size={12} strokeWidth={2.5} />
             <span className={styles.trendValue}>{trendLabel}</span>
           </div>
-          {trend && (
-            <span className={styles.trendDescription}>{trend}</span>
-          )}
+          {trend && <span className={styles.trendDescription}>{trend}</span>}
         </div>
       )}
 

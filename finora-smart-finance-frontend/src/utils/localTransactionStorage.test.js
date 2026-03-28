@@ -19,7 +19,7 @@ import {
 // MOCK i18n
 // ============================================================================
 vi.mock('@/i18n', () => ({
-  default: { t: (key) => key },
+  default: { t: key => key },
 }));
 
 // ============================================================================
@@ -32,7 +32,7 @@ function seedStorage(transactions) {
 }
 
 function getWrittenData() {
-  const call = window.sessionStorage.setItem.mock.calls.find((c) => c[0] === STORAGE_KEY);
+  const call = window.sessionStorage.setItem.mock.calls.find(c => c[0] === STORAGE_KEY);
   return call ? JSON.parse(call[1]) : null;
 }
 
@@ -127,7 +127,7 @@ describe('localTransactionStorage', () => {
       vi.advanceTimersByTime(2500);
       expect(dispatchSpy).toHaveBeenCalled();
       const event = dispatchSpy.mock.calls.find(
-        (c) => c[0] instanceof CustomEvent && c[0].type === 'toast:add'
+        c => c[0] instanceof CustomEvent && c[0].type === 'toast:add'
       );
       expect(event).toBeDefined();
 
@@ -144,7 +144,7 @@ describe('localTransactionStorage', () => {
 
       vi.advanceTimersByTime(3000);
       const toastEvents = dispatchSpy.mock.calls.filter(
-        (c) => c[0] instanceof CustomEvent && c[0].type === 'toast:add'
+        c => c[0] instanceof CustomEvent && c[0].type === 'toast:add'
       );
       expect(toastEvents.length).toBe(0);
 
@@ -225,10 +225,42 @@ describe('localTransactionStorage', () => {
   // ──────────────────────────────────────────────────────────
   describe('getFilteredLocalTransactions', () => {
     const txs = [
-      { id: '1', type: 'income', amount: 500, category: 'Gehalt', description: 'Salary', date: '2025-06-15T00:00:00Z', notes: '' },
-      { id: '2', type: 'expense', amount: 50, category: 'Food', description: 'Lunch', date: '2025-06-10T00:00:00Z', notes: 'work' },
-      { id: '3', type: 'expense', amount: 200, category: 'Rent', description: 'Miete', date: '2025-05-01T00:00:00Z', notes: '' },
-      { id: '4', type: 'income', amount: 100, category: 'Freelance', description: 'Project', date: '2025-06-20T00:00:00Z', notes: '' },
+      {
+        id: '1',
+        type: 'income',
+        amount: 500,
+        category: 'Gehalt',
+        description: 'Salary',
+        date: '2025-06-15T00:00:00Z',
+        notes: '',
+      },
+      {
+        id: '2',
+        type: 'expense',
+        amount: 50,
+        category: 'Food',
+        description: 'Lunch',
+        date: '2025-06-10T00:00:00Z',
+        notes: 'work',
+      },
+      {
+        id: '3',
+        type: 'expense',
+        amount: 200,
+        category: 'Rent',
+        description: 'Miete',
+        date: '2025-05-01T00:00:00Z',
+        notes: '',
+      },
+      {
+        id: '4',
+        type: 'income',
+        amount: 100,
+        category: 'Freelance',
+        description: 'Project',
+        date: '2025-06-20T00:00:00Z',
+        notes: '',
+      },
     ];
 
     beforeEach(() => seedStorage(txs));
@@ -254,7 +286,7 @@ describe('localTransactionStorage', () => {
         limit: 20,
       });
       expect(result.data.length).toBe(2);
-      expect(result.data.every((t) => t.type === 'income')).toBe(true);
+      expect(result.data.every(t => t.type === 'income')).toBe(true);
     });
 
     it('filters by category', () => {
@@ -311,7 +343,7 @@ describe('localTransactionStorage', () => {
         page: 1,
         limit: 20,
       });
-      const dates = result.data.map((t) => new Date(t.date).getTime());
+      const dates = result.data.map(t => new Date(t.date).getTime());
       for (let i = 1; i < dates.length; i++) {
         expect(dates[i]).toBeGreaterThanOrEqual(dates[i - 1]);
       }
@@ -399,9 +431,7 @@ describe('localTransactionStorage', () => {
     });
 
     it('handles trend when previous month is 0', () => {
-      seedStorage([
-        { id: '1', type: 'income', amount: 100, date: '2025-03-15T00:00:00Z' },
-      ]);
+      seedStorage([{ id: '1', type: 'income', amount: 100, date: '2025-03-15T00:00:00Z' }]);
       const data = computeLocalDashboardData(3, 2025);
       expect(data.summary.trends.income).toBe(100);
     });
@@ -424,7 +454,7 @@ describe('localTransactionStorage', () => {
     it('categoryBreakdown groups by type:category', () => {
       const data = computeLocalDashboardData(6, 2025);
       const gehalt = data.categoryBreakdown.find(
-        (c) => c.category === 'Gehalt' && c.type === 'income'
+        c => c.category === 'Gehalt' && c.type === 'income'
       );
       expect(gehalt).toBeDefined();
       expect(gehalt.total).toBe(3000);
@@ -451,7 +481,7 @@ describe('localTransactionStorage', () => {
       const data = computeLocalDashboardData(6, 2025);
       expect(data.recentTransactions.length).toBeLessThanOrEqual(5);
       if (data.recentTransactions.length > 1) {
-        const dates = data.recentTransactions.map((t) => new Date(t.date).getTime());
+        const dates = data.recentTransactions.map(t => new Date(t.date).getTime());
         for (let i = 1; i < dates.length; i++) {
           expect(dates[i]).toBeLessThanOrEqual(dates[i - 1]);
         }

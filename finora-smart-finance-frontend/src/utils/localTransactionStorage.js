@@ -32,7 +32,7 @@ let lastIdTimestamp = 0;
 
 function generateId() {
   const now = Date.now();
-  
+
   // Wenn innerhalb derselben Millisekunde, erhöhe Counter
   if (now === lastIdTimestamp) {
     idCounter++;
@@ -40,7 +40,7 @@ function generateId() {
     idCounter = 0;
     lastIdTimestamp = now;
   }
-  
+
   return `local_${now}_${idCounter}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
@@ -58,7 +58,7 @@ function writeStorage(transactions) {
     globalThis.sessionStorage?.setItem(STORAGE_KEY, JSON.stringify(transactions));
   } catch (e) {
     globalThis.console?.error('Failed to save transactions to sessionStorage:', e);
-    
+
     // QuotaExceededError - Speicher ist voll!
     if (e.name === 'QuotaExceededError' || e.code === 22) {
       globalThis.window?.dispatchEvent(
@@ -71,7 +71,7 @@ function writeStorage(transactions) {
         })
       );
     }
-    
+
     // Re-throw für weitere Error-Behandlung
     throw e;
   }
@@ -88,7 +88,7 @@ export function getLocalTransactions() {
 export function createLocalTransaction(data) {
   const transactions = readStorage();
   const isFirstTransaction = transactions.length === 0;
-  
+
   const newTx = {
     id: generateId(),
     type: data.type || 'expense',
@@ -103,7 +103,7 @@ export function createLocalTransaction(data) {
   };
   transactions.unshift(newTx);
   writeStorage(transactions);
-  
+
   // Toast bei ERSTER Transaction für unauthentifizierte User
   if (isFirstTransaction) {
     // Delay von 2 Sekunden damit User die Transaction erst sieht
@@ -119,13 +119,13 @@ export function createLocalTransaction(data) {
       );
     }, 2000);
   }
-  
+
   return newTx;
 }
 
 export function updateLocalTransaction(id, data) {
   const transactions = readStorage();
-  const index = transactions.findIndex((tx) => tx.id === id);
+  const index = transactions.findIndex(tx => tx.id === id);
   if (index === -1) throw new Error('Transaction not found');
   transactions[index] = {
     ...transactions[index],
@@ -139,7 +139,7 @@ export function updateLocalTransaction(id, data) {
 
 export function deleteLocalTransaction(id) {
   const transactions = readStorage();
-  writeStorage(transactions.filter((tx) => tx.id !== id));
+  writeStorage(transactions.filter(tx => tx.id !== id));
 }
 
 // ============================================================================
@@ -151,23 +151,23 @@ export function getFilteredLocalTransactions({ filter, sortBy, sortOrder, page, 
 
   // Filter
   if (filter?.type) {
-    transactions = transactions.filter((tx) => tx.type === filter.type);
+    transactions = transactions.filter(tx => tx.type === filter.type);
   }
   if (filter?.category) {
-    transactions = transactions.filter((tx) => tx.category === filter.category);
+    transactions = transactions.filter(tx => tx.category === filter.category);
   }
   if (filter?.startDate) {
     const start = new Date(filter.startDate);
-    transactions = transactions.filter((tx) => new Date(tx.date) >= start);
+    transactions = transactions.filter(tx => new Date(tx.date) >= start);
   }
   if (filter?.endDate) {
     const end = new Date(filter.endDate);
-    transactions = transactions.filter((tx) => new Date(tx.date) <= end);
+    transactions = transactions.filter(tx => new Date(tx.date) <= end);
   }
   if (filter?.searchQuery) {
     const q = filter.searchQuery.toLowerCase();
     transactions = transactions.filter(
-      (tx) =>
+      tx =>
         tx.description?.toLowerCase().includes(q) ||
         tx.category?.toLowerCase().includes(q) ||
         tx.notes?.toLowerCase().includes(q)
@@ -196,11 +196,11 @@ export function getFilteredLocalTransactions({ filter, sortBy, sortOrder, page, 
 // ============================================================================
 
 function sumByType(txs, type) {
-  return txs.filter((tx) => tx.type === type).reduce((sum, tx) => sum + tx.amount, 0);
+  return txs.filter(tx => tx.type === type).reduce((sum, tx) => sum + tx.amount, 0);
 }
 
 function filterByMonth(transactions, month, year) {
-  return transactions.filter((tx) => {
+  return transactions.filter(tx => {
     // Verwende UTC-Methoden für konsistente Ergebnisse unabhängig von Zeitzone
     const d = new Date(tx.date);
     return d.getUTCMonth() + 1 === month && d.getUTCFullYear() === year;
@@ -239,16 +239,13 @@ export function computeLocalDashboardData(month, year) {
     trends: {
       income: calcTrend(currentIncome, prevIncome),
       expense: calcTrend(currentExpense, prevExpense),
-      balance: calcTrend(
-        currentIncome - currentExpense,
-        prevIncome - prevExpense
-      ),
+      balance: calcTrend(currentIncome - currentExpense, prevIncome - prevExpense),
     },
   };
 
   // Category Breakdown (format matching API: type, category, total, count)
   const categoryMap = {};
-  currentMonthTx.forEach((tx) => {
+  currentMonthTx.forEach(tx => {
     const key = `${tx.type}:${tx.category}`;
     if (!categoryMap[key]) {
       categoryMap[key] = { type: tx.type, category: tx.category, total: 0, count: 0 };
@@ -258,7 +255,7 @@ export function computeLocalDashboardData(month, year) {
   });
 
   const categoryBreakdown = Object.values(categoryMap)
-    .map((item) => ({
+    .map(item => ({
       ...item,
       total: Math.round(item.total * 100) / 100,
     }))

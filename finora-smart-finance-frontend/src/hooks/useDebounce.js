@@ -1,16 +1,14 @@
 /**
  * @fileoverview useDebounce Custom Hook
  * @description Debounces a value with optional callback
- * 
+ *
  * USAGE:
  * const debouncedValue = useDebounce(searchQuery, 300)
- * 
+ *
  * @module useDebounce
  */
 
 import { useState, useEffect } from 'react';
-
- 
 
 /**
  * Debounce a value
@@ -18,17 +16,17 @@ import { useState, useEffect } from 'react';
  * @param {number} [delay=300] - Debounce delay in ms
  * @param {Function} [callback] - Optional callback when value changes
  * @returns {*} Debounced value
- * 
+ *
  * @example
  * const [searchQuery, setSearchQuery] = useState('');
  * const debouncedQuery = useDebounce(searchQuery, 500);
- * 
+ *
  * useEffect(() => {
  *   if (debouncedQuery) {
  *     fetchTransactions(debouncedQuery);
  *   }
  * }, [debouncedQuery]);
- * 
+ *
  * return (
  *   <input
  *     value={searchQuery}

@@ -25,7 +25,7 @@
   background-size: 200% 100%;
   animation: skeleton-loading var(--skeleton-duration) ease-in-out infinite;
   overflow: hidden;
-  
+
   // No text inside skeleton
   color: transparent !important;
   user-select: none;
@@ -131,27 +131,27 @@
 // Card skeleton
 .skeleton-card {
   @include card($hover: false);
-  
+
   .skeleton-card-image {
     @extend .skeleton;
     height: 160px;
     margin: calc(-1 * var(--card-padding)) calc(-1 * var(--card-padding)) var(--space-md);
     border-radius: var(--card-radius) var(--card-radius) 0 0;
   }
-  
+
   .skeleton-card-title {
     @extend .skeleton;
     height: 1.5em;
     width: 70%;
     margin-bottom: var(--space-sm);
   }
-  
+
   .skeleton-card-text {
     @extend .skeleton;
     height: 1em;
     width: 100%;
     margin-bottom: var(--space-2xs);
-    
+
     &:last-child {
       width: 60%;
     }
@@ -172,7 +172,7 @@
   padding: var(--space-md);
   background: var(--surface);
   border-radius: var(--r-md);
-  
+
   .skeleton-list-avatar {
     @extend .skeleton;
     width: 40px;
@@ -180,19 +180,19 @@
     border-radius: var(--r-full);
     flex-shrink: 0;
   }
-  
+
   .skeleton-list-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
-    
+
     .skeleton-list-title {
       @extend .skeleton;
       height: 1em;
       width: 60%;
     }
-    
+
     .skeleton-list-subtitle {
       @extend .skeleton;
       height: 0.75em;
@@ -204,18 +204,18 @@
 // Table skeleton
 .skeleton-table {
   width: 100%;
-  
+
   .skeleton-table-row {
     display: flex;
     gap: var(--space-md);
     padding: var(--space-sm) 0;
     border-bottom: 1px solid var(--border);
-    
+
     &:last-child {
       border-bottom: none;
     }
   }
-  
+
   .skeleton-table-cell {
     @extend .skeleton;
     height: 1em;

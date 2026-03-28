@@ -19,7 +19,7 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
   const [password, setPassword] = useState('');
   const [confirmRemoval, setConfirmRemoval] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     const result = await onSubmit(password, confirmRemoval);
 
@@ -48,7 +48,7 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
             initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
             animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
             exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
               <h3>
@@ -60,12 +60,14 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
             </div>
             <form onSubmit={handleSubmit} className={styles.modalContent}>
               <div className={styles.formGroup}>
-                <label htmlFor="removeEmailPassword">{t('profile.modals.removeEmail.passwordLabel')}</label>
+                <label htmlFor="removeEmailPassword">
+                  {t('profile.modals.removeEmail.passwordLabel')}
+                </label>
                 <input
                   type="password"
                   id="removeEmailPassword"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder={t('profile.modals.removeEmail.passwordPlaceholder')}
                   className={styles.input}
                   required
@@ -73,7 +75,7 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
               </div>
               <Checkbox
                 checked={confirmRemoval}
-                onChange={(e) => setConfirmRemoval(e.target.checked)}
+                onChange={e => setConfirmRemoval(e.target.checked)}
                 label={t('profile.modals.removeEmail.confirmLabel')}
               />
               <div className={styles.modalActions}>
@@ -81,7 +83,9 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
                   {t('profile.modals.removeEmail.cancel')}
                 </button>
                 <button type="submit" className={styles.btnDanger} disabled={isLoading}>
-                  {isLoading ? t('profile.modals.removeEmail.removing') : t('profile.modals.removeEmail.submit')}
+                  {isLoading
+                    ? t('profile.modals.removeEmail.removing')
+                    : t('profile.modals.removeEmail.submit')}
                 </button>
               </div>
             </form>

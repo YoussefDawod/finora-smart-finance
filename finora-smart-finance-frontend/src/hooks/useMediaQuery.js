@@ -4,9 +4,9 @@ import { useCallback, useSyncExternalStore } from 'react';
  * Custom hook for responsive breakpoints
  * Uses useSyncExternalStore for tear-free reads of matchMedia
  */
-export const useMediaQuery = (query) => {
+export const useMediaQuery = query => {
   const subscribe = useCallback(
-    (callback) => {
+    callback => {
       const media = window.matchMedia(query);
       media.addEventListener('change', callback);
       return () => media.removeEventListener('change', callback);

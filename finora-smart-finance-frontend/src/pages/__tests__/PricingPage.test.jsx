@@ -43,8 +43,11 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/useCookieConsent', () => ({
   useCookieConsent: () => ({
-    noticeSeen: true, showNotice: false,
-    dismissNotice: vi.fn(), reopenNotice: vi.fn(), closeNotice: vi.fn(),
+    noticeSeen: true,
+    showNotice: false,
+    dismissNotice: vi.fn(),
+    reopenNotice: vi.fn(),
+    closeNotice: vi.fn(),
   }),
 }));
 
@@ -56,7 +59,11 @@ describe('PricingPage — Pricing-Karten', () => {
   });
 
   const renderPage = () =>
-    render(<MemoryRouter><PricingPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <PricingPage />
+      </MemoryRouter>
+    );
 
   it('rendert zwei Pricing-Karten', () => {
     renderPage();
@@ -80,8 +87,8 @@ describe('PricingPage — Pricing-Karten', () => {
   it('CTA-Links: Gastmodus → /dashboard, Vollzugang → /register', () => {
     renderPage();
     const links = screen.getAllByRole('link');
-    const guestLink = links.find((l) => l.textContent === 'Jetzt starten');
-    const fullLink = links.find((l) => l.textContent === 'Registrieren');
+    const guestLink = links.find(l => l.textContent === 'Jetzt starten');
+    const fullLink = links.find(l => l.textContent === 'Registrieren');
 
     expect(guestLink).toHaveAttribute('href', '/dashboard');
     expect(fullLink).toHaveAttribute('href', '/register');
@@ -91,9 +98,9 @@ describe('PricingPage — Pricing-Karten', () => {
     renderPage();
     // Plan 0 hat leere extraFeatures → kein Button
     // Plan 1 hat extraFeatures → Button sichtbar
-    const showMoreButtons = screen.getAllByRole('button').filter(
-      (btn) => btn.textContent.includes('pricing.showMore'),
-    );
+    const showMoreButtons = screen
+      .getAllByRole('button')
+      .filter(btn => btn.textContent.includes('pricing.showMore'));
     expect(showMoreButtons).toHaveLength(1);
   });
 

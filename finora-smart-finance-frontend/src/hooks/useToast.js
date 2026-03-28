@@ -1,14 +1,14 @@
 /**
  * @fileoverview useToast Custom Hook
  * @description Wrapper around ToastContext for easy toast notifications
- * 
+ *
  * USAGE:
  * const { success, error, warning, info } = useToast();
  * success('Changes saved!');
  * error('Something went wrong');
  * warning('Are you sure?');
  * info('FYI: New feature available');
- * 
+ *
  * @module useToast
  */
 
@@ -26,7 +26,7 @@ export function useToast() {
   if (context === undefined) {
     throw new Error(
       'useToast must be used within a ToastProvider. ' +
-      'Make sure your component tree is wrapped with <ToastProvider>.'
+        'Make sure your component tree is wrapped with <ToastProvider>.'
     );
   }
 

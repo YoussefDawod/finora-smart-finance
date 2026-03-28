@@ -1,13 +1,11 @@
 /**
  * @fileoverview Error Handler
  * @description Centralized API error parsing and logging
- * 
+ *
  * @module api/errorHandler
  */
 
 import i18next from 'i18next';
-
- 
 
 const ERROR_CODES = {
   NETWORK_ERROR: 'NETWORK_ERROR',

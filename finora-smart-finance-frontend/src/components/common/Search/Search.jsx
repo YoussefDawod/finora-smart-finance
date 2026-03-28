@@ -18,7 +18,7 @@ export default function Search({
   const { t } = useTranslation();
   const resolvedPlaceholder = placeholder ?? t('transactions.searchPlaceholder');
   const resolvedAriaLabel = ariaLabel ?? t('transactions.searchAria');
-  const handleSearch = (e) => {
+  const handleSearch = e => {
     e.preventDefault();
     onSubmit?.(value?.trim?.() || '');
   };
@@ -32,17 +32,11 @@ export default function Search({
           className={styles.searchInput}
           placeholder={resolvedPlaceholder}
           value={value}
-          onChange={(e) => onChange?.(e.target.value)}
+          onChange={e => onChange?.(e.target.value)}
           aria-label={resolvedAriaLabel}
           aria-busy={isSearching}
         />
-        {isSearching && (
-          <span 
-            className={styles.searchSpinner} 
-            aria-hidden="true"
-            role="status"
-          />
-        )}
+        {isSearching && <span className={styles.searchSpinner} aria-hidden="true" role="status" />}
       </div>
     </form>
   );

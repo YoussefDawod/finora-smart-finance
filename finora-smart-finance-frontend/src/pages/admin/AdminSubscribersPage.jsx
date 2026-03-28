@@ -11,11 +11,7 @@
 
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  FiSearch,
-  FiRefreshCw,
-  FiMail,
-} from 'react-icons/fi';
+import { FiSearch, FiRefreshCw, FiMail } from 'react-icons/fi';
 import { useAdminSubscribers, useToast } from '@/hooks';
 import { AdminSubscriberTable, AdminSubscriberDetail } from '@/components/admin';
 import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
@@ -25,13 +21,14 @@ import styles from './AdminSubscribersPage.module.scss';
 export default function AdminSubscribersPage() {
   const { t } = useTranslation();
   const toast = useToast();
-  const { subscribers, pagination, loading, error, actionLoading, filters, actions } = useAdminSubscribers();
+  const { subscribers, pagination, loading, error, actionLoading, filters, actions } =
+    useAdminSubscribers();
 
   // ── Detail Modal State ──────────────────────────
   const [selectedSubscriber, setSelectedSubscriber] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const handleViewSubscriber = useCallback((sub) => {
+  const handleViewSubscriber = useCallback(sub => {
     setSelectedSubscriber(sub);
     setDetailOpen(true);
   }, []);
@@ -42,14 +39,17 @@ export default function AdminSubscribersPage() {
   }, []);
 
   // ── Delete handler ──────────────────────────────
-  const handleDelete = useCallback(async (id) => {
-    try {
-      await actions.deleteSubscriber(id);
-      toast.success(t('admin.subscribers.deleteSuccess'));
-    } catch {
-      toast.error(t('admin.subscribers.deleteError'));
-    }
-  }, [actions, toast, t]);
+  const handleDelete = useCallback(
+    async id => {
+      try {
+        await actions.deleteSubscriber(id);
+        toast.success(t('admin.subscribers.deleteSuccess'));
+      } catch {
+        toast.error(t('admin.subscribers.deleteError'));
+      }
+    },
+    [actions, toast, t]
+  );
 
   // ── Error State ─────────────────────────────────
   if (error && !loading && subscribers.length === 0) {
@@ -57,11 +57,7 @@ export default function AdminSubscribersPage() {
       <div className={styles.page}>
         <div className={styles.errorState}>
           <p className={styles.errorText}>{error}</p>
-          <button
-            className={styles.retryButton}
-            onClick={actions.refresh}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={actions.refresh} type="button">
             <FiRefreshCw size={16} />
             {t('admin.dashboard.retry')}
           </button>
@@ -100,7 +96,7 @@ export default function AdminSubscribersPage() {
             type="text"
             className={styles.searchInput}
             value={filters.search}
-            onChange={(e) => filters.setSearch(e.target.value)}
+            onChange={e => filters.setSearch(e.target.value)}
             placeholder={t('admin.subscribers.searchPlaceholder')}
             aria-label={t('admin.subscribers.searchPlaceholder')}
           />
@@ -126,7 +122,7 @@ export default function AdminSubscribersPage() {
             placeholder={t('admin.subscribers.allLanguages')}
             options={[
               { value: '', label: t('admin.subscribers.allLanguages') },
-              ...SUPPORTED_LANGUAGES.map((lang) => ({
+              ...SUPPORTED_LANGUAGES.map(lang => ({
                 value: lang,
                 label: t(`admin.subscribers.lang_${lang}`, lang.toUpperCase()),
               })),
@@ -138,9 +134,7 @@ export default function AdminSubscribersPage() {
       {/* ── Total Count Badge ───────────────────── */}
       <div className={styles.countBadge}>
         <FiMail size={14} />
-        <span>
-          {t('admin.subscribers.totalSubscribers', { count: pagination.total })}
-        </span>
+        <span>{t('admin.subscribers.totalSubscribers', { count: pagination.total })}</span>
       </div>
 
       {/* ── Table ───────────────────────────────── */}
@@ -163,8 +157,8 @@ export default function AdminSubscribersPage() {
         onClose={handleCloseDetail}
         onDelete={handleDelete}
         actionLoading={actionLoading}
-        onSuccess={(msg) => toast.success(msg)}
-        onError={(msg) => toast.error(msg)}
+        onSuccess={msg => toast.success(msg)}
+        onError={msg => toast.error(msg)}
       />
     </div>
   );

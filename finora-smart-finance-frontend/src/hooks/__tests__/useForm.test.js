@@ -22,7 +22,7 @@ describe('useForm', () => {
 
   describe('initialization', () => {
     it('should initialize with given values', () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useForm({ email: 'test@test.com', password: '' }, mockOnSubmit)
       );
 
@@ -53,9 +53,7 @@ describe('useForm', () => {
     });
 
     it('should handle checkbox inputs', () => {
-      const { result } = renderHook(() => 
-        useForm({ remember: false }, mockOnSubmit)
-      );
+      const { result } = renderHook(() => useForm({ remember: false }, mockOnSubmit));
 
       act(() => {
         result.current.handleChange({
@@ -105,9 +103,7 @@ describe('useForm', () => {
 
   describe('handleSubmit', () => {
     it('should call onSubmit with values', async () => {
-      const { result } = renderHook(() => 
-        useForm({ email: 'test@test.com' }, mockOnSubmit)
-      );
+      const { result } = renderHook(() => useForm({ email: 'test@test.com' }, mockOnSubmit));
 
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
@@ -118,9 +114,12 @@ describe('useForm', () => {
 
     it('should set isSubmitting during submission', async () => {
       let resolveSubmit;
-      const slowSubmit = vi.fn(() => new Promise((resolve) => {
-        resolveSubmit = resolve;
-      }));
+      const slowSubmit = vi.fn(
+        () =>
+          new Promise(resolve => {
+            resolveSubmit = resolve;
+          })
+      );
 
       const { result } = renderHook(() => useForm(initialValues, slowSubmit));
 
@@ -152,7 +151,7 @@ describe('useForm', () => {
   });
 
   describe('validation with custom validator', () => {
-    const customValidator = (values) => {
+    const customValidator = values => {
       const errors = {};
       if (!values.email) {
         errors.email = 'Email is required';
@@ -166,9 +165,7 @@ describe('useForm', () => {
     };
 
     it('should validate and prevent submit with errors', async () => {
-      const { result } = renderHook(() => 
-        useForm(initialValues, mockOnSubmit, customValidator)
-      );
+      const { result } = renderHook(() => useForm(initialValues, mockOnSubmit, customValidator));
 
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
@@ -180,7 +177,7 @@ describe('useForm', () => {
     });
 
     it('should submit when validation passes', async () => {
-      const { result } = renderHook(() => 
+      const { result } = renderHook(() =>
         useForm(
           { email: 'valid@email.com', password: 'password123', name: 'Test' },
           mockOnSubmit,
@@ -197,9 +194,7 @@ describe('useForm', () => {
     });
 
     it('should validate on blur when schema is provided', () => {
-      const { result } = renderHook(() => 
-        useForm(initialValues, mockOnSubmit, customValidator)
-      );
+      const { result } = renderHook(() => useForm(initialValues, mockOnSubmit, customValidator));
 
       // Set value first
       act(() => {
@@ -263,7 +258,7 @@ describe('useForm', () => {
       const { result } = renderHook(() => useForm(initialValues, mockOnSubmit));
 
       const newValues = { email: 'new@email.com', password: 'newpass', name: 'New Name' };
-      
+
       act(() => {
         result.current.setValues(newValues);
       });

@@ -41,21 +41,24 @@ export function useBudget() {
    * @param {number} budgetSettings.monthlyLimit
    * @param {number} budgetSettings.alertThreshold
    */
-  const updateBudget = useCallback(async (budgetSettings) => {
-    setError(null);
-    try {
-      await userService.updatePreferences({
-        budget: budgetSettings,
-      });
-      // Refetch to get updated status
-      await fetchBudgetStatus();
-      return { success: true };
-    } catch (err) {
-      const errorMsg = err.response?.data?.message || i18n.t('settings.budget.saveError');
-      setError(errorMsg);
-      return { success: false, error: errorMsg };
-    }
-  }, [fetchBudgetStatus]);
+  const updateBudget = useCallback(
+    async budgetSettings => {
+      setError(null);
+      try {
+        await userService.updatePreferences({
+          budget: budgetSettings,
+        });
+        // Refetch to get updated status
+        await fetchBudgetStatus();
+        return { success: true };
+      } catch (err) {
+        const errorMsg = err.response?.data?.message || i18n.t('settings.budget.saveError');
+        setError(errorMsg);
+        return { success: false, error: errorMsg };
+      }
+    },
+    [fetchBudgetStatus]
+  );
 
   /**
    * Clear budget (set limit to 0)

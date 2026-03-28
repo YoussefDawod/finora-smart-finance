@@ -89,9 +89,24 @@ export default function ProfilePage() {
               <div className={styles.profileCardHeader}>
                 <div className={styles.skeletonAvatar} />
                 <div className={styles.skeletonInfo}>
-                  <Skeleton width="180px" height="28px" borderRadius="var(--r-md)" animated={false} />
-                  <Skeleton width="220px" height="18px" borderRadius="var(--r-sm)" animated={false} />
-                  <Skeleton width="100px" height="24px" borderRadius="var(--r-full)" animated={false} />
+                  <Skeleton
+                    width="180px"
+                    height="28px"
+                    borderRadius="var(--r-md)"
+                    animated={false}
+                  />
+                  <Skeleton
+                    width="220px"
+                    height="18px"
+                    borderRadius="var(--r-sm)"
+                    animated={false}
+                  />
+                  <Skeleton
+                    width="100px"
+                    height="24px"
+                    borderRadius="var(--r-full)"
+                    animated={false}
+                  />
                 </div>
               </div>
             </div>
@@ -101,7 +116,14 @@ export default function ProfilePage() {
             </div>
             <div className={styles.section}>
               <Skeleton width="160px" height="24px" borderRadius="var(--r-md)" animated={false} />
-              <Skeleton count={2} width="100%" height="48px" gap="var(--space-md)" borderRadius="var(--r-lg)" animated={false} />
+              <Skeleton
+                count={2}
+                width="100%"
+                height="48px"
+                gap="var(--space-md)"
+                borderRadius="var(--r-lg)"
+                animated={false}
+              />
             </div>
           </div>
         </AuthRequiredOverlay>
@@ -144,7 +166,13 @@ export default function ProfilePage() {
           {/* Edit Form Skeleton */}
           <div className={styles.section}>
             <Skeleton width="160px" height="24px" borderRadius="var(--r-md)" />
-            <Skeleton count={3} width="100%" height="48px" gap="var(--space-md)" borderRadius="var(--r-lg)" />
+            <Skeleton
+              count={3}
+              width="100%"
+              height="48px"
+              gap="var(--space-md)"
+              borderRadius="var(--r-lg)"
+            />
           </div>
 
           {/* Security Section Skeleton */}
@@ -170,7 +198,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleDeleteAccount = async (password) => {
+  const handleDeleteAccount = async password => {
     try {
       await userService.deleteAccount(password);
       toast.success(t('profile.toasts.accountDeleted'));
@@ -178,7 +206,10 @@ export default function ProfilePage() {
       navigate('/dashboard', { replace: true });
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.response?.data?.error || t('profile.toasts.accountDeleteError') };
+      return {
+        success: false,
+        error: error.response?.data?.error || t('profile.toasts.accountDeleteError'),
+      };
     }
   };
 

@@ -13,14 +13,14 @@ import { ACTIONS } from '../reducers/transactionReducer';
  */
 export function useTransactionPagination(dispatch, pagination) {
   const setPage = useCallback(
-    (page) => {
+    page => {
       dispatch({ type: ACTIONS.SET_PAGE, payload: page });
     },
     [dispatch]
   );
 
   const setLimit = useCallback(
-    (limit) => {
+    limit => {
       dispatch({ type: ACTIONS.SET_LIMIT, payload: limit });
     },
     [dispatch]

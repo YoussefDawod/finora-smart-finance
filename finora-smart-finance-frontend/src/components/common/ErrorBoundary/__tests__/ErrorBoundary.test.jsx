@@ -9,7 +9,7 @@ import ErrorBoundary from '../ErrorBoundary';
 
 vi.mock('@/i18n', () => ({
   default: {
-    t: (key) => {
+    t: key => {
       const map = {
         'common.errors.somethingWrong': 'Something went wrong',
         'common.retry': 'Try again',
@@ -25,9 +25,7 @@ vi.mock('framer-motion', () => ({
     button: ({ children, whileHover, whileTap, transition, ...props }) => (
       <button {...props}>{children}</button>
     ),
-    span: ({ children, animate, transition, ...props }) => (
-      <span {...props}>{children}</span>
-    ),
+    span: ({ children, animate, transition, ...props }) => <span {...props}>{children}</span>,
   },
 }));
 /* eslint-enable no-unused-vars */
@@ -53,7 +51,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <div>Child content</div>
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText('Child content')).toBeInTheDocument();
   });
@@ -63,7 +61,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     expect(screen.getByText(/Test error/)).toBeInTheDocument();
@@ -73,12 +71,12 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(console.error).toHaveBeenCalledWith(
       'ErrorBoundary caught an error:',
       expect.any(Error),
-      expect.objectContaining({ componentStack: expect.any(String) }),
+      expect.objectContaining({ componentStack: expect.any(String) })
     );
   });
 
@@ -86,7 +84,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary fallback={<div>Custom oops</div>}>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText('Custom oops')).toBeInTheDocument();
     expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
@@ -97,7 +95,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument();
   });
@@ -107,7 +105,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary onRetry={onRetry}>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
     expect(onRetry).toHaveBeenCalledTimes(1);
@@ -117,7 +115,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /try again/i }));
@@ -130,7 +128,7 @@ describe('ErrorBoundary', () => {
     render(
       <ErrorBoundary>
         <ThrowError />
-      </ErrorBoundary>,
+      </ErrorBoundary>
     );
     expect(screen.getByText(/Error: Test error/)).toBeInTheDocument();
   });
@@ -156,29 +154,26 @@ describe('ErrorBoundary', () => {
       });
     });
 
-    it.each(chunkMessages)(
-      'calls window.location.reload() for chunk error: "%s"',
-      (msg) => {
-        const ChunkError = () => {
-          throw new Error(msg);
-        };
+    it.each(chunkMessages)('calls window.location.reload() for chunk error: "%s"', msg => {
+      const ChunkError = () => {
+        throw new Error(msg);
+      };
 
-        render(
-          <ErrorBoundary>
-            <ChunkError />
-          </ErrorBoundary>,
-        );
+      render(
+        <ErrorBoundary>
+          <ChunkError />
+        </ErrorBoundary>
+      );
 
-        fireEvent.click(screen.getByRole('button', { name: /try again/i }));
-        expect(reloadSpy).toHaveBeenCalledTimes(1);
-      },
-    );
+      fireEvent.click(screen.getByRole('button', { name: /try again/i }));
+      expect(reloadSpy).toHaveBeenCalledTimes(1);
+    });
 
     it('does NOT call reload for a normal error', () => {
       render(
         <ErrorBoundary>
           <ThrowError />
-        </ErrorBoundary>,
+        </ErrorBoundary>
       );
 
       fireEvent.click(screen.getByRole('button', { name: /try again/i }));

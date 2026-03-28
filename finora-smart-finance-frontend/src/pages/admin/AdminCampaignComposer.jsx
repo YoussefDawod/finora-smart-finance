@@ -23,12 +23,17 @@ import { adminService } from '@/api/adminService';
 import { useToast } from '@/hooks';
 import Modal from '@/components/common/Modal/Modal';
 import FilterDropdown from '@/components/common/FilterDropdown/FilterDropdown';
-import { SUPPORTED_LANGUAGES, LANGUAGE_LABELS, CAMPAIGN_TEMPLATES, TEMPLATE_MAP } from '@/constants';
+import {
+  SUPPORTED_LANGUAGES,
+  LANGUAGE_LABELS,
+  CAMPAIGN_TEMPLATES,
+  TEMPLATE_MAP,
+} from '@/constants';
 import styles from './AdminCampaignComposer.module.scss';
 
 // ── Leeres Multi-Language Objekt ──────────────────
 const emptyMultiLang = () =>
-  Object.fromEntries(SUPPORTED_LANGUAGES.map((l) => [l, { subject: '', content: '' }]));
+  Object.fromEntries(SUPPORTED_LANGUAGES.map(l => [l, { subject: '', content: '' }]));
 
 export default function AdminCampaignComposer() {
   const { t } = useTranslation();
@@ -70,80 +75,96 @@ export default function AdminCampaignComposer() {
 
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
   // ── Template Options for FilterDropdown ─────────
-  const templateOptions = useMemo(() => [
-    { value: '', label: t('admin.campaigns.templates.custom') },
-    ...CAMPAIGN_TEMPLATES.map((tpl) => ({
-      value: tpl.id,
-      label: t(tpl.labelKey),
-    })),
-  ], [t]);
+  const templateOptions = useMemo(
+    () => [
+      { value: '', label: t('admin.campaigns.templates.custom') },
+      ...CAMPAIGN_TEMPLATES.map(tpl => ({
+        value: tpl.id,
+        label: t(tpl.labelKey),
+      })),
+    ],
+    [t]
+  );
 
   // ── Recipient Options ───────────────────────────
-  const recipientOptions = useMemo(() => [
-    { value: '', label: t('admin.campaigns.allConfirmed') },
-    { value: '__broadcast__', label: t('admin.campaigns.broadcastMode') },
-    ...SUPPORTED_LANGUAGES.map((lang) => ({
-      value: lang,
-      label: t('admin.campaigns.languageOnly', { lang: LANGUAGE_LABELS[lang] }),
-    })),
-  ], [t]);
+  const recipientOptions = useMemo(
+    () => [
+      { value: '', label: t('admin.campaigns.allConfirmed') },
+      { value: '__broadcast__', label: t('admin.campaigns.broadcastMode') },
+      ...SUPPORTED_LANGUAGES.map(lang => ({
+        value: lang,
+        label: t('admin.campaigns.languageOnly', { lang: LANGUAGE_LABELS[lang] }),
+      })),
+    ],
+    [t]
+  );
 
   // ── Language Options ────────────────────────────
-  const languageOptions = useMemo(() =>
-    SUPPORTED_LANGUAGES.map((lang) => ({
-      value: lang,
-      label: LANGUAGE_LABELS[lang],
-    })),
-  []);
+  const languageOptions = useMemo(
+    () =>
+      SUPPORTED_LANGUAGES.map(lang => ({
+        value: lang,
+        label: LANGUAGE_LABELS[lang],
+      })),
+    []
+  );
 
   // ── Template-Wechsel: Inhalte auto-füllen ───────
-  const handleTemplateChange = useCallback((newTemplateId) => {
-    setTemplateId(newTemplateId);
-    if (!newTemplateId) return;
+  const handleTemplateChange = useCallback(
+    newTemplateId => {
+      setTemplateId(newTemplateId);
+      if (!newTemplateId) return;
 
-    const tpl = TEMPLATE_MAP[newTemplateId];
-    if (!tpl) return;
+      const tpl = TEMPLATE_MAP[newTemplateId];
+      if (!tpl) return;
 
-    // Multi-language → fill all tabs
-    const newMulti = {};
-    for (const lang of SUPPORTED_LANGUAGES) {
-      newMulti[lang] = {
-        subject: tpl.subjects[lang] || '',
-        content: tpl.contents[lang] || '',
-      };
-    }
-    setMultiLang(newMulti);
+      // Multi-language → fill all tabs
+      const newMulti = {};
+      for (const lang of SUPPORTED_LANGUAGES) {
+        newMulti[lang] = {
+          subject: tpl.subjects[lang] || '',
+          content: tpl.contents[lang] || '',
+        };
+      }
+      setMultiLang(newMulti);
 
-    // Single-language → fill current language
-    const lang = recipientLang || language;
-    setSubject(tpl.subjects[lang] || tpl.subjects.de || '');
-    setContent(tpl.contents[lang] || tpl.contents.de || '');
-  }, [recipientLang, language]);
+      // Single-language → fill current language
+      const lang = recipientLang || language;
+      setSubject(tpl.subjects[lang] || tpl.subjects.de || '');
+      setContent(tpl.contents[lang] || tpl.contents.de || '');
+    },
+    [recipientLang, language]
+  );
 
   // ── Recipient-Wechsel ───────────────────────────
-  const handleRecipientChange = useCallback((newVal) => {
-    if (newVal === '__broadcast__') {
-      setBroadcastMode(true);
-      setRecipientLang('');
-      return;
-    }
-    setBroadcastMode(false);
-    setRecipientLang(newVal);
-    if (newVal) {
-      setLanguage(newVal);
-      if (templateId) {
-        const tpl = TEMPLATE_MAP[templateId];
-        if (tpl) {
-          setSubject(tpl.subjects[newVal] || '');
-          setContent(tpl.contents[newVal] || '');
+  const handleRecipientChange = useCallback(
+    newVal => {
+      if (newVal === '__broadcast__') {
+        setBroadcastMode(true);
+        setRecipientLang('');
+        return;
+      }
+      setBroadcastMode(false);
+      setRecipientLang(newVal);
+      if (newVal) {
+        setLanguage(newVal);
+        if (templateId) {
+          const tpl = TEMPLATE_MAP[templateId];
+          if (tpl) {
+            setSubject(tpl.subjects[newVal] || '');
+            setContent(tpl.contents[newVal] || '');
+          }
         }
       }
-    }
-  }, [templateId]);
+    },
+    [templateId]
+  );
 
   // ── Fetch existing campaign (edit mode) ─────────
   useEffect(() => {
@@ -166,7 +187,9 @@ export default function AdminCampaignComposer() {
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [id, isEdit, t, toast]);
 
   // ── Fetch recipient count estimate ──────────────
@@ -186,16 +209,18 @@ export default function AdminCampaignComposer() {
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [recipientLang]);
 
   // ── Update multiLang from tab edits ─────────────
   const updateMultiField = useCallback((lang, field, value) => {
-    setMultiLang((prev) => ({
+    setMultiLang(prev => ({
       ...prev,
       [lang]: { ...prev[lang], [field]: value },
     }));
-    setErrors((prev) => ({ ...prev, [`${field}_${lang}`]: undefined }));
+    setErrors(prev => ({ ...prev, [`${field}_${lang}`]: undefined }));
   }, []);
 
   // ── Validation ──────────────────────────────────
@@ -212,7 +237,7 @@ export default function AdminCampaignComposer() {
         else if (c.length > 50000) errs[`content_${lang}`] = t('admin.campaigns.contentTooLong');
       }
       const firstErrLang = SUPPORTED_LANGUAGES.find(
-        (l) => errs[`subject_${l}`] || errs[`content_${l}`],
+        l => errs[`subject_${l}`] || errs[`content_${l}`]
       );
       if (firstErrLang) setActiveTab(firstErrLang);
     } else {
@@ -277,7 +302,20 @@ export default function AdminCampaignComposer() {
     } finally {
       if (mountedRef.current) setSaving(false);
     }
-  }, [validate, isMultiLang, multiLang, subject, content, language, recipientLang, isEdit, id, toast, t, navigate]);
+  }, [
+    validate,
+    isMultiLang,
+    multiLang,
+    subject,
+    content,
+    language,
+    recipientLang,
+    isEdit,
+    id,
+    toast,
+    t,
+    navigate,
+  ]);
 
   // ── Preview ─────────────────────────────────────
   const handlePreview = useCallback(async () => {
@@ -286,7 +324,7 @@ export default function AdminCampaignComposer() {
     const previewLang = isMultiLang ? activeTab : language;
 
     if (!previewContent?.trim()) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [isMultiLang ? `content_${activeTab}` : 'content']: t('admin.campaigns.contentRequired'),
       }));
@@ -323,7 +361,7 @@ export default function AdminCampaignComposer() {
         let totalSuccess = 0;
         let totalRecipients = 0;
         const skipped = []; // Sprachen ohne Abonnenten (Warnung)
-        const failed = [];  // Sprachen mit echten Fehlern
+        const failed = []; // Sprachen mit echten Fehlern
 
         for (const lang of SUPPORTED_LANGUAGES) {
           const payload = {
@@ -358,10 +396,12 @@ export default function AdminCampaignComposer() {
 
         const sentCount = SUPPORTED_LANGUAGES.length - skipped.length - failed.length;
         if (sentCount > 0) {
-          toast.success(t('admin.campaigns.sendSuccess', {
-            success: totalSuccess,
-            total: totalRecipients,
-          }));
+          toast.success(
+            t('admin.campaigns.sendSuccess', {
+              success: totalSuccess,
+              total: totalRecipients,
+            })
+          );
         }
         if (skipped.length > 0) {
           toast.warning(t('admin.campaigns.sendSkippedLangs', { langs: skipped.join(', ') }));
@@ -392,10 +432,12 @@ export default function AdminCampaignComposer() {
         const sendRes = await adminService.sendCampaign(campaignId);
         if (!mountedRef.current) return;
         const data = sendRes.data?.data || sendRes.data;
-        toast.success(t('admin.campaigns.sendSuccess', {
-          success: data?.successCount ?? 0,
-          total: data?.recipientCount ?? 0,
-        }));
+        toast.success(
+          t('admin.campaigns.sendSuccess', {
+            success: data?.successCount ?? 0,
+            total: data?.recipientCount ?? 0,
+          })
+        );
         navigate('/admin/campaigns');
       }
     } catch (err) {
@@ -412,7 +454,20 @@ export default function AdminCampaignComposer() {
         setSendConfirmOpen(false);
       }
     }
-  }, [validate, isMultiLang, multiLang, subject, content, language, recipientLang, isEdit, id, toast, t, navigate]);
+  }, [
+    validate,
+    isMultiLang,
+    multiLang,
+    subject,
+    content,
+    language,
+    recipientLang,
+    isEdit,
+    id,
+    toast,
+    t,
+    navigate,
+  ]);
 
   if (loading) {
     return (
@@ -478,23 +533,20 @@ export default function AdminCampaignComposer() {
           <p className={styles.recipientHint}>
             {recipientCount > 0
               ? t('admin.campaigns.recipientCount', { count: recipientCount })
-              : t('admin.campaigns.noRecipients')
-            }
+              : t('admin.campaigns.noRecipients')}
           </p>
         )}
 
         {/* Broadcast mode hint */}
         {broadcastMode && (
-          <p className={styles.broadcastHint}>
-            {t('admin.campaigns.broadcastModeHint')}
-          </p>
+          <p className={styles.broadcastHint}>{t('admin.campaigns.broadcastModeHint')}</p>
         )}
 
         {/* ── Multi-Language Mode ───────────────── */}
         {isMultiLang ? (
           <>
             <div className={styles.langTabs} role="tablist">
-              {SUPPORTED_LANGUAGES.map((lang) => {
+              {SUPPORTED_LANGUAGES.map(lang => {
                 const hasError = errors[`subject_${lang}`] || errors[`content_${lang}`];
                 return (
                   <button
@@ -522,7 +574,7 @@ export default function AdminCampaignComposer() {
                   type="text"
                   className={`${styles.input} ${errors[`subject_${activeTab}`] ? styles.inputError : ''}`}
                   value={tabSubject}
-                  onChange={(e) => updateMultiField(activeTab, 'subject', e.target.value)}
+                  onChange={e => updateMultiField(activeTab, 'subject', e.target.value)}
                   placeholder={t('admin.campaigns.subjectPlaceholder')}
                   maxLength={200}
                 />
@@ -540,7 +592,7 @@ export default function AdminCampaignComposer() {
                   id={`content-${activeTab}`}
                   className={`${styles.textarea} ${errors[`content_${activeTab}`] ? styles.inputError : ''}`}
                   value={tabContent}
-                  onChange={(e) => updateMultiField(activeTab, 'content', e.target.value)}
+                  onChange={e => updateMultiField(activeTab, 'content', e.target.value)}
                   placeholder={t('admin.campaigns.contentPlaceholder')}
                   rows={14}
                   maxLength={50000}
@@ -548,7 +600,9 @@ export default function AdminCampaignComposer() {
                 {errors[`content_${activeTab}`] && (
                   <p className={styles.errorMsg}>{errors[`content_${activeTab}`]}</p>
                 )}
-                <span className={styles.charCount}>{tabContent.length.toLocaleString()}/50.000</span>
+                <span className={styles.charCount}>
+                  {tabContent.length.toLocaleString()}/50.000
+                </span>
               </div>
             </div>
           </>
@@ -563,7 +617,10 @@ export default function AdminCampaignComposer() {
                 type="text"
                 className={`${styles.input} ${errors.subject ? styles.inputError : ''}`}
                 value={subject}
-                onChange={(e) => { setSubject(e.target.value); setErrors((p) => ({ ...p, subject: undefined })); }}
+                onChange={e => {
+                  setSubject(e.target.value);
+                  setErrors(p => ({ ...p, subject: undefined }));
+                }}
                 placeholder={t('admin.campaigns.subjectPlaceholder')}
                 maxLength={200}
               />
@@ -591,7 +648,10 @@ export default function AdminCampaignComposer() {
                 id="campaign-content"
                 className={`${styles.textarea} ${errors.content ? styles.inputError : ''}`}
                 value={content}
-                onChange={(e) => { setContent(e.target.value); setErrors((p) => ({ ...p, content: undefined })); }}
+                onChange={e => {
+                  setContent(e.target.value);
+                  setErrors(p => ({ ...p, content: undefined }));
+                }}
                 placeholder={t('admin.campaigns.contentPlaceholder')}
                 rows={16}
                 maxLength={50000}
@@ -682,8 +742,7 @@ export default function AdminCampaignComposer() {
               ? t('admin.campaigns.confirmSendAllLangs', { count: recipientCount ?? '?' })
               : broadcastMode
                 ? t('admin.campaigns.broadcastConfirmText', { count: recipientCount ?? '?' })
-                : t('admin.campaigns.confirmSendText', { count: recipientCount ?? '?' })
-            }
+                : t('admin.campaigns.confirmSendText', { count: recipientCount ?? '?' })}
           </p>
           <div className={styles.confirmActions}>
             <button

@@ -10,21 +10,13 @@ import { Textarea } from '../Textarea';
 /* eslint-disable no-unused-vars */
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, initial, animate, transition, ...props }) => (
-      <div {...props}>{children}</div>
-    ),
-    label: ({ children, initial, animate, ...props }) => (
-      <label {...props}>{children}</label>
-    ),
-    textarea: ({ children, initial, animate, transition, ...props }) => (
-      <textarea {...props} />
-    ),
+    div: ({ children, initial, animate, transition, ...props }) => <div {...props}>{children}</div>,
+    label: ({ children, initial, animate, ...props }) => <label {...props}>{children}</label>,
+    textarea: ({ children, initial, animate, transition, ...props }) => <textarea {...props} />,
     span: ({ children, initial, animate, transition, ...props }) => (
       <span {...props}>{children}</span>
     ),
-    p: ({ children, initial, animate, transition, ...props }) => (
-      <p {...props}>{children}</p>
-    ),
+    p: ({ children, initial, animate, transition, ...props }) => <p {...props}>{children}</p>,
   },
 }));
 /* eslint-enable no-unused-vars */
@@ -90,7 +82,7 @@ describe('Textarea', () => {
   });
 
   // ─── Sizes ────────────────────────────────────────────────────────
-  it.each(['small', 'medium', 'large'])('applies "%s" size class', (size) => {
+  it.each(['small', 'medium', 'large'])('applies "%s" size class', size => {
     const { container } = render(<Textarea size={size} />);
     expect(container.firstChild.className).toContain(size);
   });

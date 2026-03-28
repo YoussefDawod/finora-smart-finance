@@ -75,7 +75,7 @@ export function useAuthActions(dispatch, storage) {
   // ============================================
 
   const register = useCallback(
-    async (data) => {
+    async data => {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
       dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
 
@@ -127,7 +127,7 @@ export function useAuthActions(dispatch, storage) {
   // ============================================
 
   const verifyEmail = useCallback(
-    async (verificationToken) => {
+    async verificationToken => {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
       dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR });
 
@@ -171,7 +171,7 @@ export function useAuthActions(dispatch, storage) {
   // PASSWORD RESET (PUBLIC FLOW)
   // ============================================
 
-  const forgotPassword = useCallback(async (email) => {
+  const forgotPassword = useCallback(async email => {
     await authService.forgotPassword(email);
   }, []);
 
@@ -183,13 +183,15 @@ export function useAuthActions(dispatch, storage) {
   // RESEND VERIFICATION
   // ============================================
 
-  const resendVerification = useCallback(async (email) => {
+  const resendVerification = useCallback(async email => {
     try {
       const response = await authService.resendVerification(email);
       return response.data;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || error.message || 'Verifizierungs-Email konnte nicht gesendet werden.';
+        error.response?.data?.message ||
+        error.message ||
+        'Verifizierungs-Email konnte nicht gesendet werden.';
       throw new Error(errorMessage, { cause: error });
     }
   }, []);
@@ -203,7 +205,7 @@ export function useAuthActions(dispatch, storage) {
   }, [dispatch]);
 
   const setIsLoading = useCallback(
-    (isLoading) => {
+    isLoading => {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: isLoading });
     },
     [dispatch]

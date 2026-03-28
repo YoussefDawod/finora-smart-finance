@@ -8,7 +8,7 @@ const initialLanguage = preferences.language || 'de';
 
 const rtlLanguages = new Set(['ar']);
 
-const setDocumentDirection = (language) => {
+const setDocumentDirection = language => {
   if (typeof document === 'undefined') return;
   const isRtl = rtlLanguages.has(language);
   document.documentElement.lang = language;
@@ -43,7 +43,7 @@ i18n
 
 setDocumentDirection(initialLanguage);
 
-i18n.on('languageChanged', (lng) => {
+i18n.on('languageChanged', lng => {
   setDocumentDirection(lng);
 });
 

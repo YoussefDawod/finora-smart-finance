@@ -1,13 +1,13 @@
 /**
  * @fileoverview ResetPasswordForm Component - Premium Redesign
  * @description Modern form for resetting password with token validation
- * 
+ *
  * FEATURES:
  * - Password input with strength indicator
  * - Confirm password validation
  * - Loading state with spinner
  * - Success state
- * 
+ *
  * @module components/auth/ResetPasswordForm
  */
 
@@ -17,7 +17,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { FiCheck } from 'react-icons/fi';
-import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
+import {
+  calculatePasswordStrength,
+  validatePassword as _validatePassword,
+  validatePasswordMatch as _validatePasswordMatch,
+} from '@/validators';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import PasswordInput from '../PasswordInput/PasswordInput';
 import styles from './ResetPasswordForm.module.scss';
@@ -58,9 +62,9 @@ export default function ResetPasswordForm({ token }) {
     noSpecial: t('auth.reset.validation.passwordWeak'),
   };
 
-  const validatePassword = (password) => {
+  const validatePassword = password => {
     const key = _validatePassword(password);
-    return key ? (passwordErrorMap[key] || key) : '';
+    return key ? passwordErrorMap[key] || key : '';
   };
 
   const confirmErrorMap = {
@@ -70,7 +74,7 @@ export default function ResetPasswordForm({ token }) {
 
   const validateConfirmPassword = (confirmPassword, password) => {
     const key = _validatePasswordMatch(password, confirmPassword);
-    return key ? (confirmErrorMap[key] || key) : '';
+    return key ? confirmErrorMap[key] || key : '';
   };
 
   const validateForm = () => {
@@ -89,31 +93,33 @@ export default function ResetPasswordForm({ token }) {
   // HANDLERS
   // ============================================
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
 
     if (touched[name]) {
-      const error = name === 'password' 
-        ? validatePassword(value)
-        : validateConfirmPassword(value, name === 'confirmPassword' ? formData.password : value);
-      setErrors((prev) => ({ ...prev, [name]: error }));
+      const error =
+        name === 'password'
+          ? validatePassword(value)
+          : validateConfirmPassword(value, name === 'confirmPassword' ? formData.password : value);
+      setErrors(prev => ({ ...prev, [name]: error }));
     }
 
     if (apiError) setApiError('');
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = e => {
     const { name, value } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
+    setTouched(prev => ({ ...prev, [name]: true }));
 
-    const error = name === 'password'
-      ? validatePassword(value)
-      : validateConfirmPassword(value, formData.password);
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    const error =
+      name === 'password'
+        ? validatePassword(value)
+        : validateConfirmPassword(value, formData.password);
+    setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     setTouched({ password: true, confirmPassword: true });
@@ -136,9 +142,7 @@ export default function ResetPasswordForm({ token }) {
         navigate('/login', { replace: true });
       }, 2000);
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        t('auth.reset.errorToast');
+      const errorMessage = error?.response?.data?.message || t('auth.reset.errorToast');
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -152,7 +156,7 @@ export default function ResetPasswordForm({ token }) {
 
   const passwordStrength = calculatePasswordStrength(formData.password);
 
-  const getStrengthLabel = (level) => {
+  const getStrengthLabel = level => {
     const labels = {
       none: '',
       weak: t('auth.reset.strength.weak'),
@@ -179,9 +183,7 @@ export default function ResetPasswordForm({ token }) {
           <FiCheck />
         </div>
         <h2 className={styles.successTitle}>{t('auth.reset.successTitle')}</h2>
-        <p className={styles.successMessage}>
-          {t('auth.reset.successMessage')}
-        </p>
+        <p className={styles.successMessage}>{t('auth.reset.successMessage')}</p>
       </motion.div>
     );
   }
@@ -192,7 +194,8 @@ export default function ResetPasswordForm({ token }) {
 
   const hasPasswordError = errors.password && touched.password;
   const hasConfirmError = errors.confirmPassword && touched.confirmPassword;
-  const isFormValid = formData.password && formData.confirmPassword && !errors.password && !errors.confirmPassword;
+  const isFormValid =
+    formData.password && formData.confirmPassword && !errors.password && !errors.confirmPassword;
 
   return (
     <form onSubmit={handleSubmit} className={styles.resetForm} noValidate>
@@ -286,11 +289,7 @@ export default function ResetPasswordForm({ token }) {
       </div>
 
       {/* Submit Button */}
-      <button
-        type="submit"
-        className={styles.submitButton}
-        disabled={isLoading || !isFormValid}
-      >
+      <button type="submit" className={styles.submitButton} disabled={isLoading || !isFormValid}>
         {isLoading ? (
           <>
             <span className={styles.spinner} />

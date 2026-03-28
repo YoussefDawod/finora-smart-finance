@@ -8,7 +8,7 @@ import { describe, it, expect, vi } from 'vitest';
 import Alert from '../Alert';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key) => key, i18n: { language: 'de' } }),
+  useTranslation: () => ({ t: key => key, i18n: { language: 'de' } }),
 }));
 
 describe('Alert', () => {
@@ -25,12 +25,20 @@ describe('Alert', () => {
   });
 
   it('renders children as content', () => {
-    render(<Alert><span>Custom child</span></Alert>);
+    render(
+      <Alert>
+        <span>Custom child</span>
+      </Alert>
+    );
     expect(screen.getByText('Custom child')).toBeInTheDocument();
   });
 
   it('renders message and children together', () => {
-    render(<Alert message="Msg"><span>Extra</span></Alert>);
+    render(
+      <Alert message="Msg">
+        <span>Extra</span>
+      </Alert>
+    );
     expect(screen.getByText('Msg')).toBeInTheDocument();
     expect(screen.getByText('Extra')).toBeInTheDocument();
   });
@@ -41,13 +49,10 @@ describe('Alert', () => {
   });
 
   // ─── Alert Types ──────────────────────────────────────────────────
-  it.each(['info', 'success', 'warning', 'error'])(
-    'applies "%s" type class',
-    (type) => {
-      const { container } = render(<Alert type={type} message="T" />);
-      expect(container.querySelector('[role="alert"]').className).toContain(type);
-    },
-  );
+  it.each(['info', 'success', 'warning', 'error'])('applies "%s" type class', type => {
+    const { container } = render(<Alert type={type} message="T" />);
+    expect(container.querySelector('[role="alert"]').className).toContain(type);
+  });
 
   it('defaults to info type', () => {
     const { container } = render(<Alert message="Default" />);
@@ -79,10 +84,7 @@ describe('Alert', () => {
 
   it('close button has correct aria-label', () => {
     render(<Alert message="A" onClose={vi.fn()} />);
-    expect(screen.getByRole('button')).toHaveAttribute(
-      'aria-label',
-      'common.closeNotification',
-    );
+    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'common.closeNotification');
   });
 
   // ─── Accessibility ────────────────────────────────────────────────

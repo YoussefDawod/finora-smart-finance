@@ -9,7 +9,7 @@ import { createTransactionSchema, getInitialFormValues } from '@/validators/tran
 // ============================================================================
 // MOCK Translation
 // ============================================================================
-const t = (key) => key;
+const t = key => key;
 
 describe('transactionFormSchema', () => {
   const schema = createTransactionSchema(t);

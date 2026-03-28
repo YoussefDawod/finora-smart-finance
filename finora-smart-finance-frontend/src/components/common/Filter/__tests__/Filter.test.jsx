@@ -11,14 +11,14 @@ import Filter from '../Filter';
 // Mock i18n
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de' },
   }),
 }));
 
 // Mock category utilities
 vi.mock('@/config/categoryConstants', () => ({
-  getCategoriesForType: (type) => {
+  getCategoriesForType: type => {
     if (type === 'income') return ['salary', 'freelance'];
     if (type === 'expense') return ['food', 'rent', 'transport'];
     return [];
@@ -26,7 +26,7 @@ vi.mock('@/config/categoryConstants', () => ({
 }));
 
 vi.mock('@/utils/categoryTranslations', () => ({
-  translateCategory: (cat) => `translated_${cat}`,
+  translateCategory: cat => `translated_${cat}`,
 }));
 
 /* eslint-disable no-unused-vars */
@@ -53,7 +53,7 @@ vi.mock('@/components/common/DateInput/DateInput', () => ({
       <input
         type="date"
         value={value || ''}
-        onChange={(e) => onChange?.(e.target.value)}
+        onChange={e => onChange?.(e.target.value)}
         aria-label={ariaLabel || label}
         disabled={disabled}
       />
@@ -91,7 +91,10 @@ describe('Filter', () => {
 
   it('starts with dropdown closed', () => {
     renderFilter();
-    expect(screen.getByRole('button', { name: /filters\.open/i })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /filters\.open/i })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('opens dropdown on click', async () => {

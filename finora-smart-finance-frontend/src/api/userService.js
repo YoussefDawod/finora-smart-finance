@@ -1,7 +1,7 @@
 /**
  * @fileoverview User API Service
  * @description All user profile-related API calls
- * 
+ *
  * @module api/userService
  */
 
@@ -24,7 +24,8 @@ export const userService = {
    * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  updateProfile: (data, { signal } = {}) => client.put(ENDPOINTS.users.updateProfile, data, { signal }),
+  updateProfile: (data, { signal } = {}) =>
+    client.put(ENDPOINTS.users.updateProfile, data, { signal }),
 
   /**
    * Update user preferences
@@ -33,7 +34,8 @@ export const userService = {
    * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ data: object }>>}
    */
-  updatePreferences: (data, { signal } = {}) => client.put(ENDPOINTS.users.updatePreferences, data, { signal }),
+  updatePreferences: (data, { signal } = {}) =>
+    client.put(ENDPOINTS.users.updatePreferences, data, { signal }),
 
   /**
    * Change password (Backend erwartet POST)
@@ -45,7 +47,11 @@ export const userService = {
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
   changePassword: (currentPassword, newPassword, confirmPassword, { signal } = {}) =>
-    client.post(ENDPOINTS.users.password, { currentPassword, newPassword, confirmPassword }, { signal }),
+    client.post(
+      ENDPOINTS.users.password,
+      { currentPassword, newPassword, confirmPassword },
+      { signal }
+    ),
 
   /**
    * Get budget status
@@ -60,8 +66,7 @@ export const userService = {
    * @param {string} password
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  deleteAccount: (password) =>
-    client.delete(ENDPOINTS.users.deleteAccount, { data: { password } }),
+  deleteAccount: password => client.delete(ENDPOINTS.users.deleteAccount, { data: { password } }),
 
   /**
    * Get newsletter subscription status
@@ -78,7 +83,8 @@ export const userService = {
    * @param {AbortSignal} [options.signal] - AbortController signal
    * @returns {Promise<AxiosResponse<{ subscribed: boolean }>>}
    */
-  toggleNewsletter: (language, { signal } = {}) => client.post(ENDPOINTS.newsletter.toggle, { language }, { signal }),
+  toggleNewsletter: (language, { signal } = {}) =>
+    client.post(ENDPOINTS.newsletter.toggle, { language }, { signal }),
 
   // ============================================
   // Lifecycle

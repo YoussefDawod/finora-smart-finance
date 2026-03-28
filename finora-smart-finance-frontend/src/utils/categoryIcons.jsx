@@ -102,7 +102,7 @@ export const STATE_ICONS = {
  * @param {string} category - Name der Kategorie
  * @returns {React.ComponentType} - Icon-Komponente
  */
-const getCategoryIcon = (category) => {
+const getCategoryIcon = category => {
   return CATEGORY_ICONS[category] || DEFAULT_CATEGORY_ICON;
 };
 

@@ -111,7 +111,11 @@ function TransactionQuota({ quota, totalItems = 0, isGuest = false }) {
             <motion.div
               className={`${styles.progressFill} ${styles[level]}`}
               initial={shouldAnimate ? { width: 0 } : false}
-              animate={shouldAnimate ? { width: `${Math.min(percent, 100)}%` } : { width: `${Math.min(percent, 100)}%` }}
+              animate={
+                shouldAnimate
+                  ? { width: `${Math.min(percent, 100)}%` }
+                  : { width: `${Math.min(percent, 100)}%` }
+              }
               transition={{ duration: 0.5, ease: 'easeOut' }}
             />
           </div>
@@ -120,9 +124,7 @@ function TransactionQuota({ quota, totalItems = 0, isGuest = false }) {
 
       {/* Label (nur für Gäste ohne Progress-Bar) */}
       {!hasQuota && (
-        <span className={styles.label}>
-          {t('transactions.quota.label', 'Transaktionen')}
-        </span>
+        <span className={styles.label}>{t('transactions.quota.label', 'Transaktionen')}</span>
       )}
 
       {/* Warnhinweis */}
@@ -130,9 +132,7 @@ function TransactionQuota({ quota, totalItems = 0, isGuest = false }) {
         <div className={`${styles.warning} ${styles[level]}`}>
           <FiAlertTriangle aria-hidden="true" />
           <span>
-            {level === 'danger'
-              ? t('lifecycle.quota.exceeded')
-              : t('transactions.quota.nearLimit')}
+            {level === 'danger' ? t('lifecycle.quota.exceeded') : t('transactions.quota.nearLimit')}
           </span>
         </div>
       )}

@@ -28,11 +28,7 @@ const Alert = ({
   const hasContent = Boolean(message || children);
 
   return (
-    <div
-      className={`${styles.alert} ${styles[type]} ${className}`}
-      role="alert"
-      aria-live="polite"
-    >
+    <div className={`${styles.alert} ${styles[type]} ${className}`} role="alert" aria-live="polite">
       <div className={styles.iconWrapper}>
         <Icon aria-hidden="true" />
       </div>

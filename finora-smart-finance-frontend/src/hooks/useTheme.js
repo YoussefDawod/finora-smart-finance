@@ -2,10 +2,10 @@
  * @fileoverview useTheme Custom Hook
  * @description Wrapper around ThemeContext for theme management
  * Supports Light and Dark themes
- * 
+ *
  * USAGE:
  * const { theme, toggleTheme } = useTheme()
- * 
+ *
  * @module useTheme
  */
 
@@ -23,10 +23,10 @@ import { ThemeContext } from '@/context/ThemeContext';
  * @returns {Function} setTheme - Set theme to light|dark
  * @returns {Function} toggleTheme - Toggle between light and dark
  * @returns {Function} resetToSystemPreference - Reset to system preference
- * 
+ *
  * @example
  * const { theme, toggleTheme } = useTheme();
- * 
+ *
  * return (
  *   <div>
  *     <button onClick={toggleTheme}>
@@ -41,7 +41,7 @@ export function useTheme() {
   if (context === undefined) {
     throw new Error(
       'useTheme must be used within a ThemeProvider. ' +
-      'Make sure your component tree is wrapped with <ThemeProvider>.'
+        'Make sure your component tree is wrapped with <ThemeProvider>.'
     );
   }
 

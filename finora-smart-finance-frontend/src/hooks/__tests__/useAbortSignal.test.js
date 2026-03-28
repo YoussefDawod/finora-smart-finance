@@ -90,7 +90,7 @@ describe('useAbortSignal', () => {
     });
 
     // Alle bis auf das letzte sollten aborted sein
-    signals.slice(0, -1).forEach((s) => {
+    signals.slice(0, -1).forEach(s => {
       expect(s.aborted).toBe(true);
     });
     expect(signals[4].aborted).toBe(false);

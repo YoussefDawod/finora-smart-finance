@@ -10,10 +10,7 @@ import { useForm } from '@/hooks/useForm';
 import { useToast } from '@/hooks/useToast';
 import { useTransactions } from '@/hooks/useTransactions';
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '@/config/categoryConstants';
-import {
-  createTransactionSchema,
-  getInitialFormValues,
-} from '@/validators/transactionFormSchema';
+import { createTransactionSchema, getInitialFormValues } from '@/validators/transactionFormSchema';
 
 /**
  * Custom Hook für Transaction Form State Management
@@ -25,27 +22,17 @@ import {
 export const useTransactionForm = ({ initialData = null, onSuccess }) => {
   const { t } = useTranslation();
   const { addToast } = useToast();
-  const {
-    createTransaction,
-    updateTransaction,
-    loading: apiLoading,
-    error,
-  } = useTransactions();
+  const { createTransaction, updateTransaction, loading: apiLoading, error } = useTransactions();
 
   // ──────────────────────────────────────────────────────────────────────
   // TRANSACTION TYPE STATE
   // ──────────────────────────────────────────────────────────────────────
-  const [transactionType, setTransactionType] = useState(
-    initialData?.type || 'expense'
-  );
+  const [transactionType, setTransactionType] = useState(initialData?.type || 'expense');
 
   // ──────────────────────────────────────────────────────────────────────
   // VALIDATION SCHEMA (memoized mit i18n)
   // ──────────────────────────────────────────────────────────────────────
-  const transactionSchema = useMemo(
-    () => createTransactionSchema(t),
-    [t]
-  );
+  const transactionSchema = useMemo(() => createTransactionSchema(t), [t]);
 
   // ──────────────────────────────────────────────────────────────────────
   // FORM HOOK INTEGRATION
@@ -65,7 +52,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
     isSubmitting: formSubmitting,
   } = useForm(
     getInitialFormValues(initialData),
-    async (values) => {
+    async values => {
       try {
         const submitData = {
           ...values,
@@ -86,10 +73,7 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
         console.error('[TransactionForm] Submit error:', err);
         // Don't show toast for 401/403 - the API client already handles this
         if (err.response?.status !== 401 && err.response?.status !== 403) {
-          addToast(
-            err.response?.data?.message || t('transactions.saveError'),
-            'error'
-          );
+          addToast(err.response?.data?.message || t('transactions.saveError'), 'error');
         }
       }
     },
@@ -97,13 +81,15 @@ export const useTransactionForm = ({ initialData = null, onSuccess }) => {
   );
 
   // Keep ref in sync (runs after render, before any user interaction)
-  useEffect(() => { resetFormRef.current = resetForm; }, [resetForm]);
+  useEffect(() => {
+    resetFormRef.current = resetForm;
+  }, [resetForm]);
 
   // ──────────────────────────────────────────────────────────────────────
   // TYPE CHANGE HANDLER
   // ──────────────────────────────────────────────────────────────────────
   const handleTypeChange = useCallback(
-    (newType) => {
+    newType => {
       setTransactionType(newType);
       setFieldValue('type', newType);
       setFieldValue('category', ''); // Reset category when type changes

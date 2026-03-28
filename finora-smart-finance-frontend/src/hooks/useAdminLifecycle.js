@@ -40,9 +40,7 @@ export function useAdminLifecycle() {
       setStats(res.data?.data || res.data);
     } catch (err) {
       if (isAborted(err)) return;
-      setError(
-        err.response?.data?.message || err.message || 'Failed to load lifecycle stats',
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to load lifecycle stats');
     } finally {
       if (!signal.aborted) setLoading(false);
     }
@@ -50,7 +48,7 @@ export function useAdminLifecycle() {
 
   // ── Fetch User Detail ───────────────────────────
 
-  const fetchUserDetail = useCallback(async (userId) => {
+  const fetchUserDetail = useCallback(async userId => {
     setActionLoading('detail');
     try {
       const res = await adminService.getUserLifecycleDetail(userId);
@@ -69,21 +67,24 @@ export function useAdminLifecycle() {
 
   // ── Reset User Retention ────────────────────────
 
-  const resetRetention = useCallback(async (userId) => {
-    setActionLoading('reset');
-    try {
-      await adminService.resetUserRetention(userId);
-      if (!mountedRef.current) return;
+  const resetRetention = useCallback(
+    async userId => {
+      setActionLoading('reset');
+      try {
+        await adminService.resetUserRetention(userId);
+        if (!mountedRef.current) return;
 
-      // Refresh stats + user detail
-      await fetchStats();
-      if (userDetail?.user?._id === userId) {
-        await fetchUserDetail(userId);
+        // Refresh stats + user detail
+        await fetchStats();
+        if (userDetail?.user?._id === userId) {
+          await fetchUserDetail(userId);
+        }
+      } finally {
+        if (mountedRef.current) setActionLoading(null);
       }
-    } finally {
-      if (mountedRef.current) setActionLoading(null);
-    }
-  }, [fetchStats, fetchUserDetail, userDetail]);
+    },
+    [fetchStats, fetchUserDetail, userDetail]
+  );
 
   // ── Trigger Processing ──────────────────────────
 
@@ -121,19 +122,31 @@ export function useAdminLifecycle() {
   useEffect(() => {
     mountedRef.current = true;
     fetchStats();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchStats]);
 
   // ── Memoized Actions ────────────────────────────
 
-  const actions = useMemo(() => ({
-    refresh: fetchStats,
-    fetchUserDetail,
-    resetRetention,
-    triggerProcessing,
-    dismissTriggerResult,
-    closeDetail,
-  }), [fetchStats, fetchUserDetail, resetRetention, triggerProcessing, dismissTriggerResult, closeDetail]);
+  const actions = useMemo(
+    () => ({
+      refresh: fetchStats,
+      fetchUserDetail,
+      resetRetention,
+      triggerProcessing,
+      dismissTriggerResult,
+      closeDetail,
+    }),
+    [
+      fetchStats,
+      fetchUserDetail,
+      resetRetention,
+      triggerProcessing,
+      dismissTriggerResult,
+      closeDetail,
+    ]
+  );
 
   return {
     stats,

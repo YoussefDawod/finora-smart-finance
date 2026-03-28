@@ -26,7 +26,10 @@ export function useAdminTransactions(initialParams = {}) {
   // ── State ───────────────────────────────────────
   const [transactions, setTransactions] = useState([]);
   const [pagination, setPagination] = useState({
-    total: 0, page: DEFAULT_PAGE, pages: 1, limit: DEFAULT_LIMIT,
+    total: 0,
+    page: DEFAULT_PAGE,
+    pages: 1,
+    limit: DEFAULT_LIMIT,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,7 +52,7 @@ export function useAdminTransactions(initialParams = {}) {
   // Sync userId wenn sich der initialParams.userId ändert (z.B. User-Wechsel)
   useEffect(() => {
     const newId = initialParams.userId || '';
-    setUserId((prev) => (prev !== newId ? newId : prev));
+    setUserId(prev => (prev !== newId ? newId : prev));
   }, [initialParams.userId]);
 
   // ── Fetch Transactions ──────────────────────────
@@ -76,18 +79,24 @@ export function useAdminTransactions(initialParams = {}) {
 
       const data = res.data?.data || res.data;
       setTransactions(data.transactions || []);
-      setPagination(
-        data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT },
-      );
+      setPagination(data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT });
     } catch (err) {
       if (isAborted(err)) return;
-      setError(
-        err.response?.data?.message || err.message || 'Failed to load transactions',
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to load transactions');
     } finally {
       if (!signal.aborted) setLoading(false);
     }
-  }, [page, sort, debouncedSearch, typeFilter, categoryFilter, startDate, endDate, userId, createSignal]);
+  }, [
+    page,
+    sort,
+    debouncedSearch,
+    typeFilter,
+    categoryFilter,
+    startDate,
+    endDate,
+    userId,
+    createSignal,
+  ]);
 
   // Zurück auf Seite 1 bei Filteränderung
   useEffect(() => {
@@ -97,46 +106,65 @@ export function useAdminTransactions(initialParams = {}) {
   useEffect(() => {
     mountedRef.current = true;
     fetchTransactions();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchTransactions]);
 
   // ── Aktionen ────────────────────────────────────
 
-  const deleteTransaction = useCallback(async (transactionId) => {
-    setActionLoading(transactionId);
-    try {
-      const result = await adminService.deleteTransaction(transactionId);
-      if (!mountedRef.current) return { success: false };
-      await fetchTransactions();
-      return { success: true, data: result.data?.data || result.data };
-    } catch (err) {
-      if (!mountedRef.current) return { success: false };
-      return {
-        success: false,
-        error: err.response?.data?.message || err.message || 'Delete failed',
-      };
-    } finally {
-      if (mountedRef.current) setActionLoading(null);
-    }
-  }, [fetchTransactions]);
+  const deleteTransaction = useCallback(
+    async transactionId => {
+      setActionLoading(transactionId);
+      try {
+        const result = await adminService.deleteTransaction(transactionId);
+        if (!mountedRef.current) return { success: false };
+        await fetchTransactions();
+        return { success: true, data: result.data?.data || result.data };
+      } catch (err) {
+        if (!mountedRef.current) return { success: false };
+        return {
+          success: false,
+          error: err.response?.data?.message || err.message || 'Delete failed',
+        };
+      } finally {
+        if (mountedRef.current) setActionLoading(null);
+      }
+    },
+    [fetchTransactions]
+  );
 
   // ── Memoized Objekte ────────────────────────────
 
-  const actions = useMemo(() => ({
-    deleteTransaction,
-    refresh: fetchTransactions,
-  }), [deleteTransaction, fetchTransactions]);
+  const actions = useMemo(
+    () => ({
+      deleteTransaction,
+      refresh: fetchTransactions,
+    }),
+    [deleteTransaction, fetchTransactions]
+  );
 
-  const filters = useMemo(() => ({
-    search, setSearch,
-    typeFilter, setTypeFilter,
-    categoryFilter, setCategoryFilter,
-    startDate, setStartDate,
-    endDate, setEndDate,
-    sort, setSort,
-    page, setPage,
-    userId, setUserId,
-  }), [search, typeFilter, categoryFilter, startDate, endDate, sort, page, userId]);
+  const filters = useMemo(
+    () => ({
+      search,
+      setSearch,
+      typeFilter,
+      setTypeFilter,
+      categoryFilter,
+      setCategoryFilter,
+      startDate,
+      setStartDate,
+      endDate,
+      setEndDate,
+      sort,
+      setSort,
+      page,
+      setPage,
+      userId,
+      setUserId,
+    }),
+    [search, typeFilter, categoryFilter, startDate, endDate, sort, page, userId]
+  );
 
   return {
     transactions,

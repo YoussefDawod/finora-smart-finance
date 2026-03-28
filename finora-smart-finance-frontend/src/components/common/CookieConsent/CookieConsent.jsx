@@ -42,7 +42,7 @@ export default function CookieConsent() {
   useEffect(() => {
     if (!isVisible) return;
 
-    const handleEscape = (e) => {
+    const handleEscape = e => {
       if (e.key === 'Escape') handleClose();
     };
 
@@ -65,7 +65,7 @@ export default function CookieConsent() {
     }, 100);
 
     // Tab-Trap: Zirkulation innerhalb des Banners
-    const handleTabKey = (e) => {
+    const handleTabKey = e => {
       if (e.key !== 'Tab' || !bannerRef.current) return;
       const focusableElements = bannerRef.current.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'

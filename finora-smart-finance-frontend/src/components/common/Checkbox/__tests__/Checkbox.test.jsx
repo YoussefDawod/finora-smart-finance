@@ -17,7 +17,9 @@ describe('Checkbox', () => {
   it('renders with children instead of label', () => {
     render(
       <Checkbox checked={false} onChange={() => {}}>
-        <span>Rich label with <a href="/privacy">link</a></span>
+        <span>
+          Rich label with <a href="/privacy">link</a>
+        </span>
       </Checkbox>
     );
     expect(screen.getByText('link')).toBeInTheDocument();
@@ -137,9 +139,7 @@ describe('Checkbox', () => {
   });
 
   it('has aria-hidden checkmark span', () => {
-    const { container } = render(
-      <Checkbox label="Test" checked={false} onChange={() => {}} />
-    );
+    const { container } = render(<Checkbox label="Test" checked={false} onChange={() => {}} />);
     const checkmark = container.querySelector('[aria-hidden="true"]');
     expect(checkmark).toBeInTheDocument();
   });

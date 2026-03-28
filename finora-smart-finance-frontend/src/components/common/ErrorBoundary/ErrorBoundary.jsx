@@ -15,7 +15,7 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     // You can also log the error to an error reporting service
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({ errorInfo });
   }
 
@@ -46,25 +46,27 @@ class ErrorBoundary extends React.Component {
     this.setState({ hasError: false, error: null, errorInfo: null });
     // Optional: reload the page or trigger a re-fetch if a function is passed
     if (this.props.onRetry) {
-        this.props.onRetry();
+      this.props.onRetry();
     }
   };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-          return this.props.fallback;
+        return this.props.fallback;
       }
-      
+
       return (
-        <div style={{ 
-            padding: '2rem', 
-            textAlign: 'center', 
-            backgroundColor: 'var(--surface)', 
+        <div
+          style={{
+            padding: '2rem',
+            textAlign: 'center',
+            backgroundColor: 'var(--surface)',
             borderRadius: 'var(--r-md)',
             border: '1px solid var(--border)',
-            margin: '1rem'
-        }}>
+            margin: '1rem',
+          }}
+        >
           <h2>{i18n.t('common.errors.somethingWrong')}</h2>
           <p style={{ color: 'var(--error)', marginBottom: '1rem' }}>
             {this.state.error && this.state.error.toString()}
@@ -79,7 +81,7 @@ class ErrorBoundary extends React.Component {
       );
     }
 
-    return this.props.children; 
+    return this.props.children;
   }
 }
 

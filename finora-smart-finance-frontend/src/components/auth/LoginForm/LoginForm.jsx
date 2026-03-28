@@ -1,7 +1,7 @@
 /**
  * @fileoverview LoginForm Component - Premium Redesign
  * @description Modern login form with name-based authentication
- * 
+ *
  * FEATURES:
  * - Username and password inputs
  * - Remember me checkbox
@@ -9,7 +9,7 @@
  * - Loading state with spinner
  * - Error display with dismiss
  * - Forgot password link
- * 
+ *
  * @module components/auth/LoginForm
  */
 
@@ -19,12 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { parseApiError } from '@/api/errorHandler';
-import { 
-  FiUser, 
-  FiArrowRight,
-  FiArrowLeft,
-  FiCheck,
-} from 'react-icons/fi';
+import { FiUser, FiArrowRight, FiArrowLeft, FiCheck } from 'react-icons/fi';
 import Checkbox from '@/components/common/Checkbox/Checkbox';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import PasswordInput from '../PasswordInput/PasswordInput';
@@ -56,13 +51,13 @@ export default function LoginForm() {
   // VALIDATION
   // ============================================
 
-  const validateName = (name) => {
+  const validateName = name => {
     if (!name) return t('auth.login.validation.usernameRequired');
     if (name.length < 3) return t('auth.login.validation.usernameMin');
     return '';
   };
 
-  const validatePassword = (password) => {
+  const validatePassword = password => {
     if (!password) return t('auth.login.validation.passwordRequired');
     return '';
   };
@@ -80,7 +75,7 @@ export default function LoginForm() {
   };
 
   // Get field status
-  const getFieldStatus = (field) => {
+  const getFieldStatus = field => {
     if (!touched[field]) return null;
     return errors[field] ? 'error' : 'valid';
   };
@@ -89,47 +84,41 @@ export default function LoginForm() {
   // EVENT HANDLERS
   // ============================================
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
-    
-    setFormData((prev) => ({
+
+    setFormData(prev => ({
       ...prev,
       [name]: newValue,
     }));
 
     // Validate on change if field was touched
     if (touched[name]) {
-      const error = name === 'name' 
-        ? validateName(value) 
-        : name === 'password' 
-          ? validatePassword(value) 
-          : '';
-      setErrors((prev) => ({ ...prev, [name]: error }));
+      const error =
+        name === 'name' ? validateName(value) : name === 'password' ? validatePassword(value) : '';
+      setErrors(prev => ({ ...prev, [name]: error }));
     }
 
     // Clear API error on input
     if (apiError) setApiError('');
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = e => {
     const { name, value } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    
-    const error = name === 'name' 
-      ? validateName(value) 
-      : name === 'password' 
-        ? validatePassword(value) 
-        : '';
-    setErrors((prev) => ({ ...prev, [name]: error }));
+    setTouched(prev => ({ ...prev, [name]: true }));
+
+    const error =
+      name === 'name' ? validateName(value) : name === 'password' ? validatePassword(value) : '';
+    setErrors(prev => ({ ...prev, [name]: error }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
+
     // Mark all as touched
     setTouched({ name: true, password: true });
-    
+
     // Validate form
     if (!validateForm()) {
       toast.warning(t('auth.login.validation.formInvalid'));
@@ -191,13 +180,11 @@ export default function LoginForm() {
             aria-invalid={nameStatus === 'error'}
             aria-describedby={errors.name ? 'name-error' : undefined}
           />
-          {nameStatus === 'valid' && (
-            <FiCheck className={styles.statusIcon} />
-          )}
+          {nameStatus === 'valid' && <FiCheck className={styles.statusIcon} />}
         </div>
         <AnimatePresence>
           {errors.name && touched.name && (
-            <motion.span 
+            <motion.span
               id="name-error"
               className={styles.errorMessage}
               initial={shouldAnimate ? { opacity: 0, y: -4 } : {}}
@@ -233,7 +220,7 @@ export default function LoginForm() {
         />
         <AnimatePresence>
           {errors.password && touched.password && (
-            <motion.span 
+            <motion.span
               id="password-error"
               className={styles.errorMessage}
               initial={shouldAnimate ? { opacity: 0, y: -4 } : {}}
@@ -262,11 +249,7 @@ export default function LoginForm() {
       </div>
 
       {/* Submit Button */}
-      <button
-        type="submit"
-        className={styles.submitButton}
-        disabled={isLoading || !isFormValid}
-      >
+      <button type="submit" className={styles.submitButton} disabled={isLoading || !isFormValid}>
         {isLoading ? (
           <>
             <span className={styles.spinner} />
@@ -275,7 +258,11 @@ export default function LoginForm() {
         ) : (
           <>
             <span>{t('auth.login.submit')}</span>
-            {isRtl ? <FiArrowLeft className={styles.buttonIcon} /> : <FiArrowRight className={styles.buttonIcon} />}
+            {isRtl ? (
+              <FiArrowLeft className={styles.buttonIcon} />
+            ) : (
+              <FiArrowRight className={styles.buttonIcon} />
+            )}
           </>
         )}
       </button>

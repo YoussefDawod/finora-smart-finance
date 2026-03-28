@@ -25,7 +25,7 @@ vi.mock('@/hooks', async () => {
   const actual = await vi.importActual('@/hooks');
   return {
     ...actual,
-    useDebounce: (val) => val,
+    useDebounce: val => val,
   };
 });
 
@@ -92,7 +92,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           { page: 1, limit: 10, sort: '-createdAt' },
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -188,7 +188,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ role: 'admin' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -205,7 +205,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ isActive: 'true' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -222,7 +222,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ isVerified: 'true' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -239,7 +239,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ search: 'alice' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -260,7 +260,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ sort: 'name' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -281,7 +281,7 @@ describe('useAdminUsers', () => {
       await waitFor(() => {
         expect(adminService.getUsers).toHaveBeenCalledWith(
           expect.objectContaining({ page: 2 }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -406,9 +406,9 @@ describe('useAdminUsers', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolve;
       adminService.getUsers.mockReturnValue(
-        new Promise((r) => {
+        new Promise(r => {
           resolve = r;
-        }),
+        })
       );
 
       const { unmount } = renderHook(() => useAdminUsers());

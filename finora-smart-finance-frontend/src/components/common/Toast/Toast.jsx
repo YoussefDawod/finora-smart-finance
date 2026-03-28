@@ -2,12 +2,12 @@
  * @fileoverview Toast Notification Component
  * @description Individual toast notification with auto-dismiss, swipe-to-dismiss,
  * and action button support. Uses a phase state machine for clean animations.
- * 
+ *
  * ANIMATION APPROACH:
  * All exit animations use inline CSS transitions (not keyframe animations).
  * This ensures animations always start from the toast's current position,
  * avoiding "jump to center" artifacts during swipe gestures.
- * 
+ *
  * PHASES:
  * - idle:       Normal display state
  * - swiping:    Finger actively on screen, toast follows finger
@@ -15,7 +15,7 @@
  * - exit-left:  Swipe-left exit animation
  * - exit-right: Swipe-right exit animation
  * - exit-up:    Auto-dismiss / close button exit animation
- * 
+ *
  * @module components/common/Toast
  */
 
@@ -33,18 +33,11 @@ const TOAST_ICONS = {
 };
 
 // Animation timing constants
-const EXIT_DURATION = 300;   // ms - exit animation
-const SNAP_DURATION = 200;   // ms - snap-back animation
-const SWIPE_THRESHOLD = 80;  // px - minimum distance for swipe dismiss
+const EXIT_DURATION = 300; // ms - exit animation
+const SNAP_DURATION = 200; // ms - snap-back animation
+const SWIPE_THRESHOLD = 80; // px - minimum distance for swipe dismiss
 
-export default function Toast({ 
-  id,
-  message, 
-  type = 'info', 
-  duration = 5000,
-  action,
-  onClose 
-}) {
+export default function Toast({ id, message, type = 'info', duration = 5000, action, onClose }) {
   const { t } = useTranslation();
   const [progress, setProgress] = useState(100);
   const [phase, setPhase] = useState('idle');
@@ -58,12 +51,15 @@ export default function Toast({
    * Trigger exit animation and schedule DOM removal.
    * Uses ref guard to prevent double-triggering.
    */
-  const triggerExit = useCallback((exitPhase) => {
-    if (isExitingRef.current) return;
-    isExitingRef.current = true;
-    setPhase(exitPhase);
-    setTimeout(() => onClose?.(id), EXIT_DURATION);
-  }, [id, onClose]);
+  const triggerExit = useCallback(
+    exitPhase => {
+      if (isExitingRef.current) return;
+      isExitingRef.current = true;
+      setPhase(exitPhase);
+      setTimeout(() => onClose?.(id), EXIT_DURATION);
+    },
+    [id, onClose]
+  );
 
   // ============================================
   // AUTO-DISMISS TIMER + PROGRESS BAR
@@ -89,13 +85,13 @@ export default function Toast({
   // ============================================
   // TOUCH / SWIPE HANDLERS
   // ============================================
-  const handleTouchStart = (e) => {
+  const handleTouchStart = e => {
     if (isExitingRef.current || phase === 'snapping') return;
     touchStartXRef.current = e.touches[0].clientX;
     setPhase('swiping');
   };
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = e => {
     if (phase !== 'swiping' || touchStartXRef.current === null) return;
     setTranslateX(e.touches[0].clientX - touchStartXRef.current);
   };
@@ -170,7 +166,7 @@ export default function Toast({
   };
 
   return (
-    <div 
+    <div
       className={`${styles.toast} ${styles[type]}`}
       role="alert"
       aria-live="polite"
@@ -188,11 +184,7 @@ export default function Toast({
 
       <div className={styles.actions}>
         {action && (
-          <button
-            type="button"
-            className={styles.actionButton}
-            onClick={handleAction}
-          >
+          <button type="button" className={styles.actionButton} onClick={handleAction}>
             {action.label}
           </button>
         )}
@@ -208,10 +200,7 @@ export default function Toast({
 
       {duration > 0 && (
         <div className={styles.progressBar}>
-          <div 
-            className={styles.progressFill}
-            style={{ width: `${progress}%` }}
-          />
+          <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
       )}
     </div>

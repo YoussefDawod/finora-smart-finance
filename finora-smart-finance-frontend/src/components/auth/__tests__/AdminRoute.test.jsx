@@ -23,7 +23,7 @@ vi.mock('@/hooks', () => ({
 }));
 
 vi.mock('@/components/common/Skeleton/Skeleton', () => ({
-  default: (props) => <div data-testid="skeleton" {...props} />,
+  default: props => <div data-testid="skeleton" {...props} />,
 }));
 
 // ── Helpers ──────────────────────────────────────────────
@@ -46,7 +46,7 @@ const renderAdminRoute = (initialEntry = '/admin') => {
         <Route path="/login" element={<div data-testid="login-page">Login</div>} />
         <Route path="/dashboard" element={<div data-testid="dashboard-page">Dashboard</div>} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 

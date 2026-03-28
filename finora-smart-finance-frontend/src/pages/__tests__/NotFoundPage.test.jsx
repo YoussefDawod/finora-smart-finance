@@ -11,7 +11,7 @@ import NotFoundPage from '../NotFoundPage';
 // Mock react-i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => {
+    t: key => {
       const translations = {
         'errorPages.notFoundTitle': 'Seite nicht gefunden',
         'errorPages.notFoundSubtitle': 'Die Seite existiert nicht oder wurde verschoben.',
@@ -43,7 +43,9 @@ describe('NotFoundPage', () => {
 
   it('renders error subtitle', () => {
     renderPage();
-    expect(screen.getByText('Die Seite existiert nicht oder wurde verschoben.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Die Seite existiert nicht oder wurde verschoben.')
+    ).toBeInTheDocument();
   });
 
   it('renders link back to dashboard', () => {

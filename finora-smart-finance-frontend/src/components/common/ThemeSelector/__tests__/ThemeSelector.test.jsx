@@ -11,7 +11,7 @@ import ThemeSelector from '../ThemeSelector';
 // Mock i18n
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de', dir: () => 'ltr' },
   }),
 }));
@@ -40,9 +40,7 @@ vi.mock('framer-motion', () => ({
     div: ({ children, initial, animate, exit, transition, ...props }) => (
       <div {...props}>{children}</div>
     ),
-    span: ({ children, animate, transition, ...props }) => (
-      <span {...props}>{children}</span>
-    ),
+    span: ({ children, animate, transition, ...props }) => <span {...props}>{children}</span>,
   },
   AnimatePresence: ({ children, initial, ...props }) => children,
 }));
@@ -76,7 +74,10 @@ describe('ThemeSelector', () => {
   // ─── Trigger Button ──────────────────────────────────────────────
   it('starts with dropdown closed', () => {
     render(<ThemeSelector />);
-    expect(screen.getByRole('button', { name: /themeSelector\.ariaLabel/i })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /themeSelector\.ariaLabel/i })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('opens dropdown on click', async () => {
@@ -136,7 +137,10 @@ describe('ThemeSelector', () => {
     render(<ThemeSelector />);
     await user.click(screen.getByRole('button', { name: /themeSelector\.ariaLabel/i }));
     await user.click(screen.getByText('settings.appearance.themeDark'));
-    expect(screen.getByRole('button', { name: /themeSelector\.ariaLabel/i })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByRole('button', { name: /themeSelector\.ariaLabel/i })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   // ─── Close on Escape ──────────────────────────────────────────────

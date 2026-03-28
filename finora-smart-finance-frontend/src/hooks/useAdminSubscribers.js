@@ -26,7 +26,10 @@ export function useAdminSubscribers(initialParams = {}) {
   // ── State ───────────────────────────────────────
   const [subscribers, setSubscribers] = useState([]);
   const [pagination, setPagination] = useState({
-    total: 0, page: DEFAULT_PAGE, pages: 1, limit: DEFAULT_LIMIT,
+    total: 0,
+    page: DEFAULT_PAGE,
+    pages: 1,
+    limit: DEFAULT_LIMIT,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -65,14 +68,10 @@ export function useAdminSubscribers(initialParams = {}) {
 
       const data = res.data?.data || res.data;
       setSubscribers(data.subscribers || []);
-      setPagination(
-        data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT },
-      );
+      setPagination(data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT });
     } catch (err) {
       if (isAborted(err)) return;
-      setError(
-        err.response?.data?.message || err.message || 'Failed to load subscribers',
-      );
+      setError(err.response?.data?.message || err.message || 'Failed to load subscribers');
     } finally {
       if (!signal.aborted) setLoading(false);
     }
@@ -86,43 +85,59 @@ export function useAdminSubscribers(initialParams = {}) {
   useEffect(() => {
     mountedRef.current = true;
     fetchSubscribers();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchSubscribers]);
 
   // ── Aktionen ────────────────────────────────────
 
-  const deleteSubscriber = useCallback(async (subscriberId) => {
-    setActionLoading(subscriberId);
-    try {
-      const result = await adminService.deleteSubscriber(subscriberId);
-      if (!mountedRef.current) return { success: false };
-      await fetchSubscribers();
-      return { success: true, data: result.data?.data || result.data };
-    } catch (err) {
-      if (!mountedRef.current) return { success: false };
-      return {
-        success: false,
-        error: err.response?.data?.message || err.message || 'Delete failed',
-      };
-    } finally {
-      if (mountedRef.current) setActionLoading(null);
-    }
-  }, [fetchSubscribers]);
+  const deleteSubscriber = useCallback(
+    async subscriberId => {
+      setActionLoading(subscriberId);
+      try {
+        const result = await adminService.deleteSubscriber(subscriberId);
+        if (!mountedRef.current) return { success: false };
+        await fetchSubscribers();
+        return { success: true, data: result.data?.data || result.data };
+      } catch (err) {
+        if (!mountedRef.current) return { success: false };
+        return {
+          success: false,
+          error: err.response?.data?.message || err.message || 'Delete failed',
+        };
+      } finally {
+        if (mountedRef.current) setActionLoading(null);
+      }
+    },
+    [fetchSubscribers]
+  );
 
   // ── Memoized Objekte ────────────────────────────
 
-  const actions = useMemo(() => ({
-    deleteSubscriber,
-    refresh: fetchSubscribers,
-  }), [deleteSubscriber, fetchSubscribers]);
+  const actions = useMemo(
+    () => ({
+      deleteSubscriber,
+      refresh: fetchSubscribers,
+    }),
+    [deleteSubscriber, fetchSubscribers]
+  );
 
-  const filters = useMemo(() => ({
-    search, setSearch,
-    confirmedFilter, setConfirmedFilter,
-    languageFilter, setLanguageFilter,
-    sort, setSort,
-    page, setPage,
-  }), [search, confirmedFilter, languageFilter, sort, page]);
+  const filters = useMemo(
+    () => ({
+      search,
+      setSearch,
+      confirmedFilter,
+      setConfirmedFilter,
+      languageFilter,
+      setLanguageFilter,
+      sort,
+      setSort,
+      page,
+      setPage,
+    }),
+    [search, confirmedFilter, languageFilter, sort, page]
+  );
 
   return {
     subscribers,

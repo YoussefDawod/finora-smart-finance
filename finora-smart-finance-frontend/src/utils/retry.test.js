@@ -18,10 +18,7 @@ describe('retryAsync', () => {
   });
 
   it('returns result after retry', async () => {
-    const task = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('fail'))
-      .mockResolvedValue('ok');
+    const task = vi.fn().mockRejectedValueOnce(new Error('fail')).mockResolvedValue('ok');
 
     const result = await retryAsync(task, { retries: 2, delay: 1 });
     expect(result).toBe('ok');
@@ -52,18 +49,15 @@ describe('retryAsync', () => {
     const task = vi.fn().mockRejectedValue(new Error('not retryable'));
     const shouldRetry = vi.fn().mockReturnValue(false);
 
-    await expect(
-      retryAsync(task, { retries: 3, delay: 1, shouldRetry })
-    ).rejects.toThrow('not retryable');
+    await expect(retryAsync(task, { retries: 3, delay: 1, shouldRetry })).rejects.toThrow(
+      'not retryable'
+    );
     expect(task).toHaveBeenCalledTimes(1);
     expect(shouldRetry).toHaveBeenCalledTimes(1);
   });
 
   it('retries when shouldRetry returns true', async () => {
-    const task = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('retryable'))
-      .mockResolvedValue('ok');
+    const task = vi.fn().mockRejectedValueOnce(new Error('retryable')).mockResolvedValue('ok');
     const shouldRetry = vi.fn().mockReturnValue(true);
 
     const result = await retryAsync(task, { retries: 2, delay: 1, shouldRetry });
@@ -86,13 +80,9 @@ describe('retryAsync', () => {
 
     expect(onRetry).toHaveBeenCalledTimes(2);
     // First retry: attempt=1, delay=10*2^0=10
-    expect(onRetry.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ attempt: 1, delay: 10 })
-    );
+    expect(onRetry.mock.calls[0][0]).toEqual(expect.objectContaining({ attempt: 1, delay: 10 }));
     // Second retry: attempt=2, delay=10*2^1=20
-    expect(onRetry.mock.calls[1][0]).toEqual(
-      expect.objectContaining({ attempt: 2, delay: 20 })
-    );
+    expect(onRetry.mock.calls[1][0]).toEqual(expect.objectContaining({ attempt: 2, delay: 20 }));
   });
 
   // ──────────────────────────────────────────────────────────
@@ -137,10 +127,7 @@ describe('retryAsync', () => {
     vi.useFakeTimers();
     const onRetry = vi.fn();
 
-    const task = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('err'))
-      .mockResolvedValue('ok');
+    const task = vi.fn().mockRejectedValueOnce(new Error('err')).mockResolvedValue('ok');
 
     const promise = retryAsync(task, { onRetry });
 

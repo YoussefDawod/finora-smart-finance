@@ -105,9 +105,7 @@ describe('useAdminLifecycle', () => {
 
   describe('Fehlerbehandlung', () => {
     it('setzt error bei API-Fehler', async () => {
-      adminService.getLifecycleStats.mockRejectedValue(
-        new Error('Server Error'),
-      );
+      adminService.getLifecycleStats.mockRejectedValue(new Error('Server Error'));
 
       const { result } = renderHook(() => useAdminLifecycle());
 
@@ -228,9 +226,9 @@ describe('useAdminLifecycle', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolveStats;
       adminService.getLifecycleStats.mockReturnValue(
-        new Promise((resolve) => {
+        new Promise(resolve => {
           resolveStats = resolve;
-        }),
+        })
       );
 
       const { unmount } = renderHook(() => useAdminLifecycle());

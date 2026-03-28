@@ -30,8 +30,11 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/useCookieConsent', () => ({
   useCookieConsent: () => ({
-    noticeSeen: true, showNotice: false,
-    dismissNotice: vi.fn(), reopenNotice: vi.fn(), closeNotice: vi.fn(),
+    noticeSeen: true,
+    showNotice: false,
+    dismissNotice: vi.fn(),
+    reopenNotice: vi.fn(),
+    closeNotice: vi.fn(),
   }),
 }));
 
@@ -43,18 +46,22 @@ describe('FaqPage — Accordion', () => {
   });
 
   const renderPage = () =>
-    render(<MemoryRouter><FaqPage /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <FaqPage />
+      </MemoryRouter>
+    );
 
   it('rendert alle FAQ-Items', () => {
     renderPage();
-    mockQuestions.forEach((q) => {
+    mockQuestions.forEach(q => {
       expect(screen.getByText(q.question)).toBeInTheDocument();
     });
   });
 
   it('zeigt keine Antwort initial', () => {
     renderPage();
-    mockQuestions.forEach((q) => {
+    mockQuestions.forEach(q => {
       expect(screen.queryByText(q.answer)).not.toBeInTheDocument();
     });
   });

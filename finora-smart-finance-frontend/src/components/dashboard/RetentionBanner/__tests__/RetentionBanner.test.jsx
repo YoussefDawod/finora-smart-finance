@@ -61,9 +61,7 @@ describe('RetentionBanner', () => {
   // ──────────────────────────────────────────────────────────
   describe('Visibility', () => {
     it('should render nothing when lifecycleStatus is null', () => {
-      const { container } = render(
-        <RetentionBanner lifecycleStatus={null} />
-      );
+      const { container } = render(<RetentionBanner lifecycleStatus={null} />);
       expect(container.firstChild).toBeNull();
     });
 
@@ -88,16 +86,12 @@ describe('RetentionBanner', () => {
     });
 
     it('should render banner for gracePeriod phase', () => {
-      render(
-        <RetentionBanner lifecycleStatus={createLifecycleStatus({ phase: 'gracePeriod' })} />
-      );
+      render(<RetentionBanner lifecycleStatus={createLifecycleStatus({ phase: 'gracePeriod' })} />);
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
 
     it('should render banner for deleted phase', () => {
-      render(
-        <RetentionBanner lifecycleStatus={createLifecycleStatus({ phase: 'deleted' })} />
-      );
+      render(<RetentionBanner lifecycleStatus={createLifecycleStatus({ phase: 'deleted' })} />);
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
   });
@@ -110,43 +104,29 @@ describe('RetentionBanner', () => {
       render(
         <RetentionBanner lifecycleStatus={createLifecycleStatus({ oldTransactionCount: 42 })} />
       );
-      expect(
-        screen.getByText('lifecycle.retention.oldTransactions')
-      ).toBeInTheDocument();
+      expect(screen.getByText('lifecycle.retention.oldTransactions')).toBeInTheDocument();
     });
 
     it('should display no-old-transactions message when count is 0', () => {
       render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus({ oldTransactionCount: 0 })}
-        />
+        <RetentionBanner lifecycleStatus={createLifecycleStatus({ oldTransactionCount: 0 })} />
       );
       expect(screen.getByText('lifecycle.retention.noOldTransactions')).toBeInTheDocument();
     });
 
     it('should display days remaining countdown', () => {
-      render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus({ daysRemaining: 7 })}
-        />
-      );
+      render(<RetentionBanner lifecycleStatus={createLifecycleStatus({ daysRemaining: 7 })} />);
       expect(screen.getByText('lifecycle.retention.daysRemaining')).toBeInTheDocument();
     });
 
     it('should NOT display countdown when daysRemaining is 0', () => {
-      render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus({ daysRemaining: 0 })}
-        />
-      );
+      render(<RetentionBanner lifecycleStatus={createLifecycleStatus({ daysRemaining: 0 })} />);
       expect(screen.queryByText(/daysRemaining/)).not.toBeInTheDocument();
     });
 
     it('should display phase badge', () => {
       render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus({ phase: 'finalWarning' })}
-        />
+        <RetentionBanner lifecycleStatus={createLifecycleStatus({ phase: 'finalWarning' })} />
       );
       expect(screen.getByText('lifecycle.retention.phase.finalWarning')).toBeInTheDocument();
     });
@@ -170,12 +150,7 @@ describe('RetentionBanner', () => {
   describe('Actions', () => {
     it('should show export button when onExport is provided', () => {
       const onExport = vi.fn();
-      render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus()}
-          onExport={onExport}
-        />
-      );
+      render(<RetentionBanner lifecycleStatus={createLifecycleStatus()} onExport={onExport} />);
       const btn = screen.getByText('lifecycle.retention.exportButton');
       expect(btn).toBeInTheDocument();
       fireEvent.click(btn);
@@ -185,10 +160,7 @@ describe('RetentionBanner', () => {
     it('should show confirm button when onConfirmExport is provided', () => {
       const onConfirm = vi.fn();
       render(
-        <RetentionBanner
-          lifecycleStatus={createLifecycleStatus()}
-          onConfirmExport={onConfirm}
-        />
+        <RetentionBanner lifecycleStatus={createLifecycleStatus()} onConfirmExport={onConfirm} />
       );
       const btn = screen.getByText('lifecycle.retention.confirmExport');
       expect(btn).toBeInTheDocument();

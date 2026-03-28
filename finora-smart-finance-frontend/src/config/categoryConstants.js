@@ -84,6 +84,6 @@ const CATEGORIES_BY_TYPE = {
  * @param {string} type - 'income' oder 'expense'
  * @returns {string[]} - Array der Kategorien
  */
-export const getCategoriesForType = (type) => {
+export const getCategoriesForType = type => {
   return CATEGORIES_BY_TYPE[type] || ALL_CATEGORIES;
 };

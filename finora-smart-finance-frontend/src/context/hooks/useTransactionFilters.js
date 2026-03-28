@@ -33,7 +33,7 @@ export function useTransactionFilters(dispatch) {
   // FILTER
   // ──────────────────────────────────────────────────────────────────────
   const setFilter = useCallback(
-    (filterOptions) => {
+    filterOptions => {
       dispatch({ type: ACTIONS.SET_FILTER, payload: filterOptions });
     },
     [dispatch]

@@ -1,11 +1,9 @@
 /**
  * @fileoverview API Configuration
  * @description Environment-specific API settings
- * 
+ *
  * @module api/config
  */
-
- 
 
 // Empty baseURL - endpoints contain full path for proxy to work
 const RAW_API_URL = import.meta.env?.VITE_API_URL || '';

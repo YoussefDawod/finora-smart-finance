@@ -4,7 +4,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { formatCurrency, formatDate, formatTime, formatAmount, truncateText } from '@/utils/formatters';
+import {
+  formatCurrency,
+  formatDate,
+  formatTime,
+  formatAmount,
+  truncateText,
+} from '@/utils/formatters';
 
 describe('formatters', () => {
   // ──────────────────────────────────────────────────────────

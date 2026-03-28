@@ -42,17 +42,15 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
       className={styles.form}
       onSubmit={onFormSubmit}
       variants={formContainerVariants}
-      initial={shouldAnimate ? "hidden" : false}
-      animate={shouldAnimate ? "visible" : false}
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
     >
       {/* ERROR BANNER */}
       {error && (
-        <motion.div
-          className={styles.error}
-          variants={formItemVariants}
-          role="alert"
-        >
-          <span><FiAlertCircle /> {error}</span>
+        <motion.div className={styles.error} variants={formItemVariants} role="alert">
+          <span>
+            <FiAlertCircle /> {error}
+          </span>
         </motion.div>
       )}
 
@@ -68,7 +66,9 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
             onClick={() => handleTypeChange('income')}
             {...buttonMotionProps}
           >
-            <span className={styles.icon}><FiTrendingUp /></span>
+            <span className={styles.icon}>
+              <FiTrendingUp />
+            </span>
             <span>{t('transactions.income')}</span>
           </motion.button>
           <motion.button
@@ -79,7 +79,9 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
             onClick={() => handleTypeChange('expense')}
             {...buttonMotionProps}
           >
-            <span className={styles.icon}><FiTrendingDown /></span>
+            <span className={styles.icon}>
+              <FiTrendingDown />
+            </span>
             <span>{t('transactions.expense')}</span>
           </motion.button>
         </div>
@@ -94,7 +96,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           type="number"
           placeholder={t('transactions.amountPlaceholder')}
           value={formData.amount}
-          onChange={(e) =>
+          onChange={e =>
             handleChange({
               target: { name: 'amount', value: e.target.value },
             })
@@ -113,7 +115,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
         <CategoryPicker
           categories={categories}
           value={formData.category}
-          onChange={(e) =>
+          onChange={e =>
             handleChange({
               target: { name: 'category', value: e.target.value },
             })
@@ -125,7 +127,8 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           disabled={isLoading}
           size="medium"
           hint={t('transactions.categoryHint', {
-            type: transactionType === 'income' ? t('transactions.income') : t('transactions.expense'),
+            type:
+              transactionType === 'income' ? t('transactions.income') : t('transactions.expense'),
           })}
         />
       </motion.div>
@@ -138,7 +141,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           name="date"
           type="date"
           value={formData.date}
-          onChange={(e) =>
+          onChange={e =>
             handleChange({
               target: { name: 'date', value: e.target.value },
             })
@@ -160,7 +163,7 @@ export const TransactionForm = ({ onSuccess, onCancel, initialData = null }) => 
           name="description"
           placeholder={t('transactions.descriptionPlaceholder')}
           value={formData.description}
-          onChange={(e) =>
+          onChange={e =>
             handleChange({
               target: { name: 'description', value: e.target.value },
             })

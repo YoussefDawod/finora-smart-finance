@@ -22,7 +22,7 @@ export const getTimeOfDay = () => {
  * @param {'morning' | 'afternoon' | 'evening' | 'night'} timeOfDay
  * @returns {import('react').ComponentType}
  */
-export const getTimeIcon = (timeOfDay) => {
+export const getTimeIcon = timeOfDay => {
   const icons = {
     morning: FiSunrise,
     afternoon: FiSun,

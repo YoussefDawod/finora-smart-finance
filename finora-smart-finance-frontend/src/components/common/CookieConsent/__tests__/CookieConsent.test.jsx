@@ -24,8 +24,12 @@ vi.mock('@/hooks/useMotion', () => ({
 
 vi.mock('@/hooks/useCookieConsent', () => ({
   useCookieConsent: () => ({
-    get noticeSeen() { return mockNoticeSeen; },
-    get showNotice() { return mockShowNotice; },
+    get noticeSeen() {
+      return mockNoticeSeen;
+    },
+    get showNotice() {
+      return mockShowNotice;
+    },
     dismissNotice: mockDismissNotice,
     reopenNotice: mockReopenNotice,
     closeNotice: mockCloseNotice,
@@ -34,29 +38,42 @@ vi.mock('@/hooks/useCookieConsent', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de', dir: () => 'ltr' },
   }),
 }));
 
 const MOTION_PROPS = new Set([
-  'whileHover', 'whileTap', 'whileFocus', 'whileInView', 'whileDrag',
-  'initial', 'animate', 'exit', 'transition', 'variants', 'layout', 'layoutId',
+  'whileHover',
+  'whileTap',
+  'whileFocus',
+  'whileInView',
+  'whileDrag',
+  'initial',
+  'animate',
+  'exit',
+  'transition',
+  'variants',
+  'layout',
+  'layoutId',
 ]);
 
 vi.mock('framer-motion', () => {
-  const motion = new Proxy({}, {
-    get: (_target, prop) => {
-      if (prop === 'create') return (Component) => Component;
-      return ({ children, ...props }) => {
-        const htmlProps = Object.fromEntries(
-          Object.entries(props).filter(([key]) => !MOTION_PROPS.has(key)),
-        );
-        const Tag = typeof prop === 'string' ? prop : 'div';
-        return <Tag {...htmlProps}>{children}</Tag>;
-      };
-    },
-  });
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, prop) => {
+        if (prop === 'create') return Component => Component;
+        return ({ children, ...props }) => {
+          const htmlProps = Object.fromEntries(
+            Object.entries(props).filter(([key]) => !MOTION_PROPS.has(key))
+          );
+          const Tag = typeof prop === 'string' ? prop : 'div';
+          return <Tag {...htmlProps}>{children}</Tag>;
+        };
+      },
+    }
+  );
   return {
     __esModule: true,
     motion,
@@ -70,7 +87,7 @@ const renderCookieConsent = () => {
   return render(
     <MemoryRouter>
       <CookieConsent />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 };
 

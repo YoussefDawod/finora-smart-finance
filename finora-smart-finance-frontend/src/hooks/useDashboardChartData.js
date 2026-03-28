@@ -35,7 +35,7 @@ const formatMonthFromData = (year, month) => {
 /**
  * Formatiert aktuellen Monat (für Pie Chart Header)
  */
-export const formatMonthLabel = (date) =>
+export const formatMonthLabel = date =>
   new Intl.DateTimeFormat(getLocale(), { month: 'short' }).format(date);
 
 // ──────────────────────────────────────────────────────────────────────
@@ -89,19 +89,20 @@ export const useDashboardChartData = () => {
     // Line Chart: Monthly Trend (bereits vom Server aggregiert)
     const trendData = (Array.isArray(dashboardData.monthlyTrend) ? dashboardData.monthlyTrend : [])
       .filter(item => item && typeof item === 'object')
-      .map((item) => ({
+      .map(item => ({
         month: formatMonthFromData(item.year, item.month),
         income: item.income || 0,
         expense: item.expense || 0,
         balance: (item.income || 0) - (item.expense || 0),
       }));
 
-    const breakdown = (Array.isArray(dashboardData.categoryBreakdown) ? dashboardData.categoryBreakdown : [])
-      .filter(item => item && typeof item === 'object');
+    const breakdown = (
+      Array.isArray(dashboardData.categoryBreakdown) ? dashboardData.categoryBreakdown : []
+    ).filter(item => item && typeof item === 'object');
 
     const categoryExpenseData = breakdown
-      .filter((cat) => cat.type === 'expense')
-      .map((cat) => ({
+      .filter(cat => cat.type === 'expense')
+      .map(cat => ({
         category: cat.category,
         amount: cat.total || 0,
         count: cat.count || 0,
@@ -109,22 +110,16 @@ export const useDashboardChartData = () => {
       .sort((a, b) => b.amount - a.amount);
 
     const categoryIncomeData = breakdown
-      .filter((cat) => cat.type === 'income')
-      .map((cat) => ({
+      .filter(cat => cat.type === 'income')
+      .map(cat => ({
         category: cat.category,
         amount: cat.total || 0,
         count: cat.count || 0,
       }))
       .sort((a, b) => b.amount - a.amount);
 
-    const expenseTotal = categoryExpenseData.reduce(
-      (sum, item) => sum + item.amount,
-      0
-    );
-    const incomeTotal = categoryIncomeData.reduce(
-      (sum, item) => sum + item.amount,
-      0
-    );
+    const expenseTotal = categoryExpenseData.reduce((sum, item) => sum + item.amount, 0);
+    const incomeTotal = categoryIncomeData.reduce((sum, item) => sum + item.amount, 0);
 
     const hasAnyData = dashboardData.summary.totalTransactions > 0;
 

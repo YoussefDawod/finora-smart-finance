@@ -2,10 +2,10 @@
  * @fileoverview Keyboard Navigation Detection
  * @description Detects when user is navigating with keyboard (Tab key)
  * and adds visual focus indicators accordingly.
- * 
+ *
  * Improves accessibility by showing focus rings only when using keyboard,
  * not when clicking with mouse.
- * 
+ *
  * @module utils/keyboardNavigation
  */
 
@@ -18,7 +18,7 @@ export function initKeyboardNavigation() {
   let isKeyboardUser = false;
 
   // Detect Tab key usage
-  const handleKeyDown = (e) => {
+  const handleKeyDown = e => {
     if (e.key === 'Tab') {
       if (!isKeyboardUser) {
         isKeyboardUser = true;
@@ -66,7 +66,7 @@ export function createSkipLink() {
   const skipText = skipTexts[lang] || skipTexts.en;
   skipLink.textContent = skipText;
   skipLink.setAttribute('aria-label', skipText);
-  
+
   document.body.insertBefore(skipLink, document.body.firstChild);
 
   // Ensure main content has the ID

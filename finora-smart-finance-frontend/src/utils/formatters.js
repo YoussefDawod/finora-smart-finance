@@ -1,7 +1,7 @@
 /**
  * @fileoverview Formatter Utilities
  * @description Format values for display (currency, dates, etc.)
- * 
+ *
  * @module utils/formatters
  */
 

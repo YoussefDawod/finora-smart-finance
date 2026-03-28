@@ -133,9 +133,7 @@ export function transactionReducer(state, action) {
       const { month, year, startDate, endDate } = action.payload;
       // Wenn explizite Daten übergeben (z.B. "Dieses Jahr" oder Custom), diese nutzen.
       // Sonst automatisch Monatsgrenzen berechnen.
-      const dates = (startDate && endDate)
-        ? { startDate, endDate }
-        : monthBounds(month, year);
+      const dates = startDate && endDate ? { startDate, endDate } : monthBounds(month, year);
       return {
         ...state,
         dashboardMonth: month,
@@ -205,7 +203,7 @@ export function transactionReducer(state, action) {
       // Ersetze temporäre Transaktion mit echter Server-Antwort
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
+        transactions: state.transactions.map(tx =>
           tx._tempId === action.payload.tempId
             ? { ...action.payload.transaction, _pending: undefined, _tempId: undefined }
             : tx
@@ -218,7 +216,7 @@ export function transactionReducer(state, action) {
       // Rollback: Temporäre Transaktion entfernen
       return {
         ...state,
-        transactions: state.transactions.filter((tx) => tx._tempId !== action.payload.tempId),
+        transactions: state.transactions.filter(tx => tx._tempId !== action.payload.tempId),
         pagination: {
           ...state.pagination,
           total: Math.max(0, state.pagination.total - 1),
@@ -240,7 +238,7 @@ export function transactionReducer(state, action) {
       // Sofortige UI-Aktualisierung: Transaktion als "pending" markieren
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
+        transactions: state.transactions.map(tx =>
           tx.id === action.payload.id || tx._id === action.payload.id
             ? { ...action.payload.newData, _pending: 'update', _originalData: tx }
             : tx
@@ -250,7 +248,7 @@ export function transactionReducer(state, action) {
     case ACTIONS.UPDATE_SUCCESS:
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
+        transactions: state.transactions.map(tx =>
           tx.id === action.payload.id || tx._id === action.payload._id
             ? { ...action.payload, _pending: undefined, _originalData: undefined }
             : tx
@@ -262,7 +260,7 @@ export function transactionReducer(state, action) {
       // Rollback: Originalwerte wiederherstellen
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
+        transactions: state.transactions.map(tx =>
           tx.id === action.payload.id || tx._id === action.payload.id
             ? { ...tx._originalData, _pending: undefined, _originalData: undefined }
             : tx
@@ -284,10 +282,8 @@ export function transactionReducer(state, action) {
       // Sofortige UI-Aktualisierung: Transaktion als "pending" markieren
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
-          tx.id === action.payload || tx._id === action.payload
-            ? { ...tx, _pending: 'delete' }
-            : tx
+        transactions: state.transactions.map(tx =>
+          tx.id === action.payload || tx._id === action.payload ? { ...tx, _pending: 'delete' } : tx
         ),
       };
 
@@ -295,7 +291,7 @@ export function transactionReducer(state, action) {
       return {
         ...state,
         transactions: state.transactions.filter(
-          (tx) => tx.id !== action.payload && tx._id !== action.payload
+          tx => tx.id !== action.payload && tx._id !== action.payload
         ),
         pagination: {
           ...state.pagination,
@@ -308,7 +304,7 @@ export function transactionReducer(state, action) {
       // Rollback: _pending Flag entfernen
       return {
         ...state,
-        transactions: state.transactions.map((tx) =>
+        transactions: state.transactions.map(tx =>
           tx.id === action.payload.id || tx._id === action.payload.id
             ? { ...tx, _pending: undefined }
             : tx

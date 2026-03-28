@@ -67,9 +67,7 @@ function Checkbox({
       <span className={s.checkmark} aria-hidden="true">
         <FiCheck />
       </span>
-      {(children || label) && (
-        <span className={s.text}>{children || label}</span>
-      )}
+      {(children || label) && <span className={s.text}>{children || label}</span>}
     </label>
   );
 }

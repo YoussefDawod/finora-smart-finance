@@ -8,7 +8,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { Select } from '../Select';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key) => key, i18n: { language: 'de' } }),
+  useTranslation: () => ({ t: key => key, i18n: { language: 'de' } }),
 }));
 
 vi.mock('@/hooks/useMotion', () => ({
@@ -18,18 +18,12 @@ vi.mock('@/hooks/useMotion', () => ({
 /* eslint-disable no-unused-vars */
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, initial, animate, transition, ...props }) => (
-      <div {...props}>{children}</div>
-    ),
-    label: ({ children, initial, animate, ...props }) => (
-      <label {...props}>{children}</label>
-    ),
+    div: ({ children, initial, animate, transition, ...props }) => <div {...props}>{children}</div>,
+    label: ({ children, initial, animate, ...props }) => <label {...props}>{children}</label>,
     select: ({ children, initial, animate, transition, ...props }) => (
       <select {...props}>{children}</select>
     ),
-    p: ({ children, initial, animate, transition, ...props }) => (
-      <p {...props}>{children}</p>
-    ),
+    p: ({ children, initial, animate, transition, ...props }) => <p {...props}>{children}</p>,
   },
 }));
 /* eslint-enable no-unused-vars */
@@ -95,7 +89,7 @@ describe('Select', () => {
   });
 
   // ─── Sizes ────────────────────────────────────────────────────────
-  it.each(['small', 'medium', 'large'])('applies "%s" size class', (size) => {
+  it.each(['small', 'medium', 'large'])('applies "%s" size class', size => {
     const { container } = render(<Select options={options} size={size} />);
     expect(container.firstChild.className).toContain(size);
   });

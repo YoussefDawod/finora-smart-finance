@@ -423,6 +423,4 @@ Finora-ს გუნდი`,
 ];
 
 /** Template ID → Template Lookup */
-export const TEMPLATE_MAP = Object.fromEntries(
-  CAMPAIGN_TEMPLATES.map((t) => [t.id, t]),
-);
+export const TEMPLATE_MAP = Object.fromEntries(CAMPAIGN_TEMPLATES.map(t => [t.id, t]));

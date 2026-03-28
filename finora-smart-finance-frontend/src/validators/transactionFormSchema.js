@@ -11,7 +11,7 @@ import { z } from 'zod';
  * @param {Function} t - i18n Translation Funktion
  * @returns {z.ZodObject} Zod Validierungsschema
  */
-export const createTransactionSchema = (t) =>
+export const createTransactionSchema = t =>
   z.object({
     type: z.enum(['income', 'expense'], {
       errorMap: () => ({ message: t('transactions.validation.typeRequired') }),
@@ -20,7 +20,7 @@ export const createTransactionSchema = (t) =>
       .string()
       .min(1, t('transactions.validation.amountRequired'))
       .refine(
-        (val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
+        val => !isNaN(parseFloat(val)) && parseFloat(val) > 0,
         t('transactions.validation.amountPositive')
       ),
     category: z
@@ -35,10 +35,7 @@ export const createTransactionSchema = (t) =>
     date: z
       .string()
       .min(1, t('transactions.validation.dateRequired'))
-      .refine(
-        (val) => !isNaN(new Date(val).getTime()),
-        t('transactions.validation.invalidDate')
-      ),
+      .refine(val => !isNaN(new Date(val).getTime()), t('transactions.validation.invalidDate')),
   });
 
 /**

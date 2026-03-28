@@ -1,10 +1,10 @@
 /**
  * @fileoverview useMotion Custom Hook
  * @description Wrapper around MotionContext for easy access to reduced motion preference
- * 
+ *
  * USAGE:
  * const { prefersReducedMotion } = useMotion();
- * 
+ *
  * @module useMotion
  */
 
@@ -16,7 +16,7 @@ import { MotionContext } from '@/context/MotionContext';
  * @throws {Error} If used outside MotionProvider
  * @returns {Object} Motion preferences
  * @returns {boolean} prefersReducedMotion - User prefers reduced motion
- * 
+ *
  * @example
  * const { prefersReducedMotion } = useMotion();
  * if (prefersReducedMotion) {
@@ -31,7 +31,7 @@ export function useMotion() {
   if (context === undefined) {
     throw new Error(
       'useMotion must be used within a MotionProvider. ' +
-      'Make sure your component tree is wrapped with <MotionProvider>.'
+        'Make sure your component tree is wrapped with <MotionProvider>.'
     );
   }
 

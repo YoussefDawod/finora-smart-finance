@@ -34,8 +34,22 @@ const mockStatsResponse = {
         totalTransactions: 450,
       },
       recentUsers: [
-        { _id: 'u1', name: 'Alice', email: 'a@b.com', isVerified: true, role: 'user', createdAt: '2024-01-15T10:00:00Z' },
-        { _id: 'u2', name: 'Bob', email: 'b@b.com', isVerified: false, role: 'admin', createdAt: '2024-01-14T10:00:00Z' },
+        {
+          _id: 'u1',
+          name: 'Alice',
+          email: 'a@b.com',
+          isVerified: true,
+          role: 'user',
+          createdAt: '2024-01-15T10:00:00Z',
+        },
+        {
+          _id: 'u2',
+          name: 'Bob',
+          email: 'b@b.com',
+          isVerified: false,
+          role: 'admin',
+          createdAt: '2024-01-14T10:00:00Z',
+        },
       ],
       userLanguageBreakdown: [
         { _id: 'de', count: 80 },
@@ -227,9 +241,9 @@ describe('useAdminDashboard', () => {
       // Verzögerung simulieren
       let resolveStats;
       adminService.getStats.mockReturnValue(
-        new Promise((resolve) => {
+        new Promise(resolve => {
           resolveStats = resolve;
-        }),
+        })
       );
 
       act(() => {
@@ -273,9 +287,9 @@ describe('useAdminDashboard', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolveStats;
       adminService.getStats.mockReturnValue(
-        new Promise((resolve) => {
+        new Promise(resolve => {
           resolveStats = resolve;
-        }),
+        })
       );
 
       const { result, unmount } = renderHook(() => useAdminDashboard());
@@ -297,7 +311,7 @@ describe('useAdminDashboard', () => {
       adminService.getStats.mockReturnValue(
         new Promise((_, reject) => {
           rejectStats = reject;
-        }),
+        })
       );
 
       const { unmount } = renderHook(() => useAdminDashboard());

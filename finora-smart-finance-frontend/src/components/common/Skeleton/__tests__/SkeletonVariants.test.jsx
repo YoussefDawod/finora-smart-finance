@@ -23,7 +23,7 @@ describe('SkeletonCard', () => {
     expect(container.firstChild).toBeInTheDocument();
   });
 
-  it.each(['small', 'medium', 'large'])('applies size class "%s"', (size) => {
+  it.each(['small', 'medium', 'large'])('applies size class "%s"', size => {
     const { container } = render(<SkeletonCard size={size} />);
     expect(container.firstChild.className).toContain(size);
   });
@@ -91,7 +91,7 @@ describe('SkeletonTableRow', () => {
     expect(rows).toHaveLength(3);
   });
 
-  it.each(['compact', 'normal', 'spacious'])('applies density class "%s"', (density) => {
+  it.each(['compact', 'normal', 'spacious'])('applies density class "%s"', density => {
     const { container } = render(<SkeletonTableRow density={density} />);
     const row = container.firstChild.firstChild;
     expect(row.className).toContain(density);
@@ -133,7 +133,7 @@ describe('PageFallback', () => {
 
   it.each(['content', 'dashboard', 'transactions', 'settings'])(
     'renders variant "%s" without crashing',
-    (variant) => {
+    variant => {
       const { container } = render(<PageFallback variant={variant} />);
       expect(container.firstChild).toBeInTheDocument();
     }

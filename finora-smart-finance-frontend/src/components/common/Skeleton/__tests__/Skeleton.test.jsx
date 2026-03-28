@@ -43,7 +43,7 @@ describe('Skeleton', () => {
   });
 
   // ─── Variants ─────────────────────────────────────────────────────
-  it.each(['line', 'circle', 'rect', 'text'])('applies variant class "%s"', (variant) => {
+  it.each(['line', 'circle', 'rect', 'text'])('applies variant class "%s"', variant => {
     const { container } = render(<Skeleton variant={variant} />);
     const el = container.querySelector('[aria-hidden="true"]');
     expect(el.className).toContain(variant);

@@ -1,7 +1,7 @@
 /**
  * @fileoverview AuthPageSkeleton - Wiederverwendbares Auth-Seiten-Skeleton
  * @description Für Login, Register, ForgotPassword Seiten
- * 
+ *
  * @module components/common/Skeleton/AuthPageSkeleton
  */
 
@@ -15,11 +15,7 @@ import styles from './AuthPageSkeleton.module.scss';
  * @param {'login'|'register'|'forgot'|'verify'} [variant='login'] - Seiten-Variante
  * @param {boolean} [showBranding=true] - Branding-Panel anzeigen (Desktop)
  */
-const AuthPageSkeleton = memo(({
-  variant = 'login',
-  showBranding = true,
-  className = '',
-}) => {
+const AuthPageSkeleton = memo(({ variant = 'login', showBranding = true, className = '' }) => {
   const fieldCount = variant === 'register' ? 4 : variant === 'verify' ? 0 : 2;
 
   return (
@@ -29,13 +25,13 @@ const AuthPageSkeleton = memo(({
         <div className={styles.formContent}>
           {/* Logo */}
           <Skeleton width="100px" height="32px" variant="rect" />
-          
+
           {/* Header */}
           <div className={styles.header}>
             <Skeleton width="180px" height="28px" variant="text" />
             <Skeleton width="240px" height="16px" variant="text" />
           </div>
-          
+
           {/* Form Fields */}
           {variant === 'verify' ? (
             // Verify Email: 6-digit code inputs
@@ -54,17 +50,17 @@ const AuthPageSkeleton = memo(({
               ))}
             </div>
           )}
-          
+
           {/* Submit Button */}
           <Skeleton width="100%" height="44px" variant="rect" />
-          
+
           {/* Footer Links */}
           <div className={styles.footer}>
             <Skeleton width="140px" height="14px" variant="text" />
           </div>
         </div>
       </div>
-      
+
       {/* Branding Panel (Desktop) */}
       {showBranding && (
         <div className={styles.brandingPanel}>

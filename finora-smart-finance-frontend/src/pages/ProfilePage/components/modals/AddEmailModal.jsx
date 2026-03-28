@@ -18,7 +18,7 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
   const [newEmail, setNewEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (hasEmail && !password) {
@@ -54,10 +54,14 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
             initial={shouldAnimate ? { scale: 0.9, opacity: 0 } : false}
             animate={shouldAnimate ? { scale: 1, opacity: 1 } : false}
             exit={shouldAnimate ? { scale: 0.9, opacity: 0 } : undefined}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
-              <h3>{hasEmail ? t('profile.modals.addEmail.titleChange') : t('profile.modals.addEmail.titleAdd')}</h3>
+              <h3>
+                {hasEmail
+                  ? t('profile.modals.addEmail.titleChange')
+                  : t('profile.modals.addEmail.titleAdd')}
+              </h3>
               <button onClick={onClose} aria-label={t('common.close')}>
                 <FiX />
               </button>
@@ -70,7 +74,7 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
                   id="newEmail"
                   name="newEmail"
                   value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
+                  onChange={e => setNewEmail(e.target.value)}
                   placeholder={t('profile.modals.addEmail.placeholder')}
                   className={styles.input}
                   autoComplete="email"
@@ -80,12 +84,14 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
               <p className={styles.modalHint}>{t('profile.modals.addEmail.hint')}</p>
               {hasEmail && (
                 <div className={styles.formGroup}>
-                  <label htmlFor="emailPassword">{t('profile.modals.addEmail.passwordLabel')}</label>
+                  <label htmlFor="emailPassword">
+                    {t('profile.modals.addEmail.passwordLabel')}
+                  </label>
                   <input
                     type="password"
                     id="emailPassword"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={e => setPassword(e.target.value)}
                     placeholder={t('profile.modals.addEmail.passwordPlaceholder')}
                     className={styles.input}
                     autoComplete="current-password"
@@ -99,7 +105,9 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
                   {t('profile.modals.addEmail.cancel')}
                 </button>
                 <button type="submit" className={styles.btnPrimary} disabled={isLoading}>
-                  {isLoading ? t('profile.modals.addEmail.sending') : t('profile.modals.addEmail.submit')}
+                  {isLoading
+                    ? t('profile.modals.addEmail.sending')
+                    : t('profile.modals.addEmail.submit')}
                 </button>
               </div>
             </form>

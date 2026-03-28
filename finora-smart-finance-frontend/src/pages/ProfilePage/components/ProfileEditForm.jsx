@@ -12,16 +12,27 @@ import { Card } from '@/components/common';
 import { FiUser, FiEdit2, FiCheck, FiX, FiLock } from 'react-icons/fi';
 import styles from '../ProfilePage.module.scss';
 
-export function ProfileEditForm({ user, isEditing, setIsEditing, formData, handleInputChange, handleSave, handleCancel, isSaving }) {
+export function ProfileEditForm({
+  user,
+  isEditing,
+  setIsEditing,
+  formData,
+  handleInputChange,
+  handleSave,
+  handleCancel,
+  isSaving,
+}) {
   const { t } = useTranslation();
   const toast = useToast();
   const { shouldAnimate } = useMotion();
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const itemVariants = shouldAnimate ? {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  } : {};
+  const itemVariants = shouldAnimate
+    ? {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+      }
+    : {};
 
   const handleSaveClick = async () => {
     const result = await handleSave(confirmPassword);
@@ -92,7 +103,7 @@ export function ProfileEditForm({ user, isEditing, setIsEditing, formData, handl
                     id="confirmPassword"
                     name="confirmPassword"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     placeholder={t('profile.personal.passwordPlaceholder')}
                     className={styles.input}
                     autoComplete="current-password"

@@ -232,7 +232,7 @@ describe('transactionReducer', () => {
         payload: { tempId: 'temp-1', error: 'Server error' },
       });
       expect(state.transactions.length).toBe(3);
-      expect(state.transactions.find((t) => t._tempId === 'temp-1')).toBeUndefined();
+      expect(state.transactions.find(t => t._tempId === 'temp-1')).toBeUndefined();
       expect(state.pagination.total).toBe(3);
       expect(state.error).toBe('Server error');
     });
@@ -278,7 +278,7 @@ describe('transactionReducer', () => {
         payload: { id: 'tx-1', newData: { id: 'tx-1', amount: 999, type: 'income' } },
       });
       // Payload.newData replaces the matched transaction
-      const updated = state.transactions.find((t) => t.id === 'tx-1');
+      const updated = state.transactions.find(t => t.id === 'tx-1');
       expect(updated._pending).toBe('update');
       expect(updated._originalData).toEqual(tx1);
     });
@@ -286,7 +286,7 @@ describe('transactionReducer', () => {
     it('UPDATE_SUCCESS replaces transaction with server response', () => {
       const withPending = {
         ...stateWithTransactions,
-        transactions: stateWithTransactions.transactions.map((t) =>
+        transactions: stateWithTransactions.transactions.map(t =>
           t.id === 'tx-1' ? { ...t, amount: 999, _pending: 'update', _originalData: tx1 } : t
         ),
       };
@@ -295,7 +295,7 @@ describe('transactionReducer', () => {
         type: ACTIONS.UPDATE_SUCCESS,
         payload: serverTx,
       });
-      const updated = state.transactions.find((t) => t.id === 'tx-1');
+      const updated = state.transactions.find(t => t.id === 'tx-1');
       expect(updated.amount).toBe(999);
       expect(updated._pending).toBeUndefined();
       expect(updated._originalData).toBeUndefined();
@@ -304,17 +304,15 @@ describe('transactionReducer', () => {
     it('UPDATE_ROLLBACK restores original data', () => {
       const withPending = {
         ...stateWithTransactions,
-        transactions: stateWithTransactions.transactions.map((t) =>
-          t.id === 'tx-2'
-            ? { ...t, amount: 999, _pending: 'update', _originalData: { ...tx2 } }
-            : t
+        transactions: stateWithTransactions.transactions.map(t =>
+          t.id === 'tx-2' ? { ...t, amount: 999, _pending: 'update', _originalData: { ...tx2 } } : t
         ),
       };
       const state = transactionReducer(withPending, {
         type: ACTIONS.UPDATE_ROLLBACK,
         payload: { id: 'tx-2', error: 'Update failed' },
       });
-      const restored = state.transactions.find((t) => t.id === 'tx-2');
+      const restored = state.transactions.find(t => t.id === 'tx-2');
       expect(restored.amount).toBe(50); // Original value
       expect(restored._pending).toBeUndefined();
       expect(restored._originalData).toBeUndefined();
@@ -348,7 +346,7 @@ describe('transactionReducer', () => {
         type: ACTIONS.DELETE_OPTIMISTIC,
         payload: 'tx-2',
       });
-      const deleted = state.transactions.find((t) => t.id === 'tx-2');
+      const deleted = state.transactions.find(t => t.id === 'tx-2');
       expect(deleted._pending).toBe('delete');
     });
 
@@ -357,7 +355,7 @@ describe('transactionReducer', () => {
         type: ACTIONS.DELETE_SUCCESS,
         payload: 'tx-2',
       });
-      expect(state.transactions.find((t) => t.id === 'tx-2')).toBeUndefined();
+      expect(state.transactions.find(t => t.id === 'tx-2')).toBeUndefined();
       expect(state.transactions.length).toBe(2);
       expect(state.pagination.total).toBe(2);
     });
@@ -378,7 +376,7 @@ describe('transactionReducer', () => {
     it('DELETE_ROLLBACK restores pending flag', () => {
       const withPending = {
         ...stateWithTransactions,
-        transactions: stateWithTransactions.transactions.map((t) =>
+        transactions: stateWithTransactions.transactions.map(t =>
           t.id === 'tx-3' ? { ...t, _pending: 'delete' } : t
         ),
       };
@@ -386,7 +384,7 @@ describe('transactionReducer', () => {
         type: ACTIONS.DELETE_ROLLBACK,
         payload: { id: 'tx-3', error: 'Delete failed' },
       });
-      const restored = state.transactions.find((t) => t.id === 'tx-3');
+      const restored = state.transactions.find(t => t.id === 'tx-3');
       expect(restored._pending).toBeUndefined();
       expect(state.error).toBe('Delete failed');
     });
@@ -438,7 +436,13 @@ describe('transactionReducer', () => {
     it('CLEAR_FILTER resets filter, sort, and page to current month defaults', () => {
       const modified = {
         ...stateWithTransactions,
-        filter: { type: 'income', category: 'Gehalt', startDate: '2025-01-01', endDate: '2025-12-31', searchQuery: 'test' },
+        filter: {
+          type: 'income',
+          category: 'Gehalt',
+          startDate: '2025-01-01',
+          endDate: '2025-12-31',
+          searchQuery: 'test',
+        },
         sortBy: 'amount',
         sortOrder: 'asc',
         dashboardMonth: 6,

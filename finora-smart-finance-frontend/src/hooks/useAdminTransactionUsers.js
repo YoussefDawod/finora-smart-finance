@@ -22,7 +22,10 @@ const DEFAULT_SORT = '-transactionCount';
 export function useAdminTransactionUsers() {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({
-    total: 0, page: DEFAULT_PAGE, pages: 1, limit: DEFAULT_LIMIT,
+    total: 0,
+    page: DEFAULT_PAGE,
+    pages: 1,
+    limit: DEFAULT_LIMIT,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,9 +50,7 @@ export function useAdminTransactionUsers() {
 
       const data = res.data?.data || res.data;
       setUsers(data.users || []);
-      setPagination(
-        data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT },
-      );
+      setPagination(data.pagination || { total: 0, page, pages: 1, limit: DEFAULT_LIMIT });
     } catch (err) {
       if (isAborted(err)) return;
       setError(err.response?.data?.message || err.message || 'Failed to load users');
@@ -66,11 +67,17 @@ export function useAdminTransactionUsers() {
     fetchUsers();
   }, [fetchUsers]);
 
-  const filters = useMemo(() => ({
-    search, setSearch,
-    sort, setSort,
-    page, setPage,
-  }), [search, sort, page]);
+  const filters = useMemo(
+    () => ({
+      search,
+      setSearch,
+      sort,
+      setSort,
+      page,
+      setPage,
+    }),
+    [search, sort, page]
+  );
 
   return {
     users,

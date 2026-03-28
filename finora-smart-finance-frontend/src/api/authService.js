@@ -1,7 +1,7 @@
 /**
  * @fileoverview Auth API Service
  * @description All authentication-related API calls
- * 
+ *
  * @module api/authService
  */
 
@@ -42,12 +42,10 @@ export const authService = {
    * @param {string} [refreshToken] - Optional: Legacy-Refresh-Token aus Storage
    * @returns {Promise<AxiosResponse<{ message: string }>>}
    */
-  logout: (refreshToken) => {
-    return client.post(
-      ENDPOINTS.auth.logout,
-      refreshToken ? { refreshToken } : {},
-      { withCredentials: true }
-    );
+  logout: refreshToken => {
+    return client.post(ENDPOINTS.auth.logout, refreshToken ? { refreshToken } : {}, {
+      withCredentials: true,
+    });
   },
 
   /**
@@ -89,7 +87,7 @@ export const authService = {
    * @param {string} refreshToken
    * @returns {Promise<AxiosResponse<{ accessToken: string, expiresIn: number }>>}
    */
-  refreshToken: (refreshToken) => {
+  refreshToken: refreshToken => {
     return client.post(ENDPOINTS.auth.refresh, { refreshToken });
   },
 
@@ -189,7 +187,6 @@ export const authService = {
   resendAddEmailVerification: ({ signal } = {}) => {
     return client.post(ENDPOINTS.auth.resendAddEmailVerification, null, { signal });
   },
-
 };
 
 export default authService;

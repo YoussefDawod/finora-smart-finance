@@ -21,7 +21,7 @@ vi.mock('@/hooks', async () => {
   const actual = await vi.importActual('@/hooks');
   return {
     ...actual,
-    useDebounce: (val) => val,
+    useDebounce: val => val,
   };
 });
 
@@ -88,7 +88,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           { page: 1, limit: 15, sort: '-date' },
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -185,7 +185,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ type: 'income' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -202,7 +202,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ category: 'Miete' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -219,7 +219,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ startDate: '2024-01-01' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -236,7 +236,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ endDate: '2024-12-31' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -253,7 +253,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ search: 'Gehalt' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -266,7 +266,7 @@ describe('useAdminTransactions', () => {
       // Default-Aufruf ohne leere Strings
       expect(adminService.getTransactions).toHaveBeenCalledWith(
         { page: 1, limit: 15, sort: '-date' },
-        expect.objectContaining({}),
+        expect.objectContaining({})
       );
     });
   });
@@ -286,7 +286,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ sort: 'amount' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -307,7 +307,7 @@ describe('useAdminTransactions', () => {
       await waitFor(() => {
         expect(adminService.getTransactions).toHaveBeenCalledWith(
           expect.objectContaining({ page: 2 }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -364,7 +364,9 @@ describe('useAdminTransactions', () => {
     it('setzt actionLoading während Lösch-Aktion', async () => {
       let resolveDelete;
       adminService.deleteTransaction.mockReturnValue(
-        new Promise((r) => { resolveDelete = r; }),
+        new Promise(r => {
+          resolveDelete = r;
+        })
       );
       const { result } = renderHook(() => useAdminTransactions());
 
@@ -393,7 +395,9 @@ describe('useAdminTransactions', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolve;
       adminService.getTransactions.mockReturnValue(
-        new Promise((r) => { resolve = r; }),
+        new Promise(r => {
+          resolve = r;
+        })
       );
 
       const { unmount } = renderHook(() => useAdminTransactions());

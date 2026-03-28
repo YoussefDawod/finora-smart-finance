@@ -20,9 +20,15 @@ function TestConsumer() {
     <div>
       <span data-testid="noticeSeen">{String(noticeSeen)}</span>
       <span data-testid="showNotice">{String(showNotice)}</span>
-      <button data-testid="dismiss" onClick={dismissNotice}>Dismiss</button>
-      <button data-testid="reopen" onClick={reopenNotice}>Reopen</button>
-      <button data-testid="close" onClick={closeNotice}>Close</button>
+      <button data-testid="dismiss" onClick={dismissNotice}>
+        Dismiss
+      </button>
+      <button data-testid="reopen" onClick={reopenNotice}>
+        Reopen
+      </button>
+      <button data-testid="close" onClick={closeNotice}>
+        Close
+      </button>
     </div>
   );
 }
@@ -39,7 +45,7 @@ describe('CookieConsentProvider', () => {
     return render(
       <CookieConsentProvider>
         <TestConsumer />
-      </CookieConsentProvider>,
+      </CookieConsentProvider>
     );
   };
 

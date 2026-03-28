@@ -7,7 +7,7 @@ import styles from './Button.module.scss';
 /**
  * @component Button
  * @description Professional button component with multiple variants, sizes, and states
- * 
+ *
  * @param {string} [variant='primary'] - 'primary', 'secondary', 'danger', 'ghost', 'outline'
  * @param {string} [size='medium'] - 'small', 'medium', 'large'
  * @param {boolean} [disabled=false] - Disabled state
@@ -18,49 +18,48 @@ import styles from './Button.module.scss';
  * @param {string} [className] - Additional CSS classes
  * @param {React.ReactNode} children - Button text/content
  * @param {...any} props - Other HTML button props
- * 
+ *
  * @example
  * // Primary button
  * <Button variant="primary" size="medium">Save</Button>
- * 
+ *
  * // Danger button with icon
  * <Button variant="danger" icon={<DeleteIcon />}>Delete</Button>
- * 
+ *
  * // Loading state
  * <Button loading>Saving...</Button>
  */
-export const Button = forwardRef((
-  {
-    variant = 'primary',
-    size = 'medium',
-    disabled = false,
-    loading = false,
-    icon = null,
-    iconRight = null,
-    fullWidth = false,
-    className = '',
-    children,
-    'aria-label': ariaLabel,
-    ...props
-  },
-  ref
-) => {
-  const { shouldAnimate } = useMotion();
-  const isDisabled = disabled || loading;
-  const isIconOnly = icon && !children;
+export const Button = forwardRef(
+  (
+    {
+      variant = 'primary',
+      size = 'medium',
+      disabled = false,
+      loading = false,
+      icon = null,
+      iconRight = null,
+      fullWidth = false,
+      className = '',
+      children,
+      'aria-label': ariaLabel,
+      ...props
+    },
+    ref
+  ) => {
+    const { shouldAnimate } = useMotion();
+    const isDisabled = disabled || loading;
+    const isIconOnly = icon && !children;
 
-  // Animation variants for button (respects prefers-reduced-motion)
-  const whileHoverVariant = shouldAnimate && !isDisabled 
-    ? { scale: MOTION_TIMING.scaleHover, y: -2 } 
-    : {};
-  const whileTapVariant = shouldAnimate && !isDisabled 
-    ? { scale: MOTION_TIMING.scaleActive, y: 0 } 
-    : {};
+    // Animation variants for button (respects prefers-reduced-motion)
+    const whileHoverVariant =
+      shouldAnimate && !isDisabled ? { scale: MOTION_TIMING.scaleHover, y: -2 } : {};
+    const whileTapVariant =
+      shouldAnimate && !isDisabled ? { scale: MOTION_TIMING.scaleActive, y: 0 } : {};
 
-  return (
-    <motion.button
-      ref={ref}
-      className={`
+    return (
+      <motion.button
+        ref={ref}
+        className={`
         ${styles.button}
         ${styles[variant]}
         ${styles[size]}
@@ -68,40 +67,41 @@ export const Button = forwardRef((
         ${isDisabled ? styles.disabled : ''}
         ${className}
       `.trim()}
-      disabled={isDisabled}
-      aria-disabled={isDisabled}
-      aria-busy={loading}
-      aria-label={isIconOnly ? ariaLabel : undefined}
-      whileHover={whileHoverVariant}
-      whileTap={whileTapVariant}
-      transition={{ duration: 0.2 }}
-      {...props}
-    >
-      {/* SPINNER */}
-      {loading && (
-        <motion.span
-          className={styles.spinner}
-          aria-hidden="true"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-        />
-      )}
+        disabled={isDisabled}
+        aria-disabled={isDisabled}
+        aria-busy={loading}
+        aria-label={isIconOnly ? ariaLabel : undefined}
+        whileHover={whileHoverVariant}
+        whileTap={whileTapVariant}
+        transition={{ duration: 0.2 }}
+        {...props}
+      >
+        {/* SPINNER */}
+        {loading && (
+          <motion.span
+            className={styles.spinner}
+            aria-hidden="true"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+          />
+        )}
 
-      {/* ICON LEFT */}
-      {icon && !loading && (
-        <span className={styles.iconLeft} aria-hidden="true">{icon}</span>
-      )}
+        {/* ICON LEFT */}
+        {icon && !loading && (
+          <span className={styles.iconLeft} aria-hidden="true">
+            {icon}
+          </span>
+        )}
 
-      {/* TEXT */}
-      {children && <span className={styles.text}>{children}</span>}
+        {/* TEXT */}
+        {children && <span className={styles.text}>{children}</span>}
 
-      {/* ICON RIGHT */}
-      {iconRight && !loading && (
-        <span className={styles.iconRight}>{iconRight}</span>
-      )}
-    </motion.button>
-  );
-});
+        {/* ICON RIGHT */}
+        {iconRight && !loading && <span className={styles.iconRight}>{iconRight}</span>}
+      </motion.button>
+    );
+  }
+);
 
 Button.displayName = 'Button';
 

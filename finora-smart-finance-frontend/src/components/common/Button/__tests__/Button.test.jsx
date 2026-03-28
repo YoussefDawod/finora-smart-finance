@@ -13,9 +13,7 @@ vi.mock('framer-motion', () => ({
     button: ({ children, whileHover, whileTap, transition, ...props }) => (
       <button {...props}>{children}</button>
     ),
-    span: ({ children, animate, transition, ...props }) => (
-      <span {...props}>{children}</span>
-    ),
+    span: ({ children, animate, transition, ...props }) => <span {...props}>{children}</span>,
   },
   AnimatePresence: ({ children }) => children,
 }));
@@ -38,14 +36,14 @@ describe('Button', () => {
   // ─── All Variants ─────────────────────────────────────────────────
   it.each(['primary', 'secondary', 'danger', 'ghost', 'outline'])(
     'applies "%s" variant class',
-    (variant) => {
+    variant => {
       const { container } = render(<Button variant={variant}>V</Button>);
       expect(container.querySelector('button').className).toContain(variant);
-    },
+    }
   );
 
   // ─── All Sizes ────────────────────────────────────────────────────
-  it.each(['small', 'medium', 'large'])('applies "%s" size class', (size) => {
+  it.each(['small', 'medium', 'large'])('applies "%s" size class', size => {
     const { container } = render(<Button size={size}>S</Button>);
     expect(container.querySelector('button').className).toContain(size);
   });
@@ -108,7 +106,11 @@ describe('Button', () => {
 
   it('does not fire onClick when disabled', () => {
     const onClick = vi.fn();
-    render(<Button disabled onClick={onClick}>No Click</Button>);
+    render(
+      <Button disabled onClick={onClick}>
+        No Click
+      </Button>
+    );
     fireEvent.click(screen.getByRole('button'));
     expect(onClick).not.toHaveBeenCalled();
   });
@@ -125,14 +127,16 @@ describe('Button', () => {
   });
 
   it('hides left icon during loading (shows spinner instead)', () => {
-    render(<Button loading icon={<span data-testid="ico">★</span>}>L</Button>);
+    render(
+      <Button loading icon={<span data-testid="ico">★</span>}>
+        L
+      </Button>
+    );
     expect(screen.queryByTestId('ico')).not.toBeInTheDocument();
   });
 
   it('renders icon-only button (icon + no children)', () => {
-    const { container } = render(
-      <Button icon={<span>+</span>} aria-label="Add" />,
-    );
+    const { container } = render(<Button icon={<span>+</span>} aria-label="Add" />);
     expect(container.querySelector('[class*="text"]')).not.toBeInTheDocument();
   });
 
@@ -143,7 +147,11 @@ describe('Button', () => {
   });
 
   it('omits aria-label when children are present (text is label)', () => {
-    render(<Button icon={<span>★</span>} aria-label="Fav">Favorite</Button>);
+    render(
+      <Button icon={<span>★</span>} aria-label="Fav">
+        Favorite
+      </Button>
+    );
     expect(screen.getByRole('button')).not.toHaveAttribute('aria-label');
   });
 
@@ -157,7 +165,11 @@ describe('Button', () => {
 
   // ─── Prop pass-through ────────────────────────────────────────────
   it('passes additional HTML attributes', () => {
-    render(<Button data-testid="custom" type="submit">Go</Button>);
+    render(
+      <Button data-testid="custom" type="submit">
+        Go
+      </Button>
+    );
     expect(screen.getByTestId('custom')).toHaveAttribute('type', 'submit');
   });
 });

@@ -18,13 +18,13 @@ import styles from './TransactionList.module.scss';
 // KOMPONENTE - SERVER-SIDE PAGINATION
 // ============================================================================
 export const TransactionList = ({ onEdit = null, onDelete = null }) => {
-  const { 
-    transactions, 
-    deleteTransaction, 
-    loading, 
-    error, 
-    sortBy, 
-    sortOrder, 
+  const {
+    transactions,
+    deleteTransaction,
+    loading,
+    error,
+    sortBy,
+    sortOrder,
     setSort,
     // Server-Side Pagination
     currentPage,
@@ -35,47 +35,56 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
     prevPage,
     setLimit,
   } = useTransactions();
-  
+
   const { success: showSuccessToast, error: showErrorToast } = useToast();
   const isMobile = useIsMobile();
   const { t, i18n } = useTranslation();
   const { shouldAnimate } = useMotion();
   const isRtl = i18n.dir() === 'rtl';
-  
+
   // State
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   // ──────────────────────────────────────────────────────────────────────
   // HANDLERS
   // ──────────────────────────────────────────────────────────────────────
-  const handleDelete = useCallback(async (id) => {
-    try {
-      await deleteTransaction(id);
-      setDeleteConfirm(null);
-      showSuccessToast(t('transactions.deleteSuccess'));
-      onDelete?.();
-    } catch {
-      showErrorToast(t('transactions.deleteError'));
-    }
-  }, [deleteTransaction, showSuccessToast, showErrorToast, t, onDelete]);
+  const handleDelete = useCallback(
+    async id => {
+      try {
+        await deleteTransaction(id);
+        setDeleteConfirm(null);
+        showSuccessToast(t('transactions.deleteSuccess'));
+        onDelete?.();
+      } catch {
+        showErrorToast(t('transactions.deleteError'));
+      }
+    },
+    [deleteTransaction, showSuccessToast, showErrorToast, t, onDelete]
+  );
 
-  const handleToggleSort = useCallback((field) => {
-    if (sortBy === field) {
-      setSort(field, sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSort(field, 'desc');
-    }
-  }, [sortBy, sortOrder, setSort]);
+  const handleToggleSort = useCallback(
+    field => {
+      if (sortBy === field) {
+        setSort(field, sortOrder === 'asc' ? 'desc' : 'asc');
+      } else {
+        setSort(field, 'desc');
+      }
+    },
+    [sortBy, sortOrder, setSort]
+  );
 
   // Page-Size-Optionen
   const pageSizeOptions = [10, 20, 50];
 
-  const handlePageSizeChange = useCallback((newSize) => {
-    const parsed = Number(newSize);
-    if (parsed && parsed !== pageSize) {
-      setLimit(parsed);
-    }
-  }, [pageSize, setLimit]);
+  const handlePageSizeChange = useCallback(
+    newSize => {
+      const parsed = Number(newSize);
+      if (parsed && parsed !== pageSize) {
+        setLimit(parsed);
+      }
+    },
+    [pageSize, setLimit]
+  );
 
   // ──────────────────────────────────────────────────────────────────────
   // ANIMATIONS
@@ -109,9 +118,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
         >
           {t('transactions.amount')}
           {sortBy === 'amount' && (
-            <span className={styles.sortIcon}>
-              {sortOrder === 'asc' ? ' ↑' : ' ↓'}
-            </span>
+            <span className={styles.sortIcon}>{sortOrder === 'asc' ? ' ↑' : ' ↓'}</span>
           )}
         </div>
         <div
@@ -122,9 +129,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
         >
           {t('transactions.date')}
           {sortBy === 'date' && (
-            <span className={styles.sortIcon}>
-              {sortOrder === 'asc' ? ' ↑' : ' ↓'}
-            </span>
+            <span className={styles.sortIcon}>{sortOrder === 'asc' ? ' ↑' : ' ↓'}</span>
           )}
         </div>
         <div className={styles.colActions}>{t('transactions.actions')}</div>
@@ -132,7 +137,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
 
       <motion.div className={styles.tableBody} variants={itemVariants}>
         <AnimatePresence mode="sync">
-          {transactions.map((transaction) => (
+          {transactions.map(transaction => (
             <motion.div
               key={transaction.id}
               className={`${styles.tableRow} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
@@ -165,9 +170,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
 
               {/* DATE */}
               <div className={styles.colDate}>
-                <time dateTime={transaction.date}>
-                  {formatDate(transaction.date, 'short')}
-                </time>
+                <time dateTime={transaction.date}>{formatDate(transaction.date, 'short')}</time>
               </div>
 
               {/* ACTIONS */}
@@ -214,11 +217,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
                   >
                     <p>{t('transactions.deleteConfirm')}</p>
                     <div className={styles.confirmButtons}>
-                      <Button
-                        variant="ghost"
-                        size="small"
-                        onClick={() => setDeleteConfirm(null)}
-                      >
+                      <Button variant="ghost" size="small" onClick={() => setDeleteConfirm(null)}>
                         {t('common.cancel')}
                       </Button>
                       <Button
@@ -242,7 +241,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
   const renderCardView = () => (
     <motion.div className={styles.cardList} variants={itemVariants}>
       <AnimatePresence mode="sync">
-        {transactions.map((transaction) => (
+        {transactions.map(transaction => (
           <motion.div
             key={transaction.id}
             className={`${styles.card} ${styles[transaction.type]} ${transaction._pending ? styles.pending : ''}`}
@@ -255,7 +254,9 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
                 <span className={styles.categoryIcon}>
                   <CategoryIcon category={transaction.category} />
                 </span>
-                <span className={styles.categoryName}>{translateCategory(transaction.category, t)}</span>
+                <span className={styles.categoryName}>
+                  {translateCategory(transaction.category, t)}
+                </span>
               </div>
               <div className={styles.cardAmount}>
                 <span className={`${styles.amount} ${styles[transaction.type]}`}>
@@ -316,11 +317,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
                 >
                   <p>{t('transactions.deleteConfirm')}</p>
                   <div className={styles.confirmButtons}>
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      onClick={() => setDeleteConfirm(null)}
-                    >
+                    <Button variant="ghost" size="small" onClick={() => setDeleteConfirm(null)}>
                       {t('common.cancel')}
                     </Button>
                     <Button
@@ -346,11 +343,11 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
   if (loading) {
     return (
       <div className={styles.container}>
-        <SkeletonTableRow 
-          columns={isMobile ? 3 : 5} 
-          hasIcon 
-          count={pageSize || 10} 
-          density="normal" 
+        <SkeletonTableRow
+          columns={isMobile ? 3 : 5}
+          hasIcon
+          count={pageSize || 10}
+          density="normal"
         />
       </div>
     );
@@ -389,9 +386,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
           <STATE_ICONS.empty />
         </div>
         <h3 className={styles.emptyTitle}>{t('transactions.emptyTitle')}</h3>
-        <p className={styles.emptyText}>
-          {t('transactions.emptySubtitle')}
-        </p>
+        <p className={styles.emptyText}>{t('transactions.emptySubtitle')}</p>
       </motion.div>
     );
   }
@@ -403,8 +398,8 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
     <motion.div
       className={styles.container}
       variants={containerVariants}
-      initial={shouldAnimate ? "hidden" : false}
-      animate={shouldAnimate ? "visible" : false}
+      initial={shouldAnimate ? 'hidden' : false}
+      animate={shouldAnimate ? 'visible' : false}
     >
       {isMobile ? renderCardView() : renderTableView()}
 
@@ -412,9 +407,7 @@ export const TransactionList = ({ onEdit = null, onDelete = null }) => {
       {totalPages > 0 && (
         <motion.div className={styles.pagination} variants={itemVariants}>
           <div className={styles.paginationLeft}>
-            <span className={styles.pageSizeLabel}>
-              {t('transactions.perPage')}
-            </span>
+            <span className={styles.pageSizeLabel}>{t('transactions.perPage')}</span>
             <FilterDropdown
               options={pageSizeOptions.map(size => ({
                 value: String(size),

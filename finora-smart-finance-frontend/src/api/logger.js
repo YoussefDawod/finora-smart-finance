@@ -1,16 +1,14 @@
 /**
  * @fileoverview API Logger
  * @description Structured logging with support for development and production modes.
- * 
+ *
  * Features:
  * - Development mode: colorful output, timestamps, bodies, stack traces
  * - Production mode: minimal logging only
  * - Log levels: DEBUG, INFO, WARN, ERROR
- * 
+ *
  * @module api/logger
  */
-
- 
 
 // ============================================
 // COLOR PALETTE
@@ -73,7 +71,7 @@ function formatMessage(level, message) {
  */
 function debug(message, data) {
   if (LOG_LEVELS.DEBUG.level < currentLogLevel || !isDevelopment) return;
-  
+
   globalThis.console?.log(formatMessage('DEBUG', message));
   if (data && isDevelopment) {
     globalThis.console?.log('  ', data);
@@ -87,7 +85,7 @@ function debug(message, data) {
  */
 function info(message, data) {
   if (LOG_LEVELS.INFO.level < currentLogLevel) return;
-  
+
   globalThis.console?.log(formatMessage('INFO', message));
   if (data && isDevelopment) {
     globalThis.console?.log('  ', data);
@@ -101,7 +99,7 @@ function info(message, data) {
  */
 function warn(message, data) {
   if (LOG_LEVELS.WARN.level < currentLogLevel) return;
-  
+
   globalThis.console?.warn(formatMessage('WARN', message));
   if (data && isDevelopment) {
     globalThis.console?.warn('  ', data);
@@ -115,9 +113,9 @@ function warn(message, data) {
  */
 function error(message, error) {
   if (LOG_LEVELS.ERROR.level < currentLogLevel) return;
-  
+
   globalThis.console?.error(formatMessage('ERROR', message));
-  
+
   if (error) {
     if (isDevelopment) {
       globalThis.console?.error('  ', error);
@@ -161,7 +159,7 @@ function logResponse(method, url, status, data) {
  */
 function logError(method, url, err) {
   const msg = `API ERROR: ${method?.toUpperCase?.()} ${url} - ${err?.message || 'Unknown error'}`;
-  
+
   if (isDevelopment) {
     error(msg, {
       status: err?.response?.status,

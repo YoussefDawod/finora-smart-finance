@@ -45,7 +45,7 @@ class AdminErrorBoundary extends Component {
   };
 
   handleToggleDetails = () => {
-    this.setState((prev) => ({ showDetails: !prev.showDetails }));
+    this.setState(prev => ({ showDetails: !prev.showDetails }));
   };
 
   render() {
@@ -58,7 +58,9 @@ class AdminErrorBoundary extends Component {
 
     // Fallback-Texte (falls t nicht vorhanden)
     const title = t?.('admin.errorBoundary.title') || 'Etwas ist schiefgelaufen';
-    const message = t?.('admin.errorBoundary.message') || 'Beim Laden dieser Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
+    const message =
+      t?.('admin.errorBoundary.message') ||
+      'Beim Laden dieser Seite ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.';
     const retryLabel = t?.('admin.errorBoundary.retry') || 'Erneut versuchen';
     const detailsLabel = t?.('admin.errorBoundary.details') || 'Technische Details';
 
@@ -70,11 +72,7 @@ class AdminErrorBoundary extends Component {
           </div>
           <h2 className={styles.errorTitle}>{title}</h2>
           <p className={styles.errorMessage}>{message}</p>
-          <button
-            className={styles.retryButton}
-            onClick={this.handleRetry}
-            type="button"
-          >
+          <button className={styles.retryButton} onClick={this.handleRetry} type="button">
             <FiRefreshCw size={16} />
             {retryLabel}
           </button>
@@ -89,9 +87,7 @@ class AdminErrorBoundary extends Component {
                 {detailsLabel}
               </button>
               {showDetails && (
-                <pre className={styles.errorDetails}>
-                  {error.message || String(error)}
-                </pre>
+                <pre className={styles.errorDetails}>{error.message || String(error)}</pre>
               )}
             </div>
           )}

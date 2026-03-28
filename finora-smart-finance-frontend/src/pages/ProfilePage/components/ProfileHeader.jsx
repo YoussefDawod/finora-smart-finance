@@ -14,10 +14,12 @@ export function ProfileHeader({ user, emailStatus }) {
   const { t } = useTranslation();
   const { shouldAnimate } = useMotion();
 
-  const itemVariants = shouldAnimate ? {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-  } : {};
+  const itemVariants = shouldAnimate
+    ? {
+        hidden: { opacity: 0, y: 20 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+      }
+    : {};
 
   return (
     <motion.div variants={itemVariants}>
@@ -27,7 +29,7 @@ export function ProfileHeader({ user, emailStatus }) {
             <div className={styles.avatarContent}>
               {user.name
                 ?.split(' ')
-                .map((p) => p[0])
+                .map(p => p[0])
                 .join('')
                 .toUpperCase() || 'U'}
             </div>

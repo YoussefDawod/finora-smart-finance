@@ -9,7 +9,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import AdminErrorBoundary from '../AdminErrorBoundary';
 
 // ── Mock t() Funktion ────────────────────────────
-const mockT = (key) => {
+const mockT = key => {
   const translations = {
     'admin.errorBoundary.title': 'Etwas ist schiefgelaufen',
     'admin.errorBoundary.message': 'Beim Laden ist ein Fehler aufgetreten.',
@@ -44,7 +44,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <GoodChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByTestId('good-child')).toBeInTheDocument();
       expect(screen.getByText('Alles OK')).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <GoodChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
@@ -67,7 +67,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByRole('alert')).toBeInTheDocument();
       expect(screen.getByText('Etwas ist schiefgelaufen')).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByText('Beim Laden ist ein Fehler aufgetreten.')).toBeInTheDocument();
     });
@@ -86,7 +86,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.queryByTestId('good-child')).not.toBeInTheDocument();
     });
@@ -95,7 +95,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByText('Erneut versuchen')).toBeInTheDocument();
     });
@@ -117,7 +117,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <ConditionalCrash />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
 
       // Error State sichtbar
@@ -142,7 +142,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByText('Technische Details')).toBeInTheDocument();
     });
@@ -151,7 +151,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
 
       // Details sind initial versteckt
@@ -168,7 +168,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
 
       const toggle = screen.getByText('Technische Details');
@@ -186,7 +186,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
 
       const toggle = screen.getByText('Technische Details');
@@ -204,7 +204,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
       expect(screen.getByText('Etwas ist schiefgelaufen')).toBeInTheDocument();
       expect(screen.getByText('Erneut versuchen')).toBeInTheDocument();
@@ -218,7 +218,7 @@ describe('AdminErrorBoundary', () => {
       render(
         <AdminErrorBoundary t={mockT}>
           <BrokenChild />
-        </AdminErrorBoundary>,
+        </AdminErrorBoundary>
       );
 
       // React selbst loggt Fehler + unsere componentDidCatch

@@ -1,12 +1,12 @@
 /**
  * @fileoverview Multi-Step Register Form - Premium Redesign
  * @description Modern registration form with step indicator and smooth animations
- * 
+ *
  * STEPS:
  * 1. Personal Info (Name required, Email OPTIONAL)
  * 2. Password (Password, Confirm Password with strength indicator)
  * 3. Terms & Conditions (+ Warning if no email)
- * 
+ *
  * @module components/auth/MultiStepRegisterForm
  */
 
@@ -16,17 +16,21 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
 import { parseApiError } from '@/api/errorHandler';
-import { 
-  FiUser, 
-  FiMail, 
+import {
+  FiUser,
+  FiMail,
   FiLock,
   FiCheck,
   FiChevronRight,
   FiChevronLeft,
   FiShield,
-  FiAlertTriangle
+  FiAlertTriangle,
 } from 'react-icons/fi';
-import { calculatePasswordStrength, validatePassword as _validatePassword, validatePasswordMatch as _validatePasswordMatch } from '@/validators';
+import {
+  calculatePasswordStrength,
+  validatePassword as _validatePassword,
+  validatePasswordMatch as _validatePasswordMatch,
+} from '@/validators';
 import Checkbox from '@/components/common/Checkbox/Checkbox';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import PasswordInput from '../PasswordInput/PasswordInput';
@@ -73,7 +77,7 @@ export default function MultiStepRegisterForm() {
   // VALIDATION
   // ============================================
 
-  const validateName = (name) => {
+  const validateName = name => {
     if (!name) return t('auth.register.validation.nameRequired');
     if (name.length < 3) return t('auth.register.validation.nameMin');
     if (name.length > 50) return t('auth.register.validation.nameMax');
@@ -84,10 +88,11 @@ export default function MultiStepRegisterForm() {
     return '';
   };
 
-  const validateEmail = (email) => {
+  const validateEmail = email => {
     // Email ist optional - nur validieren wenn eingegeben
     if (!email || email.trim() === '') return '';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return t('auth.register.validation.emailInvalid');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return t('auth.register.validation.emailInvalid');
     return '';
   };
 
@@ -101,9 +106,9 @@ export default function MultiStepRegisterForm() {
     noSpecial: t('auth.register.validation.passwordSpecial'),
   };
 
-  const validatePassword = (password) => {
+  const validatePassword = password => {
     const key = _validatePassword(password);
-    return key ? (passwordErrorMap[key] || key) : '';
+    return key ? passwordErrorMap[key] || key : '';
   };
 
   const confirmErrorMap = {
@@ -113,10 +118,10 @@ export default function MultiStepRegisterForm() {
 
   const validateConfirmPassword = (confirmPassword, password) => {
     const key = _validatePasswordMatch(password, confirmPassword);
-    return key ? (confirmErrorMap[key] || key) : '';
+    return key ? confirmErrorMap[key] || key : '';
   };
 
-  const validateStep = (step) => {
+  const validateStep = step => {
     const newErrors = {};
 
     if (step === 0) {
@@ -130,14 +135,15 @@ export default function MultiStepRegisterForm() {
       if (passwordError) newErrors.password = passwordError;
       if (confirmError) newErrors.confirmPassword = confirmError;
     } else if (step === 2) {
-      if (!formData.agreeToTerms) newErrors.agreeToTerms = t('auth.register.validation.termsRequired');
+      if (!formData.agreeToTerms)
+        newErrors.agreeToTerms = t('auth.register.validation.termsRequired');
       // Wenn keine Email: Checkbox für "Verstanden" ist erforderlich
       if (!hasEmail && !formData.understoodNoEmailReset) {
         newErrors.understoodNoEmailReset = t('auth.register.validation.noEmailConfirm');
       }
     }
 
-    setErrors((prev) => ({ ...prev, ...newErrors }));
+    setErrors(prev => ({ ...prev, ...newErrors }));
     return Object.keys(newErrors).length === 0;
   };
 
@@ -145,23 +151,23 @@ export default function MultiStepRegisterForm() {
   // HANDLERS
   // ============================================
 
-  const handleChange = (e) => {
+  const handleChange = e => {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
 
-    setFormData((prev) => ({ ...prev, [name]: newValue }));
+    setFormData(prev => ({ ...prev, [name]: newValue }));
 
     // Clear error for this field
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
 
     if (apiError) setApiError('');
   };
 
-  const handleBlur = (e) => {
+  const handleBlur = e => {
     const { name, value } = e.target;
-    setTouched((prev) => ({ ...prev, [name]: true }));
+    setTouched(prev => ({ ...prev, [name]: true }));
 
     let error = '';
     switch (name) {
@@ -182,23 +188,23 @@ export default function MultiStepRegisterForm() {
     }
 
     if (error) {
-      setErrors((prev) => ({ ...prev, [name]: error }));
+      setErrors(prev => ({ ...prev, [name]: error }));
     }
   };
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, totalSteps - 1));
+      setCurrentStep(prev => Math.min(prev + 1, totalSteps - 1));
     } else {
       toast.warning(t('auth.register.validation.stepInvalid'));
     }
   };
 
   const handlePrev = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
+    setCurrentStep(prev => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
 
     if (!validateStep(currentStep)) {
@@ -217,7 +223,7 @@ export default function MultiStepRegisterForm() {
         email: hasEmail ? formData.email.trim() : undefined,
         understoodNoEmailReset: !hasEmail ? formData.understoodNoEmailReset : undefined,
       });
-      
+
       if (hasEmail) {
         toast.success(t('auth.register.successVerifyEmail'));
         navigate('/verify-email', { state: { email: formData.email } });
@@ -241,7 +247,7 @@ export default function MultiStepRegisterForm() {
 
   const passwordStrength = calculatePasswordStrength(formData.password);
 
-  const getStrengthLabel = (level) => {
+  const getStrengthLabel = level => {
     const labels = {
       none: '',
       weak: t('auth.register.strength.weak'),
@@ -257,7 +263,7 @@ export default function MultiStepRegisterForm() {
   // ============================================
 
   const slideVariants = {
-    enter: (direction) => ({
+    enter: direction => ({
       x: direction > 0 ? 50 : -50,
       opacity: 0,
     }),
@@ -265,7 +271,7 @@ export default function MultiStepRegisterForm() {
       x: 0,
       opacity: 1,
     },
-    exit: (direction) => ({
+    exit: direction => ({
       x: direction < 0 ? 50 : -50,
       opacity: 0,
     }),
@@ -273,7 +279,7 @@ export default function MultiStepRegisterForm() {
 
   const [slideDirection, setSlideDirection] = useState(0);
 
-  const goToStep = (step) => {
+  const goToStep = step => {
     setSlideDirection(step > currentStep ? 1 : -1);
     if (step < currentStep) {
       setCurrentStep(step);
@@ -353,9 +359,12 @@ export default function MultiStepRegisterForm() {
               {/* Name Field */}
               <div className={styles.inputGroup}>
                 <label htmlFor="register-name" className={styles.label}>
-                  {t('auth.register.step1.usernameLabel')} <span className={styles.required}>*</span>
+                  {t('auth.register.step1.usernameLabel')}{' '}
+                  <span className={styles.required}>*</span>
                 </label>
-                <div className={`${styles.inputWrapper} ${errors.name && touched.name ? styles.error : ''}`}>
+                <div
+                  className={`${styles.inputWrapper} ${errors.name && touched.name ? styles.error : ''}`}
+                >
                   <FiUser className={styles.inputIcon} />
                   <input
                     id="register-name"
@@ -379,9 +388,12 @@ export default function MultiStepRegisterForm() {
               {/* Email Field - OPTIONAL */}
               <div className={styles.inputGroup}>
                 <label htmlFor="register-email" className={styles.label}>
-                  {t('auth.register.step1.emailLabel')} <span className={styles.optional}>{t('auth.register.step1.optional')}</span>
+                  {t('auth.register.step1.emailLabel')}{' '}
+                  <span className={styles.optional}>{t('auth.register.step1.optional')}</span>
                 </label>
-                <div className={`${styles.inputWrapper} ${errors.email && touched.email ? styles.error : ''}`}>
+                <div
+                  className={`${styles.inputWrapper} ${errors.email && touched.email ? styles.error : ''}`}
+                >
                   <FiMail className={styles.inputIcon} />
                   <input
                     id="register-email"
@@ -399,9 +411,7 @@ export default function MultiStepRegisterForm() {
                 {errors.email && touched.email && (
                   <span className={styles.errorMessage}>{errors.email}</span>
                 )}
-                <span className={styles.hint}>
-                  {t('auth.register.step1.emailHint')}
-                </span>
+                <span className={styles.hint}>{t('auth.register.step1.emailHint')}</span>
               </div>
             </motion.div>
           )}
@@ -423,7 +433,9 @@ export default function MultiStepRegisterForm() {
 
               {/* Password Field */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-password" className={styles.label}>{t('auth.register.step2.passwordLabel')}</label>
+                <label htmlFor="register-password" className={styles.label}>
+                  {t('auth.register.step2.passwordLabel')}
+                </label>
                 <PasswordInput
                   formStyles={styles}
                   wrapperErrorClass={errors.password && touched.password ? styles.error : ''}
@@ -460,10 +472,14 @@ export default function MultiStepRegisterForm() {
 
               {/* Confirm Password Field */}
               <div className={styles.inputGroup}>
-                <label htmlFor="register-confirm-password" className={styles.label}>{t('auth.register.step2.confirmLabel')}</label>
+                <label htmlFor="register-confirm-password" className={styles.label}>
+                  {t('auth.register.step2.confirmLabel')}
+                </label>
                 <PasswordInput
                   formStyles={styles}
-                  wrapperErrorClass={errors.confirmPassword && touched.confirmPassword ? styles.error : ''}
+                  wrapperErrorClass={
+                    errors.confirmPassword && touched.confirmPassword ? styles.error : ''
+                  }
                   id="register-confirm-password"
                   name="confirmPassword"
                   placeholder={t('auth.register.step2.confirmPlaceholder')}
@@ -504,7 +520,10 @@ export default function MultiStepRegisterForm() {
                   <div className={styles.warningContent}>
                     <h4>{t('auth.register.step3.noEmailTitle')}</h4>
                     <p>
-                      <Trans i18nKey="auth.register.step3.noEmailText" components={{ strong: <strong /> }} />
+                      <Trans
+                        i18nKey="auth.register.step3.noEmailText"
+                        components={{ strong: <strong /> }}
+                      />
                     </p>
                   </div>
                 </div>
@@ -525,8 +544,8 @@ export default function MultiStepRegisterForm() {
                 {t('auth.register.step3.termsAccept')}{' '}
                 <a href="/terms" target="_blank" rel="noopener noreferrer">
                   {t('auth.register.step3.termsLink')}
-                </a>
-                {' '}{t('auth.register.step3.and')}{' '}
+                </a>{' '}
+                {t('auth.register.step3.and')}{' '}
                 <a href="/privacy" target="_blank" rel="noopener noreferrer">
                   {t('auth.register.step3.privacyLink')}
                 </a>
@@ -576,7 +595,9 @@ export default function MultiStepRegisterForm() {
           <button
             type="submit"
             className={styles.submitButton}
-            disabled={isLoading || !formData.agreeToTerms || (!hasEmail && !formData.understoodNoEmailReset)}
+            disabled={
+              isLoading || !formData.agreeToTerms || (!hasEmail && !formData.understoodNoEmailReset)
+            }
           >
             {isLoading ? (
               <>

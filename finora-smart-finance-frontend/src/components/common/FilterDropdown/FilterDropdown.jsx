@@ -62,16 +62,13 @@ export default function FilterDropdown({
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   // Resolve display label from current value
-  const activeOption = useMemo(
-    () => options.find((o) => o.value === value),
-    [options, value],
-  );
+  const activeOption = useMemo(() => options.find(o => o.value === value), [options, value]);
   const displayLabel = activeOption?.label || placeholder || '—';
 
   // ── Click Outside ──────────────────────────────
   useEffect(() => {
     if (!isOpen) return;
-    const handler = (e) => {
+    const handler = e => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setIsOpen(false);
       }
@@ -86,25 +83,25 @@ export default function FilterDropdown({
 
   // ── Select Handler ─────────────────────────────
   const handleSelect = useCallback(
-    (val) => {
+    val => {
       onChange?.(val);
       setIsOpen(false);
     },
-    [onChange],
+    [onChange]
   );
 
   // ── Toggle ─────────────────────────────────────
   const toggle = useCallback(() => {
     if (disabled) return;
-    setIsOpen((prev) => {
-      if (!prev) setFocusedIndex(options.findIndex((o) => o.value === value));
+    setIsOpen(prev => {
+      if (!prev) setFocusedIndex(options.findIndex(o => o.value === value));
       return !prev;
     });
   }, [disabled, options, value]);
 
   // ── Keyboard Navigation ────────────────────────
   const handleKeyDown = useCallback(
-    (e) => {
+    e => {
       if (!isOpen) {
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
           e.preventDefault();
@@ -120,11 +117,11 @@ export default function FilterDropdown({
           break;
         case 'ArrowDown':
           e.preventDefault();
-          setFocusedIndex((i) => (i < options.length - 1 ? i + 1 : 0));
+          setFocusedIndex(i => (i < options.length - 1 ? i + 1 : 0));
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setFocusedIndex((i) => (i > 0 ? i - 1 : options.length - 1));
+          setFocusedIndex(i => (i > 0 ? i - 1 : options.length - 1));
           break;
         case 'Enter':
         case ' ':
@@ -145,7 +142,7 @@ export default function FilterDropdown({
           break;
       }
     },
-    [isOpen, focusedIndex, options, handleSelect, toggle],
+    [isOpen, focusedIndex, options, handleSelect, toggle]
   );
 
   // ── Scroll focused option into view ────────────
@@ -196,9 +193,7 @@ export default function FilterDropdown({
       >
         {icon && <span className={styles.triggerIcon}>{icon}</span>}
         <span className={styles.triggerLabel}>{displayLabel}</span>
-        <FiChevronDown
-          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
-        />
+        <FiChevronDown className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`} />
       </motion.button>
 
       {/* ── Dropdown Panel ─────────────────────── */}
@@ -233,9 +228,7 @@ export default function FilterDropdown({
                   onMouseEnter={() => setFocusedIndex(idx)}
                 >
                   <span className={styles.optionLabel}>{opt.label}</span>
-                  {isActive && (
-                    <FiCheck className={styles.checkIcon} size={14} />
-                  )}
+                  {isActive && <FiCheck className={styles.checkIcon} size={14} />}
                 </button>
               );
             })}

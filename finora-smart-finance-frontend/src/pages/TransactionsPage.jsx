@@ -1,12 +1,12 @@
 /**
  * @fileoverview TransactionsPage Component
  * @description Seite zur Anzeige und Verwaltung von Transaktionen
- * 
+ *
  * FEATURES:
  * - Search & Filter Controls (oben)
  * - Transaktionsliste mit Pagination
  * - Add/Edit/Delete Transactions
- * 
+ *
  * @module pages/TransactionsPage
  */
 
@@ -55,10 +55,10 @@ const TransactionsPage = () => {
       fetchQuota();
     }
   }, [isAuthenticated, fetchQuota]);
-  
+
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  
+
   // ──────────────────────────────────────────────────────────────────────
   // LOKALER SEARCH STATE mit DEBOUNCE
   // ──────────────────────────────────────────────────────────────────────
@@ -73,7 +73,7 @@ const TransactionsPage = () => {
       isInitialMount.current = false;
       return;
     }
-    
+
     // Nur updaten wenn sich der debounced Wert unterscheidet
     if (debouncedSearchQuery !== filter.searchQuery) {
       setFilter({ searchQuery: debouncedSearchQuery });
@@ -81,20 +81,17 @@ const TransactionsPage = () => {
   }, [debouncedSearchQuery, filter.searchQuery, setFilter]);
 
   const categoryOptions = ALL_CATEGORIES;
-  
+
   // Mobile-optimierte pageSize: weniger Items auf kleinen Bildschirmen
   const pageSize = isMobile ? 8 : 15;
 
-  const handleSearchChange = useCallback(
-    (value) => {
-      // Nur lokalen State updaten → sofortiges UI-Feedback
-      setLocalSearchQuery(value);
-    },
-    []
-  );
+  const handleSearchChange = useCallback(value => {
+    // Nur lokalen State updaten → sofortiges UI-Feedback
+    setLocalSearchQuery(value);
+  }, []);
 
   const handleFilterChange = useCallback(
-    (nextFilter) => {
+    nextFilter => {
       setFilter(nextFilter);
     },
     [setFilter]
@@ -103,7 +100,7 @@ const TransactionsPage = () => {
   // ──────────────────────────────────────────────────────────────────────
   // HANDLE EDIT
   // ──────────────────────────────────────────────────────────────────────
-  const handleEdit = useCallback((transaction) => {
+  const handleEdit = useCallback(transaction => {
     setEditingTransaction(transaction);
     setShowForm(true);
   }, []);
@@ -163,18 +160,16 @@ const TransactionsPage = () => {
             aria-label={t('transactions.addTransaction')}
           />
         </div>
-        <TransactionQuota
-          quota={quota}
-          totalItems={totalItems}
-          isGuest={!isAuthenticated}
-        />
+        <TransactionQuota quota={quota} totalItems={totalItems} isGuest={!isAuthenticated} />
       </motion.div>
 
       {/* TRANSACTION FORM MODAL */}
       <Modal
         isOpen={showForm}
         onClose={handleModalClose}
-        title={editingTransaction ? t('transactions.editTransaction') : t('transactions.addTransaction')}
+        title={
+          editingTransaction ? t('transactions.editTransaction') : t('transactions.addTransaction')
+        }
         size="medium"
         closeOnOverlayClick={false}
         closeOnEsc={true}

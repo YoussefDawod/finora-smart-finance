@@ -78,7 +78,7 @@ describe('authReducer', () => {
       AUTH_ACTIONS.LOGIN_SUCCESS,
       AUTH_ACTIONS.REGISTER_SUCCESS,
       AUTH_ACTIONS.AUTO_LOGIN_SUCCESS,
-    ])('should handle %s', (actionType) => {
+    ])('should handle %s', actionType => {
       const state = authReducer(initialState, {
         type: actionType,
         payload: successPayload,
@@ -106,7 +106,7 @@ describe('authReducer', () => {
 
     it.each([AUTH_ACTIONS.LOGOUT, AUTH_ACTIONS.AUTO_LOGIN_FAIL])(
       'should handle %s and reset state',
-      (actionType) => {
+      actionType => {
         const state = authReducer(authenticatedState, { type: actionType });
 
         expect(state.user).toBeNull();
@@ -245,7 +245,7 @@ describe('authReducer', () => {
         'TOKEN_REFRESHED',
       ];
 
-      requiredActions.forEach((action) => {
+      requiredActions.forEach(action => {
         expect(AUTH_ACTIONS).toHaveProperty(action);
       });
     });

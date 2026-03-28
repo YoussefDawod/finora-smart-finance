@@ -2,22 +2,22 @@
  * @fileoverview Motion Context Provider
  * @description Manages reduced motion preference from OS/browser settings.
  * Used for conditional animations with Framer Motion or CSS animations.
- * 
+ *
  * STATE SHAPE:
  * {
  *   prefersReducedMotion: boolean
  * }
- * 
+ *
  * USAGE:
  * const { prefersReducedMotion } = useMotion();
- * 
+ *
  * <motion.div
  *   animate={prefersReducedMotion ? {} : { opacity: 1 }}
  *   transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.3 }}
  * >
  *   Content
  * </motion.div>
- * 
+ *
  * @module MotionContext
  */
 
@@ -65,7 +65,7 @@ export const MotionContext = createContext(undefined);
 /**
  * MotionProvider Component
  * Detects and listens to @media (prefers-reduced-motion: reduce) preference
- * 
+ *
  * @param {Object} props
  * @param {React.ReactNode} props.children
  */
@@ -73,20 +73,21 @@ export function MotionProvider({ children }) {
   const prefersReducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
     getReducedMotionSnapshot,
-    getReducedMotionServerSnapshot,
+    getReducedMotionServerSnapshot
   );
 
   // ============================================
   // 📤 CONTEXT VALUE
   // ============================================
 
-  const value = useMemo(() => ({
-    prefersReducedMotion,
-  }), [prefersReducedMotion]);
-
-  return (
-    <MotionContext.Provider value={value}>{children}</MotionContext.Provider>
+  const value = useMemo(
+    () => ({
+      prefersReducedMotion,
+    }),
+    [prefersReducedMotion]
   );
+
+  return <MotionContext.Provider value={value}>{children}</MotionContext.Provider>;
 }
 
 // Hook moved to @/hooks/useMotion.js — import from there.

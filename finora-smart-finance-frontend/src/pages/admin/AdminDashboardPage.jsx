@@ -29,8 +29,7 @@ import styles from './AdminDashboardPage.module.scss';
 
 export default function AdminDashboardPage() {
   const { t, i18n } = useTranslation();
-  const { stats, transactionStats, subscriberStats, loading, error, refresh } =
-    useAdminDashboard();
+  const { stats, transactionStats, subscriberStats, loading, error, refresh } = useAdminDashboard();
 
   /**
    * Stat-Card Konfigurationen — aus API-Daten berechnet
@@ -46,7 +45,9 @@ export default function AdminDashboardPage() {
         value: o.totalUsers?.toLocaleString() ?? '—',
         icon: FiUsers,
         color: 'primary',
-        trendLabel: o.usersLast7Days ? `+${o.usersLast7Days} ${t('admin.dashboard.thisWeek')}` : null,
+        trendLabel: o.usersLast7Days
+          ? `+${o.usersLast7Days} ${t('admin.dashboard.thisWeek')}`
+          : null,
         trendValue: o.usersLast7Days ?? null,
       },
       {
@@ -80,7 +81,9 @@ export default function AdminDashboardPage() {
         value: tx.totalCount?.toLocaleString() ?? o.totalTransactions?.toLocaleString() ?? '—',
         icon: FiCreditCard,
         color: 'info',
-        trendLabel: tx.last7DaysCount ? `+${tx.last7DaysCount} ${t('admin.dashboard.thisWeek')}` : null,
+        trendLabel: tx.last7DaysCount
+          ? `+${tx.last7DaysCount} ${t('admin.dashboard.thisWeek')}`
+          : null,
         trendValue: tx.last7DaysCount ?? null,
       },
       {
@@ -104,9 +107,10 @@ export default function AdminDashboardPage() {
         value: sub.totalCount?.toLocaleString() ?? '—',
         icon: FiMail,
         color: 'primary',
-        trendLabel: sub.confirmedCount != null
-          ? `${sub.confirmedCount} ${t('admin.dashboard.confirmed')}`
-          : null,
+        trendLabel:
+          sub.confirmedCount != null
+            ? `${sub.confirmedCount} ${t('admin.dashboard.confirmed')}`
+            : null,
         trendValue: sub.confirmedCount > 0 ? 1 : 0,
       },
     ];

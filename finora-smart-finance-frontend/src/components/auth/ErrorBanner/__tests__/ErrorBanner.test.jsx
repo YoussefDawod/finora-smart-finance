@@ -52,13 +52,7 @@ describe('ErrorBanner', () => {
   });
 
   it('renders dismiss button when onDismiss is provided', () => {
-    render(
-      <ErrorBanner
-        error="Error"
-        onDismiss={() => {}}
-        dismissAriaLabel="Dismiss"
-      />
-    );
+    render(<ErrorBanner error="Error" onDismiss={() => {}} dismissAriaLabel="Dismiss" />);
     expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
   });
 
@@ -66,37 +60,19 @@ describe('ErrorBanner', () => {
     const user = userEvent.setup();
     const handleDismiss = vi.fn();
 
-    render(
-      <ErrorBanner
-        error="Error"
-        onDismiss={handleDismiss}
-        dismissAriaLabel="Dismiss"
-      />
-    );
+    render(<ErrorBanner error="Error" onDismiss={handleDismiss} dismissAriaLabel="Dismiss" />);
 
     await user.click(screen.getByRole('button', { name: 'Dismiss' }));
     expect(handleDismiss).toHaveBeenCalledOnce();
   });
 
   it('dismiss button has correct aria-label', () => {
-    render(
-      <ErrorBanner
-        error="Error"
-        onDismiss={() => {}}
-        dismissAriaLabel="Fehler schließen"
-      />
-    );
+    render(<ErrorBanner error="Error" onDismiss={() => {}} dismissAriaLabel="Fehler schließen" />);
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'Fehler schließen');
   });
 
   it('dismiss button is type="button" (not submit)', () => {
-    render(
-      <ErrorBanner
-        error="Error"
-        onDismiss={() => {}}
-        dismissAriaLabel="Dismiss"
-      />
-    );
+    render(<ErrorBanner error="Error" onDismiss={() => {}} dismissAriaLabel="Dismiss" />);
     expect(screen.getByRole('button')).toHaveAttribute('type', 'button');
   });
 });

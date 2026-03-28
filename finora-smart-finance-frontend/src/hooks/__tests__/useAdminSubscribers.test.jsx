@@ -21,7 +21,7 @@ vi.mock('@/hooks', async () => {
   const actual = await vi.importActual('@/hooks');
   return {
     ...actual,
-    useDebounce: (val) => val,
+    useDebounce: val => val,
   };
 });
 
@@ -86,7 +86,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           { page: 1, limit: 15, sort: '-createdAt' },
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -181,7 +181,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           expect.objectContaining({ isConfirmed: 'true' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -198,7 +198,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           expect.objectContaining({ language: 'de' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -215,7 +215,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           expect.objectContaining({ search: 'alice' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -227,7 +227,7 @@ describe('useAdminSubscribers', () => {
 
       expect(adminService.getSubscribers).toHaveBeenCalledWith(
         { page: 1, limit: 15, sort: '-createdAt' },
-        expect.objectContaining({}),
+        expect.objectContaining({})
       );
     });
   });
@@ -247,7 +247,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           expect.objectContaining({ sort: 'email' }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -268,7 +268,7 @@ describe('useAdminSubscribers', () => {
       await waitFor(() => {
         expect(adminService.getSubscribers).toHaveBeenCalledWith(
           expect.objectContaining({ page: 2 }),
-          expect.objectContaining({}),
+          expect.objectContaining({})
         );
       });
     });
@@ -287,7 +287,9 @@ describe('useAdminSubscribers', () => {
     });
 
     it('deleteSubscriber ruft adminService.deleteSubscriber auf und refresht', async () => {
-      adminService.deleteSubscriber.mockResolvedValue({ data: { data: { email: 'alice@example.com' } } });
+      adminService.deleteSubscriber.mockResolvedValue({
+        data: { data: { email: 'alice@example.com' } },
+      });
       const { result } = renderHook(() => useAdminSubscribers());
 
       await waitFor(() => expect(result.current.loading).toBe(false));
@@ -325,7 +327,9 @@ describe('useAdminSubscribers', () => {
     it('setzt actionLoading während Lösch-Aktion', async () => {
       let resolveDelete;
       adminService.deleteSubscriber.mockReturnValue(
-        new Promise((r) => { resolveDelete = r; }),
+        new Promise(r => {
+          resolveDelete = r;
+        })
       );
       const { result } = renderHook(() => useAdminSubscribers());
 
@@ -354,7 +358,9 @@ describe('useAdminSubscribers', () => {
     it('setzt keinen State nach Unmount', async () => {
       let resolve;
       adminService.getSubscribers.mockReturnValue(
-        new Promise((r) => { resolve = r; }),
+        new Promise(r => {
+          resolve = r;
+        })
       );
 
       const { unmount } = renderHook(() => useAdminSubscribers());

@@ -8,7 +8,7 @@ import styles from './Select.module.scss';
 /**
  * @component Select
  * @description Professional select/dropdown component with label, error state, and animations
- * 
+ *
  * @param {string} [label] - Label text displayed above select
  * @param {Array} options - Array of { value, label } objects
  * @param {string} [placeholder] - Placeholder text for empty state
@@ -21,7 +21,7 @@ import styles from './Select.module.scss';
  * @param {string} [size='medium'] - 'small', 'medium', 'large'
  * @param {string} [className] - Additional CSS classes
  * @param {...any} props - Other HTML select props
- * 
+ *
  * @example
  * <Select
  *   label="Category"
@@ -33,57 +33,61 @@ import styles from './Select.module.scss';
  *   onChange={(e) => setCategory(e.target.value)}
  * />
  */
-export const Select = forwardRef((
-  {
-    label = '',
-    options = [],
-    placeholder = '',
-    value = '',
-    onChange = null,
-    error = '',
-    hint = '',
-    required = false,
-    disabled = false,
-    size = 'medium',
-    className = '',
-    ...props
-  },
-  ref
-) => {
-  const { t } = useTranslation();
-  const { shouldAnimate } = useMotion();
-  const [isFocused, setIsFocused] = useState(false);
-  const autoId = useId();
-  const hasError = !!error;
-  const hasValue = value && value !== '';
-  const resolvedPlaceholder = placeholder || t('common.selectPlaceholder');
+export const Select = forwardRef(
+  (
+    {
+      label = '',
+      options = [],
+      placeholder = '',
+      value = '',
+      onChange = null,
+      error = '',
+      hint = '',
+      required = false,
+      disabled = false,
+      size = 'medium',
+      className = '',
+      ...props
+    },
+    ref
+  ) => {
+    const { t } = useTranslation();
+    const { shouldAnimate } = useMotion();
+    const [isFocused, setIsFocused] = useState(false);
+    const autoId = useId();
+    const hasError = !!error;
+    const hasValue = value && value !== '';
+    const resolvedPlaceholder = placeholder || t('common.selectPlaceholder');
 
-  // Generate stable IDs for aria-describedby
-  const errorId = `${autoId}-error`;
-  const hintId = `${autoId}-hint`;
-  const describedBy = hasError ? errorId : hint ? hintId : undefined;
+    // Generate stable IDs for aria-describedby
+    const errorId = `${autoId}-error`;
+    const hintId = `${autoId}-hint`;
+    const describedBy = hasError ? errorId : hint ? hintId : undefined;
 
-  // ──────────────────────────────────────────────────────────────────────
-  // HANDLERS
-  // ──────────────────────────────────────────────────────────────────────
-  const handleFocus = useCallback(() => {
-    setIsFocused(true);
-  }, []);
+    // ──────────────────────────────────────────────────────────────────────
+    // HANDLERS
+    // ──────────────────────────────────────────────────────────────────────
+    const handleFocus = useCallback(() => {
+      setIsFocused(true);
+    }, []);
 
-  const handleBlur = useCallback(() => {
-    setIsFocused(false);
-  }, []);
+    const handleBlur = useCallback(() => {
+      setIsFocused(false);
+    }, []);
 
-  const handleChange = useCallback((e) => {
-    onChange?.(e);
-  }, [onChange]);
+    const handleChange = useCallback(
+      e => {
+        onChange?.(e);
+      },
+      [onChange]
+    );
 
-  // ──────────────────────────────────────────────────────────────────────
-  // RENDER
-  // ──────────────────────────────────────────────────────────────────────
-  return (
-    <motion.div
-      className={`
+    // ──────────────────────────────────────────────────────────────────────
+    // RENDER
+    // ──────────────────────────────────────────────────────────────────────
+    return (
+      <motion.div
+        className={`
         ${styles.selectGroup}
         ${styles[size]}
         ${hasError ? styles.hasError : ''}
@@ -91,98 +95,99 @@ export const Select = forwardRef((
         ${disabled ? styles.disabled : ''}
         ${className}
       `.trim()}
-      initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
-      animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
-      transition={{ duration: 0.25 }}
-    >
-      {/* LABEL */}
-      {label && (
-        <motion.label
-          className={styles.label}
-          htmlFor={props.id}
-          initial={shouldAnimate ? { opacity: 0 } : false}
-          animate={shouldAnimate ? { opacity: 1 } : false}
-        >
-          {label}
-          {required && <span className={styles.required}>*</span>}
-        </motion.label>
-      )}
+        initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
+        animate={shouldAnimate ? { opacity: 1, y: 0 } : false}
+        transition={{ duration: 0.25 }}
+      >
+        {/* LABEL */}
+        {label && (
+          <motion.label
+            className={styles.label}
+            htmlFor={props.id}
+            initial={shouldAnimate ? { opacity: 0 } : false}
+            animate={shouldAnimate ? { opacity: 1 } : false}
+          >
+            {label}
+            {required && <span className={styles.required}>*</span>}
+          </motion.label>
+        )}
 
-      {/* SELECT WRAPPER */}
-      <div className={styles.selectWrapper}>
-        <motion.select
-          ref={ref}
-          className={styles.select}
-          disabled={disabled}
-          value={value}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onChange={handleChange}
-          aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
-          {...props}
+        {/* SELECT WRAPPER */}
+        <div className={styles.selectWrapper}>
+          <motion.select
+            ref={ref}
+            className={styles.select}
+            disabled={disabled}
+            value={value}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
+            aria-invalid={hasError || undefined}
+            aria-describedby={describedBy}
+            {...props}
+          >
+            {/* PLACEHOLDER OPTION */}
+            {resolvedPlaceholder && (
+              <option value="" disabled={!hasValue}>
+                {resolvedPlaceholder}
+              </option>
+            )}
+
+            {/* OPTIONS */}
+            {options.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </motion.select>
+
+          {/* DROPDOWN ARROW ICON */}
+          <motion.div
+            className={styles.arrow}
+            animate={{ rotate: isFocused ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+            aria-hidden="true"
+          >
+            <FiChevronDown />
+          </motion.div>
+        </div>
+
+        {/* HELPER TEXT / ERROR */}
+        <motion.div
+          className={styles.footer}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          transition={{ duration: 0.2 }}
         >
-          {/* PLACEHOLDER OPTION */}
-          {resolvedPlaceholder && (
-            <option value="" disabled={!hasValue}>
-              {resolvedPlaceholder}
-            </option>
+          {hasError && (
+            <motion.p
+              id={errorId}
+              className={styles.error}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.2 }}
+              role="alert"
+            >
+              <FiAlertCircle /> {error}
+            </motion.p>
           )}
 
-          {/* OPTIONS */}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </motion.select>
-
-        {/* DROPDOWN ARROW ICON */}
-        <motion.div
-          className={styles.arrow}
-          animate={{ rotate: isFocused ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-          aria-hidden="true"
-        >
-          <FiChevronDown />
+          {hint && !hasError && (
+            <motion.p
+              id={hintId}
+              className={styles.hint}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              {hint}
+            </motion.p>
+          )}
         </motion.div>
-      </div>
-
-      {/* HELPER TEXT / ERROR */}
-      <motion.div
-        className={styles.footer}
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: 'auto' }}
-        transition={{ duration: 0.2 }}
-      >
-        {hasError && (
-          <motion.p
-            id={errorId}
-            className={styles.error}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-            role="alert"
-          >
-            <FiAlertCircle /> {error}
-          </motion.p>
-        )}
-
-        {hint && !hasError && (
-          <motion.p
-            id={hintId}
-            className={styles.hint}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
-          >
-            {hint}
-          </motion.p>
-        )}
       </motion.div>
-    </motion.div>
-  );
-});
+    );
+  }
+);
 
 Select.displayName = 'Select';
 

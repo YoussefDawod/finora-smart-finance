@@ -8,7 +8,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Toast from '../Toast';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key) => key, i18n: { language: 'de' } }),
+  useTranslation: () => ({ t: key => key, i18n: { language: 'de' } }),
 }));
 
 const renderToast = (props = {}) =>
@@ -31,13 +31,10 @@ describe('Toast', () => {
   });
 
   // ─── All types ────────────────────────────────────────────────────
-  it.each(['success', 'error', 'warning', 'info'])(
-    'applies "%s" type class',
-    (type) => {
-      const { container } = renderToast({ type });
-      expect(container.querySelector('[role="alert"]').className).toContain(type);
-    },
-  );
+  it.each(['success', 'error', 'warning', 'info'])('applies "%s" type class', type => {
+    const { container } = renderToast({ type });
+    expect(container.querySelector('[role="alert"]').className).toContain(type);
+  });
 
   it('defaults to info type', () => {
     const { container } = renderToast();

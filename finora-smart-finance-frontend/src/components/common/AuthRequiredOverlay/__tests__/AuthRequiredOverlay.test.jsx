@@ -10,7 +10,7 @@ import AuthRequiredOverlay from '../AuthRequiredOverlay';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key) => key,
+    t: key => key,
     i18n: { language: 'de' },
   }),
 }));

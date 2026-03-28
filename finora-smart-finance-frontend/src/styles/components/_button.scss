@@ -236,7 +236,7 @@
 
 // Active/Selected state
 .btn-active,
-.btn[aria-pressed="true"] {
+.btn[aria-pressed='true'] {
   background: var(--primary);
   color: var(--on-primary);
   border-color: var(--primary);

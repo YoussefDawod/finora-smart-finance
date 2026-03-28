@@ -1,7 +1,7 @@
 /**
  * @fileoverview VerifyEmailForm Component - Premium Redesign
  * @description Modern 6-digit code verification form
- * 
+ *
  * FEATURES:
  * - 6 input fields (1 digit each)
  * - Auto-focus on digit entry
@@ -9,7 +9,7 @@
  * - Keyboard navigation
  * - Resend email with countdown
  * - Animated transitions
- * 
+ *
  * @module components/auth/VerifyEmailForm
  */
 
@@ -18,11 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useMotion } from '@/hooks';
-import { 
-  FiMail, 
-  FiCheck,
-  FiRefreshCw
-} from 'react-icons/fi';
+import { FiMail, FiCheck, FiRefreshCw } from 'react-icons/fi';
 import ErrorBanner from '../ErrorBanner/ErrorBanner';
 import styles from './VerifyEmailForm.module.scss';
 
@@ -53,7 +49,7 @@ export default function VerifyEmailForm({ email }) {
     if (resendCountdown <= 0) return;
 
     const timer = window.setTimeout(() => {
-      setResendCountdown((prev) => prev - 1);
+      setResendCountdown(prev => prev - 1);
     }, 1000);
 
     return () => window.clearTimeout(timer);
@@ -63,35 +59,36 @@ export default function VerifyEmailForm({ email }) {
   // AUTO-SUBMIT
   // ============================================
 
-  const handleSubmit = useCallback(async (fullCode) => {
-    if (fullCode.length !== 6 || isLoading) return;
+  const handleSubmit = useCallback(
+    async fullCode => {
+      if (fullCode.length !== 6 || isLoading) return;
 
-    setIsLoading(true);
-    setApiError('');
+      setIsLoading(true);
+      setApiError('');
 
-    try {
-      await verifyEmail(fullCode);
-      setIsSuccess(true);
-      toast.success(t('auth.verifyForm.successToast'));
+      try {
+        await verifyEmail(fullCode);
+        setIsSuccess(true);
+        toast.success(t('auth.verifyForm.successToast'));
 
-      // Redirect after delay
-      window.setTimeout(() => {
-        navigate('/dashboard', { replace: true });
-      }, 1500);
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        t('auth.verifyForm.errorToast');
-      setApiError(errorMessage);
-      toast.error(errorMessage);
+        // Redirect after delay
+        window.setTimeout(() => {
+          navigate('/dashboard', { replace: true });
+        }, 1500);
+      } catch (error) {
+        const errorMessage = error?.response?.data?.message || t('auth.verifyForm.errorToast');
+        setApiError(errorMessage);
+        toast.error(errorMessage);
 
-      // Clear code on error
-      setCode(['', '', '', '', '', '']);
-      inputRefs.current[0]?.focus();
-    } finally {
-      setIsLoading(false);
-    }
-  }, [verifyEmail, toast, navigate, t, isLoading]);
+        // Clear code on error
+        setCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [verifyEmail, toast, navigate, t, isLoading]
+  );
 
   useEffect(() => {
     const fullCode = code.join('');
@@ -155,7 +152,7 @@ export default function VerifyEmailForm({ email }) {
     }
   };
 
-  const handlePaste = (e) => {
+  const handlePaste = e => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').trim();
     const digits = pastedData.replace(/\D/g, '').slice(0, 6);
@@ -188,9 +185,7 @@ export default function VerifyEmailForm({ email }) {
       setResendCountdown(60);
       toast.success(t('auth.verifyForm.resendSuccess'));
     } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        t('auth.verifyForm.resendError');
+      const errorMessage = error?.response?.data?.message || t('auth.verifyForm.resendError');
       setApiError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -214,9 +209,7 @@ export default function VerifyEmailForm({ email }) {
           <FiCheck />
         </div>
         <h2 className={styles.successTitle}>{t('auth.verifyForm.successTitle')}</h2>
-        <p className={styles.successMessage}>
-          {t('auth.verifyForm.successMessage')}
-        </p>
+        <p className={styles.successMessage}>{t('auth.verifyForm.successMessage')}</p>
       </motion.div>
     );
   }
@@ -239,13 +232,13 @@ export default function VerifyEmailForm({ email }) {
         {code.map((digit, index) => (
           <input
             key={index}
-            ref={(el) => (inputRefs.current[index] = el)}
+            ref={el => (inputRefs.current[index] = el)}
             type="text"
             inputMode="numeric"
             maxLength={1}
             value={digit}
-            onChange={(e) => handleInputChange(index, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(index, e)}
+            onChange={e => handleInputChange(index, e.target.value)}
+            onKeyDown={e => handleKeyDown(index, e)}
             onPaste={handlePaste}
             disabled={isLoading}
             className={`${styles.codeInput} ${digit ? styles.filled : ''}`}
@@ -265,9 +258,7 @@ export default function VerifyEmailForm({ email }) {
 
       {/* Resend Section */}
       <div className={styles.resendSection}>
-        <span className={styles.resendText}>
-          {t('auth.verifyForm.resendPrompt')}
-        </span>
+        <span className={styles.resendText}>{t('auth.verifyForm.resendPrompt')}</span>
         <button
           type="button"
           className={styles.resendButton}

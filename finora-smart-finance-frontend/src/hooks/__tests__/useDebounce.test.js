@@ -22,10 +22,9 @@ describe('useDebounce', () => {
   });
 
   it('should debounce value changes', async () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useDebounce(value, 300),
-      { initialProps: { value: 'initial' } }
-    );
+    const { result, rerender } = renderHook(({ value }) => useDebounce(value, 300), {
+      initialProps: { value: 'initial' },
+    });
 
     expect(result.current).toBe('initial');
 
@@ -45,22 +44,21 @@ describe('useDebounce', () => {
   });
 
   it('should cancel previous timeout on rapid changes', async () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useDebounce(value, 300),
-      { initialProps: { value: 'a' } }
-    );
+    const { result, rerender } = renderHook(({ value }) => useDebounce(value, 300), {
+      initialProps: { value: 'a' },
+    });
 
     // Rapid changes
     rerender({ value: 'b' });
     act(() => {
       vi.advanceTimersByTime(100);
     });
-    
+
     rerender({ value: 'c' });
     act(() => {
       vi.advanceTimersByTime(100);
     });
-    
+
     rerender({ value: 'd' });
 
     // Value should still be 'a' since no timeout completed
@@ -77,11 +75,10 @@ describe('useDebounce', () => {
 
   it('should call callback after debounce', async () => {
     const callback = vi.fn();
-    
-    renderHook(
-      ({ value }) => useDebounce(value, 300, callback),
-      { initialProps: { value: 'test' } }
-    );
+
+    renderHook(({ value }) => useDebounce(value, 300, callback), {
+      initialProps: { value: 'test' },
+    });
 
     // Callback should not be called immediately
     expect(callback).not.toHaveBeenCalled();
@@ -96,10 +93,9 @@ describe('useDebounce', () => {
   });
 
   it('should use default delay of 300ms', () => {
-    const { result, rerender } = renderHook(
-      ({ value }) => useDebounce(value),
-      { initialProps: { value: 'initial' } }
-    );
+    const { result, rerender } = renderHook(({ value }) => useDebounce(value), {
+      initialProps: { value: 'initial' },
+    });
 
     rerender({ value: 'updated' });
 
