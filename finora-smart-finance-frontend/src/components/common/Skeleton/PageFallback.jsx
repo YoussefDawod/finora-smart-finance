@@ -55,7 +55,14 @@ const DashboardFallback = memo(() => (
     {/* Recent transactions */}
     <div className={styles.recentList}>
       <Skeleton width="180px" height="22px" variant="text" />
-      <Skeleton count={5} width="100%" height="56px" gap="8px" variant="rect" borderRadius="var(--r-md)" />
+      <Skeleton
+        count={5}
+        width="100%"
+        height="56px"
+        gap="8px"
+        variant="rect"
+        borderRadius="var(--r-md)"
+      />
     </div>
   </div>
 ));
@@ -76,7 +83,14 @@ const TransactionsFallback = memo(() => (
 
     {/* Table rows */}
     <div className={styles.tableRows}>
-      <Skeleton count={8} width="100%" height="52px" gap="4px" variant="rect" borderRadius="var(--r-sm)" />
+      <Skeleton
+        count={8}
+        width="100%"
+        height="52px"
+        gap="4px"
+        variant="rect"
+        borderRadius="var(--r-sm)"
+      />
     </div>
   </div>
 ));
@@ -90,10 +104,17 @@ const SettingsFallback = memo(() => (
   <div className={styles.settings}>
     <Skeleton width="200px" height="28px" variant="text" />
     <div className={styles.settingsSections}>
-      {[1, 2, 3].map((i) => (
+      {[1, 2, 3].map(i => (
         <div key={i} className={styles.settingsSection}>
           <Skeleton width="140px" height="20px" variant="text" />
-          <Skeleton count={3} width="100%" height="44px" gap="8px" variant="rect" borderRadius="var(--r-md)" />
+          <Skeleton
+            count={3}
+            width="100%"
+            height="44px"
+            gap="8px"
+            variant="rect"
+            borderRadius="var(--r-md)"
+          />
         </div>
       ))}
     </div>
@@ -103,11 +124,47 @@ const SettingsFallback = memo(() => (
 SettingsFallback.displayName = 'SettingsFallback';
 
 /**
+ * Landing-Page-Fallback — Hero-Section Skeleton (Nav wird bereits von PublicLayout gerendert)
+ */
+const LandingFallback = memo(() => (
+  <div className={styles.landing}>
+    <div className={styles.landingHero}>
+      {/* Text Column */}
+      <div className={styles.landingText}>
+        <Skeleton width="90%" height="44px" variant="text" />
+        <Skeleton width="70%" height="44px" variant="text" />
+        <div className={styles.landingSpacer} />
+        <Skeleton width="85%" height="18px" variant="text" />
+        <Skeleton width="65%" height="18px" variant="text" />
+        <div className={styles.landingActions}>
+          <Skeleton width="180px" height="48px" borderRadius="var(--r-xl)" />
+          <Skeleton width="160px" height="48px" borderRadius="var(--r-xl)" />
+        </div>
+        <div className={styles.landingBadges}>
+          <Skeleton width="85px" height="28px" borderRadius="var(--r-lg)" />
+          <Skeleton width="170px" height="28px" borderRadius="var(--r-lg)" />
+          <Skeleton width="90px" height="28px" borderRadius="var(--r-lg)" />
+          <Skeleton width="100px" height="28px" borderRadius="var(--r-lg)" />
+        </div>
+      </div>
+      {/* Mockup Column */}
+      <div className={styles.landingMockup}>
+        <Skeleton width="100%" height="340px" borderRadius="var(--r-xl)" />
+      </div>
+    </div>
+  </div>
+));
+
+LandingFallback.displayName = 'LandingFallback';
+
+/**
  * Universeller PageFallback — wählt passende Variante per Prop
  * @param {'content'|'dashboard'|'transactions'|'settings'} [variant='content']
  */
 const PageFallback = memo(({ variant = 'content' }) => {
   switch (variant) {
+    case 'landing':
+      return <LandingFallback />;
     case 'dashboard':
       return <DashboardFallback />;
     case 'transactions':
@@ -122,4 +179,10 @@ const PageFallback = memo(({ variant = 'content' }) => {
 PageFallback.displayName = 'PageFallback';
 
 export default PageFallback;
-export { ContentPageFallback, DashboardFallback, TransactionsFallback, SettingsFallback };
+export {
+  ContentPageFallback,
+  DashboardFallback,
+  TransactionsFallback,
+  SettingsFallback,
+  LandingFallback,
+};

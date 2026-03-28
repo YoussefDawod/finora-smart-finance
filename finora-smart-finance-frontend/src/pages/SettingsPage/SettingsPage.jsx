@@ -5,6 +5,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import {
   FiBell,
   FiLayout,
@@ -104,6 +105,7 @@ export default function SettingsPage() {
   const { user, refreshUser, isAuthenticated } = useAuth();
   const { success, error: showError } = useToast();
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const {
     lifecycleStatus,
     isLoading: lifecycleLoading,
@@ -251,6 +253,17 @@ export default function SettingsPage() {
     setPreferences(nextPreferences);
     setInitialPreferences(nextPreferences);
   }, [user, i18n.language]);
+
+  // Scroll to hash target (e.g. #feedback) after mount
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (!hash) return;
+    // Small delay so Framer Motion animations have rendered the target
+    const timer = setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [location.hash]);
 
   const isDirty = useMemo(
     () => JSON.stringify(preferences) !== JSON.stringify(initialPreferences),
@@ -654,7 +667,18 @@ export default function SettingsPage() {
           )}
         </motion.div>
 
-        {/* Feedback Section - Auth required */}
+        {/* Export Section - Auth required */}
+        <motion.div className={styles.sectionSlot} variants={itemVariants}>
+          {!isAuthenticated ? (
+            <AuthRequiredOverlay>
+              <ExportSection />
+            </AuthRequiredOverlay>
+          ) : (
+            <ExportSection />
+          )}
+        </motion.div>
+
+        {/* Feedback Section - Auth required (letzte Sektion) */}
         <motion.div className={styles.sectionCard} variants={itemVariants} id="feedback">
           {!isAuthenticated ? (
             <AuthRequiredOverlay>
@@ -684,17 +708,6 @@ export default function SettingsPage() {
                 <FeedbackSection />
               </div>
             </>
-          )}
-        </motion.div>
-
-        {/* Export Section - Auth required */}
-        <motion.div className={styles.sectionSlot} variants={itemVariants}>
-          {!isAuthenticated ? (
-            <AuthRequiredOverlay>
-              <ExportSection />
-            </AuthRequiredOverlay>
-          ) : (
-            <ExportSection />
           )}
         </motion.div>
       </div>

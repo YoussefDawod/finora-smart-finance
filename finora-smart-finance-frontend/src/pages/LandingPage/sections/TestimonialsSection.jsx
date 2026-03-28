@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { useMotion } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MEDIA_QUERIES } from '@/constants/breakpoints';
 import { feedbackService } from '@/api/feedbackService';

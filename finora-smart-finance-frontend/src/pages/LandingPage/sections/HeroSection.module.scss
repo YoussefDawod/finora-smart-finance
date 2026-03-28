@@ -26,14 +26,14 @@
 
 .content {
   display: grid;
-  grid-template-columns: 50% 50%;
-  gap: var(--space-3xl);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
   align-items: center;
   width: 100%;
 
   @include below-lg {
     grid-template-columns: 1fr;
-    gap: var(--space-2xl);
+    gap: var(--space-xl);
     text-align: center;
   }
 }
@@ -96,9 +96,7 @@
   font-weight: var(--fw-sb);
   font-size: var(--fs-md);
   text-decoration: none;
-  transition:
-    box-shadow var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   &:hover {
     box-shadow: 0 0 24px color-mix(in srgb, var(--primary) 45%, transparent);
@@ -118,9 +116,7 @@
   font-weight: var(--fw-sb);
   font-size: var(--fs-md);
   text-decoration: none;
-  transition:
-    background var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   &:hover {
     background: color-mix(in srgb, var(--primary) 10%, transparent);
@@ -162,13 +158,21 @@
 // ============================================
 
 .mockupCol {
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
+
+  @include below-lg {
+    max-width: 500px;
+    width: 100%;
+    margin-inline: auto;
+  }
 }
 
 // ── Laptop — MacBook Pro ──
-// Volle Breite im Mockup-Bereich, leichte Perspektive
+// Container-responsive: skaliert per Container-Query statt Viewport
 
 .deviceLaptop {
   zoom: 0.5;
@@ -179,12 +183,24 @@
     transform: rotateY(-2deg) rotateX(1.5deg);
   }
 
-  @include below-md {
-    zoom: 0.36;
+  @container (max-width: 600px) {
+    zoom: 0.42;
   }
 
-  @include below-sm {
-    zoom: 0.28;
+  @container (max-width: 500px) {
+    zoom: 0.34;
+  }
+
+  @container (max-width: 400px) {
+    zoom: 0.26;
+  }
+
+  @container (max-width: 300px) {
+    zoom: 0.2;
+  }
+
+  @include mobile {
+    display: none;
   }
 }
 
@@ -196,23 +212,68 @@
   justify-content: space-between;
   align-items: flex-end;
   width: 95%;
-  margin-top: -150px;
+  margin-top: -30%;
   position: relative;
   z-index: 2;
+
+  @include mobile {
+    justify-content: center;
+    margin-top: 0;
+  }
 }
 
 // ── Tablet — iPad Mini ──
 
 .deviceTablet {
-  zoom: 0.3;
+  zoom: 0.38;
   filter: drop-shadow(0 10px 32px rgba(0, 0, 0, 0.1));
+
+  @container (max-width: 600px) {
+    zoom: 0.3;
+  }
+
+  @container (max-width: 500px) {
+    zoom: 0.24;
+  }
+
+  @container (max-width: 400px) {
+    zoom: 0.19;
+  }
+
+  @container (max-width: 300px) {
+    zoom: 0.14;
+  }
+
+  @include mobile {
+    display: none;
+  }
 }
 
 // ── Mobile — iPhone X ──
 
 .deviceMobile {
-  zoom: 0.28;
+  zoom: 0.35;
   filter: drop-shadow(0 8px 28px rgba(0, 0, 0, 0.12));
+
+  @container (max-width: 600px) {
+    zoom: 0.28;
+  }
+
+  @container (max-width: 500px) {
+    zoom: 0.23;
+  }
+
+  @container (max-width: 400px) {
+    zoom: 0.18;
+  }
+
+  @container (max-width: 300px) {
+    zoom: 0.13;
+  }
+
+  @include mobile {
+    zoom: 0.7;
+  }
 }
 
 // ── Screenshot Bilder ──

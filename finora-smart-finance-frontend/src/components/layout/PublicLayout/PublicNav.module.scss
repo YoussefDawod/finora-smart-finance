@@ -13,6 +13,7 @@
 // damit .mobileMenu NICHT im backdrop-filter Compositing-Scope liegt.
 .navBar {
   min-height: var(--header-height, 56px);
+  contain: layout style;
   display: flex;
   align-items: center;
   transition:

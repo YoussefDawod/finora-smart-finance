@@ -11,6 +11,8 @@ function FooterBrand() {
         src="/logo-branding/finora-logo.svg"
         alt="Finora"
         className={`app-logo ${styles.brandLogo}`}
+        width={120}
+        height={40}
       />
       <p className={styles.brandDescription}>{t('footer.brand.description')}</p>
     </div>

@@ -17,6 +17,7 @@ const SECTION_ICONS = {
 function SectionTimeline({ sections, sectionRefs }) {
   const [activeId, setActiveId] = useState(sections[0]?.id ?? '');
   const [visible, setVisible] = useState(true);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const isMobile = useMediaQuery(MEDIA_QUERIES.mobile);
   const { shouldAnimate } = useMotion();
 
@@ -64,18 +65,22 @@ function SectionTimeline({ sections, sectionRefs }) {
     return () => observer.disconnect();
   }, [sections, sectionRefs]);
 
-  // Footer-Nähe → Timeline ausblenden
+  // Footer-Nähe → Timeline ausblenden + Mobile: erst nach Scroll anzeigen
   useEffect(() => {
     const handleScroll = () => {
       const scrollBottom = window.scrollY + window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
       setVisible(docHeight - scrollBottom > 120);
+
+      if (!hasScrolled && window.scrollY > 50) {
+        setHasScrolled(true);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [hasScrolled]);
 
   const scrollTo = useCallback(id => {
     // Sofort aktiv setzen + Observer blockieren während smooth-scroll
@@ -91,7 +96,7 @@ function SectionTimeline({ sections, sectionRefs }) {
     }, 900);
   }, []);
 
-  if (!visible) return null;
+  if (!visible || (isMobile && !hasScrolled)) return null;
 
   return (
     <motion.nav

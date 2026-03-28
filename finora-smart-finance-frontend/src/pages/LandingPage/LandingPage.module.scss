@@ -6,23 +6,25 @@
 .landing {
   width: 100%;
   overflow-x: hidden;
-  scrollbar-width: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 .section {
   scroll-margin-top: 80px; // Offset für fixierten Header
   min-height: 100dvh;
+  contain: layout style;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+
+  @include below-md {
+    min-height: auto;
+    justify-content: center;
+    padding-block: var(--space-3xl);
+  }
 }
 
 .sectionHidden {

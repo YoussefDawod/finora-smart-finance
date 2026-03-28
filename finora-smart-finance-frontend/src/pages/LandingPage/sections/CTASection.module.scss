@@ -109,9 +109,7 @@
   font-weight: var(--fw-sb);
   font-size: var(--fs-md);
   text-decoration: none;
-  transition:
-    box-shadow var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   &:hover {
     box-shadow: 0 0 28px color-mix(in srgb, var(--primary) 50%, transparent);
@@ -130,9 +128,7 @@
   font-weight: var(--fw-sb);
   font-size: var(--fs-md);
   text-decoration: none;
-  transition:
-    background var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   &:hover {
     background: color-mix(in srgb, var(--primary) 10%, transparent);

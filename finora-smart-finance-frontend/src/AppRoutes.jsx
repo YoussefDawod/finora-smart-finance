@@ -3,19 +3,30 @@ import { lazy, Suspense, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { useAuth, useMotion, useToast } from '@/hooks';
-import { MainLayout, AdminLayout, PublicLayout } from '@/components/layout';
-import { AdminRoute } from '@/components/auth';
+
+// Direct hook imports — Barrel '@/hooks' vermieden, um riesigen Dependency-Tree
+// (Admin-Hooks, Zod, Form-Schemas, etc.) nicht auf jeder Route zu laden.
+import { useAuth } from '@/hooks/useAuth';
+import { useMotion } from '@/hooks/useMotion';
+import { useToast } from '@/hooks/useToast';
+
+// PublicLayout wird sofort benötigt (Landing Page, Public Pages)
+import PublicLayout from '@/components/layout/PublicLayout/PublicLayout';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import { PageFallback } from '@/components/common/Skeleton';
 
-// ============================================
-// Critical Pages — statisch importiert (sofort benötigt)
-// ============================================
-import AuthPage from '@/pages/AuthPage';
-import EmailVerificationPage from '@/pages/EmailVerificationPage';
-import VerifyEmailPage from '@/pages/VerifyEmailPage';
-import NotFoundPage from '@/pages/NotFoundPage';
+// Layouts & Auth-Guard — lazy, damit Sidebar/Header/AdminErrorBoundary
+// nicht den initialen Bundle der Landing Page aufblähen.
+const MainLayout = lazy(() => import('@/components/layout/MainLayout/MainLayout'));
+const AdminLayout = lazy(() => import('@/components/layout/AdminLayout/AdminLayout'));
+const AdminRoute = lazy(() => import('@/components/auth/AdminRoute'));
+
+// Auth & Error Pages — selten der erste Ladevorgang,
+// daher lazy statt statisch.
+const AuthPage = lazy(() => import('@/pages/AuthPage'));
+const EmailVerificationPage = lazy(() => import('@/pages/EmailVerificationPage'));
+const VerifyEmailPage = lazy(() => import('@/pages/VerifyEmailPage'));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
 
 // ============================================
 // Lazy-Loaded Pages — on-demand importiert
@@ -124,7 +135,11 @@ const VerifyEmailWrapper = () => {
   const location = useLocation();
   const params = new globalThis.URLSearchParams(location.search);
   const hasResult = params.has('success') || params.has('error');
-  return hasResult ? <EmailVerificationPage /> : <VerifyEmailPage />;
+  return (
+    <Suspense fallback={<PageFallback variant="content" />}>
+      {hasResult ? <EmailVerificationPage /> : <VerifyEmailPage />}
+    </Suspense>
+  );
 };
 
 /**
@@ -204,7 +219,7 @@ const RootRedirect = () => {
   return (
     <PublicLayout variant="product">
       <PageTransition>
-        <Suspense fallback={<PageFallback variant="content" />}>
+        <Suspense fallback={<PageFallback variant="landing" />}>
           <LandingPage />
         </Suspense>
       </PageTransition>
@@ -225,7 +240,9 @@ function AnimatedRoutes() {
           path="/login"
           element={
             <PublicRoute>
-              <AuthPage />
+              <Suspense fallback={<PageFallback variant="content" />}>
+                <AuthPage />
+              </Suspense>
             </PublicRoute>
           }
         />
@@ -233,7 +250,9 @@ function AnimatedRoutes() {
           path="/register"
           element={
             <PublicRoute>
-              <AuthPage />
+              <Suspense fallback={<PageFallback variant="content" />}>
+                <AuthPage />
+              </Suspense>
             </PublicRoute>
           }
         />
@@ -251,7 +270,9 @@ function AnimatedRoutes() {
           path="/forgot-password"
           element={
             <PublicRoute>
-              <AuthPage />
+              <Suspense fallback={<PageFallback variant="content" />}>
+                <AuthPage />
+              </Suspense>
             </PublicRoute>
           }
         />
@@ -386,7 +407,13 @@ function AnimatedRoutes() {
         {/* App Routes — MainLayout OHNE ProtectedRoute:
             Guest-Modus erlaubt vollen Zugriff ohne Login (LocalStorage-basiert).
             Auth-sensitive Bereiche nutzen intern useAuth() + AuthRequiredOverlay. */}
-        <Route element={<MainLayout />}>
+        <Route
+          element={
+            <Suspense fallback={<PageFallback variant="dashboard" />}>
+              <MainLayout />
+            </Suspense>
+          }
+        >
           <Route
             path="/dashboard"
             element={
@@ -433,9 +460,11 @@ function AnimatedRoutes() {
         <Route
           path="/admin"
           element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
+            <Suspense fallback={<PageFallback variant="dashboard" />}>
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            </Suspense>
           }
         >
           <Route
@@ -546,7 +575,9 @@ function AnimatedRoutes() {
           path="*"
           element={
             <PageTransition>
-              <NotFoundPage />
+              <Suspense fallback={<PageFallback variant="content" />}>
+                <NotFoundPage />
+              </Suspense>
             </PageTransition>
           }
         />

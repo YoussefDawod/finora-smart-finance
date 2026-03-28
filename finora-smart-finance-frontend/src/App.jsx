@@ -4,7 +4,9 @@ import { ToastProvider } from '@/context/ToastContext';
 import { MotionProvider } from '@/context/MotionContext';
 import { TransactionProvider } from '@/context/TransactionContext';
 import { CookieConsentProvider } from '@/context/CookieConsentContext';
-import { ToastContainer, ErrorBoundary, CookieConsent } from '@/components/common';
+import ToastContainer from '@/components/common/ToastContainer/ToastContainer';
+import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
+import CookieConsent from '@/components/common/CookieConsent/CookieConsent';
 import { OfflineBanner } from '@/components/common/OfflineBanner/OfflineBanner';
 import AppRoutes from '@/AppRoutes';
 

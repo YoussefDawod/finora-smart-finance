@@ -5,7 +5,7 @@ import { FiMenu, FiX, FiLogOut } from 'react-icons/fi';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MEDIA_QUERIES } from '@/constants/breakpoints';
 import { useAuth } from '@/hooks/useAuth';
-import { UserMenu } from '@/components/common';
+import UserMenu from '@/components/common/UserMenu/UserMenu';
 import Skeleton from '@/components/common/Skeleton/Skeleton';
 import styles from './PublicNav.module.scss';
 
@@ -53,6 +53,16 @@ function PublicNav() {
 
   const logoTo = isAuthenticated ? '/dashboard' : '/';
 
+  const handleLogoClick = useCallback(
+    e => {
+      if (location.pathname === '/') {
+        e.preventDefault();
+        window.location.reload();
+      }
+    },
+    [location.pathname]
+  );
+
   return (
     <nav className={styles.nav} aria-label={t('nav.publicNav', 'Navigation')}>
       {/* navBar trägt backdrop-filter — mobileMenu ist AUSSERHALB davon */}
@@ -75,11 +85,18 @@ function PublicNav() {
 
               {/* Mobile: Logo on landing page */}
               {isLandingPage && (
-                <Link to="/" className={styles.logo} aria-label="Finora Home">
+                <Link
+                  to="/"
+                  className={styles.logo}
+                  aria-label="Finora Home"
+                  onClick={handleLogoClick}
+                >
                   <img
                     src="/logo-branding/finora-logo.svg"
                     alt="Finora"
                     className={styles.logoImg}
+                    width={120}
+                    height={32}
                   />
                 </Link>
               )}
@@ -100,8 +117,19 @@ function PublicNav() {
           ) : (
             <>
               {/* Desktop LEFT: Logo → Dashboard oder Home */}
-              <Link to={logoTo} className={styles.logo} aria-label="Finora Home">
-                <img src="/logo-branding/finora-logo.svg" alt="Finora" className={styles.logoImg} />
+              <Link
+                to={logoTo}
+                className={styles.logo}
+                aria-label="Finora Home"
+                onClick={handleLogoClick}
+              >
+                <img
+                  src="/logo-branding/finora-logo.svg"
+                  alt="Finora"
+                  className={styles.logoImg}
+                  width={120}
+                  height={32}
+                />
               </Link>
 
               {/* Desktop CENTER: Nav Links (hidden on landing page) */}
@@ -133,14 +161,9 @@ function PublicNav() {
                     <UserMenu user={user} onLogout={handleLogout} />
                   </>
                 ) : (
-                  <>
-                    <Link to="/login" className={styles.loginBtn}>
-                      {t('nav.login')}
-                    </Link>
-                    <Link to="/register" className={styles.registerBtn}>
-                      {t('nav.register')}
-                    </Link>
-                  </>
+                  <Link to="/login" className={styles.loginBtn}>
+                    {t('nav.login')}
+                  </Link>
                 )}
               </div>
             </>
@@ -187,14 +210,9 @@ function PublicNav() {
                 {t('nav.logout')}
               </button>
             ) : (
-              <>
-                <Link to="/login" className={styles.loginBtn} onClick={closeMenu}>
-                  {t('nav.login')}
-                </Link>
-                <Link to="/register" className={styles.registerBtn} onClick={closeMenu}>
-                  {t('nav.register')}
-                </Link>
-              </>
+              <Link to="/login" className={styles.loginBtn} onClick={closeMenu}>
+                {t('nav.login')}
+              </Link>
             )}
           </div>
         </div>

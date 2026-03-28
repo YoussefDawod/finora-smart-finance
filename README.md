@@ -10,7 +10,7 @@
 
 ---
 
-[🎬 Live Demo](#) • [📖 Frontend Docs](./finora-smart-finance-frontend/README.md) • [⚙️ Backend Docs](./finora-smart-finance-api/README.md) • [🐛 Issues](https://github.com/YoussefDawod/expense-tracker/issues)
+[📖 Frontend Docs](./finora-smart-finance-frontend/README.md) • [⚙️ Backend Docs](./finora-smart-finance-api/README.md) • [🐛 Issues](https://github.com/YoussefDawod/finora-smart-finance/issues)
 
 </div>
 
@@ -35,13 +35,17 @@
 
 | Feature | Beschreibung |
 |---------|-------------|
-| 📊 **Smart Dashboard** | Echtzeit-Statistiken, Charts (Pie, Bar, Line), Trend-Analyse |
-| 💰 **Transaktions-Management** | Schnelles Hinzufügen, automatische Kategorisierung, Tags |
-| 🎯 **Sparziele & Budgets** | Budget-Limits, Progress Tracking, Notifikationen |
-| 🔐 **Admin Panel** | Dashboard, User-Management, Transaktions-Übersicht, Newsletter, Audit-Log |
+| 📊 **Smart Dashboard** | Echtzeit-Statistiken, Charts (Area, Pie, Bar), Budget-Tracking, Orbital Savings Ring |
+| 💰 **Transaktions-Management** | Schnelles Hinzufügen, Kategorisierung, Quota-Tracking, PDF-Export |
+| 🎯 **Budgets & Alerts** | Budget-Limits pro Kategorie, Benachrichtigungen bei Überschreitung |
+| 🔐 **Admin Panel** | Dashboard, User-Management, Transaktionen, Newsletter, Campaigns, Feedback, Audit-Log, Lifecycle |
 | 🌍 **4 Sprachen** | Deutsch, English, العربية, ქართული (RTL Support) |
-| 🔐 **Bank-Level Sicherheit** | JWT Auth, Bcrypt Hashing, Rate Limiting |
-| 🌙 **Dark Mode** | Framer Motion Animationen |
+| 📧 **Newsletter & Campaigns** | Double-Opt-In, Template-basierte E-Mail-Kampagnen |
+| 💬 **Kontakt & Feedback** | Kontaktformular mit Honeypot-Schutz, In-App Feedback-System |
+| 🔐 **Bank-Level Sicherheit** | JWT Auth, Bcrypt Hashing, Rate Limiting, Helmet, HPP |
+| 🌙 **Dark Mode** | Framer Motion Animationen, System-Preference Auto-Detect |
+| 📱 **PWA** | Offline-fähig, installierbar, Service Worker mit Workbox |
+| 🏠 **Landing Page** | Hero mit Device-Mockups, Features, How It Works, Testimonials, CTA |
 
 ---
 
@@ -49,10 +53,10 @@
 
 | ✨ | Vorteil | Details |
 |---|---------|---------|
-| 💎 | **Premium UX** | WCAG 2.1 AA, flüssige Animationen, durchdachte Patterns |
-| 🚀 | **Developer-Friendly** | 1638+ Unit Tests, MVC-Pattern |
-| 🌍 | **Global Ready** | 4 Sprachen, HTTP i18n Backend, Multi-Currency |
-| 🔧 | **Production-Ready** | GitHub Actions CI/CD, ESLint, Prettier |
+| 💎 | **Premium UX** | WCAG 2.1 AA, Glass-Morphism Design, flüssige Animationen |
+| 🚀 | **Developer-Friendly** | 2811 Unit Tests, 8 E2E Tests, MVC-Pattern |
+| 🌍 | **Global Ready** | 4 Sprachen, HTTP i18n Backend |
+| 🔧 | **Production-Ready** | GitHub Actions CI/CD, ESLint, Prettier, Husky Pre-Commit |
 
 ---
 
@@ -60,8 +64,8 @@
 
 ```bash
 # 1️⃣ Repository klonen
-git clone https://github.com/YoussefDawod/expense-tracker.git
-cd expense-tracker
+git clone https://github.com/YoussefDawod/finora-smart-finance.git
+cd finora-smart-finance
 
 # 2️⃣ Dependencies installieren
 npm install
@@ -85,28 +89,29 @@ npm run dev:api &         # Express ⚙️ Port 5000
 
 | Layer | Technologie |
 |-------|-------------|
-| **Frontend** | React 19, Vite 7, SCSS Modules, Recharts, Framer Motion |
-| **Backend** | Express 5, MongoDB, Mongoose, JWT, Bcrypt |
-| **Testing** | Vitest (1176 Tests), Jest (462 Tests) |
-| **Quality** | ESLint 9, Prettier 3, Husky, GitHub Actions |
+| **Frontend** | React 19, Vite 7, SCSS Modules, Recharts, Framer Motion, PWA (Workbox) |
+| **Backend** | Express 5, MongoDB, Mongoose 9, JWT, Bcrypt, Nodemailer |
+| **Testing** | Vitest (1708 Tests), Jest (1103 Tests), Playwright (8 E2E Specs) |
+| **Quality** | ESLint 9, Prettier 3, Husky, lint-staged, GitHub Actions CI/CD |
 
 ---
 
 ## 🧪 Testing & Qualität
 
 ```bash
-npm run test              # Alle Tests
+npm run test              # Alle Unit Tests (Frontend + Backend)
 npm run test:frontend     # Frontend (Vitest)
 npm run test:api          # Backend (Jest)
+npm run test:e2e          # E2E Tests (Playwright)
 npm run lint              # Code-Qualität
 ```
 
 | Metric | Wert |
 |--------|------|
-| **Unit Tests** | 1638+ (1176 Frontend + 462 Backend) |
-| **Test Suites** | 79 (57 Frontend + 22 Backend) |
+| **Unit Tests** | 2811 (1708 Frontend + 1103 Backend) |
+| **Test Suites** | 140 (96 Frontend + 44 Backend) |
+| **E2E Specs** | 8 (Playwright) |
 | **ESLint Errors** | 0 |
-| **Build Size** | ~500KB |
 
 ---
 
@@ -116,9 +121,12 @@ npm run lint              # Code-Qualität
 |---------|-------------|
 | 🔐 **JWT Auth** | Access (15min) + Refresh (7d) Tokens |
 | 🔒 **Bcrypt** | 10 Rounds Password Hashing |
+| 📧 **E-Mail-Verifizierung** | Double-Opt-In bei Registrierung |
 | 🛡️ **CORS** | Whitelist erlaubter Origins |
 | ⏱️ **Rate Limiting** | Schutz vor Brute-Force |
-| ✅ **Validation** | Zod Schema + MongoDB Validation |
+| 🧹 **MongoDB Sanitizer** | NoSQL-Injection-Schutz |
+| 🪖 **Helmet & HPP** | HTTP-Header-Hardening |
+| ✅ **Validation** | Zod Schema + Mongoose Validation |
 
 ---
 
@@ -126,7 +134,7 @@ npm run lint              # Code-Qualität
 
 ```bash
 # Fork & Clone
-git clone https://github.com/YOUR_USERNAME/expense-tracker.git
+git clone https://github.com/YOUR_USERNAME/finora-smart-finance.git
 
 # Feature Branch
 git checkout -b feature/amazing-feature
@@ -147,10 +155,10 @@ git push origin feature/amazing-feature
 
 | Dokument | Beschreibung |
 |----------|-------------|
-| [Frontend README](./finora-smart-finance-frontend/README.md) | React, Hooks, Design System |
+| [Frontend README](./finora-smart-finance-frontend/README.md) | React, Hooks, Design System, PWA |
 | [Backend README](./finora-smart-finance-api/README.md) | Express, API Endpoints, Admin CLI |
-| [Admin API Reference](./finora-smart-finance-api/docs/ADMIN_API.md) | Admin Endpoints |
-| [Changelog](./CHANGELOG.md) | Alle Änderungen |
+| [Admin API Reference](./finora-smart-finance-api/docs/ADMIN_API.md) | Admin Endpoints & Auth |
+| [Design System](./docs/Projekt-Design.md) | Aurora Flow Design System |
 
 ---
 
@@ -158,9 +166,8 @@ git push origin feature/amazing-feature
 
 | | |
 |---|---|
-| 🐛 **Bugs** | [GitHub Issues](https://github.com/YoussefDawod/expense-tracker/issues) |
-| 💬 **Fragen** | [GitHub Discussions](https://github.com/YoussefDawod/expense-tracker/discussions) |
-| 📧 **Kontakt** | contact@example.com |
+| 🐛 **Bugs** | [GitHub Issues](https://github.com/YoussefDawod/finora-smart-finance/issues) |
+| 💬 **Fragen** | [GitHub Discussions](https://github.com/YoussefDawod/finora-smart-finance/discussions) |
 
 ---
 

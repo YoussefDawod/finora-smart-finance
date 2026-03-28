@@ -93,10 +93,7 @@
   backdrop-filter: blur(var(--glass-blur-minimal, 10px));
   -webkit-backdrop-filter: blur(var(--glass-blur-minimal, 10px));
   padding: var(--space-xl);
-  transition:
-    border-color var(--tr),
-    box-shadow var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   @supports not (backdrop-filter: blur(1px)) {
     background: var(--surface);
@@ -144,33 +141,17 @@
   line-height: var(--lh-relaxed);
 }
 
-// ── Carousel (Mobile) ──
+// ── Mobile Stack ──
 
 .carousel {
   display: flex;
+  flex-direction: column;
   gap: var(--space-md);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: var(--space-sm);
-
-  // Scrollbar verstecken
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  width: 100%;
 }
 
 .carouselItem {
-  flex: 0 0 85%;
-  scroll-snap-align: center;
-  min-height: 10rem;
-
-  // Karten im Karussell brauchen expliziten border-radius
-  .featureCard {
-    height: 100%;
-  }
+  width: 100%;
 }
 
 // ── More Link ──

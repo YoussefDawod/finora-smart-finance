@@ -86,7 +86,7 @@ function DashboardContent() {
     fetchQuota,
     confirmExport,
   } = useLifecycle();
-  const { feedback } = useFeedback();
+  const { feedback, feedbackCount } = useFeedback();
 
   // Lifecycle-Daten und Quota einmalig laden (nur wenn authentifiziert)
   useEffect(() => {
@@ -378,6 +378,18 @@ function DashboardContent() {
     >
       <AuroraCanvas />
 
+      {/* Feedback Prompt (§8.2) — einmalige Benachrichtigung */}
+      {isAuthenticated && (
+        <motion.div variants={fadeUp}>
+          <FeedbackPrompt
+            userCreatedAt={user?.createdAt}
+            transactionCount={dashboardData?.summary?.totalTransactions ?? 0}
+            hasFeedback={!!feedback}
+            feedbackCount={feedbackCount}
+          />
+        </motion.div>
+      )}
+
       {/* Header */}
       <motion.section className={styles.headerSection} variants={fadeUp}>
         <div className={styles.greeting}>
@@ -449,17 +461,6 @@ function DashboardContent() {
             lifecycleStatus={lifecycleStatus}
             lifecycleLoading={lifecycleLoading}
             confirmExport={confirmExport}
-          />
-        </motion.div>
-      )}
-
-      {/* Feedback Prompt (§8.2) — einmalige Benachrichtigung */}
-      {isAuthenticated && (
-        <motion.div variants={fadeUp}>
-          <FeedbackPrompt
-            userCreatedAt={user?.createdAt}
-            transactionCount={dashboardData?.summary?.totalTransactions ?? 0}
-            hasFeedback={!!feedback}
           />
         </motion.div>
       )}

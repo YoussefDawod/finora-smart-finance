@@ -68,10 +68,7 @@
   -webkit-backdrop-filter: blur(var(--glass-blur-minimal, 10px));
   padding: var(--space-xl);
   position: relative;
-  transition:
-    border-color var(--tr),
-    box-shadow var(--tr),
-    transform var(--tr);
+  transition: transform var(--tr);
 
   @supports not (backdrop-filter: blur(1px)) {
     background: var(--surface);

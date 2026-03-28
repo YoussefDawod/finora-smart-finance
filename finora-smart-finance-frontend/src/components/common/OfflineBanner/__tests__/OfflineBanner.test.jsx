@@ -16,7 +16,7 @@ vi.mock('react-i18next', () => ({
 
 // ── Mock useOnlineStatus ──────────────────────────
 let mockIsOnline = true;
-vi.mock('@/hooks', () => ({
+vi.mock('@/hooks/useOnlineStatus', () => ({
   useOnlineStatus: () => mockIsOnline,
 }));
 
@@ -61,7 +61,7 @@ describe('OfflineBanner', () => {
     render(<OfflineBanner />);
 
     expect(
-      screen.getByText('Du bist offline – einige Funktionen sind eingeschränkt'),
+      screen.getByText('Du bist offline – einige Funktionen sind eingeschränkt')
     ).toBeInTheDocument();
   });
 });

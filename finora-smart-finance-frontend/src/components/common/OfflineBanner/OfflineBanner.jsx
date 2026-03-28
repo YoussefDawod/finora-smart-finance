@@ -9,7 +9,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { FiWifiOff } from 'react-icons/fi';
-import { useOnlineStatus } from '@/hooks';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import styles from './OfflineBanner.module.scss';
 
 /**

@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import HeroSection from './sections/HeroSection';
 import FeaturesSection from './sections/FeaturesSection';
@@ -21,6 +21,12 @@ export default function LandingPage() {
 
   const handleTestimonialsLoaded = useCallback(count => {
     setHasTestimonials(count > 0);
+  }, []);
+
+  // Scrollbar auf html ausblenden — Timeline Navigation ersetzt sie
+  useEffect(() => {
+    document.documentElement.classList.add('page-no-scrollbar');
+    return () => document.documentElement.classList.remove('page-no-scrollbar');
   }, []);
 
   const visibleSections = SECTIONS.filter(id => id !== 'testimonials' || hasTestimonials);

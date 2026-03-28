@@ -132,24 +132,26 @@ function FeedbackDetailModal({
             <p className={styles.detailText}>{fb.text || t('admin.feedbacks.noText')}</p>
           </div>
 
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>{t('admin.feedbacks.colConsent')}</span>
-            <span
-              className={`${styles.badge} ${fb.consentGiven ? styles.badgeConsent : styles.badgeNoConsent}`}
-            >
-              {fb.consentGiven
-                ? t('admin.feedbacks.consentGiven')
-                : t('admin.feedbacks.consentNotGiven')}
-            </span>
-          </div>
+          <div className={styles.detailRowPair}>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>{t('admin.feedbacks.colConsent')}</span>
+              <span
+                className={`${styles.badge} ${fb.consentGiven ? styles.badgeConsent : styles.badgeNoConsent}`}
+              >
+                {fb.consentGiven
+                  ? t('admin.feedbacks.consentGiven')
+                  : t('admin.feedbacks.consentNotGiven')}
+              </span>
+            </div>
 
-          <div className={styles.detailRow}>
-            <span className={styles.detailLabel}>{t('admin.feedbacks.colStatus')}</span>
-            <span
-              className={`${styles.badge} ${fb.published ? styles.badgePublished : styles.badgeUnpublished}`}
-            >
-              {fb.published ? t('admin.feedbacks.published') : t('admin.feedbacks.unpublished')}
-            </span>
+            <div className={styles.detailRow}>
+              <span className={styles.detailLabel}>{t('admin.feedbacks.colStatus')}</span>
+              <span
+                className={`${styles.badge} ${fb.published ? styles.badgePublished : styles.badgeUnpublished}`}
+              >
+                {fb.published ? t('admin.feedbacks.published') : t('admin.feedbacks.unpublished')}
+              </span>
+            </div>
           </div>
 
           <div className={styles.detailRow}>
@@ -396,7 +398,6 @@ export default function AdminFeedbacksPage() {
               <tr>
                 <th>{t('admin.feedbacks.colUser')}</th>
                 <th>{t('admin.feedbacks.colRating')}</th>
-                <th>{t('admin.feedbacks.colText')}</th>
                 <th>{t('admin.feedbacks.colConsent')}</th>
                 <th>{t('admin.feedbacks.colStatus')}</th>
                 <th>{t('admin.feedbacks.colDate')}</th>
@@ -406,7 +407,7 @@ export default function AdminFeedbacksPage() {
             <tbody>
               {[...Array(5)].map((_, i) => (
                 <tr key={i} className={styles.skeletonRow}>
-                  {[...Array(7)].map((__, j) => (
+                  {[...Array(6)].map((__, j) => (
                     <td key={j}>
                       <div className={styles.skeletonCell} style={{ width: `${60 + j * 10}%` }} />
                     </td>
@@ -429,7 +430,6 @@ export default function AdminFeedbacksPage() {
                 <tr>
                   <th>{t('admin.feedbacks.colUser')}</th>
                   <th>{t('admin.feedbacks.colRating')}</th>
-                  <th>{t('admin.feedbacks.colText')}</th>
                   <th>{t('admin.feedbacks.colConsent')}</th>
                   <th>{t('admin.feedbacks.colStatus')}</th>
                   <th>{t('admin.feedbacks.colDate')}</th>
@@ -451,16 +451,6 @@ export default function AdminFeedbacksPage() {
                     </td>
                     <td>
                       <StarRating rating={fb.rating} />
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className={fb.text ? styles.feedbackTextBtn : styles.feedbackTextEmpty}
-                        onClick={() => fb.text && setDetailFeedback(fb)}
-                        title={fb.text || undefined}
-                      >
-                        {fb.text || t('admin.feedbacks.noText')}
-                      </button>
                     </td>
                     <td>
                       <span

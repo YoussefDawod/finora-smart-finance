@@ -9,7 +9,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiStar, FiTrash2, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { FiStar, FiTrash2, FiCheck } from 'react-icons/fi';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/hooks/useToast';
 import { useMotion } from '@/hooks/useMotion';
@@ -277,14 +277,6 @@ export default function FeedbackForm({
             <span>{t('feedback.form.checkPrivacy')}</span>
           </label>
         </div>
-
-        {/* Hint for consent */}
-        {rating >= 4 && (
-          <p className={styles.consentHint}>
-            <FiAlertCircle />
-            {t('feedback.form.consentHint')}
-          </p>
-        )}
 
         <button type="submit" className={styles.submitBtn} disabled={!canSubmit}>
           {actionLoading ? t('common.saving') : t('feedback.form.submit')}

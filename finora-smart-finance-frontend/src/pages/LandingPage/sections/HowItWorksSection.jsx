@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FiEdit3, FiTrendingUp, FiCheckCircle } from 'react-icons/fi';
-import { useMotion } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
 import StepCard from '../components/StepCard';
 import styles from './HowItWorksSection.module.scss';
 

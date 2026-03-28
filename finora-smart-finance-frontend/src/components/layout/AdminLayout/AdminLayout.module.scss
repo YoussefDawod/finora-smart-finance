@@ -55,6 +55,12 @@
   align-items: center;
   gap: var(--space-sm);
 
+  .adminLogo {
+    display: flex;
+    align-items: center;
+    @include focus-ring;
+  }
+
   .adminLogoImg {
     height: 2.25rem; // 36px — konsistent mit App-Header & PublicNav
     width: auto;

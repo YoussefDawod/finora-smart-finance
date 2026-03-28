@@ -105,3 +105,83 @@
   flex-direction: column;
   gap: var(--space-sm);
 }
+
+/* ============================================
+   LANDING PAGE
+   ============================================ */
+
+.landing {
+  width: 100%;
+  min-height: calc(100dvh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.landingHero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.landingText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.landingSpacer {
+  height: var(--space-xs);
+}
+
+.landingActions {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.landingBadges {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+  margin-top: var(--space-md);
+}
+
+.landingMockup {
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1023px) {
+  .landingHero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .landingText {
+    align-items: center;
+  }
+
+  .landingActions {
+    justify-content: center;
+  }
+
+  .landingBadges {
+    justify-content: center;
+  }
+
+  .landingMockup {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .landing {
+    padding: var(--space-lg) var(--space-md);
+  }
+}

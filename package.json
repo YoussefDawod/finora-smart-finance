@@ -1,5 +1,5 @@
 {
-  "name": "expense-tracker",
+  "name": "finora-smart-finance",
   "version": "2.1.0",
   "description": "Finora Smart Finance - Moderne Finanzverwaltung mit React + Node.js",
   "private": true,
@@ -47,5 +47,8 @@
       "npm run lint:fix --workspace=finora-smart-finance-api",
       "npm run format --workspace=finora-smart-finance-api"
     ]
+  },
+  "overrides": {
+    "@rollup/plugin-terser": "^1.0.0"
   }
 }

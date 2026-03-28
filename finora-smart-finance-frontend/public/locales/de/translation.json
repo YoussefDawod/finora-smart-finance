@@ -1127,8 +1127,7 @@
           "Im Rahmen des Betriebs der Anwendung setzen wir folgende Dienstleister als Auftragsverarbeiter ein (Art. 28 DSGVO):"
         ],
         "list": [
-          "Hosting (Frontend): ALL-INKL.COM – Neue Medien Münnich, Hauptstraße 68, 02742 Friedersdorf, Deutschland. Serverstandort: Deutschland/EU.",
-          "Hosting (Backend/API): Render Services, Inc., San Francisco, USA. Datenverarbeitung auf Servern in der EU/EWR-Region. Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.",
+          "Hosting (Frontend & Backend/API): Render Services, Inc., 525 Brannan Street, Suite 300, San Francisco, CA 94107, USA. Datenverarbeitung auf Servern in der EU/EWR-Region (Frankfurt). Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.",
           "Datenbank: MongoDB, Inc. (MongoDB Atlas), New York, USA. Cluster-Standort: EU (Frankfurt). Standardvertragsklauseln gemäß Art. 46 Abs. 2 lit. c DSGVO.",
           "Newsletter-Versand: Erfolgt über einen eigenen SMTP-Server. Es wird kein externer Newsletter-Dienstleister eingesetzt."
         ],
@@ -2443,7 +2442,7 @@
       "subtitle": "So einfach geht's mit Finora.",
       "step1": {
         "title": "Erfassen",
-        "description": "Transaktionen eintragen — manuell oder per Import. Einfach und schnell."
+        "description": "Transaktionen eintragen — mit Kategorie, Betrag und Datum. Einfach und schnell."
       },
       "step2": {
         "title": "Analysieren",

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
-import { useMotion } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './CTASection.module.scss';
 
 export default function CTASection() {

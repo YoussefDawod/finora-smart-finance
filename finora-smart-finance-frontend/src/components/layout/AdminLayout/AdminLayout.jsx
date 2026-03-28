@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -134,11 +134,13 @@ export default function AdminLayout() {
             </motion.button>
           )}
           {!isMobile && (
-            <img
-              src="/logo-branding/finora-logo.svg"
-              alt="Finora"
-              className={styles.adminLogoImg}
-            />
+            <Link to="/dashboard" className={styles.adminLogo}>
+              <img
+                src="/logo-branding/finora-logo.svg"
+                alt="Finora"
+                className={styles.adminLogoImg}
+              />
+            </Link>
           )}
         </div>
         <div className={styles.headerRight}>

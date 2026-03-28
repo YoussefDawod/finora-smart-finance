@@ -24,7 +24,7 @@
  */
 
 import { motion } from 'framer-motion';
-import { useMotion } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
 import styles from './BrandingBackground.module.scss';
 
 // ============================================
@@ -33,18 +33,18 @@ import styles from './BrandingBackground.module.scss';
 
 /** Vollständige Shape-Konfiguration — Desktop / große Viewports */
 const SHAPES_FULL = [
-  { size: 120, x: '10%', y: '18%', delay: 0,   duration: 9  },
-  { size: 90,  x: '78%', y: '16%', delay: 0.6, duration: 10 },
-  { size: 70,  x: '24%', y: '72%', delay: 1.0, duration: 8  },
+  { size: 120, x: '10%', y: '18%', delay: 0, duration: 9 },
+  { size: 90, x: '78%', y: '16%', delay: 0.6, duration: 10 },
+  { size: 70, x: '24%', y: '72%', delay: 1.0, duration: 8 },
   { size: 110, x: '82%', y: '66%', delay: 0.3, duration: 11 },
-  { size: 48,  x: '58%', y: '42%', delay: 1.4, duration: 7  },
+  { size: 48, x: '58%', y: '42%', delay: 1.4, duration: 7 },
 ];
 
 /** Kompakte Shape-Konfiguration — Mobile / schmale Viewports */
 const SHAPES_COMPACT = [
-  { size: 60, x: '12%', y: '20%', delay: 0,   duration: 9  },
+  { size: 60, x: '12%', y: '20%', delay: 0, duration: 9 },
   { size: 45, x: '80%', y: '30%', delay: 0.8, duration: 10 },
-  { size: 35, x: '65%', y: '75%', delay: 1.2, duration: 8  },
+  { size: 35, x: '65%', y: '75%', delay: 1.2, duration: 8 },
 ];
 
 // ============================================
@@ -53,8 +53,8 @@ const SHAPES_COMPACT = [
 
 /** Nur y (max ±12px) + rotate — kein scale-Loop (MOTION_GLOW_RULES §3) */
 const shapeAnimate = {
-  y:      [0, -12, 0],
-  rotate: [0,   4, -3, 0],
+  y: [0, -12, 0],
+  rotate: [0, 4, -3, 0],
 };
 
 /**
@@ -70,7 +70,6 @@ export default function BrandingBackground({ withBlur = false, compact = false }
 
   return (
     <div className={styles.background} aria-hidden="true">
-
       {/* Gradient Backdrop */}
       <div className={styles.backdrop} />
 
@@ -81,19 +80,19 @@ export default function BrandingBackground({ withBlur = false, compact = false }
             key={index}
             className={styles.shape}
             style={{
-              width:  shape.size,
+              width: shape.size,
               height: shape.size,
-              left:   shape.x,
-              top:    shape.y,
+              left: shape.x,
+              top: shape.y,
             }}
             animate={shouldAnimate ? shapeAnimate : {}}
             transition={
               shouldAnimate
                 ? {
-                    duration:   shape.duration,
-                    delay:      shape.delay,
-                    repeat:     Infinity,
-                    ease:       'easeInOut',
+                    duration: shape.duration,
+                    delay: shape.delay,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
                   }
                 : {}
             }
@@ -103,7 +102,6 @@ export default function BrandingBackground({ withBlur = false, compact = false }
 
       {/* Optional Blur Overlay — für Logo-Lesbarkeit wenn direkt auf Background platziert */}
       {withBlur && <div className={styles.blurOverlay} />}
-
     </div>
   );
 }

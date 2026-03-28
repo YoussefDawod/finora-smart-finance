@@ -10,7 +10,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const mockRemoveToast = vi.fn();
 let mockToasts = [];
 
-vi.mock('@/hooks', () => ({
+vi.mock('@/hooks/useToast', () => ({
   useToast: () => ({
     toasts: mockToasts,
     removeToast: mockRemoveToast,
@@ -105,9 +105,7 @@ describe('ToastContainer', () => {
     mockToasts = [{ id: '1', message: 'X' }];
     const { container } = render(<ToastContainer />);
     expect(container.innerHTML).toBe('');
-    expect(errorSpy).toHaveBeenCalledWith(
-      expect.stringContaining('toast-portal-root')
-    );
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('toast-portal-root'));
     errorSpy.mockRestore();
     // Re-create for afterEach cleanup
     portalRoot = document.createElement('div');

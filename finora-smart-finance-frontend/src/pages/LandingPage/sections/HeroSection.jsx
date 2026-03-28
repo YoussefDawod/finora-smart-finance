@@ -4,7 +4,8 @@ import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
 import { DeviceFrameset } from 'react-device-frameset';
 import 'react-device-frameset/styles/marvel-devices.min.css';
-import { useMotion, useTheme } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
+import { useTheme } from '@/hooks/useTheme';
 import styles from './HeroSection.module.scss';
 
 const trustKeys = ['trustFree', 'trustNoSignup', 'trustLanguages', 'trustDarkMode'];
@@ -70,13 +71,21 @@ export default function HeroSection() {
         <motion.div className={styles.mockupCol} variants={shouldAnimate ? fadeUp : undefined}>
           {/* Laptop — volle Breite, mit Perspektive */}
           <div className={styles.deviceLaptop}>
-            <DeviceFrameset device="MacBook Pro">
-              <img
-                src={`/Screenshots/Screenshot-Desktop-${suffix}.png`}
-                alt={t('landing.hero.altDesktop', 'Finora Dashboard — Desktop')}
-                className={styles.screenshot}
-                loading="eager"
-              />
+            <DeviceFrameset device="MacBook Pro" width={960} height={556}>
+              <picture>
+                <source
+                  srcSet={`/Screenshots/Screenshot-Desktop-${suffix}.webp`}
+                  type="image/webp"
+                />
+                <img
+                  src={`/Screenshots/Screenshot-Desktop-${suffix}.png`}
+                  alt={t('landing.hero.altDesktop', 'Finora Dashboard — Desktop')}
+                  className={styles.screenshot}
+                  loading="eager"
+                  width={960}
+                  height={556}
+                />
+              </picture>
             </DeviceFrameset>
           </div>
 
@@ -84,23 +93,38 @@ export default function HeroSection() {
           <div className={styles.smallDevices}>
             <div className={styles.deviceTablet}>
               <DeviceFrameset device="iPad Mini" color={isDarkMode ? 'black' : 'silver'}>
-                <img
-                  src={`/Screenshots/Screenshot-Tablet-${suffix}.png`}
-                  alt={t('landing.hero.altTablet', 'Finora Dashboard — Tablet')}
-                  className={styles.screenshot}
-                  loading="lazy"
-                />
+                <picture>
+                  <source
+                    srcSet={`/Screenshots/Screenshot-Tablet-${suffix}.webp`}
+                    type="image/webp"
+                  />
+                  <img
+                    src={`/Screenshots/Screenshot-Tablet-${suffix}.png`}
+                    alt={t('landing.hero.altTablet', 'Finora Dashboard — Tablet')}
+                    className={styles.screenshot}
+                    loading="lazy"
+                  />
+                </picture>
               </DeviceFrameset>
             </div>
 
             <div className={styles.deviceMobile}>
-              <DeviceFrameset device="iPhone X">
-                <img
-                  src={`/Screenshots/Screenshot-Mobile-${suffix}.png`}
-                  alt={t('landing.hero.altMobile', 'Finora Dashboard — Mobile')}
-                  className={styles.screenshot}
-                  loading="eager"
-                />
+              <DeviceFrameset device="iPhone X" width={375} height={642}>
+                <picture>
+                  <source
+                    srcSet={`/Screenshots/Screenshot-Mobile-${suffix}.webp`}
+                    type="image/webp"
+                  />
+                  <img
+                    src={`/Screenshots/Screenshot-Mobile-${suffix}.png`}
+                    alt={t('landing.hero.altMobile', 'Finora Dashboard — Mobile')}
+                    className={styles.screenshot}
+                    loading="eager"
+                    fetchPriority="high"
+                    width={498}
+                    height={852}
+                  />
+                </picture>
               </DeviceFrameset>
             </div>
           </div>

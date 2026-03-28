@@ -1128,8 +1128,7 @@
           "We use the following service providers as data processors (Art. 28 GDPR) to operate the application:"
         ],
         "list": [
-          "Hosting (Frontend): ALL-INKL.COM – Neue Medien Münnich, Hauptstraße 68, 02742 Friedersdorf, Germany. Server location: Germany/EU.",
-          "Hosting (Backend/API): Render Services, Inc., San Francisco, USA. Data processing on servers in the EU/EEA region. Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
+          "Hosting (Frontend & Backend/API): Render Services, Inc., 525 Brannan Street, Suite 300, San Francisco, CA 94107, USA. Data processing on servers in the EU/EEA region (Frankfurt). Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
           "Database: MongoDB, Inc. (MongoDB Atlas), New York, USA. Cluster location: EU (Frankfurt). Standard contractual clauses pursuant to Art. 46(2)(c) GDPR.",
           "Newsletter delivery: Handled via our own SMTP server. No external newsletter service provider is used."
         ],
@@ -2444,7 +2443,7 @@
       "subtitle": "It's that easy with Finora.",
       "step1": {
         "title": "Record",
-        "description": "Enter transactions — manually or via import. Quick and simple."
+        "description": "Log transactions — with category, amount, and date. Quick and simple."
       },
       "step2": {
         "title": "Analyze",

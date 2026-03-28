@@ -1,13 +1,12 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use '@/styles/mixins' as *;
 
 .prompt {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  background: var(--glass-bg, rgba(255, 255, 255, 0.06));
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
   border-inline-start: 3px solid var(--primary);
@@ -39,9 +38,9 @@
 }
 
 .description {
-  font-size: 0.8125rem;
+  font-size: var(--fs-xs);
   color: var(--tx-muted);
-  margin: 0.125rem 0 0;
+  margin: var(--space-2xs) 0 0;
   line-height: 1.4;
 }
 
@@ -51,8 +50,8 @@
   color: var(--on-primary);
   border: none;
   border-radius: var(--r-md);
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-sb);
   cursor: pointer;
   white-space: nowrap;
@@ -76,7 +75,7 @@
   color: var(--tx-muted);
   font-size: var(--fs-base);
   cursor: pointer;
-  padding: 0.25rem;
+  padding: var(--space-2xs);
   border-radius: 50%;
   transition:
     color var(--tr-fast),
@@ -84,7 +83,7 @@
 
   &:hover {
     color: var(--tx);
-    background: var(--glass-bg);
+    background: var(--surface-2);
   }
 }
 

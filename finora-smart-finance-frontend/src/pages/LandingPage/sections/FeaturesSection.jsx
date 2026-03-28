@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FiCreditCard, FiBarChart2, FiGlobe, FiDownload, FiUnlock, FiMoon } from 'react-icons/fi';
-import { useMotion } from '@/hooks';
+import { useMotion } from '@/hooks/useMotion';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { MEDIA_QUERIES } from '@/constants/breakpoints';
 import FeatureCard from '../components/FeatureCard';

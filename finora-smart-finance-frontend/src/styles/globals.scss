@@ -131,6 +131,28 @@ html.page-public-product {
 }
 
 // ============================================
+// 🚫 SCROLLBAR HIDDEN — Landing Page
+// ============================================
+// Timeline Navigation ersetzt die Browser-Scrollbar.
+// Klasse wird per useEffect in LandingPage.jsx gesetzt/entfernt.
+// ============================================
+html.page-no-scrollbar {
+  scrollbar-width: none; // Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome, Safari, Edge
+  }
+
+  body {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+// ============================================
 // 🔁 RTL BASE OVERRIDES
 // ============================================
 

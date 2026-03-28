@@ -2,7 +2,7 @@
  * @fileoverview FeedbackPrompt Component
  * @description Dezente Benachrichtigungskarte auf dem Dashboard (§8.2)
  *
- * Trigger: ≥7 Tage seit Registrierung UND ≥10 Transaktionen
+ * Trigger: ≥7 Tage seit Registrierung ODER ≥10 Transaktionen
  * Wird exakt einmal angezeigt (localStorage-Flag)
  * Nicht angezeigt wenn bereits Feedback vorhanden
  */
@@ -19,9 +19,14 @@ const MIN_DAYS = 7;
 const MIN_TRANSACTIONS = 10;
 
 /**
- * @param {{ userCreatedAt: string, transactionCount: number, hasFeedback: boolean }} props
+ * @param {{ userCreatedAt: string, transactionCount: number, hasFeedback: boolean, feedbackCount: number|null }} props
  */
-export default function FeedbackPrompt({ userCreatedAt, transactionCount, hasFeedback }) {
+export default function FeedbackPrompt({
+  userCreatedAt,
+  transactionCount,
+  hasFeedback,
+  feedbackCount,
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
@@ -35,9 +40,8 @@ export default function FeedbackPrompt({ userCreatedAt, transactionCount, hasFee
       !hasFeedback &&
       !dismissed &&
       !!userCreatedAt &&
-      (now - new Date(userCreatedAt).getTime()) / (1000 * 60 * 60 * 24) >= MIN_DAYS &&
-      typeof transactionCount === 'number' &&
-      transactionCount >= MIN_TRANSACTIONS,
+      ((now - new Date(userCreatedAt).getTime()) / (1000 * 60 * 60 * 24) >= MIN_DAYS ||
+        (typeof transactionCount === 'number' && transactionCount >= MIN_TRANSACTIONS)),
     [hasFeedback, dismissed, userCreatedAt, now, transactionCount]
   );
 
@@ -49,8 +53,16 @@ export default function FeedbackPrompt({ userCreatedAt, transactionCount, hasFee
   const handleNavigate = useCallback(() => {
     localStorage.setItem(STORAGE_KEY, 'true');
     setDismissed(true);
-    navigate('/settings', { state: { scrollTo: 'feedback' } });
+    navigate('/settings#feedback');
   }, [navigate]);
+
+  const getPromptTitle = () => {
+    if (feedbackCount === null || feedbackCount === undefined) return t('feedback.prompt.title');
+    if (feedbackCount === 0) return t('feedback.motivation.first');
+    if (feedbackCount <= 2) return t('feedback.motivation.topThree');
+    if (feedbackCount <= 9) return t('feedback.motivation.topTen');
+    return t('feedback.prompt.title');
+  };
 
   return (
     <AnimatePresence>
@@ -66,7 +78,7 @@ export default function FeedbackPrompt({ userCreatedAt, transactionCount, hasFee
             <FiMessageSquare />
           </div>
           <div className={styles.content}>
-            <p className={styles.title}>{t('feedback.prompt.title')}</p>
+            <p className={styles.title}>{getPromptTitle()}</p>
             <p className={styles.description}>{t('feedback.prompt.description')}</p>
           </div>
           <button className={styles.ctaBtn} onClick={handleNavigate} type="button">

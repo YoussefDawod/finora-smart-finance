@@ -24,6 +24,9 @@
   color: var(--tx-muted);
   font-size: var(--fs-sm);
   transition: padding-left var(--tr);
+  // CLS-Prävention: Reserviert Höhe und verhindert Layout-Shifts
+  contain: layout style;
+  min-height: 320px;
 
   @supports not (backdrop-filter: blur(1px)) {
     background: var(--surface);
@@ -273,10 +276,7 @@
   background: none;
   border: none;
   border-radius: var(--r-md);
-  transition:
-    color var(--tr-fast),
-    filter var(--tr-fast),
-    transform var(--tr-fast);
+  transition: transform var(--tr-fast);
   text-decoration: none;
 
   &:hover {
