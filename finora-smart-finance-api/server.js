@@ -91,9 +91,6 @@ app.use((req, res, next) => {
 app.use(mongoSanitizeMiddleware);
 app.use(hpp());
 
-// Connect to DB
-connectDB();
-
 // Routes
 app.get('/', (req, res) => {
   res.json({
@@ -166,33 +163,42 @@ app.use((req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-// Start Server - listen on all interfaces (0.0.0.0) for network access
-const server = app.listen(config.port, '0.0.0.0', () => {
-  // MongoDB-URI sicher loggen — Credentials maskieren
-  const safeMongoUrl = (config.mongodb.uri || '').replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
-  logger.info(`Server started successfully`, {
-    port: config.port,
-    environment: config.nodeEnv,
-    nodeVersion: process.version,
-    mongoUrl: safeMongoUrl,
+// Start Server — erst DB verbinden, damit keine Requests bei fehlender DB gepuffert werden
+let server;
+
+connectDB()
+  .then(() => {
+    server = app.listen(config.port, '0.0.0.0', () => {
+      // MongoDB-URI sicher loggen — Credentials maskieren
+      const safeMongoUrl = (config.mongodb.uri || '').replace(/\/\/([^:]+):([^@]+)@/, '//***:***@');
+      logger.info(`Server started successfully`, {
+        port: config.port,
+        environment: config.nodeEnv,
+        nodeVersion: process.version,
+        mongoUrl: safeMongoUrl,
+      });
+
+      // Starte Report Scheduler (nur in Produktion oder explizit aktiviert)
+      // Im Cluster-Modus nur auf Worker 1 ausführen, um doppelte Reports zu vermeiden
+      if (config.nodeEnv === 'production' || process.env.ENABLE_REPORT_SCHEDULER === 'true') {
+        if (!cluster.isWorker || cluster.worker.id === 1) {
+          initializeReportScheduler();
+        }
+      }
+
+      // Starte Lifecycle Scheduler (nur in Produktion oder explizit aktiviert)
+      // Verarbeitet tägliche Retention-Prüfung (Erinnerungen, Warnungen, Löschungen)
+      if (config.nodeEnv === 'production' || process.env.ENABLE_LIFECYCLE_SCHEDULER === 'true') {
+        if (!cluster.isWorker || cluster.worker.id === 1) {
+          initializeLifecycleScheduler();
+        }
+      }
+    });
+  })
+  .catch(err => {
+    logger.error('Failed to start server:', err);
+    process.exit(1);
   });
-
-  // Starte Report Scheduler (nur in Produktion oder explizit aktiviert)
-  // Im Cluster-Modus nur auf Worker 1 ausführen, um doppelte Reports zu vermeiden
-  if (config.nodeEnv === 'production' || process.env.ENABLE_REPORT_SCHEDULER === 'true') {
-    if (!cluster.isWorker || cluster.worker.id === 1) {
-      initializeReportScheduler();
-    }
-  }
-
-  // Starte Lifecycle Scheduler (nur in Produktion oder explizit aktiviert)
-  // Verarbeitet tägliche Retention-Prüfung (Erinnerungen, Warnungen, Löschungen)
-  if (config.nodeEnv === 'production' || process.env.ENABLE_LIFECYCLE_SCHEDULER === 'true') {
-    if (!cluster.isWorker || cluster.worker.id === 1) {
-      initializeLifecycleScheduler();
-    }
-  }
-});
 
 /**
  * Initialisiert den Report Scheduler
@@ -268,7 +274,7 @@ function initializeLifecycleScheduler() {
 process.on('SIGTERM', gracefulShutdown);
 process.on('SIGINT', gracefulShutdown);
 
-function gracefulShutdown() {
+async function gracefulShutdown() {
   logger.warn('Shutdown signal received, closing gracefully');
 
   // Scheduler stoppen
@@ -281,6 +287,13 @@ function gracefulShutdown() {
     clearInterval(lifecycleSchedulerInterval);
     lifecycleSchedulerInterval = null;
     logger.info('Lifecycle scheduler stopped');
+  }
+
+  if (!server) {
+    logger.info('Server not yet started, closing DB and exiting');
+    await mongoose.connection.close();
+    process.exit(0);
+    return;
   }
 
   server.close(async () => {
