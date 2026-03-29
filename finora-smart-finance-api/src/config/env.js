@@ -78,8 +78,9 @@ const config = {
   production: {
     nodeEnv: 'production',
     port: process.env.PORT || 5000,
-    apiUrl: process.env.API_URL || 'https://api.youssefdawod.com',
-    frontendUrl: process.env.FRONTEND_URL || 'https://finora.app',
+    apiUrl: process.env.API_URL || 'https://api.finora.dawoddev.com',
+    frontendUrl: process.env.FRONTEND_URL || 'https://finora.dawoddev.com',
+    cookieDomain: process.env.COOKIE_DOMAIN || '.finora.dawoddev.com',
     mongodb: {
       uri: process.env.MONGODB_URI,
       db: process.env.MONGODB_DB || 'finora',

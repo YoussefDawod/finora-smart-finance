@@ -26,10 +26,10 @@ const REFRESH_MAX_AGE_MS = (config.jwt.refreshExpire || 604800) * 1000;
  */
 function getRefreshCookieOptions() {
   const isProd = config.nodeEnv === 'production';
-  return {
+  const options = {
     httpOnly: true,
     secure: isProd,
-    // Production: 'none' weil Frontend (finora.app) und Backend (api.youssefdawod.com)
+    // Production: 'none' weil Frontend (finora.dawoddev.com) und Backend (api.finora.dawoddev.com)
     // unterschiedliche Origins sind — 'strict'/'lax' blockieren Cross-Site-Cookies.
     // Benötigt secure: true (HTTPS), was in Production gegeben ist.
     // Development: 'lax' reicht, da Vite-Proxy alles same-origin hält.
@@ -37,6 +37,11 @@ function getRefreshCookieOptions() {
     path: '/api/v1/auth',
     maxAge: REFRESH_MAX_AGE_MS,
   };
+  // Domain setzen für Cross-Subdomain Cookie-Sharing (z.B. .finora.dawoddev.com)
+  if (config.cookieDomain) {
+    options.domain = config.cookieDomain;
+  }
+  return options;
 }
 
 /**
@@ -46,12 +51,16 @@ function getRefreshCookieOptions() {
  */
 function getClearCookieOptions() {
   const isProd = config.nodeEnv === 'production';
-  return {
+  const options = {
     httpOnly: true,
     secure: isProd,
     sameSite: isProd ? 'none' : 'lax',
     path: '/api/v1/auth',
   };
+  if (config.cookieDomain) {
+    options.domain = config.cookieDomain;
+  }
+  return options;
 }
 
 /**
