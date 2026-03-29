@@ -406,17 +406,19 @@ function DashboardContent() {
         </div>
 
         <div className={styles.headerActions}>
-          <DashboardFilter
-            selectedMonth={dashboardMonth}
-            selectedYear={dashboardYear}
-            onMonthChange={setDashboardMonth}
-            startDate={filter.startDate}
-            endDate={filter.endDate}
-            onReset={() => {
-              const now = new Date();
-              setDashboardMonth(now.getMonth() + 1, now.getFullYear());
-            }}
-          />
+          <div className={styles.filterSlot}>
+            <DashboardFilter
+              selectedMonth={dashboardMonth}
+              selectedYear={dashboardYear}
+              onMonthChange={setDashboardMonth}
+              startDate={filter.startDate}
+              endDate={filter.endDate}
+              onReset={() => {
+                const now = new Date();
+                setDashboardMonth(now.getMonth() + 1, now.getFullYear());
+              }}
+            />
+          </div>
           <Button
             variant="primary"
             size="small"

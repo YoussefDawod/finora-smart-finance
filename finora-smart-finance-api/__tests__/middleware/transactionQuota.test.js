@@ -72,6 +72,7 @@ describe('TransactionQuota', () => {
 
     it('should return true when resetDate is in a previous month', () => {
       const lastMonth = new Date();
+      lastMonth.setDate(1);
       lastMonth.setMonth(lastMonth.getMonth() - 1);
       expect(isNewMonth(lastMonth)).toBe(true);
     });
@@ -195,9 +196,7 @@ describe('TransactionQuota', () => {
 
     it('should block with 429 when limit reached (both attempts fail)', async () => {
       // Both atomic attempts return null → limit reached
-      User.findOneAndUpdate
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
+      User.findOneAndUpdate.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
       // findById for current count
       User.findById.mockReturnValue({
@@ -283,9 +282,7 @@ describe('TransactionQuota', () => {
     });
 
     it('should include future resetDate in 429 response', async () => {
-      User.findOneAndUpdate
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(null);
+      User.findOneAndUpdate.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
       User.findById.mockReturnValue({
         select: jest.fn().mockReturnValue({
           lean: jest.fn().mockResolvedValue({
@@ -305,14 +302,12 @@ describe('TransactionQuota', () => {
       req.user.transactionLifecycle = undefined;
 
       // Attempt 1 fails, Attempt 2 succeeds (new month for legacy user)
-      User.findOneAndUpdate
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({
-          transactionLifecycle: {
-            monthlyTransactionCount: 1,
-            monthlyCountResetAt: new Date(),
-          },
-        });
+      User.findOneAndUpdate.mockResolvedValueOnce(null).mockResolvedValueOnce({
+        transactionLifecycle: {
+          monthlyTransactionCount: 1,
+          monthlyCountResetAt: new Date(),
+        },
+      });
 
       await transactionQuota(req, res, next);
 
@@ -391,6 +386,7 @@ describe('TransactionQuota', () => {
 
     it('should reset and set to 1 when new month', async () => {
       const lastMonth = new Date();
+      lastMonth.setDate(1);
       lastMonth.setMonth(lastMonth.getMonth() - 1);
 
       const user = {
@@ -486,6 +482,7 @@ describe('TransactionQuota', () => {
     it('should not decrement when transaction is from a different month', async () => {
       const now = new Date();
       const lastMonth = new Date();
+      lastMonth.setDate(1);
       lastMonth.setMonth(lastMonth.getMonth() - 1);
 
       const user = {
@@ -609,6 +606,7 @@ describe('TransactionQuota', () => {
 
     it('should show 0 used when new month (not yet reset)', () => {
       const lastMonth = new Date();
+      lastMonth.setDate(1);
       lastMonth.setMonth(lastMonth.getMonth() - 1);
 
       const user = {

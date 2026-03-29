@@ -62,8 +62,8 @@
       })();
     </script>
 
-    <!-- LCP-Bild Preload — lädt Screenshot parallel zu JS statt sequentiell -->
-    <script>(function(){var t=document.documentElement.getAttribute('data-theme')||'light';var s=t==='dark'?'Dark':'Light';var m=window.matchMedia('(max-width:1023px)').matches;var l=document.createElement('link');l.rel='preload';l.as='image';l.type='image/webp';l.href='/Screenshots/Screenshot-'+(m?'Mobile':'Desktop')+'-'+s+'.webp';document.head.appendChild(l)})()</script>
+    <!-- LCP-Bild Preload — nur auf Landing Page (/) -->
+    <script>(function(){if(location.pathname!=='/')return;var t=document.documentElement.getAttribute('data-theme')||'light';var s=t==='dark'?'Dark':'Light';var m=window.matchMedia('(max-width:1023px)').matches;var l=document.createElement('link');l.rel='preload';l.as='image';l.type='image/webp';l.href='/Screenshots/Screenshot-'+(m?'Mobile':'Desktop')+'-'+s+'.webp';document.head.appendChild(l)})()</script>
     
     <!-- Primary Meta Tags -->
     <title>Finora | Smart Finance - Intelligente Finanzverwaltung</title>

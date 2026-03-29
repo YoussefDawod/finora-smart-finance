@@ -104,7 +104,7 @@
 
   > button,
   > :global(.button),
-  > :global([class*='filterWrapper']) {
+  > .filterSlot {
     height: var(--btn-height-sm, 2rem);
     flex-shrink: 0;
 
