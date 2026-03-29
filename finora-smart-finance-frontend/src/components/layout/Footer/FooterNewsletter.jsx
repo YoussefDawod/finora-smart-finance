@@ -88,6 +88,8 @@ function FooterNewsletter() {
           <div className={styles.inputWrapper}>
             <FiMail className={styles.inputIcon} />
             <input
+              id="newsletter-email"
+              name="email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}

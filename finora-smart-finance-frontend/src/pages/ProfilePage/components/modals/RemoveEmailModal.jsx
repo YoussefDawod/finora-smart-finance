@@ -66,10 +66,12 @@ export function RemoveEmailModal({ isOpen, onClose, onSubmit, isLoading }) {
                 <input
                   type="password"
                   id="removeEmailPassword"
+                  name="removeEmailPassword"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder={t('profile.modals.removeEmail.passwordPlaceholder')}
                   className={styles.input}
+                  autoComplete="current-password"
                   required
                 />
               </div>

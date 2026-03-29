@@ -251,6 +251,8 @@ function AdminAuditLogTable({
               {selectable && (
                 <th className={styles.checkboxCell}>
                   <input
+                    id="select-all-audit-logs"
+                    name="select-all-audit-logs"
                     type="checkbox"
                     checked={allSelected}
                     onChange={() => onSelectAll?.()}
@@ -303,8 +305,9 @@ function AdminAuditLogTable({
                 >
                   {/* Checkbox */}
                   {selectable && (
-                    <td className={styles.checkboxCell} data-label="">
+                    <td className={styles.checkboxCell}>
                       <input
+                        name="select-audit-log"
                         type="checkbox"
                         checked={selectedIds.has(logId)}
                         onChange={() => onSelectId?.(logId)}

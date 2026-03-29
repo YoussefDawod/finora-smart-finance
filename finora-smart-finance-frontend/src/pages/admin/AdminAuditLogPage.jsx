@@ -117,6 +117,7 @@ export default function AdminAuditLogPage() {
             onClick={() => guard(actions.exportCSV)}
             disabled={loading || logs.length === 0}
             type="button"
+            aria-label={t('admin.auditLog.exportCSV')}
           >
             <FiDownload size={14} />
             {t('admin.auditLog.exportCSV')}
@@ -126,8 +127,9 @@ export default function AdminAuditLogPage() {
             onClick={() => guard(actions.exportPDF)}
             disabled={loading || logs.length === 0}
             type="button"
+            aria-label={t('admin.auditLog.exportPDF')}
           >
-            <FiDownload size={14} />
+            <FiFileText size={14} />
             {t('admin.auditLog.exportPDF')}
           </button>
           {/* Refresh */}
@@ -179,6 +181,8 @@ export default function AdminAuditLogPage() {
         <div className={styles.searchWrapper}>
           <FiSearch className={styles.searchIcon} size={16} />
           <input
+            id="audit-search"
+            name="audit-search"
             className={styles.searchInput}
             type="text"
             placeholder={t('admin.auditLog.searchPlaceholder')}
@@ -199,6 +203,8 @@ export default function AdminAuditLogPage() {
             <FiChevronLeft size={16} />
           </button>
           <input
+            id="audit-month"
+            name="audit-month"
             type="month"
             className={styles.monthInput}
             value={filters.selectedMonth}

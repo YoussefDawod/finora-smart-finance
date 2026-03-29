@@ -233,6 +233,8 @@ export default function VerifyEmailForm({ email }) {
           <input
             key={index}
             ref={el => (inputRefs.current[index] = el)}
+            id={`otp-digit-${index}`}
+            name={`otp-digit-${index}`}
             type="text"
             inputMode="numeric"
             maxLength={1}

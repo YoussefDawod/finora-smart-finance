@@ -180,6 +180,7 @@ export default function BudgetSettings() {
             <input
               type="text"
               id="monthlyLimit"
+              name="monthlyLimit"
               value={monthlyLimit}
               onChange={handleLimitChange}
               placeholder={new Intl.NumberFormat(i18n.language, {
@@ -193,8 +194,12 @@ export default function BudgetSettings() {
         </div>
 
         <div className={styles.inputGroup}>
-          <label>{t('settings.budget.alertThreshold')}</label>
-          <div className={styles.thresholdOptions}>
+          <label id="alert-threshold-label">{t('settings.budget.alertThreshold')}</label>
+          <div
+            className={styles.thresholdOptions}
+            role="group"
+            aria-labelledby="alert-threshold-label"
+          >
             {THRESHOLD_OPTIONS.map(value => (
               <button
                 key={value}

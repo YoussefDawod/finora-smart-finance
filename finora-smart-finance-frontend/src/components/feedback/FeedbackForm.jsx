@@ -216,12 +216,10 @@ export default function FeedbackForm({
 
         {/* Star Rating */}
         <div className={styles.ratingGroup}>
-          <label className={styles.label}>{t('feedback.form.ratingLabel')}</label>
-          <div
-            className={styles.stars}
-            role="radiogroup"
-            aria-label={t('feedback.form.ratingLabel')}
-          >
+          <label id="feedback-rating-label" className={styles.label}>
+            {t('feedback.form.ratingLabel')}
+          </label>
+          <div className={styles.stars} role="radiogroup" aria-labelledby="feedback-rating-label">
             {[1, 2, 3, 4, 5].map(star => (
               <button
                 key={star}
@@ -246,6 +244,7 @@ export default function FeedbackForm({
           </label>
           <textarea
             id="feedback-text"
+            name="feedback-text"
             className={styles.textarea}
             value={text}
             onChange={e => setText(e.target.value)}
@@ -260,6 +259,8 @@ export default function FeedbackForm({
         <div className={styles.checkboxGroup}>
           <label className={styles.checkbox}>
             <input
+              id="check-honest"
+              name="check-honest"
               type="checkbox"
               checked={checkHonest}
               onChange={e => setCheckHonest(e.target.checked)}
@@ -269,6 +270,8 @@ export default function FeedbackForm({
           </label>
           <label className={styles.checkbox}>
             <input
+              id="check-privacy"
+              name="check-privacy"
               type="checkbox"
               checked={checkPrivacy}
               onChange={e => setCheckPrivacy(e.target.checked)}

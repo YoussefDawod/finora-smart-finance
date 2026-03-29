@@ -210,6 +210,8 @@ export default function Filter({ value, onChange, onClear, categories = [] }) {
       <div className={styles.filterSection}>
         <h4 className={styles.filterTitle}>{t('filters.category')}</h4>
         <select
+          id="filter-category"
+          name="filter-category"
           className={styles.filterSelect}
           value={activeCategory}
           onChange={e => onChange?.({ category: e.target.value || null })}

@@ -61,15 +61,16 @@
     }
   }
 
-  // ── tbody (Desktop normal, Tablet/Mobile Grid)
+  // ── tbody (Desktop normal, Mobile Card-List)
   tbody {
     @include below-lg {
-      display: grid;
-      gap: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
     }
   }
 
-  // ── tr (Desktop Zeile, Tablet/Mobile Card)
+  // ── tr (Desktop Zeile, Mobile Card)
   tbody tr {
     border-bottom: 1px solid var(--border-light);
     transition: background var(--duration-fast);
@@ -83,19 +84,15 @@
     }
 
     @include below-lg {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
       gap: 0;
-      padding: var(--space-md) var(--space-lg);
+      padding: var(--space-sm) var(--space-md);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--r-lg);
-      box-shadow: var(--sh-sm);
       overflow: hidden;
       word-break: break-word;
-      transition:
-        box-shadow var(--duration-fast),
-        transform var(--duration-fast);
 
       &:last-child {
         border-bottom: 1px solid var(--border);
@@ -103,18 +100,11 @@
 
       &:hover {
         background: var(--surface);
-        box-shadow: var(--sh-md);
-        transform: translateY(-1px);
       }
-    }
-
-    @include below-sm {
-      grid-template-columns: 1fr;
-      padding: var(--space-md);
     }
   }
 
-  // ── td (Desktop normal, Tablet/Mobile Flex)
+  // ── td (Desktop normal, Mobile stacked)
   td {
     padding: var(--space-sm) var(--space-md);
     color: var(--tx);
@@ -123,29 +113,37 @@
     @include below-lg {
       display: flex;
       align-items: center;
-      gap: var(--space-sm);
-      padding: var(--space-sm) 0;
-      border-bottom: 1px solid var(--border-light);
-
-      &:last-child {
-        border-bottom: none;
-      }
+      gap: var(--space-xs);
+      padding: var(--space-2xs) 0;
+      font-size: var(--fs-xs);
     }
   }
 
   // data-label für Mobile-Labels
   td[data-label] {
     @include below-lg {
-      justify-content: space-between;
-
       &::before {
-        content: attr(data-label);
+        content: attr(data-label) ': ';
         font-size: var(--fs-2xs);
         font-weight: var(--fw-sb);
-        color: var(--primary);
-        text-transform: uppercase;
-        letter-spacing: var(--ls-n);
+        color: var(--tx-muted);
         flex-shrink: 0;
+        min-width: 4.5rem;
+      }
+    }
+  }
+
+  // Checkbox-Cell: eigene Zeile, rechts, kein Strich
+  .checkboxCell {
+    @include below-lg {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 0 var(--space-2xs) 0;
+      border-bottom: none;
+
+      input[type='checkbox'] {
+        width: 0.65rem;
+        height: 0.65rem;
       }
     }
   }
@@ -176,16 +174,9 @@
 
   input[type='checkbox'] {
     cursor: pointer;
-    width: 1rem;
-    height: 1rem;
+    width: 0.875rem;
+    height: 0.875rem;
     accent-color: var(--primary);
-  }
-
-  @include below-lg {
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: var(--space-xs);
   }
 }
 
@@ -200,11 +191,9 @@
   min-width: 140px;
 
   @include below-lg {
-    grid-column: 1 / -1;
-    font-weight: var(--fw-sb);
-    color: var(--tx);
-    padding-bottom: var(--space-xs);
-    border-bottom: 1px solid var(--border);
+    font-size: var(--fs-2xs);
+    color: var(--tx-muted);
+    min-width: 0;
   }
 }
 
@@ -214,6 +203,10 @@
   gap: var(--space-2xs);
   white-space: nowrap;
   font-weight: var(--fw-m);
+
+  @include below-lg {
+    font-size: var(--fs-2xs);
+  }
 }
 
 .adminIcon {
@@ -231,6 +224,7 @@
     max-width: none;
     white-space: normal;
     word-break: break-all;
+    font-size: var(--fs-2xs);
   }
 }
 
@@ -248,6 +242,7 @@
     max-width: none;
     white-space: normal;
     word-break: break-all;
+    font-size: var(--fs-2xs);
   }
 }
 
@@ -258,8 +253,7 @@
   color: var(--tx-muted);
 
   @include below-lg {
-    grid-column: 1 / -1;
-    border-bottom: none;
+    font-size: var(--fs-2xs);
   }
 }
 
@@ -270,7 +264,8 @@
   min-width: 80px;
 
   @include below-lg {
-    grid-column: 1 / 2;
+    min-width: 0;
+    font-size: var(--fs-2xs);
   }
 }
 
@@ -281,7 +276,8 @@
   min-width: 80px;
 
   @include below-lg {
-    grid-column: 2 / -1;
+    min-width: 0;
+    font-size: var(--fs-2xs);
   }
 }
 
@@ -292,8 +288,10 @@
   text-overflow: ellipsis;
 
   @include below-lg {
-    grid-column: 1 / -1;
-    border-bottom: none;
+    font-size: var(--fs-2xs);
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -316,6 +314,14 @@
   font-size: var(--fs-2xs);
   font-weight: var(--fw-m);
   white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include below-lg {
+    font-size: 0.625rem;
+    padding: 2px var(--space-2xs);
+  }
 
   &.success {
     background: color-mix(in srgb, var(--success) 18%, transparent);
@@ -446,6 +452,16 @@
   .paginationInfo {
     width: 100%;
     text-align: center;
+  }
+}
+
+// Mobile: Secondary columns ausblenden (Country, City, IP, Request-ID)
+@include below-lg {
+  .countryCell,
+  .cityCell,
+  .ipCell,
+  .requestIdCell {
+    display: none;
   }
 }
 

@@ -389,6 +389,7 @@ function AdminCreateUser({ isOpen, onClose, onSubmit, loading = false }) {
           <div className={styles.passwordInputWrapper}>
             <input
               id="create-user-password"
+              name="create-user-password"
               type={showPassword ? 'text' : 'password'}
               className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
               value={form.password}

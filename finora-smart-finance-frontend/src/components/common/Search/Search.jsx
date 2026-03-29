@@ -28,6 +28,8 @@ export default function Search({
       <div className={`${styles.searchInputWrapper} ${isSearching ? styles.searching : ''}`}>
         <FiSearch className={styles.searchIcon} aria-hidden="true" />
         <input
+          id="transaction-search"
+          name="transaction-search"
           type="text"
           className={styles.searchInput}
           placeholder={resolvedPlaceholder}

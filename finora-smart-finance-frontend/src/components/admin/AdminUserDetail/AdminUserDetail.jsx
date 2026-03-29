@@ -209,9 +209,11 @@ function AdminUserDetail({
       </div>
       <h3>{t('admin.users.confirmBan')}</h3>
       <p className={styles.confirmText}>{t('admin.users.confirmBanText', { name: user.name })}</p>
-      <label className={styles.inputLabel}>
+      <label className={styles.inputLabel} htmlFor="ban-reason">
         {t('admin.users.banReason')}
         <input
+          id="ban-reason"
+          name="ban-reason"
           type="text"
           className={styles.input}
           value={banReason}
@@ -246,9 +248,11 @@ function AdminUserDetail({
       <p className={styles.confirmText}>
         {t('admin.users.resetPasswordText', { name: user.name })}
       </p>
-      <label className={styles.inputLabel}>
+      <label className={styles.inputLabel} htmlFor="new-password">
         {t('admin.users.newPassword')}
         <input
+          id="new-password"
+          name="new-password"
           type="password"
           className={styles.input}
           value={newPassword}
@@ -256,6 +260,7 @@ function AdminUserDetail({
           placeholder={t('admin.users.newPasswordPlaceholder')}
           minLength={8}
           disabled={isBusy}
+          autoComplete="new-password"
         />
       </label>
       {newPassword.length > 0 && newPassword.length < 8 && (
@@ -485,9 +490,11 @@ function AdminUserDetail({
       <h3>{t('admin.users.edit.title')}</h3>
 
       <div className={styles.editForm}>
-        <label className={styles.inputLabel}>
+        <label className={styles.inputLabel} htmlFor="edit-user-name">
           {t('admin.users.name')}
           <input
+            id="edit-user-name"
+            name="edit-user-name"
             type="text"
             className={styles.input}
             value={editForm.name}
@@ -496,14 +503,17 @@ function AdminUserDetail({
           />
         </label>
 
-        <label className={styles.inputLabel}>
+        <label className={styles.inputLabel} htmlFor="edit-user-email">
           {t('admin.users.email')}
           <input
+            id="edit-user-email"
+            name="edit-user-email"
             type="email"
             className={styles.input}
             value={editForm.email}
             onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
             disabled={isBusy}
+            autoComplete="email"
           />
         </label>
 

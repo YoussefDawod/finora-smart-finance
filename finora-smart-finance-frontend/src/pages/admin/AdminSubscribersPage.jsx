@@ -93,6 +93,8 @@ export default function AdminSubscribersPage() {
         <div className={styles.searchWrapper}>
           <FiSearch size={16} className={styles.searchIcon} />
           <input
+            id="subscribers-search"
+            name="subscribers-search"
             type="text"
             className={styles.searchInput}
             value={filters.search}

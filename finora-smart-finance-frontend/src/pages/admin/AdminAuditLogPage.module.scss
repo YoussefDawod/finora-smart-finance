@@ -45,6 +45,11 @@
   align-items: center;
   gap: var(--space-sm);
   flex-wrap: wrap;
+
+  // Mobile: Buttons als icon-only darstellen
+  @include below-md {
+    gap: var(--space-xs);
+  }
 }
 
 // ── Stats Grid ──────────────────────────────
@@ -101,6 +106,18 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  @include below-md {
+    padding: var(--space-sm);
+    font-size: 0;
+    gap: 0;
+
+    svg {
+      font-size: var(--fs-md);
+      width: 16px;
+      height: 16px;
+    }
+  }
 }
 
 .spinning {
@@ -137,6 +154,18 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  @include below-md {
+    padding: var(--space-sm);
+    font-size: 0;
+    gap: 0;
+
+    svg {
+      font-size: var(--fs-md);
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 // ── Month Filter ────────────────────────────
@@ -150,8 +179,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--btn-height-sm, 2rem);
-  height: var(--btn-height-sm, 2rem);
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -159,6 +188,7 @@
   color: var(--tx-muted);
   cursor: pointer;
   transition: all var(--duration-fast);
+  flex-shrink: 0;
 
   &:hover {
     background: var(--surface-2);
@@ -171,11 +201,11 @@
 
 .monthInput {
   padding: 0 var(--space-sm);
-  height: var(--btn-height-sm, 2rem);
+  height: 1.75rem;
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   font-family: inherit;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   font-weight: var(--fw-m);
   color: var(--tx);
   background: var(--surface);
@@ -271,7 +301,7 @@
 // ── Delete All ──────────────────────────────
 .deleteAllWrapper {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .deleteAllButton {
@@ -360,12 +390,22 @@
   align-items: flex-end;
   gap: var(--space-lg);
   flex-wrap: wrap;
+
+  @include below-md {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
 }
 
 .searchWrapper {
   position: relative;
   flex: 0 1 280px;
   min-width: 180px;
+
+  @include below-md {
+    flex: 1 1 100%;
+  }
 }
 
 .searchIcon {
@@ -380,9 +420,9 @@
 .searchInput {
   width: 100%;
   padding: var(--space-sm) var(--space-sm) var(--space-sm) calc(var(--space-sm) + 20px);
-  height: var(--btn-height-sm, 2rem);
+  height: 1.75rem;
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   font-family: inherit;
   font-size: var(--fs-sm);
   color: var(--tx);
@@ -407,7 +447,16 @@
 .filterGroup {
   display: flex;
   gap: var(--space-sm);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+
+  @include below-md {
+    width: 100%;
+
+    > * {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
 }
 
 // ── Date Range ──────────────────────────────

@@ -236,6 +236,8 @@ export default function AdminTransactionsPage() {
           <div className={styles.searchWrapper}>
             <FiSearch size={16} className={styles.searchIcon} />
             <input
+              id="transactions-user-search"
+              name="transactions-user-search"
               type="text"
               className={styles.searchInput}
               value={userList.filters.search}
@@ -314,6 +316,8 @@ export default function AdminTransactionsPage() {
         <div className={styles.searchWrapper}>
           <FiSearch size={16} className={styles.searchIcon} />
           <input
+            id="transactions-search"
+            name="transactions-search"
             type="text"
             className={styles.searchInput}
             value={filters.search}

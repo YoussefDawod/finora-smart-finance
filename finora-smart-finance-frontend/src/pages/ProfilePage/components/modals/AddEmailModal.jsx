@@ -90,6 +90,7 @@ export function AddEmailModal({ isOpen, onClose, hasEmail, onSubmit, isLoading }
                   <input
                     type="password"
                     id="emailPassword"
+                    name="emailPassword"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder={t('profile.modals.addEmail.passwordPlaceholder')}

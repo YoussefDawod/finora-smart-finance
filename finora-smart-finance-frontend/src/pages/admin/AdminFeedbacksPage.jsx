@@ -331,6 +331,8 @@ export default function AdminFeedbacksPage() {
         <div className={styles.searchWrapper}>
           <FiSearch size={16} className={styles.searchIcon} />
           <input
+            id="feedbacks-search"
+            name="feedbacks-search"
             type="text"
             className={styles.searchInput}
             value={filters.search}

@@ -443,6 +443,8 @@ export default function AdminLifecyclePage() {
         <div className={styles.searchBar}>
           <FiSearch size={14} className={styles.searchIcon} />
           <input
+            id="lifecycle-search"
+            name="lifecycle-search"
             type="text"
             className={styles.searchInput}
             placeholder={t('lifecycle.admin.searchPlaceholder')}

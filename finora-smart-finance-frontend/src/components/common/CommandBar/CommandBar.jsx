@@ -216,6 +216,8 @@ export default function CommandBar() {
               <FiSearch className={styles.searchIcon} />
               <input
                 ref={inputRef}
+                id="command-bar-search"
+                name="command-bar-search"
                 className={styles.input}
                 type="text"
                 value={query}
