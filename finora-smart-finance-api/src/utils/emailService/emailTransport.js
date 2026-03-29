@@ -34,6 +34,9 @@ async function initTransporter() {
         user: config.smtp.user,
         pass: config.smtp.pass,
       },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000,
     });
     logger.info('Email transporter initialized (Production SMTP)');
     logger.info('Hinweis: Stelle sicher, dass SPF/DKIM/DMARC konfiguriert sind!');

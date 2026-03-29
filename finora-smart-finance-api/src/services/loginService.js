@@ -175,16 +175,16 @@ async function generateLoginSession(user, requestContext = {}) {
     details: { ip: requestContext.ip },
   });
 
-  // Send security alert if email is verified
+  // Send security alert if email is verified (fire-and-forget — Login darf nicht auf SMTP warten)
   if (user.email && user.isVerified) {
-    try {
-      await emailService.sendSecurityAlert(user, 'login', {
+    emailService
+      .sendSecurityAlert(user, 'login', {
         ip: requestContext.ip,
         userAgent: requestContext.userAgent,
+      })
+      .catch(notifyError => {
+        logger.warn(`Login notification skipped: ${notifyError.message}`);
       });
-    } catch (notifyError) {
-      logger.warn(`Login notification skipped: ${notifyError.message}`);
-    }
   }
 
   return { tokens, user };
