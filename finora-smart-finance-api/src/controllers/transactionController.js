@@ -184,35 +184,22 @@ async function createTransaction(req, res) {
     // Quota wurde bereits atomar in der Middleware reserviert (req.quotaReserved)
     const quota = req.quotaSnapshot || getQuotaStatus(user);
 
-    // Transaktions-Benachrichtigung (prüft automatisch Benutzereinstellungen)
-    if (user.email && user.isVerified) {
-      try {
-        await emailService.sendTransactionNotification(user, transaction);
-      } catch (notifyError) {
-        logger.warn(`Transaction notification skipped: ${notifyError.message}`);
-      }
-
-      // Budget-Alert prüfen (nur für Ausgaben, benötigt Budget-Limit)
-      try {
-        await budgetAlertService.checkBudgetAfterTransaction(user, transaction);
-      } catch (budgetError) {
-        logger.warn(`Budget alert check failed: ${budgetError.message}`);
-      }
-
-      // Negatives Saldo Alert prüfen (für alle Ausgaben)
-      try {
-        await budgetAlertService.checkNegativeBalanceAlert(user, transaction);
-      } catch (negativeBalanceError) {
-        logger.warn(`Negative balance alert check failed: ${negativeBalanceError.message}`);
-      }
-    }
-
+    // Response sofort senden – E-Mails und Budget-Checks im Hintergrund (fire-and-forget)
     res.status(201).json({
       success: true,
       data: transactionService.formatTransaction(transaction),
       message: 'Transaktion erstellt',
       quota,
     });
+
+    // Hintergrund-Tasks: E-Mails und Budget-Checks (blockieren Response nicht)
+    if (user.email && user.isVerified) {
+      Promise.allSettled([
+        emailService.sendTransactionNotification(user, transaction),
+        budgetAlertService.checkBudgetAfterTransaction(user, transaction),
+        budgetAlertService.checkNegativeBalanceAlert(user, transaction),
+      ]).catch(err => logger.warn('Background transaction tasks failed:', err.message));
+    }
   } catch (error) {
     // Quota-Rollback: Middleware hat Slot reserviert, aber Transaktion schlug fehl
     if (req.quotaReserved) {
