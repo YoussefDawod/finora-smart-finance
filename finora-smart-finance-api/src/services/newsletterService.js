@@ -72,16 +72,17 @@ async function subscribe(email, language, authHeader) {
   const unsubscribeToken = subscriber.generateUnsubscribeToken();
   await subscriber.save();
 
-  try {
-    await emailService.sendNewsletterConfirmation(
+  // Fire-and-forget: SMTP soll Response nicht blockieren
+  emailService
+    .sendNewsletterConfirmation(
       subscriber.email,
       confirmToken,
       unsubscribeToken,
       subscriber.language
-    );
-  } catch (err) {
-    logger.error(`Newsletter confirmation email failed: ${err.message}`);
-  }
+    )
+    .catch(err => {
+      logger.error(`Newsletter confirmation email failed: ${err.message}`);
+    });
 
   logger.info(`Newsletter subscription request: ${email}`);
   return { success: true, message: 'Bestätigungsmail wurde gesendet' };
@@ -111,11 +112,12 @@ async function confirmSubscription(token) {
   const unsubscribeToken = subscriber.generateUnsubscribeToken();
   await subscriber.save();
 
-  try {
-    await emailService.sendNewsletterWelcome(subscriber.email, unsubscribeToken, subscriberLang);
-  } catch (err) {
-    logger.error(`Newsletter welcome email failed: ${err.message}`);
-  }
+  // Fire-and-forget: SMTP soll Response nicht blockieren
+  emailService
+    .sendNewsletterWelcome(subscriber.email, unsubscribeToken, subscriberLang)
+    .catch(err => {
+      logger.error(`Newsletter welcome email failed: ${err.message}`);
+    });
 
   logger.info(`Newsletter confirmed: ${subscriber.email}`);
   return { confirmed: true, lang: subscriberLang };
@@ -143,11 +145,10 @@ async function unsubscribeByToken(token) {
   const subscriberLanguage = subscriber.language || 'de';
   await Subscriber.deleteOne({ _id: subscriber._id });
 
-  try {
-    await emailService.sendNewsletterGoodbye(subscriberEmail, subscriberLanguage);
-  } catch (err) {
+  // Fire-and-forget: SMTP soll Response nicht blockieren
+  emailService.sendNewsletterGoodbye(subscriberEmail, subscriberLanguage).catch(err => {
     logger.error(`Newsletter goodbye email failed: ${err.message}`);
-  }
+  });
 
   logger.info(`Newsletter unsubscribed: ${subscriberEmail}`);
   return { unsubscribed: true, lang: subscriberLanguage };
@@ -179,11 +180,10 @@ async function toggle(userEmail, userId, userLanguage) {
     const subscriberLanguage = existing.language;
     await Subscriber.deleteOne({ _id: existing._id });
 
-    try {
-      await emailService.sendNewsletterGoodbye(email, subscriberLanguage);
-    } catch (err) {
+    // Fire-and-forget: SMTP soll Response nicht blockieren
+    emailService.sendNewsletterGoodbye(email, subscriberLanguage).catch(err => {
       logger.error(`Newsletter goodbye email failed: ${err.message}`);
-    }
+    });
 
     logger.info(`Newsletter unsubscribed via toggle: ${email}`);
     return { subscribed: false, message: 'Newsletter abgemeldet' };
@@ -203,11 +203,10 @@ async function toggle(userEmail, userId, userLanguage) {
     const unsubscribeToken = existing.generateUnsubscribeToken();
     await existing.save();
 
-    try {
-      await emailService.sendNewsletterWelcome(email, unsubscribeToken, existing.language);
-    } catch (err) {
+    // Fire-and-forget: SMTP soll Response nicht blockieren
+    emailService.sendNewsletterWelcome(email, unsubscribeToken, existing.language).catch(err => {
       logger.error(`Newsletter welcome email failed: ${err.message}`);
-    }
+    });
   } else {
     const subscriber = new Subscriber({
       email,
@@ -220,11 +219,10 @@ async function toggle(userEmail, userId, userLanguage) {
     const unsubscribeToken = subscriber.generateUnsubscribeToken();
     await subscriber.save();
 
-    try {
-      await emailService.sendNewsletterWelcome(email, unsubscribeToken, lang);
-    } catch (err) {
+    // Fire-and-forget: SMTP soll Response nicht blockieren
+    emailService.sendNewsletterWelcome(email, unsubscribeToken, lang).catch(err => {
       logger.error(`Newsletter welcome email failed: ${err.message}`);
-    }
+    });
   }
 
   logger.info(`Newsletter subscribed via toggle: ${email}`);

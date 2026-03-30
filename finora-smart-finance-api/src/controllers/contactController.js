@@ -72,11 +72,13 @@ async function submitContact(req, res) {
   const safeEmail = email.trim().slice(0, 100);
   logger.info(`Contact form submission: ${safeCategory} from ${safeEmail}`);
 
-  // E-Mail senden (falls Service konfiguriert)
+  // Fire-and-forget: SMTP soll Response nicht blockieren
   try {
     const emailService = require('../utils/emailService');
     if (emailService?.sendContactEmail) {
-      await emailService.sendContactEmail({ name, email, category, message });
+      emailService.sendContactEmail({ name, email, category, message }).catch(() => {
+        logger.info('Contact email sending failed, request logged only');
+      });
     }
   } catch {
     logger.info('Contact email service not configured, request logged only');

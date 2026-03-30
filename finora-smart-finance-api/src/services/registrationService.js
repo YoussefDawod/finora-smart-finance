@@ -9,6 +9,7 @@ const emailService = require('../utils/emailService');
 const authService = require('./authService');
 const auditLogService = require('./auditLogService');
 const config = require('../config/env');
+const logger = require('../utils/logger');
 const {
   validateName,
   validatePassword,
@@ -95,10 +96,10 @@ async function registerUser(validatedData, requestContext = {}) {
     const verificationToken = user.generateVerification();
     await user.save();
 
-    const emailResult = await emailService.sendVerificationEmail(user, verificationToken);
-    if (config.nodeEnv === 'development' && emailResult) {
-      verificationLink = emailResult.link;
-    }
+    // Fire-and-forget: SMTP soll HTTP-Response nicht blockieren
+    emailService.sendVerificationEmail(user, verificationToken).catch(err => {
+      logger.warn(`Verification email failed for ${user.email}: ${err.message}`);
+    });
 
     // Auto-Newsletter-Abo für neue User mit Email (fire & forget)
     Subscriber.findOne({ email: user.email })

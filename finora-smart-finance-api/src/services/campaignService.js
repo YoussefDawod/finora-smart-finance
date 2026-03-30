@@ -182,37 +182,14 @@ async function sendCampaign(campaignId) {
   campaign.recipientCount = subscribers.length;
   await campaign.save();
 
-  // Batch-Versand (sequentiell mit Rate-Limiting)
-  let successCount = 0;
-  let failCount = 0;
+  // Fire-and-forget: Batch-Versand im Hintergrund
+  // Admin bekommt sofort Response, Kampagne wird asynchron versendet
+  _processCampaignEmails(campaign, subscribers).catch(err => {
+    logger.error(`Campaign ${campaignId} background processing failed: ${err.message}`);
+  });
 
-  for (const sub of subscribers) {
-    try {
-      await emailService.sendNewsletterCampaign(
-        sub.email,
-        campaign.subject,
-        campaign.content,
-        sub.unsubscribeToken,
-        sub.language
-      );
-      successCount++;
-    } catch (err) {
-      failCount++;
-      logger.error(`Campaign ${campaignId}: Failed to send to ${sub.email}: ${err.message}`);
-    }
-
-    // Rate-Limiting: 100ms Pause zwischen E-Mails (SMTP-Schutz)
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  // Ergebnis speichern
-  campaign.status = failCount === subscribers.length ? 'failed' : 'sent';
-  campaign.successCount = successCount;
-  campaign.failCount = failCount;
-  await campaign.save();
-
-  logger.info(`Campaign ${campaignId} sent: ${successCount}/${subscribers.length} successful`);
-  return { sent: true, successCount, failCount, recipientCount: subscribers.length };
+  logger.info(`Campaign ${campaignId} started: ${subscribers.length} recipients queued`);
+  return { sent: true, recipientCount: subscribers.length };
 }
 
 /**
@@ -260,6 +237,44 @@ async function getCampaignStats() {
     totalEmailsSent: avg.totalSent,
     totalEmailsFailed: avg.totalFailed,
   };
+}
+
+/**
+ * Hintergrund-Versand: Sendet Kampagnen-Emails sequentiell mit Rate-Limiting.
+ * Wird als fire-and-forget aus sendCampaign() aufgerufen.
+ */
+async function _processCampaignEmails(campaign, subscribers) {
+  let successCount = 0;
+  let failCount = 0;
+
+  for (const sub of subscribers) {
+    try {
+      await emailService.sendNewsletterCampaign(
+        sub.email,
+        campaign.subject,
+        campaign.content,
+        sub.unsubscribeToken,
+        sub.language
+      );
+      successCount++;
+    } catch (err) {
+      failCount++;
+      logger.error(`Campaign ${campaign._id}: Failed to send to ${sub.email}: ${err.message}`);
+    }
+
+    // Rate-Limiting: 100ms Pause zwischen E-Mails (SMTP-Schutz)
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  // Ergebnis speichern
+  campaign.status = failCount === subscribers.length ? 'failed' : 'sent';
+  campaign.successCount = successCount;
+  campaign.failCount = failCount;
+  await campaign.save();
+
+  logger.info(
+    `Campaign ${campaign._id} completed: ${successCount}/${subscribers.length} successful`
+  );
 }
 
 module.exports = {

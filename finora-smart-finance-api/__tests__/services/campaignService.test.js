@@ -229,7 +229,10 @@ describe('CampaignService', () => {
 
       expect(result.campaigns).toHaveLength(1);
       expect(result.pagination).toEqual({
-        total: 1, page: 1, pages: 1, limit: 20,
+        total: 1,
+        page: 1,
+        pages: 1,
+        limit: 20,
       });
     });
 
@@ -271,6 +274,9 @@ describe('CampaignService', () => {
   // sendCampaign Tests
   // ============================================
   describe('sendCampaign', () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
     it('should send campaign to all confirmed subscribers', async () => {
       const mockCampaign = {
         _id: 'camp-1',
@@ -293,11 +299,15 @@ describe('CampaignService', () => {
       const result = await campaignService.sendCampaign('camp-1');
 
       expect(result.sent).toBe(true);
-      expect(result.successCount).toBe(2);
-      expect(result.failCount).toBe(0);
       expect(result.recipientCount).toBe(2);
+
+      // Wait for fire-and-forget background processing
+      await jest.advanceTimersByTimeAsync(1000);
+
       expect(emailService.sendNewsletterCampaign).toHaveBeenCalledTimes(2);
       expect(mockCampaign.status).toBe('sent');
+      expect(mockCampaign.successCount).toBe(2);
+      expect(mockCampaign.failCount).toBe(0);
     });
 
     it('should handle partial failures', async () => {
@@ -325,8 +335,14 @@ describe('CampaignService', () => {
 
       const result = await campaignService.sendCampaign('camp-1');
 
-      expect(result.successCount).toBe(1);
-      expect(result.failCount).toBe(1);
+      expect(result.sent).toBe(true);
+      expect(result.recipientCount).toBe(2);
+
+      // Wait for fire-and-forget background processing
+      await jest.advanceTimersByTimeAsync(1000);
+
+      expect(mockCampaign.successCount).toBe(1);
+      expect(mockCampaign.failCount).toBe(1);
       expect(mockCampaign.status).toBe('sent'); // partial success → 'sent'
     });
 
@@ -342,9 +358,9 @@ describe('CampaignService', () => {
       Campaign.findById = jest.fn().mockResolvedValue(mockCampaign);
 
       Subscriber.find = jest.fn().mockReturnValue({
-        select: jest.fn().mockResolvedValue([
-          { email: 'a@test.com', language: 'de', unsubscribeToken: 'tok1' },
-        ]),
+        select: jest
+          .fn()
+          .mockResolvedValue([{ email: 'a@test.com', language: 'de', unsubscribeToken: 'tok1' }]),
       });
 
       emailService.sendNewsletterCampaign.mockRejectedValue(new Error('SMTP down'));
@@ -352,7 +368,12 @@ describe('CampaignService', () => {
       const result = await campaignService.sendCampaign('camp-1');
 
       expect(result.sent).toBe(true);
-      expect(result.failCount).toBe(1);
+      expect(result.recipientCount).toBe(1);
+
+      // Wait for fire-and-forget background processing
+      await jest.advanceTimersByTimeAsync(1000);
+
+      expect(mockCampaign.failCount).toBe(1);
       expect(mockCampaign.status).toBe('failed');
     });
 
@@ -394,9 +415,9 @@ describe('CampaignService', () => {
       };
       Campaign.findById = jest.fn().mockResolvedValue(mockCampaign);
       Subscriber.find = jest.fn().mockReturnValue({
-        select: jest.fn().mockResolvedValue([
-          { email: 'a@test.com', language: 'de', unsubscribeToken: 'tok1' },
-        ]),
+        select: jest
+          .fn()
+          .mockResolvedValue([{ email: 'a@test.com', language: 'de', unsubscribeToken: 'tok1' }]),
       });
 
       await campaignService.sendCampaign('camp-1');
@@ -411,9 +432,16 @@ describe('CampaignService', () => {
   describe('getCampaignStats', () => {
     it('should return complete campaign statistics', async () => {
       Campaign.countDocuments = jest.fn().mockResolvedValue(10);
-      Campaign.aggregate = jest.fn()
-        .mockResolvedValueOnce([{ _id: 'draft', count: 3 }, { _id: 'sent', count: 7 }])
-        .mockResolvedValueOnce([{ _id: 'de', count: 5 }, { _id: 'en', count: 5 }])
+      Campaign.aggregate = jest
+        .fn()
+        .mockResolvedValueOnce([
+          { _id: 'draft', count: 3 },
+          { _id: 'sent', count: 7 },
+        ])
+        .mockResolvedValueOnce([
+          { _id: 'de', count: 5 },
+          { _id: 'en', count: 5 },
+        ])
         .mockResolvedValueOnce([{ avg: 50, totalSent: 300, totalFailed: 10 }]);
 
       Campaign.find = jest.fn().mockReturnValue({
@@ -435,7 +463,8 @@ describe('CampaignService', () => {
 
     it('should handle empty database', async () => {
       Campaign.countDocuments = jest.fn().mockResolvedValue(0);
-      Campaign.aggregate = jest.fn()
+      Campaign.aggregate = jest
+        .fn()
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce([]);

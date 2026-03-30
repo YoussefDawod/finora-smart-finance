@@ -362,15 +362,16 @@ async function createUser(data) {
       await user.save();
     }
 
-    const emailResult = await sendAdminCreatedCredentialsEmail(
+    // Fire-and-forget: SMTP soll Admin-Response nicht blockieren
+    sendAdminCreatedCredentialsEmail(
       user,
       plainPassword,
       activationToken,
       data.emailLanguage
-    );
-    emailSent = !!emailResult?.sent;
-    activationLink = emailResult?.activationLink || null;
-    logger.info(`Admin: Credentials email sent=${emailSent} for user ${user.name}`);
+    ).catch(err => {
+      logger.warn(`Admin: Credentials email failed for user ${user.name}: ${err.message}`);
+    });
+    emailSent = true;
   }
 
   return {

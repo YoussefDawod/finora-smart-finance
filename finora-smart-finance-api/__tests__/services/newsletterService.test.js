@@ -26,12 +26,16 @@ const newsletterService = require('../../src/services/newsletterService');
 // ──────────────────────────────────────────────────────────────────────────────
 // Hilfsfunktion: Hash berechnen (spiegelt den Service-Code wider)
 // ──────────────────────────────────────────────────────────────────────────────
-const sha256 = (val) => crypto.createHash('sha256').update(val).digest('hex');
+const sha256 = val => crypto.createHash('sha256').update(val).digest('hex');
 
 describe('newsletterService', () => {
   beforeEach(() => {
     // resetAllMocks: leert Mock-Queues (mockResolvedValueOnce-Reste) zwischen Tests
     jest.resetAllMocks();
+    // Email-Mocks müssen nach Reset Promises zurückgeben (fire-and-forget .catch())
+    emailService.sendNewsletterWelcome.mockResolvedValue(true);
+    emailService.sendNewsletterGoodbye.mockResolvedValue(true);
+    emailService.sendNewsletterConfirmation.mockResolvedValue(true);
     // deleteOne nach Reset neu setzen, damit es ein jest.fn() bleibt
     Subscriber.deleteOne = jest.fn().mockResolvedValue({});
   });
@@ -55,7 +59,7 @@ describe('newsletterService', () => {
       // Pfad 1 trifft → findOne gibt Ergebnis beim Hash-Lookup zurück
       Subscriber.findOne
         .mockResolvedValueOnce(mockSubscriber) // erster Aufruf → Hash-Lookup
-        .mockResolvedValueOnce(null);           // zweiter Aufruf nie erreicht
+        .mockResolvedValueOnce(null); // zweiter Aufruf nie erreicht
       Subscriber.deleteOne = jest.fn().mockResolvedValue({});
 
       const result = await newsletterService.unsubscribeByToken(rawToken);
@@ -64,17 +68,14 @@ describe('newsletterService', () => {
       // Erster findOne muss mit dem Hash aufgerufen worden sein
       expect(Subscriber.findOne).toHaveBeenCalledWith({ unsubscribeToken: tokenHash });
       expect(Subscriber.deleteOne).toHaveBeenCalledWith({ _id: 'sub-1' });
-      expect(emailService.sendNewsletterGoodbye).toHaveBeenCalledWith(
-        'test@example.com',
-        'de'
-      );
+      expect(emailService.sendNewsletterGoodbye).toHaveBeenCalledWith('test@example.com', 'de');
     });
 
     // ── Pfad 2: HASH direkt (Kampagnen-E-Mails) ──────────────────────────
     it('(Pfad 2) findet Abonnenten wenn HASH direkt übergeben wird', async () => {
       // Pfad 1 schlägt fehl (doppeltes Hashen findet nichts) → Pfad 2 greift
       Subscriber.findOne
-        .mockResolvedValueOnce(null)           // Hash-Lookup → nicht gefunden
+        .mockResolvedValueOnce(null) // Hash-Lookup → nicht gefunden
         .mockResolvedValueOnce(mockSubscriber); // direkter Hash-Lookup → gefunden
       Subscriber.deleteOne = jest.fn().mockResolvedValue({});
 

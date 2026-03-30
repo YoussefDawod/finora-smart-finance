@@ -44,21 +44,15 @@ async function addEmail(req, res) {
     const token = user.generateEmailAddToken(emailValidation.email);
     await user.save();
 
-    const emailResult = await emailService.sendAddEmailVerification(
-      user,
-      token,
-      emailValidation.email
-    );
+    // Fire-and-forget: SMTP soll Response nicht blockieren
+    emailService.sendAddEmailVerification(user, token, emailValidation.email).catch(err => {
+      logger.warn(`Add-email verification email failed: ${err.message}`);
+    });
 
     const responseData = {
       sent: true,
       message: 'Bestätigungs-Email gesendet. Bitte prüfen Sie Ihr Postfach.',
       pendingEmail: emailValidation.email,
-      ...(config.nodeEnv === 'development' &&
-        emailResult && {
-          verificationLink: emailResult.link,
-          previewUrl: emailResult.previewUrl,
-        }),
     };
 
     return res.status(200).json({ success: true, data: responseData });
@@ -300,17 +294,14 @@ async function resendAddEmailVerification(req, res) {
     const token = user.generateEmailAddToken(user.emailChangeNewEmail);
     await user.save();
 
-    const emailResult = await emailService.sendAddEmailVerification(
-      user,
-      token,
-      user.emailChangeNewEmail
-    );
+    // Fire-and-forget: SMTP soll Response nicht blockieren
+    emailService.sendAddEmailVerification(user, token, user.emailChangeNewEmail).catch(err => {
+      logger.warn(`Resend add-email verification failed: ${err.message}`);
+    });
 
     const responseData = {
       sent: true,
       email: user.emailChangeNewEmail,
-      ...(config.nodeEnv === 'development' &&
-        emailResult && { verificationLink: emailResult.link }),
     };
 
     logger.info(`📧 Resend Add-Email Verification: ${user.emailChangeNewEmail}`);

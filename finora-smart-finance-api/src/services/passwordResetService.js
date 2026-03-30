@@ -53,13 +53,11 @@ async function changePassword(userId, currentPassword, newPassword) {
     targetUserName: user.name,
   });
 
-  // Send security alert
+  // Fire-and-forget: Security Alert soll Response nicht blockieren
   if (user.email && user.isVerified) {
-    try {
-      await emailService.sendSecurityAlert(user, 'password_change', {});
-    } catch (notifyError) {
+    emailService.sendSecurityAlert(user, 'password_change', {}).catch(notifyError => {
       logger.warn(`Password change notification skipped: ${notifyError.message}`);
-    }
+    });
   }
 
   return { changed: true, message: 'Passwort geändert' };
@@ -98,7 +96,11 @@ async function initiatePasswordReset(email) {
   // Generate reset token and send email
   const resetToken = user.generatePasswordReset();
   await user.save();
-  await emailService.sendPasswordResetEmail(user, resetToken);
+
+  // Fire-and-forget: SMTP soll Response nicht blockieren
+  emailService.sendPasswordResetEmail(user, resetToken).catch(err => {
+    logger.warn(`Password reset email failed for ${user.email}: ${err.message}`);
+  });
 
   // Audit-Log: Passwort-Reset angefordert
   auditLogService.log({
@@ -162,13 +164,11 @@ async function completePasswordReset(token, newPassword) {
     targetUserName: user.name,
   });
 
-  // Send security alert
+  // Fire-and-forget: Security Alert soll Response nicht blockieren
   if (user.email && user.isVerified) {
-    try {
-      await emailService.sendSecurityAlert(user, 'password_change', {});
-    } catch (notifyError) {
+    emailService.sendSecurityAlert(user, 'password_change', {}).catch(notifyError => {
       logger.warn(`Password reset notification skipped: ${notifyError.message}`);
-    }
+    });
   }
 
   return { reset: true };

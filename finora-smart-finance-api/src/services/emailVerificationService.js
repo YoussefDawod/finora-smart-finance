@@ -18,14 +18,12 @@ async function sendVerificationEmail(user) {
   const verificationToken = user.generateVerification();
   await user.save();
 
-  const emailResult = await emailService.sendVerificationEmail(user, verificationToken);
+  // Fire-and-forget: SMTP soll Response nicht blockieren
+  emailService.sendVerificationEmail(user, verificationToken).catch(err => {
+    logger.warn(`Verification email failed for ${user.email}: ${err.message}`);
+  });
 
-  const response = { sent: true };
-  if (config.nodeEnv === 'development' && emailResult) {
-    response.verificationLink = emailResult.link;
-  }
-
-  return response;
+  return { sent: true };
 }
 
 /**
@@ -54,11 +52,9 @@ async function verifyEmailByToken(token) {
   await user.save();
 
   // Welcome-Email senden (fire-and-forget)
-  try {
-    await emailService.sendWelcomeEmail(user);
-  } catch (err) {
+  emailService.sendWelcomeEmail(user).catch(err => {
     logger.warn(`Welcome email failed for ${user.email}: ${err.message}`);
-  }
+  });
 
   return { verified: true, user };
 }
