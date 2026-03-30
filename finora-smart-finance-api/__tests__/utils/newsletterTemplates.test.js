@@ -15,7 +15,7 @@ describe('NewsletterTemplates', () => {
   // campaignTemplate Tests
   // ============================================
   describe('campaignTemplate', () => {
-    const defaultUrl = 'https://finora.app/newsletter/unsubscribe/tok123';
+    const defaultUrl = 'https://finora.yellowdeveloper.de/newsletter/unsubscribe/tok123';
 
     it('should return HTML string with subject and content', () => {
       const html = campaignTemplate('Test-Betreff', 'Hallo Welt', defaultUrl, 'de');
@@ -43,7 +43,7 @@ describe('NewsletterTemplates', () => {
 
     it('should include unsubscribe link for each language', () => {
       const languages = ['de', 'en', 'ar', 'ka'];
-      languages.forEach((lang) => {
+      languages.forEach(lang => {
         const html = campaignTemplate('Test', 'Content', defaultUrl, lang);
         expect(html).toContain(`href="${defaultUrl}"`);
       });
@@ -102,7 +102,7 @@ describe('NewsletterTemplates', () => {
     });
 
     it('should support all 4 languages', () => {
-      ['de', 'en', 'ar', 'ka'].forEach((lang) => {
+      ['de', 'en', 'ar', 'ka'].forEach(lang => {
         const html = newsletterConfirmation('https://confirm.link', 'https://unsub.link', lang);
         expect(html).toBeTruthy();
         expect(html.length).toBeGreaterThan(100);
@@ -121,7 +121,7 @@ describe('NewsletterTemplates', () => {
     });
 
     it('should support all 4 languages', () => {
-      ['de', 'en', 'ar', 'ka'].forEach((lang) => {
+      ['de', 'en', 'ar', 'ka'].forEach(lang => {
         const html = newsletterWelcome('https://unsub.link', lang);
         expect(html).toBeTruthy();
         expect(html.length).toBeGreaterThan(100);
@@ -141,7 +141,7 @@ describe('NewsletterTemplates', () => {
     });
 
     it('should support all 4 languages', () => {
-      ['de', 'en', 'ar', 'ka'].forEach((lang) => {
+      ['de', 'en', 'ar', 'ka'].forEach(lang => {
         const html = newsletterGoodbye(lang);
         expect(html).toBeTruthy();
       });

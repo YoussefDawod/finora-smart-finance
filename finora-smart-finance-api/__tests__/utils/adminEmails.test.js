@@ -25,16 +25,17 @@ jest.mock('../../src/utils/logger', () => mockLogger);
 jest.mock('../../src/utils/emailService/emailTransport', () => ({
   sendEmail: mockSendEmail,
   buildLink: jest.fn(
-    (_base, _path, token) => `https://api.finora.com/api/v1/auth/verify-email?token=${token}`
+    (_base, _path, token) =>
+      `https://api.finora.yellowdeveloper.de/api/v1/auth/verify-email?token=${token}`
   ),
-  backendBaseUrl: 'https://api.finora.com',
+  backendBaseUrl: 'https://api.finora.yellowdeveloper.de',
 }));
 jest.mock('../../src/utils/emailTemplates', () => ({
   newUserRegistration: jest.fn().mockReturnValue('<html>mock</html>'),
   adminCreatedCredentials: jest.fn().mockReturnValue('<html>credentials-mock</html>'),
 }));
 jest.mock('../../src/config/env', () => ({
-  frontendUrl: 'https://app.finora.com',
+  frontendUrl: 'https://finora.yellowdeveloper.de',
 }));
 
 const { notifyAdminsNewUser } = require('../../src/utils/emailService/adminEmails');
@@ -254,7 +255,7 @@ describe('sendAdminCreatedCredentialsEmail', () => {
 
     expect(templates.adminCreatedCredentials).toHaveBeenCalledWith(
       expect.objectContaining({
-        loginLink: 'https://app.finora.com/login',
+        loginLink: 'https://finora.yellowdeveloper.de/login',
         activationLink: null,
       })
     );

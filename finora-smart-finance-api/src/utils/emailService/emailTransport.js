@@ -116,7 +116,7 @@ async function sendEmail(to, subject, html, textContent = null, options = {}) {
 
   try {
     const mailOptions = {
-      from: config.smtp?.from || '"Finora" <noreply@finora.dawoddev.com>',
+      from: config.smtp?.from || '"Finora" <finora@yellowdeveloper.de>',
       to,
       subject,
       html,

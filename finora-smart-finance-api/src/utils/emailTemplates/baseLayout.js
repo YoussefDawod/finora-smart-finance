@@ -4,7 +4,7 @@
  *
  * Logo-Header: Reines HTML/CSS — kein Bild, keine externen Abhängigkeiten.
  * Funktioniert in 100% aller Email-Clients:
- * Gmail, Outlook, Roundcube (All-Inkl), Apple Mail, Yahoo, Thunderbird.
+ * Gmail, Outlook, Roundcube (Netcup), Apple Mail, Yahoo, Thunderbird.
  */
 
 const config = require('../../config/env');

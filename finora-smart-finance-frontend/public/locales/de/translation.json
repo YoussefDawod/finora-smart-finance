@@ -1020,7 +1020,7 @@
       "ariaGithub": "Besuche uns auf GitHub (öffnet in neuem Tab)",
       "ariaLinkedin": "Besuche uns auf LinkedIn (öffnet in neuem Tab)"
     },
-    "copyright": "© {{year}} Finora. <link>Youssef Dawod</link>",
+    "copyright": "© {{year}} Finora. <link>Yellow Developer</link>",
     "backToTop": "Nach oben",
     "languageSwitcher": {
       "label": "Sprache",
@@ -1044,7 +1044,7 @@
           "Verantwortlich für die Datenverarbeitung in dieser App ist:",
           "Youssef Dawod",
           "Bahnhofstraße 1, 29614 Soltau, Deutschland",
-          "E-Mail: info@finora.dawoddev.com | Alternativ: Kontaktformular unter /kontakt",
+          "E-Mail: finora@yellowdeveloper.de | Alternativ: Kontaktformular unter /kontakt",
           "Der Verantwortliche entscheidet allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung personenbezogener Daten."
         ]
       },
@@ -1149,7 +1149,7 @@
           "Widerspruchsrecht (Art. 21 DSGVO): Sie können der Verarbeitung auf Basis berechtigter Interessen widersprechen"
         ],
         "additionalParagraphs": [
-          "Zur Ausübung Ihrer Rechte senden Sie uns bitte eine E-Mail an info@finora.dawoddev.com oder nutzen das Kontaktformular unter /kontakt. Zur Identitätsprüfung bitten wir Sie, Ihren Benutzernamen und ggf. weitere zur Verifizierung geeignete Angaben mitzuteilen. Wir beantworten Ihre Anfrage innerhalb eines Monats (Art. 12 Abs. 3 DSGVO)."
+          "Zur Ausübung Ihrer Rechte senden Sie uns bitte eine E-Mail an finora@yellowdeveloper.de oder nutzen das Kontaktformular unter /kontakt. Zur Identitätsprüfung bitten wir Sie, Ihren Benutzernamen und ggf. weitere zur Verifizierung geeignete Angaben mitzuteilen. Wir beantworten Ihre Anfrage innerhalb eines Monats (Art. 12 Abs. 3 DSGVO)."
         ]
       },
       {
@@ -1194,7 +1194,7 @@
       {
         "title": "§ 14 Kontakt bei Datenschutzfragen",
         "paragraphs": [
-          "Bei Fragen zum Datenschutz, zur Verarbeitung Ihrer personenbezogenen Daten oder zur Ausübung Ihrer Rechte als betroffene Person können Sie uns jederzeit per E-Mail an info@finora.dawoddev.com oder über unser Kontaktformular unter /kontakt erreichen. Wir werden Ihre Anfrage unverzüglich, spätestens jedoch innerhalb eines Monats, beantworten (Art. 12 Abs. 3 DSGVO)."
+          "Bei Fragen zum Datenschutz, zur Verarbeitung Ihrer personenbezogenen Daten oder zur Ausübung Ihrer Rechte als betroffene Person können Sie uns jederzeit per E-Mail an finora@yellowdeveloper.de oder über unser Kontaktformular unter /kontakt erreichen. Wir werden Ihre Anfrage unverzüglich, spätestens jedoch innerhalb eines Monats, beantworten (Art. 12 Abs. 3 DSGVO)."
         ]
       },
       {
@@ -1351,9 +1351,9 @@
     },
     "developer": {
       "title": "Entwickler",
-      "name": "Youssef Dawod",
+      "name": "Yellow Developer",
       "role": "Full-Stack Developer",
-      "description": "Finora wird von Youssef Dawod entwickelt und gepflegt — ein leidenschaftlicher Full-Stack-Entwickler, der sich der Erstellung nützlicher, schöner und barrierefreier Webanwendungen widmet."
+      "description": "Finora wird von Yellow Developer entwickelt und gepflegt — ein leidenschaftlicher Full-Stack-Entwickler, der sich der Erstellung nützlicher, schöner und barrierefreier Webanwendungen widmet."
     },
     "tech": {
       "title": "Was Finora besonders macht",
@@ -1568,7 +1568,7 @@
       {
         "title": "Weitere Hilfe benötigt?",
         "paragraphs": [
-          "Falls du die gesuchte Antwort nicht findest, kontaktiere uns gerne per E-Mail unter <email>info@finora.dawoddev.com</email> oder nutze unser <contactLink>Kontaktformular</contactLink>.",
+          "Falls du die gesuchte Antwort nicht findest, kontaktiere uns gerne per E-Mail unter <email>finora@yellowdeveloper.de</email> oder nutze unser <contactLink>Kontaktformular</contactLink>.",
           "Schau auch in unsere <faqLink>FAQ</faqLink> — dort findest du Antworten auf die häufigsten Fragen."
         ]
       }
@@ -1617,7 +1617,7 @@
       },
       {
         "question": "Wie kann ich den Support kontaktieren?",
-        "answer": "Du erreichst uns per E-Mail unter info@finora.dawoddev.com oder über das Kontaktformular auf unserer Kontaktseite. Wir bemühen uns, alle Anfragen zeitnah zu beantworten."
+        "answer": "Du erreichst uns per E-Mail unter finora@yellowdeveloper.de oder über das Kontaktformular auf unserer Kontaktseite. Wir bemühen uns, alle Anfragen zeitnah zu beantworten."
       }
     ]
   },
@@ -1638,7 +1638,7 @@
       {
         "title": "Kontakt",
         "paragraphs": [
-          "E-Mail: info@finora.dawoddev.com",
+          "E-Mail: finora@yellowdeveloper.de",
           "Kontaktformular: /kontakt"
         ]
       },
@@ -2347,7 +2347,7 @@
       {
         "title": "Kontakt",
         "paragraphs": [
-          "Bei Fragen zum Datenschutz erreichen Sie uns unter: datenschutz@finora.app"
+          "Bei Fragen zum Datenschutz erreichen Sie uns unter: finora@yellowdeveloper.de"
         ]
       }
     ]

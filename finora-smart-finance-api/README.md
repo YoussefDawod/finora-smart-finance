@@ -274,6 +274,6 @@ CORS_ORIGIN=http://localhost:3000
 
 <div align="center">
 
-**Made with ❤️ by Youssef Dawod**
+**Made with ❤️ by Yellow Developer**
 
 </div>

@@ -29,7 +29,7 @@ function getRefreshCookieOptions() {
   const options = {
     httpOnly: true,
     secure: isProd,
-    // Production: 'none' weil Frontend (finora.dawoddev.com) und Backend (api.finora.dawoddev.com)
+    // Production: 'none' weil Frontend (finora.yellowdeveloper.de) und Backend (api.finora.yellowdeveloper.de)
     // unterschiedliche Origins sind — 'strict'/'lax' blockieren Cross-Site-Cookies.
     // Benötigt secure: true (HTTPS), was in Production gegeben ist.
     // Development: 'lax' reicht, da Vite-Proxy alles same-origin hält.
@@ -37,7 +37,7 @@ function getRefreshCookieOptions() {
     path: '/api/v1/auth',
     maxAge: REFRESH_MAX_AGE_MS,
   };
-  // Domain setzen für Cross-Subdomain Cookie-Sharing (z.B. .finora.dawoddev.com)
+  // Domain setzen für Cross-Subdomain Cookie-Sharing (z.B. .finora.yellowdeveloper.de)
   if (config.cookieDomain) {
     options.domain = config.cookieDomain;
   }

@@ -28,7 +28,10 @@ export default function HelpPage() {
                         i18nKey={`help.sections.${index}.paragraphs.${pIndex}`}
                         components={{
                           email: (
-                            <a href="mailto:info@finora.dawoddev.com" className={styles.helpLink} />
+                            <a
+                              href="mailto:finora@yellowdeveloper.de"
+                              className={styles.helpLink}
+                            />
                           ),
                           contactLink: <Link to="/contact" className={styles.helpLink} />,
                           faqLink: <Link to="/faq" className={styles.helpLink} />,

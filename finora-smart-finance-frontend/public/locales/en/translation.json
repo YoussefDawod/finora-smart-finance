@@ -1021,7 +1021,7 @@
       "ariaGithub": "Visit us on GitHub (opens in new tab)",
       "ariaLinkedin": "Visit us on LinkedIn (opens in new tab)"
     },
-    "copyright": "© {{year}} Finora. <link>Youssef Dawod</link>",
+    "copyright": "© {{year}} Finora. <link>Yellow Developer</link>",
     "backToTop": "Back to Top",
     "languageSwitcher": {
       "label": "Language",
@@ -1045,7 +1045,7 @@
           "The data controller responsible for data processing in this application is:",
           "Youssef Dawod",
           "Bahnhofstraße 1, 29614 Soltau, Germany",
-          "Email: info@finora.dawoddev.com | Alternatively: Contact form at /contact",
+          "Email: finora@yellowdeveloper.de | Alternatively: Contact form at /contact",
           "The controller determines the purposes and means of processing personal data."
         ]
       },
@@ -1150,7 +1150,7 @@
           "Right to object (Art. 21 GDPR): You can object to processing based on legitimate interests"
         ],
         "additionalParagraphs": [
-          "To exercise your rights, please send an email to info@finora.dawoddev.com or use the contact form at /contact. For identity verification, please include your username and, if applicable, additional information suitable for verification. We will respond to your request within one month (Art. 12(3) GDPR)."
+          "To exercise your rights, please send an email to finora@yellowdeveloper.de or use the contact form at /contact. For identity verification, please include your username and, if applicable, additional information suitable for verification. We will respond to your request within one month (Art. 12(3) GDPR)."
         ]
       },
       {
@@ -1195,7 +1195,7 @@
       {
         "title": "§ 14 Contact for Privacy Concerns",
         "paragraphs": [
-          "For questions about data protection, the processing of your personal data, or to exercise your rights as a data subject, you can contact us at any time by email at info@finora.dawoddev.com or via our contact form at /contact. We will respond to your inquiry without delay, but at the latest within one month (Art. 12(3) GDPR)."
+          "For questions about data protection, the processing of your personal data, or to exercise your rights as a data subject, you can contact us at any time by email at finora@yellowdeveloper.de or via our contact form at /contact. We will respond to your inquiry without delay, but at the latest within one month (Art. 12(3) GDPR)."
         ]
       },
       {
@@ -1352,9 +1352,9 @@
     },
     "developer": {
       "title": "Developer",
-      "name": "Youssef Dawod",
+      "name": "Yellow Developer",
       "role": "Full-Stack Developer",
-      "description": "Finora is developed and maintained by Youssef Dawod — a passionate full-stack developer dedicated to building useful, beautiful, and accessible web applications."
+      "description": "Finora is developed and maintained by Yellow Developer — a passionate full-stack developer dedicated to building useful, beautiful, and accessible web applications."
     },
     "tech": {
       "title": "What Makes Finora Special",
@@ -1569,7 +1569,7 @@
       {
         "title": "Need More Help?",
         "paragraphs": [
-          "If you can't find the answer you're looking for, feel free to contact us via email at <email>info@finora.dawoddev.com</email> or use our <contactLink>contact form</contactLink>.",
+          "If you can't find the answer you're looking for, feel free to contact us via email at <email>finora@yellowdeveloper.de</email> or use our <contactLink>contact form</contactLink>.",
           "Also check out our <faqLink>FAQ</faqLink> — you'll find answers to the most common questions there."
         ]
       }
@@ -1618,7 +1618,7 @@
       },
       {
         "question": "How do I contact support?",
-        "answer": "You can reach us by email at info@finora.dawoddev.com or through the contact form on our Contact page. We aim to respond to all inquiries promptly."
+        "answer": "You can reach us by email at finora@yellowdeveloper.de or through the contact form on our Contact page. We aim to respond to all inquiries promptly."
       }
     ]
   },
@@ -1639,7 +1639,7 @@
       {
         "title": "Contact",
         "paragraphs": [
-          "Email: info@finora.dawoddev.com",
+          "Email: finora@yellowdeveloper.de",
           "Contact form: /contact"
         ]
       },
@@ -2348,7 +2348,7 @@
       {
         "title": "Contact",
         "paragraphs": [
-          "For privacy-related questions, reach us at: privacy@finora.app"
+          "For privacy-related questions, reach us at: finora@yellowdeveloper.de"
         ]
       }
     ]

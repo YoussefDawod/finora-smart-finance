@@ -18,7 +18,7 @@ const templates = require('../emailTemplates');
  * @returns {Promise<Object>} Ergebnis mit sent-Status
  */
 async function sendContactEmail({ name, email, category, message }) {
-  const contactRecipient = config.contactEmail || 'info@finora.dawoddev.com';
+  const contactRecipient = config.contactEmail || 'finora@yellowdeveloper.de';
 
   const categoryLabels = {
     feedback: 'Feedback',

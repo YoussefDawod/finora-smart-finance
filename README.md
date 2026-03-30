@@ -173,13 +173,13 @@ git push origin feature/amazing-feature
 
 ## 📄 Lizenz
 
-**ISC License** © 2026 Youssef Dawod
+**ISC License** © 2026 Yellow Developer
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by Youssef Dawod**
+**Made with ❤️ by Yellow Developer**
 
 ⭐ **Gefällt dir Finora? Gib uns einen Star!** ⭐
 

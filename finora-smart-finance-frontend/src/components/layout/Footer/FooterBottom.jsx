@@ -18,12 +18,12 @@ function FooterBottom() {
         <p className={styles.copyright}>
           © {new Date().getFullYear()} Finora.{' '}
           <a
-            href="https://dawoddev.com"
+            href="https://yellowdeveloper.de"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.copyrightLink}
           >
-            Youssef Dawod
+            Yellow Developer
           </a>
         </p>
         <span className={styles.copyrightDivider}> — </span>

@@ -230,6 +230,6 @@ npm run test:e2e:report   # E2E Report anzeigen
 
 <div align="center">
 
-**Made with ❤️ by Youssef Dawod**
+**Made with ❤️ by Yellow Developer**
 
 </div>

@@ -70,23 +70,23 @@ const config = {
       secure: process.env.SMTP_SECURE !== 'false',
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASS || '',
-      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.dawoddev.com>',
+      from: process.env.SMTP_FROM || '"Finora" <finora@yellowdeveloper.de>',
     },
-    contactEmail: process.env.CONTACT_EMAIL || 'info@finora.dawoddev.com',
+    contactEmail: process.env.CONTACT_EMAIL || 'finora@yellowdeveloper.de',
   },
 
   production: {
     nodeEnv: 'production',
     port: process.env.PORT || 5000,
-    apiUrl: process.env.API_URL || 'https://api.finora.dawoddev.com',
-    frontendUrl: process.env.FRONTEND_URL || 'https://finora.dawoddev.com',
-    cookieDomain: process.env.COOKIE_DOMAIN || '.finora.dawoddev.com',
+    apiUrl: process.env.API_URL || 'https://api.finora.yellowdeveloper.de',
+    frontendUrl: process.env.FRONTEND_URL || 'https://finora.yellowdeveloper.de',
+    cookieDomain: process.env.COOKIE_DOMAIN || '.finora.yellowdeveloper.de',
     mongodb: {
       uri: process.env.MONGODB_URI,
       db: process.env.MONGODB_DB || 'finora',
     },
     cors: {
-      origin: (process.env.CORS_ORIGIN || 'https://finora.app').split(','),
+      origin: (process.env.CORS_ORIGIN || 'https://finora.yellowdeveloper.de').split(','),
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
@@ -117,9 +117,9 @@ const config = {
       secure: process.env.SMTP_SECURE !== 'false',
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
-      from: process.env.SMTP_FROM || '"Finora" <noreply@finora.dawoddev.com>',
+      from: process.env.SMTP_FROM || '"Finora" <finora@yellowdeveloper.de>',
     },
-    contactEmail: process.env.CONTACT_EMAIL || 'info@finora.dawoddev.com',
+    contactEmail: process.env.CONTACT_EMAIL || 'finora@yellowdeveloper.de',
   },
 
   test: {
@@ -163,9 +163,9 @@ const config = {
       secure: false,
       user: '',
       pass: '',
-      from: '"Finora Test" <test@finora.dawoddev.com>',
+      from: '"Finora Test" <test@finora.yellowdeveloper.de>',
     },
-    contactEmail: 'info@finora.dawoddev.com',
+    contactEmail: 'finora@yellowdeveloper.de',
   },
 };
 
