@@ -4,6 +4,7 @@
  */
 
 const nodemailer = require('nodemailer');
+const net = require('net');
 const dns = require('dns');
 const config = require('../../config/env');
 const logger = require('../logger');
@@ -30,6 +31,29 @@ async function resolveIPv4(hostname) {
     logger.warn(`DNS resolve4 failed for ${hostname}, using hostname directly`);
     return hostname;
   }
+}
+
+/**
+ * Testet ob ein TCP-Port auf einem Host erreichbar ist.
+ * Hilft zu diagnostizieren, ob Render den Port blockiert.
+ */
+function testTcpPort(host, port, timeoutMs = 8000) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection({ host, port });
+    const timer = setTimeout(() => {
+      socket.destroy();
+      reject(new Error(`TCP timeout after ${timeoutMs}ms`));
+    }, timeoutMs);
+    socket.on('connect', () => {
+      clearTimeout(timer);
+      socket.destroy();
+      resolve();
+    });
+    socket.on('error', err => {
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
 }
 
 /**
@@ -73,24 +97,26 @@ async function initTransporter() {
       socketTimeout: 15000,
     });
 
-    logger.info('Email transporter initialized (Production SMTP)', {
-      host: smtpHost,
-      originalHost: config.smtp.host,
-      port: smtpPort,
-      secure: smtpSecure,
-      user: config.smtp.user,
-    });
+    logger.info(
+      `Email transporter initialized (Production SMTP) → ${smtpHost}:${smtpPort} secure=${smtpSecure} user=${config.smtp.user}`
+    );
+
+    // Erst raw TCP-Test, dann SMTP-Verify
+    try {
+      await testTcpPort(smtpHost, smtpPort, 8000);
+      logger.info(`TCP connection to ${smtpHost}:${smtpPort} OK`);
+    } catch (tcpError) {
+      logger.error(`TCP connection to ${smtpHost}:${smtpPort} FAILED: ${tcpError.message}`);
+    }
 
     // SMTP-Verbindung + Auth beim Start verifizieren
     try {
       await transporter.verify();
       logger.info('SMTP connection verified successfully');
     } catch (verifyError) {
-      logger.error(`SMTP verification FAILED: ${verifyError.message}`, {
-        code: verifyError.code,
-        host: config.smtp.host,
-        port: smtpPort,
-      });
+      logger.error(
+        `SMTP verification FAILED: ${verifyError.message} (host=${smtpHost} port=${smtpPort} secure=${smtpSecure})`
+      );
       // Transporter bleibt erstellt — Emails werden bei jedem Versuch fehlschlagen
       // und der Fehler wird in den Fire-and-forget .catch()-Handlern geloggt
     }
