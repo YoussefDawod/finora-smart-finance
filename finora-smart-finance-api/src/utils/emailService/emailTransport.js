@@ -41,6 +41,9 @@ async function initTransporter() {
         user: config.smtp.user,
         pass: config.smtp.pass,
       },
+      // IPv4 erzwingen — Render unterstützt kein IPv6-Outbound,
+      // Netcup SMTP löst aber auf IPv6 auf → ENETUNREACH
+      family: 4,
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
