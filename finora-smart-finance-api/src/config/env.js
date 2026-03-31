@@ -119,6 +119,7 @@ const config = {
       pass: process.env.SMTP_PASS,
       from: process.env.SMTP_FROM || '"Finora" <finora@yellowdeveloper.de>',
     },
+    resendApiKey: process.env.RESEND_API_KEY || '',
     contactEmail: process.env.CONTACT_EMAIL || 'finora@yellowdeveloper.de',
   },
 
