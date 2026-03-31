@@ -4,8 +4,6 @@
  */
 
 const nodemailer = require('nodemailer');
-const net = require('net');
-const dns = require('dns');
 const config = require('../../config/env');
 const logger = require('../logger');
 
@@ -14,70 +12,6 @@ const backendBaseUrl =
 const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
 let transporter = null;
-
-/**
- * Testet TCP-Erreichbarkeit eines Host:Port — gibt ms oder Fehler zurück
- */
-function testTcp(host, port, timeoutMs = 8000) {
-  return new Promise(resolve => {
-    const start = Date.now();
-    const socket = net.createConnection({ host, port });
-    const timer = setTimeout(() => {
-      socket.destroy();
-      resolve({ ok: false, error: `timeout ${timeoutMs}ms`, ms: timeoutMs });
-    }, timeoutMs);
-    socket.on('connect', () => {
-      clearTimeout(timer);
-      socket.destroy();
-      resolve({ ok: true, ms: Date.now() - start });
-    });
-    socket.on('error', err => {
-      clearTimeout(timer);
-      resolve({ ok: false, error: err.message, ms: Date.now() - start });
-    });
-  });
-}
-
-/**
- * Führt eine umfassende SMTP-Netzwerk-Diagnose durch (beim Start + Admin-Endpoint)
- */
-async function runSmtpDiagnostics() {
-  const targets = [
-    // Aktueller SMTP (Netcup)
-    { label: 'Netcup-465', host: 'mxf90a.netcup.net', port: 465 },
-    { label: 'Netcup-587', host: 'mxf90a.netcup.net', port: 587 },
-    // Alter SMTP (All-Inkl) — Referenztest: hat von Render funktioniert
-    { label: 'AllInkl-465', host: 'w02133ad.kasserver.com', port: 465 },
-    // Gmail — Canary: wenn das klappt, blockiert Render SMTP nicht
-    { label: 'Gmail-465', host: 'smtp.gmail.com', port: 465 },
-    // Netcup über aufgelöste IPv4 direkt
-    { label: 'Netcup-IPv4-465', host: '46.38.249.10', port: 465 },
-    { label: 'Netcup-IPv4-587', host: '46.38.249.10', port: 587 },
-  ];
-
-  const results = {};
-  for (const t of targets) {
-    const r = await testTcp(t.host, t.port, 8000);
-    results[t.label] = `${r.ok ? 'OK' : 'FAIL'} (${r.ok ? r.ms + 'ms' : r.error})`;
-    logger.info(`[SMTP-DIAG] ${t.label} ${t.host}:${t.port} → ${results[t.label]}`);
-  }
-
-  // DNS-Info
-  try {
-    const ipv4 = await dns.promises.resolve4('mxf90a.netcup.net');
-    results['Netcup-DNS-IPv4'] = ipv4.join(', ');
-  } catch (e) {
-    results['Netcup-DNS-IPv4'] = `FAIL: ${e.code}`;
-  }
-  try {
-    const ipv6 = await dns.promises.resolve6('mxf90a.netcup.net');
-    results['Netcup-DNS-IPv6'] = ipv6.join(', ');
-  } catch (e) {
-    results['Netcup-DNS-IPv6'] = `FAIL: ${e.code}`;
-  }
-
-  return results;
-}
 
 /**
  * Initialisiert den Nodemailer Transporter basierend auf Environment
@@ -98,9 +32,6 @@ async function initTransporter() {
     logger.info(
       `SMTP Config: host=${config.smtp.host} port=${smtpPort} secure=${smtpSecure} user=${config.smtp.user}`
     );
-
-    // Netzwerk-Diagnose — testet Erreichbarkeit verschiedener SMTP-Server
-    await runSmtpDiagnostics();
 
     transporter = nodemailer.createTransport({
       host: config.smtp.host,
@@ -249,14 +180,10 @@ async function verifySmtp() {
     };
   }
 
-  // Netzwerk-Diagnose einschließen
-  const diagnostics = await runSmtpDiagnostics();
-
   try {
     await transport.verify();
     return {
       ok: true,
-      diagnostics,
       config: {
         host: config.smtp.host,
         port: config.smtp.port,
@@ -269,7 +196,6 @@ async function verifySmtp() {
     return {
       ok: false,
       error: error.message,
-      diagnostics,
       config: {
         host: config.smtp.host,
         port: config.smtp.port,
@@ -286,7 +212,6 @@ module.exports = {
   buildLink,
   sendEmail,
   verifySmtp,
-  runSmtpDiagnostics,
   backendBaseUrl,
   frontendBaseUrl,
 };

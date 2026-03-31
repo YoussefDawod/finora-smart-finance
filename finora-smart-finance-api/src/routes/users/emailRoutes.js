@@ -10,6 +10,7 @@ const {
 const emailService = require('../../utils/emailService');
 const auditLogService = require('../../services/auditLogService');
 const logger = require('../../utils/logger');
+const config = require('../../config/env');
 const { sanitizeUser } = require('../../utils/userSanitizer');
 const { sendError } = require('../../utils/responseHelper');
 const { validateEmailChangeInput } = require('../../validators/userValidation');
@@ -230,15 +231,12 @@ router.post('/change-email', auth, emailOperationLimiter, async (req, res) => {
 
 // GET /api/users/verify-email-change - Email-Change verifizieren
 router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) => {
+  const frontendUrl = config.frontendUrl || 'http://localhost:3000';
   try {
     const { token } = req.query;
 
     if (!token) {
-      return sendError(res, req, {
-        error: 'Token erforderlich',
-        code: 'MISSING_TOKEN',
-        status: 400,
-      });
+      return res.redirect(`${frontendUrl}/verify-email?error=missing_token&type=email-change`);
     }
 
     // Token hashen und suchen
@@ -246,7 +244,7 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
     const user = await User.findOne({ emailChangeToken: tokenHash });
 
     if (!user) {
-      return sendError(res, req, { error: 'Token ungültig', code: 'INVALID_TOKEN', status: 400 });
+      return res.redirect(`${frontendUrl}/verify-email?error=invalid_token&type=email-change`);
     }
 
     // Token abgelaufen?
@@ -255,11 +253,7 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
       user.emailChangeNewEmail = undefined;
       user.emailChangeExpires = undefined;
       await user.save();
-      return sendError(res, req, {
-        error: 'Token ist abgelaufen',
-        code: 'TOKEN_EXPIRED',
-        status: 400,
-      });
+      return res.redirect(`${frontendUrl}/verify-email?error=token_expired&type=email-change`);
     }
 
     // Email aktualisieren
@@ -282,13 +276,12 @@ router.get('/verify-email-change', sensitiveOperationLimiter, async (req, res) =
       req,
     });
 
-    res.json({
-      success: true,
-      message: 'Email erfolgreich geändert',
-      data: sanitizeUser(user),
-    });
+    return res.redirect(
+      `${frontendUrl}/verify-email?success=true&email=${encodeURIComponent(user.email)}&type=email-change`
+    );
   } catch (error) {
-    handleServerError(res, req, 'GET /verify-email-change', error);
+    logger.error(`Verify-email-change error: ${error.message}`);
+    return res.redirect(`${frontendUrl}/verify-email?error=server_error&type=email-change`);
   }
 });
 

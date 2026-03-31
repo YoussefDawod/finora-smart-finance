@@ -108,12 +108,17 @@ const AuthLoadingScreen = () => (
 
 const PublicRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return <AuthLoadingScreen />;
   }
 
-  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+  // Passwort-Reset-Links müssen auch für eingeloggte User erreichbar sein
+  const params = new URLSearchParams(location.search);
+  const isForgotWithToken = location.pathname === '/forgot-password' && params.has('token');
+
+  return !isAuthenticated || isForgotWithToken ? children : <Navigate to="/dashboard" replace />;
 };
 
 // NOTE: ProtectedRoute existiert bewusst, wird aber NICHT auf die App-Routes angewendet.

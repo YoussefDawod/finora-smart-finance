@@ -61,12 +61,12 @@ export default function AuthPage() {
   // Mobile: Register/Forgot → branding on top, Login → branding on bottom
   const isPanelTop = isRegisterMode || isForgotMode;
 
-  // Auto-redirect if authenticated
+  // Auto-redirect if authenticated (except password reset with token)
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated && !(isForgotMode && resetToken)) {
       navigate('/dashboard', { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, navigate, isForgotMode, resetToken]);
 
   // Loading state
   if (isLoading) {
