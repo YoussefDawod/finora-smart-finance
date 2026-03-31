@@ -629,6 +629,10 @@ router.get('/lifecycle/users/:id', adminController.getUserLifecycleDetail);
 router.post('/lifecycle/users/:id/reset', requireAdmin, adminController.resetUserRetention);
 router.post('/lifecycle/trigger', requireAdmin, adminController.triggerRetentionProcessing);
 
+// SMTP Diagnose (nur Admin)
+router.get('/smtp-test', requireAdmin, adminController.smtpTest);
+router.post('/smtp-test', requireAdmin, adminController.smtpTest);
+
 // Feedback-Routen
 router.get('/feedbacks', adminController.listFeedbacks);
 router.get('/feedbacks/stats', adminController.getFeedbackStats);

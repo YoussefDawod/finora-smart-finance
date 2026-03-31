@@ -8,6 +8,7 @@ const adminService = require('../services/adminService');
 const campaignService = require('../services/campaignService');
 const feedbackService = require('../services/feedbackService');
 const auditLog = require('../services/auditLogService');
+const { verifySmtp, sendEmail } = require('../utils/emailService/emailTransport');
 const { sendError, handleServerError } = require('../utils/responseHelper');
 const {
   validateUserQuery,
@@ -1327,7 +1328,49 @@ async function deleteFeedbackAdmin(req, res) {
   }
 }
 
+/**
+ * SMTP-Verbindung prüfen + optionale Test-Email senden
+ * GET  /admin/smtp-test         → nur Verbindungscheck
+ * POST /admin/smtp-test { to }  → sendet Test-Email
+ */
+async function smtpTest(req, res) {
+  try {
+    const result = await verifySmtp();
+
+    if (req.method === 'POST' && result.ok) {
+      const to = req.body?.to;
+      if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+        return sendError(res, req, {
+          error: 'Gültige E-Mail-Adresse im Body erforderlich: { "to": "email@example.com" }',
+          code: 'VALIDATION_ERROR',
+          status: 400,
+        });
+      }
+
+      const emailResult = await sendEmail(
+        to,
+        '[Finora] SMTP Test — E-Mail-Versand funktioniert',
+        '<h2>Finora SMTP Test</h2><p>Diese Test-Email bestätigt, dass der E-Mail-Versand korrekt konfiguriert ist.</p><p><small>Gesendet am: ' +
+          new Date().toISOString() +
+          '</small></p>',
+        'Finora SMTP Test — E-Mail-Versand funktioniert. Gesendet am: ' + new Date().toISOString()
+      );
+
+      return res.json({
+        success: true,
+        smtp: result,
+        testEmail: { sent: emailResult.sent, to, messageId: emailResult.messageId },
+      });
+    }
+
+    res.json({ success: result.ok, smtp: result });
+  } catch (error) {
+    handleServerError(res, req, 'Admin: SMTP test', error);
+  }
+}
+
 module.exports = {
+  smtpTest,
   listUsers,
   getUser,
   getStats,

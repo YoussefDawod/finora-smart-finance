@@ -22,24 +22,50 @@ async function initTransporter() {
 
   if (config.nodeEnv === 'production') {
     if (!config.smtp?.host || !config.smtp?.user || !config.smtp?.pass) {
-      logger.error('SMTP configuration missing in production!');
+      logger.error('SMTP configuration missing in production!', {
+        hasHost: !!config.smtp?.host,
+        hasUser: !!config.smtp?.user,
+        hasPass: !!config.smtp?.pass,
+      });
       return null;
     }
 
+    const smtpPort = config.smtp.port || 465;
+    const smtpSecure = config.smtp.secure !== false;
+
     transporter = nodemailer.createTransport({
       host: config.smtp.host,
-      port: config.smtp.port || 587,
-      secure: config.smtp.secure || false,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
         user: config.smtp.user,
         pass: config.smtp.pass,
       },
-      connectionTimeout: 5000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000,
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
-    logger.info('Email transporter initialized (Production SMTP)');
-    logger.info('Hinweis: Stelle sicher, dass SPF/DKIM/DMARC konfiguriert sind!');
+
+    logger.info('Email transporter initialized (Production SMTP)', {
+      host: config.smtp.host,
+      port: smtpPort,
+      secure: smtpSecure,
+      user: config.smtp.user,
+    });
+
+    // SMTP-Verbindung + Auth beim Start verifizieren
+    try {
+      await transporter.verify();
+      logger.info('SMTP connection verified successfully');
+    } catch (verifyError) {
+      logger.error(`SMTP verification FAILED: ${verifyError.message}`, {
+        code: verifyError.code,
+        host: config.smtp.host,
+        port: smtpPort,
+      });
+      // Transporter bleibt erstellt — Emails werden bei jedem Versuch fehlschlagen
+      // und der Fehler wird in den Fire-and-forget .catch()-Handlern geloggt
+    }
   } else if (config.nodeEnv === 'development') {
     if (config.smtp?.host && config.smtp?.user && config.smtp?.pass) {
       transporter = nodemailer.createTransport({
@@ -142,10 +168,60 @@ async function sendEmail(to, subject, html, textContent = null, options = {}) {
   }
 }
 
+/**
+ * Prüft SMTP-Verbindung und Auth (für Admin-Diagnose)
+ * @returns {Promise<Object>} Diagnose-Ergebnis
+ */
+async function verifySmtp() {
+  const transport = await initTransporter();
+
+  if (!transport) {
+    return {
+      ok: false,
+      error: 'No transporter configured',
+      config: {
+        host: config.smtp?.host || '(not set)',
+        port: config.smtp?.port || '(not set)',
+        secure: config.smtp?.secure,
+        user: config.smtp?.user || '(not set)',
+        hasPass: !!config.smtp?.pass,
+      },
+    };
+  }
+
+  try {
+    await transport.verify();
+    return {
+      ok: true,
+      config: {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        secure: config.smtp.secure,
+        user: config.smtp.user,
+        from: config.smtp.from,
+      },
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error.message,
+      code: error.code,
+      config: {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        secure: config.smtp.secure,
+        user: config.smtp.user,
+        hasPass: !!config.smtp.pass,
+      },
+    };
+  }
+}
+
 module.exports = {
   initTransporter,
   buildLink,
   sendEmail,
+  verifySmtp,
   backendBaseUrl,
   frontendBaseUrl,
 };

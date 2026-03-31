@@ -21,6 +21,7 @@ const v1Routes = require('./src/routes/v1');
 const reportScheduler = require('./src/services/reportScheduler');
 const lifecycleScheduler = require('./src/services/lifecycleScheduler');
 const connectDB = require('./src/config/database');
+const { initTransporter } = require('./src/utils/emailService/emailTransport');
 const cluster = require('cluster');
 
 const app = express();
@@ -193,6 +194,12 @@ connectDB()
           initializeLifecycleScheduler();
         }
       }
+
+      // SMTP-Transporter beim Start initialisieren + verifizieren
+      // Fehler werden nur geloggt — Server läuft auch ohne SMTP weiter
+      initTransporter().catch(err => {
+        logger.warn(`SMTP init at startup failed: ${err.message}`);
+      });
     });
   })
   .catch(err => {
