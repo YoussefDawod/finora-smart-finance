@@ -8,16 +8,29 @@ const dns = require('dns');
 const config = require('../../config/env');
 const logger = require('../logger');
 
-// IPv4 bevorzugen — Render hat kein IPv6-Outbound,
-// Node.js 22 löst standardmäßig "verbatim" (OS-Reihenfolge) auf,
-// was bei Netcup-SMTP zu IPv6 führt → ENETUNREACH
-dns.setDefaultResultOrder('ipv4first');
-
 const backendBaseUrl =
   (config.apiUrl && config.apiUrl.replace(/\/api$/, '')) || 'http://localhost:5000';
 const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
 let transporter = null;
+
+/**
+ * Löst einen Hostnamen explizit per IPv4 auf.
+ * Render hat kein IPv6-Outbound — tls.connect() ignoriert sowohl
+ * family:4 als auch dns.setDefaultResultOrder('ipv4first') in Node 22.
+ * Einzige Garantie: DNS selbst auflösen und IP direkt übergeben.
+ */
+async function resolveIPv4(hostname) {
+  try {
+    const addresses = await dns.promises.resolve4(hostname);
+    logger.info(`DNS resolved ${hostname} → ${addresses[0]} (IPv4)`);
+    return addresses[0];
+  } catch {
+    // Fallback: Hostname direkt nutzen (funktioniert wenn IPv4 zufällig first ist)
+    logger.warn(`DNS resolve4 failed for ${hostname}, using hostname directly`);
+    return hostname;
+  }
+}
 
 /**
  * Initialisiert den Nodemailer Transporter basierend auf Environment
@@ -39,24 +52,29 @@ async function initTransporter() {
     const smtpPort = config.smtp.port || 465;
     const smtpSecure = config.smtp.secure !== false;
 
+    // SMTP-Host auf IPv4 auflösen — Render kann kein IPv6-Outbound
+    const smtpHost = await resolveIPv4(config.smtp.host);
+
     transporter = nodemailer.createTransport({
-      host: config.smtp.host,
+      host: smtpHost,
       port: smtpPort,
       secure: smtpSecure,
       auth: {
         user: config.smtp.user,
         pass: config.smtp.pass,
       },
-      // IPv4 erzwingen — Render unterstützt kein IPv6-Outbound,
-      // Netcup SMTP löst aber auf IPv6 auf → ENETUNREACH
-      family: 4,
+      // TLS-Servername muss der echte Hostname sein (für Zertifikatsprüfung)
+      tls: {
+        servername: config.smtp.host,
+      },
       connectionTimeout: 10000,
       greetingTimeout: 10000,
       socketTimeout: 15000,
     });
 
     logger.info('Email transporter initialized (Production SMTP)', {
-      host: config.smtp.host,
+      host: smtpHost,
+      originalHost: config.smtp.host,
       port: smtpPort,
       secure: smtpSecure,
       user: config.smtp.user,
