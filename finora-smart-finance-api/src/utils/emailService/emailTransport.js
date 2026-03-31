@@ -4,8 +4,14 @@
  */
 
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 const config = require('../../config/env');
 const logger = require('../logger');
+
+// IPv4 bevorzugen — Render hat kein IPv6-Outbound,
+// Node.js 22 löst standardmäßig "verbatim" (OS-Reihenfolge) auf,
+// was bei Netcup-SMTP zu IPv6 führt → ENETUNREACH
+dns.setDefaultResultOrder('ipv4first');
 
 const backendBaseUrl =
   (config.apiUrl && config.apiUrl.replace(/\/api$/, '')) || 'http://localhost:5000';
