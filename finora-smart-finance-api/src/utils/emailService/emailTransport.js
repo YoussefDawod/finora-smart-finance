@@ -1,11 +1,11 @@
 /**
  * Email Service - Transporter & Core Configuration
- * Resend HTTP API für Production (Render blockiert SMTP-Ports)
- * Nodemailer SMTP für Development
+ * Nodemailer SMTP für Production & Development
  */
 
 const nodemailer = require('nodemailer');
-const { Resend } = require('resend');
+const net = require('net');
+const dns = require('dns');
 const config = require('../../config/env');
 const logger = require('../logger');
 
@@ -14,70 +14,117 @@ const backendBaseUrl =
 const frontendBaseUrl = config.frontendUrl || 'http://localhost:3000';
 
 let transporter = null;
-let resendClient = null;
 
 /**
- * Initialisiert den Email-Transporter basierend auf Environment.
- * Production: Resend HTTP API (Render blockiert alle SMTP-Ports 25/465/587)
- * Development: Nodemailer SMTP oder Ethereal Testaccount
+ * Testet TCP-Erreichbarkeit eines Host:Port — gibt ms oder Fehler zurück
+ */
+function testTcp(host, port, timeoutMs = 8000) {
+  return new Promise(resolve => {
+    const start = Date.now();
+    const socket = net.createConnection({ host, port });
+    const timer = setTimeout(() => {
+      socket.destroy();
+      resolve({ ok: false, error: `timeout ${timeoutMs}ms`, ms: timeoutMs });
+    }, timeoutMs);
+    socket.on('connect', () => {
+      clearTimeout(timer);
+      socket.destroy();
+      resolve({ ok: true, ms: Date.now() - start });
+    });
+    socket.on('error', err => {
+      clearTimeout(timer);
+      resolve({ ok: false, error: err.message, ms: Date.now() - start });
+    });
+  });
+}
+
+/**
+ * Führt eine umfassende SMTP-Netzwerk-Diagnose durch (beim Start + Admin-Endpoint)
+ */
+async function runSmtpDiagnostics() {
+  const targets = [
+    // Aktueller SMTP (Netcup)
+    { label: 'Netcup-465', host: 'mxf90a.netcup.net', port: 465 },
+    { label: 'Netcup-587', host: 'mxf90a.netcup.net', port: 587 },
+    // Alter SMTP (All-Inkl) — Referenztest: hat von Render funktioniert
+    { label: 'AllInkl-465', host: 'w02133ad.kasserver.com', port: 465 },
+    // Gmail — Canary: wenn das klappt, blockiert Render SMTP nicht
+    { label: 'Gmail-465', host: 'smtp.gmail.com', port: 465 },
+    // Netcup über aufgelöste IPv4 direkt
+    { label: 'Netcup-IPv4-465', host: '46.38.249.10', port: 465 },
+    { label: 'Netcup-IPv4-587', host: '46.38.249.10', port: 587 },
+  ];
+
+  const results = {};
+  for (const t of targets) {
+    const r = await testTcp(t.host, t.port, 8000);
+    results[t.label] = `${r.ok ? 'OK' : 'FAIL'} (${r.ok ? r.ms + 'ms' : r.error})`;
+    logger.info(`[SMTP-DIAG] ${t.label} ${t.host}:${t.port} → ${results[t.label]}`);
+  }
+
+  // DNS-Info
+  try {
+    const ipv4 = await dns.promises.resolve4('mxf90a.netcup.net');
+    results['Netcup-DNS-IPv4'] = ipv4.join(', ');
+  } catch (e) {
+    results['Netcup-DNS-IPv4'] = `FAIL: ${e.code}`;
+  }
+  try {
+    const ipv6 = await dns.promises.resolve6('mxf90a.netcup.net');
+    results['Netcup-DNS-IPv6'] = ipv6.join(', ');
+  } catch (e) {
+    results['Netcup-DNS-IPv6'] = `FAIL: ${e.code}`;
+  }
+
+  return results;
+}
+
+/**
+ * Initialisiert den Nodemailer Transporter basierend auf Environment
  * @returns {Promise<Object|null>} Der Transporter oder null
  */
 async function initTransporter() {
   if (transporter) return transporter;
 
   if (config.nodeEnv === 'production') {
-    const apiKey = config.resendApiKey;
-
-    if (!apiKey) {
-      logger.error(
-        'RESEND_API_KEY is not set! Emails will not work. ' +
-          'Render blocks all outbound SMTP ports — Resend HTTP API is required.'
-      );
+    if (!config.smtp?.host || !config.smtp?.user || !config.smtp?.pass) {
+      logger.error('SMTP configuration missing in production!');
       return null;
     }
 
-    resendClient = new Resend(apiKey);
-
-    // Wrapper mit sendMail-Interface (kompatibel mit bestehendem Code)
-    transporter = {
-      sendMail: async ({ from, to, subject, html, text, replyTo, ...rest }) => {
-        const payload = {
-          from: from || config.smtp?.from || '"Finora" <finora@yellowdeveloper.de>',
-          to: Array.isArray(to) ? to : [to],
-          subject,
-          html,
-        };
-        if (text) payload.text = text;
-        if (replyTo) payload.reply_to = replyTo;
-        if (rest.cc) payload.cc = Array.isArray(rest.cc) ? rest.cc : [rest.cc];
-        if (rest.bcc) payload.bcc = Array.isArray(rest.bcc) ? rest.bcc : [rest.bcc];
-
-        const { data, error } = await resendClient.emails.send(payload);
-
-        if (error) {
-          throw new Error(`Resend API error: ${error.message}`);
-        }
-
-        return { messageId: data?.id || 'resend-ok' };
-      },
-      verify: async () => {
-        // API-Key testen durch Abruf der Domains
-        const { error } = await resendClient.domains.list();
-        if (error) throw new Error(`Resend API key invalid: ${error.message}`);
-        return true;
-      },
-    };
+    const smtpPort = config.smtp.port || 465;
+    const smtpSecure = config.smtp.secure !== false;
 
     logger.info(
-      `Email transporter initialized (Resend HTTP API) — from=${config.smtp?.from || 'finora@yellowdeveloper.de'}`
+      `SMTP Config: host=${config.smtp.host} port=${smtpPort} secure=${smtpSecure} user=${config.smtp.user}`
     );
 
-    // Resend API-Key beim Start verifizieren
+    // Netzwerk-Diagnose — testet Erreichbarkeit verschiedener SMTP-Server
+    await runSmtpDiagnostics();
+
+    transporter = nodemailer.createTransport({
+      host: config.smtp.host,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: {
+        user: config.smtp.user,
+        pass: config.smtp.pass,
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
+    });
+
+    logger.info('Email transporter initialized (Production SMTP)');
+
+    // SMTP-Verbindung + Auth verifizieren
     try {
       await transporter.verify();
-      logger.info('Resend API connection verified successfully');
+      logger.info('SMTP connection verified successfully');
     } catch (verifyError) {
-      logger.error(`Resend verification FAILED: ${verifyError.message}`);
+      logger.error(
+        `SMTP verification FAILED: ${verifyError.message} (host=${config.smtp.host} port=${smtpPort} secure=${smtpSecure})`
+      );
     }
   } else if (config.nodeEnv === 'development') {
     if (config.smtp?.host && config.smtp?.user && config.smtp?.pass) {
@@ -182,7 +229,7 @@ async function sendEmail(to, subject, html, textContent = null, options = {}) {
 }
 
 /**
- * Prüft Email-Verbindung (für Admin-Diagnose)
+ * Prüft SMTP-Verbindung (für Admin-Diagnose)
  * @returns {Promise<Object>} Diagnose-Ergebnis
  */
 async function verifySmtp() {
@@ -192,44 +239,44 @@ async function verifySmtp() {
     return {
       ok: false,
       error: 'No transporter configured',
-      provider: config.resendApiKey ? 'resend (key set but init failed)' : 'none',
       config: {
-        hasResendKey: !!config.resendApiKey,
-        smtpHost: config.smtp?.host || '(not set)',
-        smtpPort: config.smtp?.port || '(not set)',
+        host: config.smtp?.host || '(not set)',
+        port: config.smtp?.port || '(not set)',
+        secure: config.smtp?.secure,
+        user: config.smtp?.user || '(not set)',
+        hasPass: !!config.smtp?.pass,
       },
     };
   }
+
+  // Netzwerk-Diagnose einschließen
+  const diagnostics = await runSmtpDiagnostics();
 
   try {
     await transport.verify();
     return {
       ok: true,
-      provider: resendClient ? 'resend' : 'smtp',
-      config: resendClient
-        ? { from: config.smtp?.from || 'finora@yellowdeveloper.de' }
-        : {
-            host: config.smtp.host,
-            port: config.smtp.port,
-            secure: config.smtp.secure,
-            user: config.smtp.user,
-            from: config.smtp.from,
-          },
+      diagnostics,
+      config: {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        secure: config.smtp.secure,
+        user: config.smtp.user,
+        from: config.smtp.from,
+      },
     };
   } catch (error) {
     return {
       ok: false,
       error: error.message,
-      provider: resendClient ? 'resend' : 'smtp',
-      config: resendClient
-        ? { from: config.smtp?.from || 'finora@yellowdeveloper.de' }
-        : {
-            host: config.smtp.host,
-            port: config.smtp.port,
-            secure: config.smtp.secure,
-            user: config.smtp.user,
-            hasPass: !!config.smtp.pass,
-          },
+      diagnostics,
+      config: {
+        host: config.smtp.host,
+        port: config.smtp.port,
+        secure: config.smtp.secure,
+        user: config.smtp.user,
+        hasPass: !!config.smtp.pass,
+      },
     };
   }
 }
@@ -239,6 +286,7 @@ module.exports = {
   buildLink,
   sendEmail,
   verifySmtp,
+  runSmtpDiagnostics,
   backendBaseUrl,
   frontendBaseUrl,
 };
