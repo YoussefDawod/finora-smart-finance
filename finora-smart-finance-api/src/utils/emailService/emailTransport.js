@@ -49,8 +49,9 @@ async function initTransporter() {
       return null;
     }
 
-    const smtpPort = config.smtp.port || 465;
-    const smtpSecure = config.smtp.secure !== false;
+    const smtpPort = config.smtp.port || 587;
+    // Port 587 = STARTTLS (secure:false), Port 465 = implicit TLS (secure:true)
+    const smtpSecure = smtpPort === 465;
 
     // SMTP-Host auf IPv4 auflösen — Render kann kein IPv6-Outbound
     const smtpHost = await resolveIPv4(config.smtp.host);
