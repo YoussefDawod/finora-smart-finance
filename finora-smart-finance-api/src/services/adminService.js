@@ -445,6 +445,12 @@ async function deleteUser(userId) {
   const auditLogService = require('./auditLogService');
   await auditLogService.deleteByUserId(user._id);
 
+  // Newsletter-Abonnement entfernen (User komplett aus dem System)
+  if (user.email) {
+    await Subscriber.deleteMany({ email: user.email });
+    logger.info(`Admin: Deleted newsletter subscription for ${user.email}`);
+  }
+
   await User.findByIdAndDelete(userId);
 
   logger.warn(

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/User');
 const Transaction = require('../../models/Transaction');
+const Subscriber = require('../../models/Subscriber');
 const auth = require('../../middleware/authMiddleware');
 const { sensitiveOperationLimiter } = require('../../middleware/rateLimiter');
 const dataService = require('../../services/dataService');
@@ -98,6 +99,12 @@ router.delete('/me', auth, sensitiveOperationLimiter, async (req, res) => {
 
     // DSGVO: AuditLog-Einträge des Users löschen
     await auditLogService.deleteByUserId(userId);
+
+    // Newsletter-Abonnement entfernen (User soll komplett aus dem System raus)
+    if (user.email) {
+      await Subscriber.deleteMany({ email: user.email });
+      logger.info(`Deleted newsletter subscription for ${user.email}`);
+    }
 
     // User löschen
     await User.deleteOne({ _id: userId });

@@ -13,7 +13,6 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  overflow-y: auto;
 
   @include mobile {
     padding: var(--space-md);
@@ -116,6 +115,33 @@
 
 :global([dir='rtl']) .formLabel {
   flex-direction: row-reverse;
+}
+
+:global([dir='rtl']) .formInput,
+:global([dir='rtl']) .formSelect,
+:global([dir='rtl']) .formTextarea {
+  text-align: right;
+  direction: rtl;
+}
+
+:global([dir='rtl']) .consentGroup {
+  text-align: right;
+}
+
+:global([dir='rtl']) .consentError {
+  text-align: right;
+}
+
+:global([dir='rtl']) .errorMessage {
+  text-align: right;
+}
+
+:global([dir='rtl']) .submitButton {
+  flex-direction: row-reverse;
+}
+
+:global([dir='rtl']) .successMessage {
+  text-align: right;
 }
 
 .formInput,
