@@ -18,7 +18,7 @@ async function changePassword(req, res) {
       req.user._id,
       currentPassword,
       newPassword,
-      { ip: req.ip, userAgent: req.headers['user-agent'] }
+      { ip: req.clientIp, userAgent: req.headers['user-agent'] }
     );
 
     if (!result.changed) {
@@ -43,7 +43,7 @@ async function forgotPassword(req, res) {
   try {
     const { email } = req.body || {};
     await passwordResetService.initiatePasswordReset(email, {
-      ip: req.ip,
+      ip: req.clientIp,
       userAgent: req.headers['user-agent'],
     });
 
@@ -73,7 +73,7 @@ async function resetPassword(req, res) {
     }
 
     const result = await passwordResetService.completePasswordReset(token, candidatePassword, {
-      ip: req.ip,
+      ip: req.clientIp,
       userAgent: req.headers['user-agent'],
     });
 

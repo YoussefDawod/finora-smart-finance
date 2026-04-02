@@ -39,7 +39,7 @@ async function log({
   userAgent: explicitUserAgent = null,
 }) {
   try {
-    const ip = req ? req.ip || req.connection?.remoteAddress || null : explicitIp;
+    const ip = req ? req.clientIp || req.ip || req.connection?.remoteAddress || null : explicitIp;
     const userAgent = req ? req.headers?.['user-agent'] || null : explicitUserAgent;
 
     // Geolocation aus IP ableiten (nur öffentliche IPs)

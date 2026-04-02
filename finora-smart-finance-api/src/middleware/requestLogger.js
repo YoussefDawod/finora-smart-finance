@@ -43,7 +43,7 @@ const requestLoggerMiddleware = (req, res, next) => {
     method: req.method,
     path: req.path,
     query: sanitizeQueryForLog(req.query),
-    ip: req.ip,
+    ip: req.clientIp || req.ip,
   });
 
   // Override res.json für Response-Logging

@@ -30,6 +30,7 @@ const subscribeLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: req => req.clientIp || req.ip,
 });
 
 // ============================================

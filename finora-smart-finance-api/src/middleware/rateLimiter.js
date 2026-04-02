@@ -22,7 +22,8 @@ const createLimiter = options => {
     standardHeaders: true, // Rate limit info in `RateLimit-*` headers
     legacyHeaders: false, // Disable `X-RateLimit-*` headers
     skipSuccessfulRequests: options.skipSuccessfulRequests || false,
-    // Use default keyGenerator (handles IPv6 correctly)
+    // Real client IP behind Cloudflare → Render proxy chain
+    keyGenerator: req => req.clientIp || req.ip,
     validate: { xForwardedForHeader: false },
   });
 };

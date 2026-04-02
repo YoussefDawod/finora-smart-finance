@@ -29,7 +29,7 @@ async function register(req, res) {
 
     const { user, tokens, verificationLink } = await registrationService.registerUser(
       validation.data,
-      { userAgent: req.headers['user-agent'], ip: req.ip }
+      { userAgent: req.headers['user-agent'], ip: req.clientIp }
     );
 
     const responseData = {
@@ -81,7 +81,7 @@ async function login(req, res, next) {
 
     const authResult = await loginService.authenticateUser(identifier, password, {
       userAgent: req.headers['user-agent'],
-      ip: req.ip,
+      ip: req.clientIp,
     });
     if (!authResult.success) {
       return sendError(res, req, { error: authResult.error, code: authResult.code, status: 401 });
@@ -98,7 +98,7 @@ async function login(req, res, next) {
 
     const { tokens, user } = await loginService.generateLoginSession(authResult.user, {
       userAgent: req.headers['user-agent'],
-      ip: req.ip,
+      ip: req.clientIp,
     });
 
     if (tokens?.refreshToken) {
@@ -155,7 +155,7 @@ async function refresh(req, res) {
 
     const tokens = await authService.rotateRefreshToken(user, refreshToken, {
       userAgent: req.headers['user-agent'],
-      ip: req.ip,
+      ip: req.clientIp,
     });
 
     // Neuen rotierten Refresh-Token als Cookie setzen

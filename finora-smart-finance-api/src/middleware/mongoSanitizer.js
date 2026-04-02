@@ -45,7 +45,7 @@ function mongoSanitizeMiddleware(req, res, next) {
 
   if (req.query && hasDangerousKeys(req.query)) {
     logger.warn('Blocked request with NoSQL injection attempt in query params', {
-      ip: req.ip,
+      ip: req.clientIp || req.ip,
       path: req.path,
     });
     return res.status(400).json({

@@ -79,6 +79,14 @@ if (config.nodeEnv === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Real Client-IP (Cloudflare → Render → Express)
+// Cloudflare setzt CF-Connecting-IP mit der echten Client-IP.
+// Ohne diesen Header fällt req.clientIp auf req.ip (X-Forwarded-For) zurück.
+app.use((req, res, next) => {
+  req.clientIp = req.headers['cf-connecting-ip'] || req.headers['x-real-ip'] || req.ip || null;
+  next();
+});
+
 app.use(helmet(helmetConfig));
 
 // Permissions-Policy Header (nicht in Helmet v8 enthalten)
