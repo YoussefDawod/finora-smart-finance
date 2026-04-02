@@ -1065,7 +1065,7 @@
           "Finanztransaktionsdaten (Betrag, Kategorie, Beschreibung, Datum)",
           "Spracheinstellungen, Theme-Präferenzen und Sidebar-Zustand",
           "Datenschutz-Hinweis-Status (ob der Hinweis zur Kenntnis genommen wurde)",
-          "IP-Adresse, User-Agent sowie geografische Herkunft (Land, Stadt – offline aus IP-Adresse abgeleitet, kein Drittanbieter) bei Admin-Aktionen (Sicherheitsprotokoll)",
+          "IP-Adresse, User-Agent sowie geografische Herkunft (Land – offline aus IP-Adresse abgeleitet, kein Drittanbieter; Stadt wird bewusst nicht erfasst, da die Genauigkeit der verwendeten Datenbank nicht ausreichend ist) bei Admin-Aktionen (Sicherheitsprotokoll)",
           "Kontaktformulardaten (Name, E-Mail, Kategorie, Nachricht)",
           "Newsletter-Abonnement (E-Mail, Double-Opt-In-Status)",
           "Feedback-Daten (Sterne-Bewertung, optionaler Freitext, Benutzername als Anzeigename) bei freiwilliger Abgabe eines Feedbacks"
@@ -2074,7 +2074,6 @@
       "statActiveAdmins": "Aktive Admins",
       "searchPlaceholder": "Audit-Logs durchsuchen…",
       "country": "Land",
-      "city": "Stadt",
       "unknownLocation": "Unbekannt",
       "selectMonth": "Monat auswählen",
       "prevMonth": "Vorheriger Monat",

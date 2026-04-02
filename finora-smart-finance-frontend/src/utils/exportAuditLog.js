@@ -59,7 +59,6 @@ export function exportToCSV(logs, filename, t) {
     escapeCSV(t(`admin.auditLog.actions_enum.${log.action}`, log.action)),
     escapeCSV(log.targetUserName),
     escapeCSV(log.country),
-    escapeCSV(log.city),
     escapeCSV(log.ipAddress),
     escapeCSV(typeof log.details === 'object' ? JSON.stringify(log.details) : log.details),
   ]);
@@ -93,7 +92,6 @@ export async function exportToPDF(logs, filename, t, userInfo) {
     t('admin.auditLog.action'),
     t('admin.auditLog.target'),
     t('admin.auditLog.country'),
-    t('admin.auditLog.city'),
     t('admin.auditLog.ipAddress'),
   ];
 
@@ -103,7 +101,6 @@ export async function exportToPDF(logs, filename, t, userInfo) {
     t(`admin.auditLog.actions_enum.${log.action}`, log.action),
     log.targetUserName || '—',
     log.country || '—',
-    log.city || '—',
     log.ipAddress || '—',
   ]);
 

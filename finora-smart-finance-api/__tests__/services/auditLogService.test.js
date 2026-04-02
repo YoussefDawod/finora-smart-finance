@@ -108,7 +108,6 @@ describe('AuditLogService', () => {
           ipAddress: '127.0.0.1',
           userAgent: 'CLI/1.0',
           country: null,
-          city: null,
         })
       );
     });
@@ -145,25 +144,6 @@ describe('AuditLogService', () => {
           ipAddress: null,
           userAgent: null,
           country: null,
-          city: null,
-        })
-      );
-    });
-
-    it('should handle missing req (undefined) with null geo', async () => {
-      const mockEntry = { save: jest.fn().mockResolvedValue(true) };
-      AuditLog.mockImplementation(() => mockEntry);
-
-      await auditLogService.log({
-        action: 'USER_UPDATED',
-      });
-
-      expect(AuditLog).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ipAddress: null,
-          userAgent: null,
-          country: null,
-          city: null,
         })
       );
     });

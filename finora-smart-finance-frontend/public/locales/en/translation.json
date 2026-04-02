@@ -1066,7 +1066,7 @@
           "Financial transaction data (amount, category, description, date)",
           "Language settings, theme preferences, and sidebar state",
           "Privacy notice status (whether the notice has been acknowledged)",
-          "IP address, user agent, and geographic origin (country, city – derived offline from IP address, no third party) on admin actions (security audit log)",
+          "IP address, user agent, and geographic origin (country – derived offline from IP address, no third party; city is intentionally not collected as the accuracy of the database used is insufficient) on admin actions (security audit log)",
           "Contact form data (name, email, category, message)",
           "Newsletter subscription (email, double opt-in status)",
           "Feedback data (star rating, optional free text, username as display name) when voluntarily submitting feedback"
@@ -2075,7 +2075,6 @@
       "statActiveAdmins": "Active Admins",
       "searchPlaceholder": "Search audit logs…",
       "country": "Country",
-      "city": "City",
       "unknownLocation": "Unknown",
       "selectMonth": "Select month",
       "prevMonth": "Previous month",

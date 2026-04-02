@@ -42,15 +42,13 @@ async function log({
     const ip = req ? req.clientIp || req.ip || req.connection?.remoteAddress || null : explicitIp;
     const userAgent = req ? req.headers?.['user-agent'] || null : explicitUserAgent;
 
-    // Geolocation aus IP ableiten (nur öffentliche IPs)
+    // Geolocation aus IP ableiten (nur öffentliche IPs, nur Land-Ebene)
     let country = null;
-    let city = null;
     if (ip) {
       const cleanIp = ip.replace(/^::ffff:/, '');
       const geo = geoip.lookup(cleanIp);
       if (geo) {
         country = geo.country || null;
-        city = geo.city || null;
       }
     }
 
@@ -65,7 +63,6 @@ async function log({
       ipAddress: ip,
       userAgent: userAgent || null,
       country,
-      city,
     });
 
     await entry.save();
@@ -111,7 +108,6 @@ async function getLogs({
     'adminName',
     'targetUserName',
     'country',
-    'city',
   ]);
   const sortField = sort.startsWith('-') ? sort.slice(1) : sort;
   const safeSort = ALLOWED_SORT_FIELDS.has(sortField) ? sort : '-createdAt';

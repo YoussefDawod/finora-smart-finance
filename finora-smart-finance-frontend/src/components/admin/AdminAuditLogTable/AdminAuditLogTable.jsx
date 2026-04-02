@@ -284,7 +284,6 @@ function AdminAuditLogTable({
               >
                 {t('admin.auditLog.country')} {getSortIcon('country')}
               </th>
-              <th>{t('admin.auditLog.city')}</th>
               <th>{t('admin.auditLog.ipAddress')}</th>
               <th>{t('admin.auditLog.requestId')}</th>
             </tr>
@@ -354,11 +353,6 @@ function AdminAuditLogTable({
                   {/* Country */}
                   <td className={styles.countryCell} data-label={t('admin.auditLog.country')}>
                     {log.country || '—'}
-                  </td>
-
-                  {/* City */}
-                  <td className={styles.cityCell} data-label={t('admin.auditLog.city')}>
-                    {log.city || '—'}
                   </td>
 
                   {/* IP */}

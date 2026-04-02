@@ -269,18 +269,6 @@
   }
 }
 
-.cityCell {
-  white-space: nowrap;
-  font-size: var(--fs-xs);
-  color: var(--tx-muted);
-  min-width: 80px;
-
-  @include below-lg {
-    min-width: 0;
-    font-size: var(--fs-2xs);
-  }
-}
-
 .requestIdCell {
   white-space: nowrap;
   max-width: 10rem;
@@ -455,10 +443,9 @@
   }
 }
 
-// Mobile: Secondary columns ausblenden (Country, City, IP, Request-ID)
+// Mobile: Secondary columns ausblenden (Country, IP, Request-ID)
 @include below-lg {
   .countryCell,
-  .cityCell,
   .ipCell,
   .requestIdCell {
     display: none;

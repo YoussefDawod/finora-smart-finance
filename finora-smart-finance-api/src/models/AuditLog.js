@@ -123,13 +123,8 @@ const auditLogSchema = new mongoose.Schema(
       maxlength: 500,
     },
 
-    // Geolocation (aus IP abgeleitet)
+    // Geolocation (aus IP abgeleitet – nur Land-Ebene, Stadt ist zu ungenau)
     country: {
-      type: String,
-      default: null,
-      maxlength: 100,
-    },
-    city: {
       type: String,
       default: null,
       maxlength: 100,
