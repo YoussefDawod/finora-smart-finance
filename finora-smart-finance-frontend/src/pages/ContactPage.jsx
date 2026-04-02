@@ -65,9 +65,9 @@ export default function ContactPage() {
             <div className={styles.honeypot} aria-hidden="true">
               <input
                 type="text"
-                name="website"
+                name="_hp_field"
                 tabIndex={-1}
-                autoComplete="off"
+                autoComplete="new-password"
                 value={honeypot}
                 onChange={e => setHoneypot(e.target.value)}
               />

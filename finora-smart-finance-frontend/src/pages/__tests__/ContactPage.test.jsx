@@ -101,7 +101,7 @@ describe('ContactPage — Kontaktformular', () => {
   it('blockiert Submit wenn Honeypot-Feld gefüllt ist', async () => {
     renderPage();
     // Fill honeypot
-    const honeypot = document.querySelector('input[name="website"]');
+    const honeypot = document.querySelector('input[name="_hp_field"]');
     fireEvent.change(honeypot, { target: { value: 'bot-entry' } });
 
     // Fill required fields
