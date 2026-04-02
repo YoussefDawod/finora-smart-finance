@@ -79,7 +79,10 @@ async function login(req, res, next) {
       return sendError(res, req, { error: validation.error, code: validation.code, status: 400 });
     }
 
-    const authResult = await loginService.authenticateUser(identifier, password);
+    const authResult = await loginService.authenticateUser(identifier, password, {
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+    });
     if (!authResult.success) {
       return sendError(res, req, { error: authResult.error, code: authResult.code, status: 401 });
     }

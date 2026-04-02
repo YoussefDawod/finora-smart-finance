@@ -138,6 +138,8 @@ async function registerUser(validatedData, requestContext = {}) {
     targetUserId: user._id,
     targetUserName: user.name,
     details: { hasEmail: !!email },
+    ip: requestContext.ip,
+    userAgent: requestContext.userAgent,
   });
 
   return {

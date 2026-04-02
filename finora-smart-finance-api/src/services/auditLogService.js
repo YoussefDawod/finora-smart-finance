@@ -35,9 +35,12 @@ async function log({
   targetUserName = null,
   details = {},
   req = null,
+  ip: explicitIp = null,
+  userAgent: explicitUserAgent = null,
 }) {
   try {
-    const ip = req ? req.ip || req.connection?.remoteAddress || null : null;
+    const ip = req ? req.ip || req.connection?.remoteAddress || null : explicitIp;
+    const userAgent = req ? req.headers?.['user-agent'] || null : explicitUserAgent;
 
     // Geolocation aus IP ableiten (nur öffentliche IPs)
     let country = null;
@@ -60,7 +63,7 @@ async function log({
       details,
       requestId: req?.requestId || null,
       ipAddress: ip,
-      userAgent: req ? req.headers?.['user-agent'] || null : null,
+      userAgent: userAgent || null,
       country,
       city,
     });

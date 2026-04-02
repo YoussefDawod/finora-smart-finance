@@ -37,7 +37,7 @@ function validateLoginInput(identifier, password) {
  * @param {string} password
  * @returns {Object} { success: boolean, user?: User, error?: string, code?: string }
  */
-async function authenticateUser(identifier, password) {
+async function authenticateUser(identifier, password, requestContext = {}) {
   const trimmed = identifier.trim();
   const isEmail = trimmed.includes('@');
 
@@ -89,6 +89,8 @@ async function authenticateUser(identifier, password) {
         targetUserId: user._id,
         targetUserName: user.name,
         details: { failedAttempts: user.failedLoginAttempts },
+        ip: requestContext.ip,
+        userAgent: requestContext.userAgent,
       });
 
       // Security-Alert bei Lockout senden (falls E-Mail vorhanden)
@@ -111,6 +113,8 @@ async function authenticateUser(identifier, password) {
       targetUserId: user._id,
       targetUserName: user.name,
       details: { attempt: user.failedLoginAttempts },
+      ip: requestContext.ip,
+      userAgent: requestContext.userAgent,
     });
 
     return {
@@ -173,6 +177,8 @@ async function generateLoginSession(user, requestContext = {}) {
     targetUserId: user._id,
     targetUserName: user.name,
     details: { ip: requestContext.ip },
+    ip: requestContext.ip,
+    userAgent: requestContext.userAgent,
   });
 
   // Send security alert if email is verified (fire-and-forget — Login darf nicht auf SMTP warten)

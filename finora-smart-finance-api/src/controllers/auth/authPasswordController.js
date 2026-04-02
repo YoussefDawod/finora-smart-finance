@@ -17,7 +17,8 @@ async function changePassword(req, res) {
     const result = await passwordResetService.changePassword(
       req.user._id,
       currentPassword,
-      newPassword
+      newPassword,
+      { ip: req.ip, userAgent: req.headers['user-agent'] }
     );
 
     if (!result.changed) {
@@ -41,7 +42,10 @@ async function changePassword(req, res) {
 async function forgotPassword(req, res) {
   try {
     const { email } = req.body || {};
-    await passwordResetService.initiatePasswordReset(email);
+    await passwordResetService.initiatePasswordReset(email, {
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
 
     // Immer 200 zurückgeben — verhindert E-Mail-Enumeration
     return res.status(200).json({ success: true, data: { sent: true } });
@@ -68,7 +72,10 @@ async function resetPassword(req, res) {
       });
     }
 
-    const result = await passwordResetService.completePasswordReset(token, candidatePassword);
+    const result = await passwordResetService.completePasswordReset(token, candidatePassword, {
+      ip: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
 
     if (!result.reset) {
       return sendError(res, req, { error: result.error, code: result.code, status: 400 });

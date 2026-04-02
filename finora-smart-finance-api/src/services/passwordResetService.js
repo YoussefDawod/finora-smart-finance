@@ -15,7 +15,7 @@ const { validatePassword } = require('../validators/authValidation');
  * Requires current password verification
  * @returns {Object} { changed: boolean, error?: string, code?: string }
  */
-async function changePassword(userId, currentPassword, newPassword) {
+async function changePassword(userId, currentPassword, newPassword, requestContext = {}) {
   // Validate new password
   const passwordValidation = validatePassword(newPassword);
   if (!passwordValidation.valid) {
@@ -51,6 +51,8 @@ async function changePassword(userId, currentPassword, newPassword) {
     action: 'PASSWORD_CHANGED',
     targetUserId: user._id,
     targetUserName: user.name,
+    ip: requestContext.ip,
+    userAgent: requestContext.userAgent,
   });
 
   // Fire-and-forget: Security Alert soll Response nicht blockieren
@@ -68,7 +70,7 @@ async function changePassword(userId, currentPassword, newPassword) {
  * Sends reset email to user
  * @returns {Object} { sent: true } - always true to prevent email enumeration
  */
-async function initiatePasswordReset(email) {
+async function initiatePasswordReset(email, requestContext = {}) {
   if (!email) {
     return { sent: true }; // Prevent email enumeration
   }
@@ -107,6 +109,8 @@ async function initiatePasswordReset(email) {
     action: 'PASSWORD_RESET_REQUESTED',
     targetUserId: user._id,
     targetUserName: user.name,
+    ip: requestContext.ip,
+    userAgent: requestContext.userAgent,
   });
 
   return { sent: true };
@@ -116,7 +120,7 @@ async function initiatePasswordReset(email) {
  * Completes password reset using token
  * @returns {Object} { reset: boolean, error?: string, code?: string }
  */
-async function completePasswordReset(token, newPassword) {
+async function completePasswordReset(token, newPassword, requestContext = {}) {
   if (!token || !newPassword) {
     return {
       reset: false,
@@ -162,6 +166,8 @@ async function completePasswordReset(token, newPassword) {
     action: 'PASSWORD_RESET_COMPLETED',
     targetUserId: user._id,
     targetUserName: user.name,
+    ip: requestContext.ip,
+    userAgent: requestContext.userAgent,
   });
 
   // Fire-and-forget: Security Alert soll Response nicht blockieren
