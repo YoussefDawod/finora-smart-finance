@@ -1,158 +1,121 @@
 // ============================================
-// PRIVACY NOTICE BANNER — Einfacher Datenschutz-Hinweis
+// PRIVACY NOTICE BANNER — Scroll-getriggerter Datenschutz-Hinweis
+// Floating Card, kein Modal, kein Backdrop, kein Blur.
 // ============================================
 @use '@/styles/mixins' as *;
 
-// ============================================
-// BACKDROP
-// ============================================
-.backdrop {
+.banner {
   position: fixed;
-  inset: 0;
-  background: transparent;
-  z-index: var(--z-modal);
-  backdrop-filter: blur(var(--glass-blur-minimal));
-  -webkit-backdrop-filter: blur(var(--glass-blur-minimal));
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-overlay, 1200);
+  width: clamp(280px, 44vw, 500px);
 
-  @supports not (backdrop-filter: blur(1px)) {
-    background: var(--overlay);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+
+  padding: 1rem 1.25rem 1.25rem;
+  border-radius: var(--radius-lg, 14px);
+
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.32),
+    0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+
+  animation: hint-slide-up 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes hint-slide-up {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
-// ============================================
-// BANNER CONTAINER
-// ============================================
-.banner {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: calc(var(--z-modal) + 1);
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  box-shadow: var(--sh-xl);
-  max-height: 90vh;
-  overflow-y: auto;
-
-  @include custom-scrollbar;
-}
-
-// ============================================
-// CLOSE BUTTON (for re-opening from footer)
-// ============================================
-.closeButton {
-  position: absolute;
-  top: var(--space-md);
-  right: var(--space-md);
+.close {
+  align-self: flex-end;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  background: transparent;
-  color: var(--tx-muted);
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  color: var(--text-secondary, #a5b4fc);
   cursor: pointer;
-  transition: all var(--tr-fast);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
-    color: var(--tx);
-    border-color: var(--tx-muted);
+    background: color-mix(in srgb, var(--primary) 20%, transparent);
+    color: var(--text, #ede9fe);
   }
 
   &:focus-visible {
     @include focus-ring;
   }
-
-  :global([dir='rtl']) & {
-    right: auto;
-    left: var(--space-md);
-  }
 }
 
-// ============================================
-// CONTENT
-// ============================================
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  max-width: var(--mw-xl, 1280px);
-  margin: 0 auto;
-  padding: var(--space-xl) var(--space-2xl);
-
-  @include mobile {
-    padding: var(--space-lg) var(--space-md);
-  }
+.text {
+  margin: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed, 1.625);
+  color: var(--text-secondary, #a5b4fc);
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.icon {
+.link {
   color: var(--primary);
-  flex-shrink: 0;
-}
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
 
-.title {
-  font-size: var(--fs-lg);
-  font-weight: var(--fw-sb);
-  color: var(--tx);
-  margin: 0;
-
-  @include mobile {
-    font-size: var(--fs-md);
+  &:hover {
+    color: var(--secondary);
+    border-bottom-color: var(--secondary);
   }
 }
 
-.description {
-  font-size: var(--fs-sm);
-  line-height: var(--lh-relaxed);
-  color: var(--tx-muted);
-  margin: 0;
-}
-
-// ============================================
-// ACTIONS (button row)
-// ============================================
-.actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex-wrap: wrap;
-
-  @include mobile {
-    flex-direction: column;
-    align-items: stretch;
+// --- Mobile ---
+@include mobile {
+  .banner {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    width: auto;
+    transform: none;
+    animation-name: hint-slide-up-mobile;
   }
 }
 
-.btnAccept {
-  @include button-base;
-  font-size: var(--fs-sm);
-  white-space: nowrap;
-  background: var(--primary);
-  color: var(--text-on-primary, #fff);
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.1);
+@keyframes hint-slide-up-mobile {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// ============================================
-// REDUCED MOTION
-// ============================================
+// --- Reduced motion ---
 @include reduced-motion {
-  .closeButton,
-  .btnAccept {
-    transition: none;
+  .banner {
+    animation: none;
   }
-
-  .backdrop {
-    backdrop-filter: none;
+  .close,
+  .link {
+    transition: none;
   }
 }
