@@ -9,7 +9,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { FiX } from 'react-icons/fi';
 import styles from './HintBanner.module.scss';
 
@@ -57,9 +56,9 @@ export default function HintBanner() {
         Finora respektiert Ihre Privatsphäre vollständig — kein Tracking, keine Analyse-Tools und
         keine Drittanbieter-Cookies. Lediglich technisch notwendige Daten werden lokal in Ihrem
         Browser gespeichert.{' '}
-        <Link to="/privacy" className={styles.link} onClick={dismiss}>
+        <a href="/privacy" className={styles.link} onClick={dismiss}>
           Zur Datenschutzerklärung →
-        </Link>
+        </a>
       </p>
     </div>
   );
