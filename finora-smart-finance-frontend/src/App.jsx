@@ -8,6 +8,7 @@ import ToastContainer from '@/components/common/ToastContainer/ToastContainer';
 import ErrorBoundary from '@/components/common/ErrorBoundary/ErrorBoundary';
 import CookieConsent from '@/components/common/CookieConsent/CookieConsent';
 import { OfflineBanner } from '@/components/common/OfflineBanner/OfflineBanner';
+import HintBanner from '@/components/common/HintBanner/HintBanner';
 import AppRoutes from '@/AppRoutes';
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
                 {/* ToastContainer uses Portal - rendered first for proper stacking */}
                 <ToastContainer />
                 <OfflineBanner />
+                <HintBanner />
                 <TransactionProvider>
                   <AppRoutes />
                   <CookieConsent />

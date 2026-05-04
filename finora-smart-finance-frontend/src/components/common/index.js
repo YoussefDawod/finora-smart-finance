@@ -36,3 +36,4 @@ export { default as BrandingBackground } from './BrandingBackground/BrandingBack
 // Others
 export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary';
 export { default as CookieConsent } from './CookieConsent/CookieConsent';
+export { default as HintBanner } from './HintBanner/HintBanner';
